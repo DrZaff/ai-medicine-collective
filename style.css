@@ -560,7 +560,7 @@ button:hover {
 
 /* Past vs upcoming section headings */
 .past-section .section-subtitle {
-  color: #bbbbbb;
+  color: var(--accent);
 }
 
 .upcoming-section .section-subtitle {
