@@ -551,3 +551,86 @@ button:hover {
   color: var(--accent);
   opacity: 0.9;
 }
+
+/* === MEETING SCHEDULE STYLES === */
+
+.meeting-section {
+  margin-top: 18px;
+}
+
+.section-subtitle {
+  font-size: 0.9rem;
+  margin: 0 0 6px;
+  opacity: 0.9;
+}
+
+.meeting-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meeting-item {
+  font-size: 0.9rem;
+}
+
+.meeting-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 1px solid rgba(0, 255, 102, 0.25);
+  background: rgba(0, 0, 0, 0.75);
+  text-decoration: none;
+  color: var(--text);
+  transition: 0.15s ease-out;
+}
+
+.meeting-link:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.25);
+  transform: translateX(4px);
+}
+
+.meeting-date {
+  font-family: "Courier New", monospace;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  min-width: 90px;
+}
+
+.meeting-title {
+  flex: 1;
+}
+
+.meeting-status {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 10px;
+  padding: 1px 6px;
+  border: 1px solid;
+}
+
+/* Past vs upcoming tags */
+
+.tag-past {
+  border-color: #888888;
+  color: #bbbbbb;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tag-upcoming {
+  border-color: #00ff66;
+  color: #00ff66;
+  background: rgba(0, 255, 102, 0.08);
+}
+
+/* Dim past items slightly */
+.meeting-item.past .meeting-title,
+.meeting-item.past .meeting-date {
+  opacity: 0.8;
+}
