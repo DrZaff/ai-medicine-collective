@@ -527,3 +527,27 @@ button:hover {
   margin-top: 2px;
   opacity: 0.85;
 }
+
+/* Fake "code comment" list style: use on <ul class="list-hash"> */
+.list-hash {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+  font-family: "Courier New", monospace;
+}
+
+.list-hash li {
+  position: relative;
+  padding-left: 18px;
+  margin: 2px 0;
+}
+
+/* Prepend a green "#" like a comment marker */
+.list-hash li::before {
+  content: "#";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent);
+  opacity: 0.9;
+}
