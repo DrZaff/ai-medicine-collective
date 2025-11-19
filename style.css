@@ -558,10 +558,21 @@ button:hover {
   margin-top: 18px;
 }
 
-.section-subtitle {
-  font-size: 0.9rem;
-  margin: 0 0 6px;
-  opacity: 0.9;
+/* Past vs upcoming section headings */
+.past-section .section-subtitle {
+  color: #bbbbbb;
+}
+
+.upcoming-section .section-subtitle {
+  color: var(--accent);
+}
+
+/* Smaller, secondary note under Past meetings */
+.small-note {
+  font-size: 0.8rem;
+  margin-top: 2px;
+  margin-bottom: 8px;
+  opacity: 0.8;
 }
 
 .meeting-list {
@@ -577,6 +588,7 @@ button:hover {
   font-size: 0.9rem;
 }
 
+/* Shared meeting row styles */
 .meeting-link {
   display: flex;
   align-items: center;
@@ -629,8 +641,23 @@ button:hover {
   background: rgba(0, 255, 102, 0.08);
 }
 
-/* Dim past items slightly */
+/* Extra visual distinction */
+
+.meeting-item.past .meeting-link {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(0, 255, 102, 0.15);
+}
+
 .meeting-item.past .meeting-title,
 .meeting-item.past .meeting-date {
   opacity: 0.8;
+}
+
+.meeting-item.upcoming .meeting-link {
+  background: rgba(0, 255, 102, 0.06);
+  border-color: rgba(0, 255, 102, 0.4);
+}
+
+.meeting-item.upcoming .meeting-title {
+  font-weight: bold;
 }
