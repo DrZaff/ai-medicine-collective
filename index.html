@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Medicine Collective</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="terminal-frame">
+
+    <!-- TOP BORDER -->
+    <div class="horizontal-rule"></div>
+
+    <!-- HEADER (hidden until password is correct) -->
+    <header id="site-header" class="hidden">
+      <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
+      <div class="horizontal-rule"></div>
+    </header>
+
+    <!-- PASSWORD GATE -->
+    <section id="gate">
+      <h2 class="section-title">ACCESS REQUIRED</h2>
+      <p class="gate-text">
+        Enter the AI Medicine Collective password to continue.
+      </p>
+      <form id="password-form">
+        <label for="password-input" class="prompt">&gt; PASSWORD:</label>
+        <input
+          type="password"
+          id="password-input"
+          autocomplete="off"
+          required
+        />
+        <button type="submit">ENTER</button>
+      </form>
+      <p id="error-message" class="error hidden">
+        ACCESS DENIED. TRY AGAIN.
+      </p>
+
+      <p class="gate-hint">
+        # Hint: ask a member of the Collective.
+      </p>
+
+      <div class="horizontal-rule"></div>
+    </section>
+
+    <!-- MAIN CONTENT (hidden until password correct) -->
+    <main id="site-content" class="hidden">
+
+      <section class="section landing-links">
+
+        <div class="landing-item">
+          <h2 class="landing-title">
+            <a href="about.html">&gt; ABOUT</a>
+          </h2>
+        </div>
+
+        <div class="landing-item">
+          <h2 class="landing-title">
+            <a href="members.html">&gt; MEMBERS</a>
+          </h2>
+        </div>
+
+        <div class="landing-item">
+          <h2 class="landing-title">
+            <a href="schedule.html">&gt; MEETING_SCHEDULE</a>
+          </h2>
+        </div>
+
+        <div class="landing-item">
+          <h2 class="landing-title">
+            <a href="projects.html">&gt; PROJECTS</a>
+          </h2>
+        </div>
+
+        <div class="landing-item">
+          <h2 class="landing-title">
+            <a href="join.html">&gt; JOIN</a>
+          </h2>
+        </div>
+
+      </section>
+
+      <div class="horizontal-rule bottom-rule"></div>
+
+      <footer class="footer">
+        &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+        <span class="cursor">█</span>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
