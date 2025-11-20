@@ -31,6 +31,7 @@
       <h2 class="section-title">MEMBERS</h2>
 
       <p class="note">// Current roster</p>
+      <p class="note">Click any member to automatically copy their email to your clipboard.</p>
 
       <!-- Member Grid -->
       <div class="member-grid">
@@ -137,7 +138,6 @@
         if (!email || !navigator.clipboard) return;
 
         navigator.clipboard.writeText(email).then(() => {
-          // visual feedback on the card
           card.classList.add('copied');
           setTimeout(() => {
             card.classList.remove('copied');
