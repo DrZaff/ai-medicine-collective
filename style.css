@@ -685,3 +685,8 @@ button:hover {
   color: #00ff99;
   text-shadow: 0 0 10px #00ff99;
 }
+
+.member-card.copied {
+  box-shadow: 0 0 12px #00ff9d;
+  border-color: #00ff9d;
+}
