@@ -690,3 +690,97 @@ button:hover {
   box-shadow: 0 0 12px #00ff9d;
   border-color: #00ff9d;
 }
+
+/* === Members grid & cards ===================================== */
+
+.member-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px 32px;
+  margin-top: 1.5rem;
+}
+
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border: 1px solid #00ff66;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.08s ease;
+}
+
+.member-card:hover {
+  background: rgba(0, 255, 102, 0.08);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Glow when copied */
+.member-card.copied {
+  border-color: #00ff9d;
+  box-shadow: 0 0 14px #00ff9d;
+}
+
+/* Circle initials avatar */
+.member-initials {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid #00ff66;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
+
+/* Text stack */
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.member-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.member-role {
+  font-size: 0.9rem;
+}
+
+/* Specialty tags */
+.member-tag {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  border: 1px solid;
+}
+
+/* Internal Medicine */
+.im-tag {
+  border-color: #00ff66;
+  color: #00ff66;
+}
+
+/* Med/Peds */
+.medpeds-tag {
+  border-color: #00bfff;
+  color: #00bfff;
+}
+
+/* Emergency Medicine */
+.em-tag {
+  border-color: #ff9900;
+  color: #ff9900;
+}
