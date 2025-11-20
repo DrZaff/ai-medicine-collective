@@ -194,7 +194,7 @@ button:hover {
   display: none;
 }
 
-/* Members multi-column on wider screens */
+/* Members multi-column on wider screens (for older list usage) */
 
 .list-columns {
   columns: 2;
@@ -363,130 +363,6 @@ button:hover {
 .logout-btn:hover {
   opacity: 1;
   background: rgba(0, 255, 102, 0.08);
-}
-
-/* === Member cards grid === */
-
-.member-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 14px 18px;
-  margin-top: 12px;
-}
-
-.member-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border: 1px solid rgba(0, 255, 102, 0.25);
-  background: rgba(0, 0, 0, 0.7);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.08);
-}
-
-.member-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 14px rgba(0, 255, 102, 0.25);
-}
-
-/* Avatar circle */
-
-.member-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1px solid var(--accent);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at 30% 30%, #0b2d0b 0, #000 65%);
-  flex-shrink: 0;
-}
-
-.member-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.avatar-placeholder {
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-  color: var(--text);
-  opacity: 0.9;
-}
-
-/* Text */
-
-.member-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.member-name {
-  font-size: 0.95rem;
-  font-weight: bold;
-}
-
-.member-meta {
-  font-size: 0.8rem;
-  opacity: 0.9;
-}
-
-.member-tags {
-  margin-top: 2px;
-}
-
-/* Department tags */
-
-.member-tag {
-  display: inline-block;
-  padding: 1px 6px;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 10px;
-  border: 1px solid;
-}
-
-/* Internal Medicine (green) */
-.tag-im {
-  border-color: #00ff66;
-  color: #00ff66;
-  background: rgba(0, 255, 102, 0.08);
-}
-
-/* Med/Peds (teal) */
-.tag-medpeds {
-  border-color: #00ffd5;
-  color: #00ffd5;
-  background: rgba(0, 255, 213, 0.08);
-}
-
-/* Emergency Medicine (orange) */
-.tag-em {
-  border-color: #ffb347;
-  color: #ffb347;
-  background: rgba(255, 179, 71, 0.1);
-}
-
-/* Slight tweak for small screens: stack cards nicely */
-
-@media (max-width: 480px) {
-  .member-card {
-    padding: 8px;
-  }
-
-  .member-name {
-    font-size: 0.9rem;
-  }
-
-  .member-meta {
-    font-size: 0.75rem;
-  }
 }
 
 /* === PROJECTS PAGE === */
@@ -662,10 +538,7 @@ button:hover {
   font-weight: bold;
 }
 
-.member-card.copied {
-  box-shadow: 0 0 12px #00ff9d;
-  border-color: #00ff9d;
-}
+/* Copy icon (JOIN page) */
 
 .copy-icon {
   cursor: pointer;
@@ -684,11 +557,6 @@ button:hover {
 .copy-icon.copied {
   color: #00ff99;
   text-shadow: 0 0 10px #00ff99;
-}
-
-.member-card.copied {
-  box-shadow: 0 0 12px #00ff9d;
-  border-color: #00ff9d;
 }
 
 /* === Members grid & cards ===================================== */
@@ -757,107 +625,13 @@ button:hover {
   font-size: 0.9rem;
 }
 
-/* Specialty tags */
+/* Specialty tags (small colored pills) */
 .member-tag {
   display: inline-block;
   margin-top: 6px;
   padding: 2px 10px;
   border-radius: 999px;
   font-size: 0.75rem;
-  border: 1px solid;
-}
-
-/* Internal Medicine */
-.im-tag {
-  border-color: #00ff66;
-  color: #00ff66;
-}
-
-/* Med/Peds */
-.medpeds-tag {
-  border-color: #00bfff;
-  color: #00bfff;
-}
-
-/* Emergency Medicine */
-.em-tag {
-  border-color: #ff9900;
-  color: #ff9900;
-}
-
-/* Member grid layout */
-.member-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px 32px;
-  margin-top: 1.5rem;
-}
-
-/* Card container */
-.member-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 18px;
-  border: 1px solid #00ff66;
-  box-sizing: border-box;
-  cursor: pointer;
-  transition:
-    background 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease,
-    transform 0.08s ease;
-}
-
-.member-card:hover {
-  background: rgba(0, 255, 102, 0.06);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.25);
-  transform: translateY(-1px);
-}
-
-/* Glow when copied */
-.member-card.copied {
-  border-color: #00ff9d;
-  box-shadow: 0 0 14px #00ff9d;
-}
-
-/* Circle initials – thinner, cleaner */
-.member-initials {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 1.5px solid #00ff66;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  letter-spacing: 1px;
-  font-size: 0.85rem;
-}
-
-/* Text stack */
-.member-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.member-name {
-  font-weight: 700;
-  font-size: 0.98rem;
-}
-
-.member-role {
-  font-size: 0.86rem;
-}
-
-/* Specialty tags — smaller pills */
-.member-tag {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 1px 10px 2px;
-  border-radius: 999px;
-  font-size: 0.7rem;
   border: 1px solid;
 }
 
