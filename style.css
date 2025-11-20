@@ -666,3 +666,22 @@ button:hover {
   box-shadow: 0 0 12px #00ff9d;
   border-color: #00ff9d;
 }
+
+.copy-icon {
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 1.2rem;
+  color: #00ff99;
+  user-select: none;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.copy-icon:hover {
+  color: #66ffcc;
+  text-shadow: 0 0 6px #00ffcc;
+}
+
+.copy-icon.copied {
+  color: #00ff99;
+  text-shadow: 0 0 10px #00ff99;
+}
