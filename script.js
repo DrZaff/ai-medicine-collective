@@ -107,3 +107,40 @@ if (copyEmailBtn && joinEmailSpan && navigator.clipboard) {
     });
   });
 }
+
+// === MEMBERS PAGE: copy member email when clicking a member card ===
+
+const memberCards = document.querySelectorAll(".member-card");
+
+if (memberCards.length && navigator.clipboard) {
+  memberCards.forEach((card) => {
+    // Make it feel clickable
+    card.style.cursor = "pointer";
+
+    card.addEventListener("click", () => {
+      const email = card.dataset.email;
+      if (!email) return;
+
+      navigator.clipboard.writeText(email).then(() => {
+        const nameEl = card.querySelector(".member-name");
+        if (!nameEl) return;
+
+        // Preserve original text the first time
+        if (!nameEl.dataset.originalText) {
+          nameEl.dataset.originalText = nameEl.textContent;
+        }
+
+        // Terminal-style feedback
+        nameEl.textContent = `Copied: ${email}`;
+        card.classList.add("member-copied");
+
+        setTimeout(() => {
+          nameEl.textContent = nameEl.dataset.originalText;
+          card.classList.remove("member-copied");
+        }, 1200);
+      }).catch((err) => {
+        console.error("Failed to copy member email:", err);
+      });
+    });
+  });
+}
