@@ -86,3 +86,24 @@ if (form) {
     }
   });
 }
+
+// === JOIN PAGE: copy email to clipboard (overlapping squares icon) ===
+
+const copyEmailBtn = document.getElementById("copy-email-btn");
+const joinEmailSpan = document.getElementById("join-email");
+
+if (copyEmailBtn && joinEmailSpan && navigator.clipboard) {
+  copyEmailBtn.addEventListener("click", () => {
+    const email = joinEmailSpan.textContent.trim();
+
+    navigator.clipboard.writeText(email).then(() => {
+      // Add a brief glow/flash effect on the icon
+      copyEmailBtn.classList.add("copied");
+      setTimeout(() => {
+        copyEmailBtn.classList.remove("copied");
+      }, 700);
+    }).catch((err) => {
+      console.error("Failed to copy email:", err);
+    });
+  });
+}
