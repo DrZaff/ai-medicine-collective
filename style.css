@@ -652,3 +652,127 @@ button:hover {
   border-color: #ff9900;
   color: #ff9900;
 }
+
+/* === Member cards grid === */
+
+.member-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px 18px;
+  margin-top: 12px;
+}
+
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 255, 102, 0.25);
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.08);
+}
+
+.member-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(0, 255, 102, 0.25);
+}
+
+/* Avatar circle */
+
+.member-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, #0b2d0b 0, #000 65%);
+  flex-shrink: 0;
+}
+
+.member-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatar-placeholder {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  opacity: 0.9;
+}
+
+/* Text */
+
+.member-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.member-name {
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.member-meta {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.member-tags {
+  margin-top: 2px;
+}
+
+/* Department tags */
+
+.member-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 10px;
+  border: 1px solid;
+}
+
+/* Internal Medicine (green) */
+.tag-im {
+  border-color: #00ff66;
+  color: #00ff66;
+  background: rgba(0, 255, 102, 0.08);
+}
+
+/* Med/Peds (teal) */
+.tag-medpeds {
+  border-color: #00ffd5;
+  color: #00ffd5;
+  background: rgba(0, 255, 213, 0.08);
+}
+
+/* Emergency Medicine (orange) */
+.tag-em {
+  border-color: #ffb347;
+  color: #ffb347;
+  background: rgba(255, 179, 71, 0.1);
+}
+
+/* Slight tweak for small screens: stack cards nicely */
+
+@media (max-width: 480px) {
+  .member-card {
+    padding: 8px;
+  }
+
+  .member-name {
+    font-size: 0.9rem;
+  }
+
+  .member-meta {
+    font-size: 0.75rem;
+  }
+}
