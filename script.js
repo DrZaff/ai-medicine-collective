@@ -128,6 +128,36 @@ if (memberCards.length && navigator.clipboard) {
   });
 }
 
+// === MEMBER PROFILE: copy email button ========================
+
+(function () {
+  const btn = document.querySelector(".copy-email-btn");
+  const emailSpan = document.querySelector(".profile-email-address");
+
+  if (!btn || !emailSpan || !navigator.clipboard) return;
+
+  btn.addEventListener("click", () => {
+    const email = emailSpan.textContent.trim();
+    if (!email) return;
+
+    navigator.clipboard
+      .writeText(email)
+      .then(() => {
+        const originalText = btn.textContent;
+        btn.textContent = "COPIED!";
+        btn.classList.add("copied");
+
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove("copied");
+        }, 900);
+      })
+      .catch((err) => {
+        console.error("Failed to copy email:", err);
+      });
+  });
+})();
+
 // === PROJECTS PAGE: type grid <-> detail list switching =============
 
 (function () {
@@ -324,6 +354,7 @@ if (joinForm) {
     }
   });
 }
+
 
 
 
