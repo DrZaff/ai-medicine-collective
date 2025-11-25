@@ -1,6 +1,5 @@
 // === AI Medicine Collective - soft gate + session memory + UI polish ===
 
-// Change this if you want a different password:
 const CLUB_PASSWORD = "collective";
 
 const header = document.getElementById("site-header");
@@ -10,7 +9,6 @@ const form = document.getElementById("password-form");
 const errorMsg = document.getElementById("error-message");
 const input = document.getElementById("password-input");
 
-// Create logout button (top-right), works on all pages once authenticated
 function createLogoutButton() {
   if (document.getElementById("logout-btn")) return;
 
@@ -21,28 +19,21 @@ function createLogoutButton() {
 
   btn.addEventListener("click", () => {
     sessionStorage.removeItem("amc-auth");
-    // Reload index page and show the gate again
     window.location.href = "index.html";
   });
 
   document.body.appendChild(btn);
 }
 
-// Minimal auth banner
 function showAuthBanner() {
   const banner = document.createElement("div");
   banner.className = "auth-banner";
   banner.textContent = "AUTHENTICATION ACCEPTED";
   document.body.appendChild(banner);
 
-  setTimeout(() => {
-    if (banner && banner.parentNode) {
-      banner.remove();
-    }
-  }, 1800);
+  setTimeout(() => banner.remove(), 1800);
 }
 
-// Unlock the site UI
 function unlockSite(withAnimation = true) {
   if (gate) gate.classList.add("hidden");
   if (header) header.classList.remove("hidden");
@@ -51,21 +42,15 @@ function unlockSite(withAnimation = true) {
     main.classList.add("fade-in");
   }
 
-  // Show logout button on any page once authenticated
   createLogoutButton();
 
-  // Only show banner when just authenticated
-  if (withAnimation) {
-    showAuthBanner();
-  }
+  if (withAnimation) showAuthBanner();
 }
 
-// If already authenticated in this tab, skip the gate
 if (sessionStorage.getItem("amc-auth") === "true") {
-  unlockSite(false); // no banner/animation on refresh/back
+  unlockSite(false);
 }
 
-// Handle password form submission (index.html only)
 if (form) {
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -73,11 +58,9 @@ if (form) {
 
     if (value === CLUB_PASSWORD) {
       sessionStorage.setItem("amc-auth", "true");
-
       if (errorMsg) errorMsg.classList.add("hidden");
       unlockSite(true);
       input.value = "";
-
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       if (errorMsg) errorMsg.classList.remove("hidden");
@@ -87,7 +70,7 @@ if (form) {
   });
 }
 
-// === JOIN PAGE: copy email to clipboard (overlapping squares icon) ===
+// === JOIN PAGE COPY EMAIL ===
 
 const copyEmailBtn = document.getElementById("copy-email-btn");
 const joinEmailSpan = document.getElementById("join-email");
@@ -96,53 +79,51 @@ if (copyEmailBtn && joinEmailSpan && navigator.clipboard) {
   copyEmailBtn.addEventListener("click", () => {
     const email = joinEmailSpan.textContent.trim();
 
-    navigator.clipboard
-      .writeText(email)
-      .then(() => {
-        // Add a brief glow/flash effect on the icon
-        copyEmailBtn.classList.add("copied");
-        setTimeout(() => {
-          copyEmailBtn.classList.remove("copied");
-        }, 700);
-      })
-      .catch((err) => {
-        console.error("Failed to copy email:", err);
-      });
+    navigator.clipboard.writeText(email).then(() => {
+      copyEmailBtn.classList.add("copied");
+      setTimeout(() => copyEmailBtn.classList.remove("copied"), 700);
+    });
   });
 }
 
-// === MEMBER PROFILE PAGE: copy email button =========================
+// === MEMBERS PAGE copy by clicking a card ===
 
-const profileCopyBtn = document.getElementById("profile-copy-btn");
-const profileEmailSpan = document.getElementById("profile-email");
+const memberCards = document.querySelectorAll(".member-card");
 
-if (profileCopyBtn && profileEmailSpan && navigator.clipboard) {
-  profileCopyBtn.addEventListener("click", () => {
-    const email = profileEmailSpan.textContent.trim();
+if (memberCards.length && navigator.clipboard) {
+  memberCards.forEach((card) => {
+    card.style.cursor = "pointer";
 
-    navigator.clipboard
-      .writeText(email)
-      .then(() => {
-        profileCopyBtn.classList.add("copied");
-        const status = document.getElementById("profile-copy-status");
-        if (status) status.textContent = "Copied!";
+    card.addEventListener("click", () => {
+      const email = card.dataset.email;
+      if (!email) return;
+
+      navigator.clipboard.writeText(email).then(() => {
+        const nameEl = card.querySelector(".member-name");
+        if (!nameEl) return;
+
+        if (!nameEl.dataset.originalText) {
+          nameEl.dataset.originalText = nameEl.textContent;
+        }
+
+        nameEl.textContent = `Copied: ${email}`;
+        card.classList.add("member-copied");
+
         setTimeout(() => {
-          profileCopyBtn.classList.remove("copied");
-          if (status) status.textContent = "";
-        }, 1000);
-      })
-      .catch((err) => {
-        console.error("Failed to copy profile email:", err);
+          nameEl.textContent = nameEl.dataset.originalText;
+          card.classList.remove("member-copied");
+        }, 1200);
       });
+    });
   });
 }
 
-// === PROJECTS PAGE: category -> detail view switch ==================
+// === PROJECTS PAGE SWITCHING ===
 
 (function () {
   const typesContainer = document.getElementById("project-types");
   const detailsContainer = document.getElementById("project-details");
-  if (!typesContainer || !detailsContainer) return; // not on projects page
+  if (!typesContainer || !detailsContainer) return;
 
   const backWrapper = document.getElementById("projects-back-types");
   const typeLabel = document.getElementById("projects-current-type-label");
@@ -156,25 +137,25 @@ if (profileCopyBtn && profileEmailSpan && navigator.clipboard) {
     misc: "Miscellaneous",
   };
 
-  // When a project type is clicked
   typesContainer.querySelectorAll(".project-type").forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
+
       const type = link.dataset.type;
       if (!type) return;
 
-      // Update label
       if (typeLabel) {
         typeLabel.textContent = `// ${typeNames[type] || "Projects"}`;
       }
 
-      // Show only cards for that type
       detailCards.forEach((card) => {
-        card.style.display = card.dataset.type === type ? "block" : "none";
+        card.style.display =
+          card.dataset.type === type ? "block" : "none";
       });
 
-      // Fade out type grid, fade in detail list
+      // *** FADE OUT (fixed by CSS) ***
       typesContainer.classList.add("projects-fade-out");
+
       setTimeout(() => {
         typesContainer.classList.add("hidden");
         typesContainer.classList.remove("projects-fade-out");
@@ -191,28 +172,28 @@ if (profileCopyBtn && profileEmailSpan && navigator.clipboard) {
     });
   });
 
-  // Back to project type selection
   if (backWrapper) {
     const backLink = backWrapper.querySelector(".project-back-link");
-    if (backLink) {
-      backLink.addEventListener("click", (e) => {
-        e.preventDefault();
+    if (!backLink) return;
 
-        detailsContainer.classList.add("projects-fade-out");
+    backLink.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      detailsContainer.classList.add("projects-fade-out");
+
+      setTimeout(() => {
+        detailsContainer.classList.add("hidden");
+        detailsContainer.classList.remove("projects-fade-out");
+
+        typesContainer.classList.remove("hidden");
+        typesContainer.classList.add("projects-fade-in");
+
+        backWrapper.classList.add("hidden");
+
         setTimeout(() => {
-          detailsContainer.classList.add("hidden");
-          detailsContainer.classList.remove("projects-fade-out");
-
-          typesContainer.classList.remove("hidden");
-          typesContainer.classList.add("projects-fade-in");
-
-          backWrapper.classList.add("hidden");
-
-          setTimeout(() => {
-            typesContainer.classList.remove("projects-fade-in");
-          }, 350);
-        }, 220);
-      });
-    }
+          typesContainer.classList.remove("projects-fade-in");
+        }, 350);
+      }, 220);
+    });
   }
 })();
