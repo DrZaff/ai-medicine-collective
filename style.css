@@ -799,6 +799,88 @@ button:hover {
   }
 }
 
+/* === ADELANTE REPORT – dropdown stack ======================== */
+
+.adelante-section {
+  margin-top: 20px;
+}
+
+/* Container with a subtle stacked-card feel */
+.report-stack {
+  max-width: 720px;
+  margin-top: 12px;
+}
+
+/* Header bar that toggles the list */
+.report-stack-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 255, 102, 0.5);
+  background: radial-gradient(circle at top, #071707 0, #000 70%);
+  color: var(--text);
+  font-family: "Courier New", monospace;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.25);
+}
+
+.report-stack-header:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(0, 255, 102, 0.35);
+}
+
+.report-stack-label {
+  flex: 1;
+}
+
+.report-stack-chevron {
+  margin-left: 10px;
+  font-size: 0.9rem;
+}
+
+/* Body (collapsible) */
+.report-stack-body {
+  border: 1px solid rgba(0, 255, 102, 0.3);
+  border-top: none;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 8px 10px 10px;
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.18);
+}
+
+/* When open, adjust chevron */
+.report-stack.open .report-stack-chevron {
+  transform: rotate(180deg);
+}
+
+/* List styling */
+.report-stack-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.report-stack-item + .report-stack-item {
+  margin-top: 6px;
+}
+
+.report-stack-item a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.report-stack-item a:hover {
+  color: var(--accent);
+  text-shadow: 0 0 4px rgba(0, 255, 102, 0.85);
+  text-decoration: underline;
+}
+
 /* === Global BACK links ===================================== */
 
 /* Make all "< Back" links pop (bright magenta, bold) */
@@ -814,6 +896,7 @@ button:hover {
   text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
   text-decoration: underline;
 }
+
 
 
 
