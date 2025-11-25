@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Member Profile – Brandon Zaffuto</title>
+  <title>Member – Brandon Zaffuto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- NOTE: now that this file is inside /member/, we go up one level -->
   <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
@@ -12,7 +11,7 @@
 
     <div class="horizontal-rule"></div>
 
-    <header id="site-header">
+    <header>
       <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
 
       <nav class="nav">
@@ -29,22 +28,22 @@
       <div class="horizontal-rule"></div>
     </header>
 
-    <main id="site-content" class="section">
+    <main class="section">
       <h2 class="section-title">MEMBER PROFILE</h2>
-      <p>// Internal roster file: AI Medicine Collective</p>
+      <p class="note">// Internal roster file: AI Medicine Collective.</p>
 
-      <!-- ===== Profile layout (same structure you had before) ===== -->
       <div class="profile-layout">
+        <!-- PHOTO SIDE -->
         <aside class="profile-photo-side">
           <div class="profile-photo-frame">
-            <!-- update image path if you add a photo -->
-            <!-- <img src="../images/members/brandon.jpg" alt="Brandon Zaffuto" /> -->
-            <div class="profile-photo-placeholder">
-              PHOTO PENDING
-            </div>
+            <img
+              src="../images/members/brandon-zaffuto.jpg"
+              alt="Brandon Zaffuto"
+            />
           </div>
         </aside>
 
+        <!-- DATA SIDE -->
         <section class="profile-data-side">
           <h3 class="profile-name">Brandon Zaffuto</h3>
           <p class="profile-role">Internal Medicine — PGY-3</p>
@@ -63,7 +62,9 @@
           </dl>
 
           <div class="profile-actions">
-            <span>Email: <span id="profile-email">zaffutbn@ucmail.uc.edu</span></span>
+            <span>Email:&nbsp;
+              <span id="profile-email">zaffutbn@ucmail.uc.edu</span>
+            </span>
             <button
               type="button"
               class="copy-email-btn"
@@ -71,7 +72,7 @@
             >
               Copy my email
             </button>
-            <span class="copy-status">// click to copy</span>
+            <span class="copy-status"></span>
           </div>
         </section>
       </div>
@@ -89,7 +90,6 @@
     </footer>
   </div>
 
-  <!-- also needs ../ now -->
   <script src="../script.js"></script>
 </body>
 </html>
