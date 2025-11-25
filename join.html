@@ -33,8 +33,15 @@
 
       <p>// Become part of the AI Medicine Collective.</p>
 
-      <!-- JOIN FORM (front-end only for now) -->
-      <form class="join-form">
+      <!-- JOIN FORM (now wired to Formspree) -->
+      <form
+        class="join-form"
+        action="https://formspree.io/f/mqaonqpr"
+        method="POST"
+      >
+        <!-- optional: tag which page it came from -->
+        <input type="hidden" name="source" value="AI Medicine Collective – Join page" />
+
         <div class="join-row">
           <label for="join-name" class="join-label">Name</label>
           <input
@@ -44,6 +51,7 @@
             class="join-input"
             placeholder="Ada Lovelace"
             autocomplete="name"
+            required
           />
         </div>
 
@@ -56,16 +64,17 @@
             class="join-input"
             placeholder="you@example.com"
             autocomplete="email"
+            required
           />
         </div>
 
-        <button type="button" class="join-submit">
+        <button type="submit" class="join-submit">
           JOIN
         </button>
 
         <p class="join-hint">
-          // Email automation coming soon. For now, you can still contact
-          <span class="highlight">zaffutbn@ucmail.uc.edu</span> directly.
+          // Your request will be sent securely via Formspree.<br />
+          // You can also contact <span class="highlight">zaffutbn@ucmail.uc.edu</span> directly.
         </p>
       </form>
 
