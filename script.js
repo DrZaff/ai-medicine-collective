@@ -302,5 +302,29 @@ if (memberCards.length && navigator.clipboard) {
   });
 })();
 
+// JOIN FORM SUCCESS
+const joinForm = document.getElementById("join-form");
+const joinSuccess = document.getElementById("join-success");
+
+if (joinForm) {
+  joinForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(joinForm);
+
+    const response = await fetch(joinForm.action, {
+      method: "POST",
+      body: formData,
+      headers: { Accept: "application/json" },
+    });
+
+    if (response.ok) {
+      joinForm.reset();
+      joinSuccess.classList.remove("hidden");
+    }
+  });
+}
+
+
 
 
