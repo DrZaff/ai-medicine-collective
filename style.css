@@ -1113,6 +1113,30 @@ button:hover {
   opacity: 0.85;
 }
 
+/* === THUMBNAIL GALLERY === */
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.thumbnail-item img {
+  width: 100%;
+  max-width: 140px;
+  height: auto;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  transition: 0.15s ease-out;
+}
+
+.thumbnail-item img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+}
+
+
+
 
 
 
