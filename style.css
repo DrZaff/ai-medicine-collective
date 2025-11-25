@@ -377,37 +377,64 @@ button:hover {
   position: relative;
 }
 
+/* === Project action buttons (Instructions + Launch) =================== */
+
 .project-actions {
-  margin-top: 6px;
+  margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  font-size: 0.8rem;
+  gap: 10px;
+  font-size: 0.85rem;
 }
 
-.project-doc-link {
-  text-decoration: underline;
-  cursor: pointer;
-}
-
+/* Base pill style for both buttons */
+.project-doc-link,
 .project-launch-btn {
-  padding: 3px 10px;
+  display: inline-block;
+  padding: 5px 16px;
   border-radius: 999px;
-  border: 1px solid var(--accent);
+  border: 1px solid;
+  text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
   cursor: pointer;
+  transition:
+    background-color 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    transform 0.08s ease-out;
+}
+
+/* Instructions = bright cyan */
+.project-doc-link {
+  border-color: #00e5ff;
+  color: #00e5ff;
+}
+
+.project-doc-link:hover {
+  background-color: rgba(0, 229, 255, 0.12);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Launch = magenta/pink */
+.project-launch-btn {
+  border-color: #ff4dff;
+  color: #ff4dff;
 }
 
 .project-launch-btn:hover {
-  background-color: rgba(0, 255, 102, 0.1);
-  box-shadow: 0 0 6px rgba(0, 255, 102, 0.4);
+  background-color: rgba(255, 77, 255, 0.14);
+  box-shadow: 0 0 8px rgba(255, 77, 255, 0.5);
+  transform: translateY(-1px);
 }
 
+/* Disabled placeholders stay subtle */
 .project-actions .disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: default;
+  border-radius: 999px;
 }
 
 /* === MEETING SCHEDULE STYLES === */
@@ -780,6 +807,7 @@ button:hover {
   text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
   text-decoration: underline;
 }
+
 
 
 
