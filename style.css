@@ -418,15 +418,15 @@ button:hover {
   transform: translateY(-1px);
 }
 
-/* Launch = magenta/pink */
+/* Launch = neon yellow */
 .project-launch-btn {
-  border-color: #ff4dff;
-  color: #ff4dff;
+  border-color: #ffe600;
+  color: #ffe600;
 }
 
 .project-launch-btn:hover {
-  background-color: rgba(255, 77, 255, 0.14);
-  box-shadow: 0 0 8px rgba(255, 77, 255, 0.5);
+  background-color: rgba(255, 230, 0, 0.15);
+  box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
   transform: translateY(-1px);
 }
 
@@ -807,6 +807,7 @@ button:hover {
   text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
   text-decoration: underline;
 }
+
 
 
 
