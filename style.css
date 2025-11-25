@@ -1322,40 +1322,54 @@ a:active {
   font-weight: 600;
 }
 
-/* === JOIN PAGE FORM ========================================= */
+/* =========================================================
+   JOIN PAGE – FORM + LAYOUT
+   ========================================================= */
 
-.join-form {
-  margin-top: 16px;
-  border: 1px solid rgba(0, 255, 102, 0.25);
-  padding: 14px 16px;
-  background: rgba(0, 0, 0, 0.7);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.12);
+/* Outer centered box */
+.join-box {
+  width: 420px;
+  margin: 40px auto;            /* Centers the box */
+  padding: 24px 20px;
+  border: 1px solid var(--accent);
+  background: rgba(0, 0, 0, 0.65);
+  box-shadow: 0 0 14px rgba(0, 255, 102, 0.25);
+  border-radius: 6px;
 }
 
+/* Form wrapper */
+.join-form {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Label + input row */
 .join-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 10px;
+  flex-direction: column;
+  gap: 6px;
 }
 
+/* Label */
 .join-label {
-  min-width: 60px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  opacity: 0.9;
 }
 
+/* Input field */
 .join-input {
-  flex: 1;
-  min-width: 180px;
+  width: 100%;
   background: transparent;
   border: 1px solid var(--accent);
   color: var(--text);
-  padding: 6px 8px;
+  padding: 8px 10px;
   font-family: "Courier New", monospace;
   font-size: 0.9rem;
+  border-radius: 4px;
 }
 
 .join-input:focus {
@@ -1363,38 +1377,42 @@ a:active {
   box-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
 }
 
+/* Submit button */
 .join-submit {
-  margin-top: 6px;
-  padding: 6px 18px;
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px 0;
   border-radius: 999px;
   border: 1px solid #ff66cc;
   color: #ff66cc;
   background: transparent;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
+  transition: 0.15s ease-out;
 }
 
 .join-submit:hover {
-  background: rgba(255, 102, 204, 0.08);
-  box-shadow: 0 0 10px rgba(255, 102, 204, 0.4);
+  background: rgba(255, 102, 204, 0.1);
+  box-shadow: 0 0 12px rgba(255, 102, 204, 0.45);
 }
 
+/* Hint text */
 .join-hint {
   margin-top: 10px;
   font-size: 0.8rem;
-  opacity: 0.85;
+  opacity: 0.8;
+  line-height: 1.4;
 }
 
-/* Center JOIN box */
-.join-box {
-  width: 420px;
-  margin: 40px auto;   /* centers it */
-  padding: 24px;
-  border: 1px solid var(--accent);
-  background: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 12px rgba(255, 105, 180, 0.3);
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .join-box {
+    width: 95%;
+    margin: 24px auto;
+    padding: 20px 16px;
+  }
 }
 
 
