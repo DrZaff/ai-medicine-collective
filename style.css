@@ -1244,6 +1244,28 @@ button:hover {
   background: rgba(0, 255, 102, 0.15);
 }
 
+/* ===== TERMINAL LINK FIX ===== */
+
+a {
+  color: #00ff80;           /* neon green */
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  color: #00e5ff;           /* cyan hover */
+  text-shadow: 0 0 6px #00e5ff;
+}
+
+a:visited {
+  color: #00ff80;           /* keep green, no purple */
+}
+
+a:active {
+  color: #00e5ff;
+}
+
+
 
 
 
