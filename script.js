@@ -141,6 +141,88 @@ if (memberCards.length && navigator.clipboard) {
       }).catch((err) => {
         console.error("Failed to copy member email:", err);
       });
+
+      // === Projects page: category -> detail view switch ===
+      (function () {
+        const typesContainer = document.getElementById("project-types");
+        const detailsContainer = document.getElementById("project-details");
+        if (!typesContainer || !detailsContainer) return; // not on projects page
+
+        const backWrapper = document.getElementById("projects-back-types");
+        const typeLabel = document.getElementById("projects-current-type-label");
+        const detailCards = detailsContainer.querySelectorAll(".project-detail-card");
+
+        const typeNames = {
+          clinical: "Clinical tools",
+          education: "Education",
+          lifestyle: "Lifestyle",
+          productivity: "Productivity",
+          misc: "Miscellaneous",
+        };
+
+        // When a project type is clicked
+        typesContainer.querySelectorAll(".project-type").forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const type = link.dataset.type;
+            if (!type) return;
+
+      // Update label
+      if (typeLabel) {
+        typeLabel.textContent = `// ${typeNames[type] || "Projects"}`;
+      }
+
+      // Show only cards for that type
+      detailCards.forEach((card) => {
+        card.style.display =
+          card.dataset.type === type ? "block" : "none";
+      });
+
+      // Fade out type grid, fade in detail list
+      typesContainer.classList.add("projects-fade-out");
+      setTimeout(() => {
+        typesContainer.classList.add("hidden");
+        typesContainer.classList.remove("projects-fade-out");
+
+        detailsContainer.classList.remove("hidden");
+        detailsContainer.classList.add("projects-fade-in");
+
+        if (backWrapper) backWrapper.classList.remove("hidden");
+
+        setTimeout(() => {
+          detailsContainer.classList.remove("projects-fade-in");
+        }, 350);
+      }, 220);
+    });
+  });
+
+  // Back to project type selection
+  if (backWrapper) {
+    const backLink = backWrapper.querySelector(".project-back-link");
+    if (backLink) {
+      backLink.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        detailsContainer.classList.add("projects-fade-out");
+        setTimeout(() => {
+          detailsContainer.classList.add("hidden");
+          detailsContainer.classList.remove("projects-fade-out");
+
+          typesContainer.classList.remove("hidden");
+          typesContainer.classList.add("projects-fade-in");
+
+          backWrapper.classList.add("hidden");
+
+          setTimeout(() => {
+            typesContainer.classList.remove("projects-fade-in");
+          }, 350);
+        }, 220);
+      });
+    }
+  }
+})();
+
     });
   });
 }
+
