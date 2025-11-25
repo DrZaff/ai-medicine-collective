@@ -1135,6 +1135,39 @@ button:hover {
   box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
 }
 
+/* ===== RESOURCE THUMB GRID FIXES ===== */
+
+.resource-thumbs {
+  display: flex;
+  gap: 20px;               /* smaller spacing */
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.resource-thumb {
+  margin: 0;
+  padding: 0;
+}
+
+.resource-thumb img {
+  width: 180px;
+  height: auto;
+  cursor: pointer;
+  border: 2px solid #00ff9c;
+  transition: transform 0.15s ease-in-out;
+}
+
+.resource-thumb img:hover {
+  transform: scale(1.07);
+}
+
+/* Remove captions */
+.resource-thumb figcaption {
+  display: none;
+}
+
+
+
 
 
 
