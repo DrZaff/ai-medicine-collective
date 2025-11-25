@@ -765,6 +765,23 @@ button:hover {
   }
 }
 
+/* === Global BACK links ===================================== */
+
+/* Make all "< Back" links pop (bright magenta, bold) */
+.back-link {
+  color: #ff6ad5;                /* bright neon pink */
+  font-weight: bold;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+
+.back-link:hover {
+  color: #ffc1ff;
+  text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
+  text-decoration: underline;
+}
+
+
 
 
 
