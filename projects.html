@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
   <div class="terminal-frame">
 
@@ -30,33 +29,31 @@
     <main class="section">
       <h2 class="section-title">PROJECTS</h2>
 
+      <p>Click a project type to explore tools.</p>
       <p class="note">
-        Click a project type to explore tools.
-      </p>
-      <p class="note small-note">
         Note: Custom GPT links require a paid ChatGPT subscription to use.
       </p>
 
-      <!-- PROJECT TYPE SELECTION -->
+      <!-- ========== TYPE GRID (shown on page load) ========== -->
       <div id="project-types" class="projects-list">
         <a href="#" class="project-item project-type" data-type="clinical">
           <span class="project-title">Clinical tools</span>
-          <span class="project-desc">// bedside algorithms & decision support</span>
+          <span class="project-desc">// bedside algorithms &amp; decision support</span>
         </a>
 
         <a href="#" class="project-item project-type" data-type="education">
           <span class="project-title">Education</span>
-          <span class="project-desc">// med learning & teaching workflows</span>
+          <span class="project-desc">// med learning &amp; teaching workflows</span>
         </a>
 
         <a href="#" class="project-item project-type" data-type="lifestyle">
           <span class="project-title">Lifestyle</span>
-          <span class="project-desc">// personality, wellness & fun builds</span>
+          <span class="project-desc">// personality, wellness &amp; fun builds</span>
         </a>
 
         <a href="#" class="project-item project-type" data-type="productivity">
           <span class="project-title">Productivity</span>
-          <span class="project-desc">// time-savers, automation & summaries</span>
+          <span class="project-desc">// time-savers, automation &amp; summaries</span>
         </a>
 
         <a href="#" class="project-item project-type" data-type="misc">
@@ -65,142 +62,144 @@
         </a>
       </div>
 
-      <!-- Back link shown only when viewing a category -->
-      <p id="projects-back-types" class="note hidden">
+      <!-- Back link + dynamic label (hidden initially) -->
+      <div id="projects-back-types" class="hidden">
         <a href="#" class="project-back-link">&lt; Back to project types</a>
-      </p>
+      </div>
 
-      <!-- PROJECTS FOR A GIVEN TYPE -->
+      <h3 id="projects-current-type-label" class="section-subtitle hidden">
+        <!-- JS will fill this, e.g. "// Clinical tools" -->
+      </h3>
+
+      <!-- ========== DETAIL LIST (HIDDEN ON LOAD) ========== -->
       <div id="project-details" class="projects-list hidden">
-
-        <!-- Label changes based on selected type -->
-        <p class="note" id="projects-current-type-label">// Clinical tools</p>
-
-        <!-- ===== CLINICAL TOOLS ===== -->
-
-        <div class="project-item project-detail-card" data-type="clinical">
+        <!-- Clinical tools -->
+        <article
+          class="project-item project-detail-card"
+          data-type="clinical"
+        >
           <span class="project-title">VA Night Float Algorithm – Excel</span>
           <span class="project-desc">
             // automated patient assignment + triage logic (spreadsheet workflow)
           </span>
           <div class="project-actions">
-            <!-- TODO: update href once you have a real PDF -->
-            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
+            <a
+              href="projects/VA_Night_Float_Algorithm_Excel_Instructions.pdf"
+              target="_blank"
+              rel="noopener"
+              class="project-doc-link"
+            >
               Instructions (PDF)
             </a>
             <a
-              href="files/VA-Night-Float-Algorithm.xlsx"
+              href="projects/VA_Night_Float_Algorithm_Excel_Template.xlsx"
               class="project-launch-btn"
               target="_blank"
               rel="noopener"
             >
-              LAUNCH
+              Launch
             </a>
           </div>
-        </div>
+        </article>
 
-        <div class="project-item project-detail-card" data-type="clinical">
+        <article
+          class="project-item project-detail-card"
+          data-type="clinical"
+        >
           <span class="project-title">VA Night Float Algorithm – Custom GPT</span>
           <span class="project-desc">
             // conversational assistant that applies the night float assignment rules
           </span>
           <div class="project-actions">
-            <!-- TODO: update once you have a PDF write-up -->
-            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
+            <a
+              href="projects/VA_Night_Float_Algorithm_GPT_Instructions.pdf"
+              target="_blank"
+              rel="noopener"
+              class="project-doc-link"
+            >
               Instructions (PDF)
             </a>
             <a
-              href="https://chatgpt.com/g/g-6912a44ed37081918d9ef6192c0e1d1b-va-night-call-algorithm"
+              href="https://chat.openai.com/g/gpt-va-night-float-algorithm"
               class="project-launch-btn"
               target="_blank"
               rel="noopener"
             >
-              LAUNCH
+              Launch
             </a>
           </div>
-        </div>
+        </article>
 
-        <!-- ===== EDUCATION ===== -->
-
-        <div class="project-item project-detail-card" data-type="education">
-          <span class="project-title">ANKIGen — Custom Anki Generator</span>
+        <!-- Education (placeholder examples) -->
+        <article
+          class="project-item project-detail-card"
+          data-type="education"
+        >
+          <span class="project-title">ADELANTE – Paper Summarization Pipeline</span>
           <span class="project-desc">
-            // structured cloze + tag engine for medical learning cards
+            // one-page research briefs for AI in medicine papers
           </span>
           <div class="project-actions">
-            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
+            <a
+              href="projects/ADELANTE_Instructions.pdf"
+              target="_blank"
+              rel="noopener"
+              class="project-doc-link"
+            >
               Instructions (PDF)
             </a>
             <a
-              href="https://chatgpt.com/g/g-68e43efd7d608191ba161e3f1e6da8f8-ankigen-med"
+              href="https://chat.openai.com/g/gpt-adelante"
               class="project-launch-btn"
               target="_blank"
               rel="noopener"
             >
-              LAUNCH
+              Launch
             </a>
           </div>
-        </div>
+        </article>
 
-        <!-- ===== LIFESTYLE ===== -->
-
-        <div class="project-item project-detail-card" data-type="lifestyle">
-          <span class="project-title">
-            It's a Neapolitan World — AI Personality Survey
-          </span>
+        <!-- Lifestyle placeholder -->
+        <article
+          class="project-item project-detail-card"
+          data-type="lifestyle"
+        >
+          <span class="project-title">Lifestyle Lab (coming soon)</span>
           <span class="project-desc">
-            // playful chocolate / vanilla / strawberry archetype personality model
+            // wellness, fitness &amp; personal analytics experiments
           </span>
           <div class="project-actions">
-            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
-              Instructions (PDF)
-            </a>
-            <a
-              href="https://chatgpt.com/g/g-68c8846d98948191a1bfba004e2b1dbf-it-s-a-neapolitan-world"
-              class="project-launch-btn"
-              target="_blank"
-              rel="noopener"
-            >
-              LAUNCH
-            </a>
+            <span class="disabled">Instructions (coming soon)</span>
           </div>
-        </div>
+        </article>
 
-        <!-- ===== PRODUCTIVITY ===== -->
-
-        <div class="project-item project-detail-card" data-type="productivity">
-          <span class="project-title">Meeting Project Summarizer</span>
+        <!-- Productivity placeholder -->
+        <article
+          class="project-item project-detail-card"
+          data-type="productivity"
+        >
+          <span class="project-title">Productivity Toolkit (coming soon)</span>
           <span class="project-desc">
-            // LLM-powered meeting-to-summary workflow for project updates
+            // automation &amp; time-saving tools for busy clinicians
           </span>
           <div class="project-actions">
-            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
-              Instructions (PDF)
-            </a>
-            <a
-              href="https://chatgpt.com/g/g-68d04208ab20819184d3a4013326ed30-project-meeting-summarizer"
-              class="project-launch-btn"
-              target="_blank"
-              rel="noopener"
-            >
-              LAUNCH
-            </a>
+            <span class="disabled">Instructions (coming soon)</span>
           </div>
-        </div>
+        </article>
 
-        <!-- ===== MISCELLANEOUS ===== -->
-
-        <div class="project-item project-detail-card" data-type="misc">
-          <span class="project-title">Experimental builds (coming soon)</span>
+        <!-- Misc placeholder -->
+        <article
+          class="project-item project-detail-card"
+          data-type="misc"
+        >
+          <span class="project-title">Experimental Sandbox (coming soon)</span>
           <span class="project-desc">
-            // sandbox for future tools that don’t fit other categories yet
+            // odd ideas, prototypes &amp; side quests
           </span>
           <div class="project-actions">
-            <span class="project-doc-link disabled">Instructions (PDF) – TBD</span>
-            <span class="project-launch-btn disabled">LAUNCH</span>
+            <span class="disabled">Instructions (coming soon)</span>
           </div>
-        </div>
-
+        </article>
       </div>
 
       <p><a href="index.html">&lt; Back</a></p>
@@ -212,7 +211,6 @@
       &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
       <span class="cursor">█</span>
     </footer>
-
   </div>
 
   <script src="script.js"></script>
