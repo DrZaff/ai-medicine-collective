@@ -96,76 +96,72 @@ if (copyEmailBtn && joinEmailSpan && navigator.clipboard) {
   copyEmailBtn.addEventListener("click", () => {
     const email = joinEmailSpan.textContent.trim();
 
-    navigator.clipboard.writeText(email).then(() => {
-      // Add a brief glow/flash effect on the icon
-      copyEmailBtn.classList.add("copied");
-      setTimeout(() => {
-        copyEmailBtn.classList.remove("copied");
-      }, 700);
-    }).catch((err) => {
-      console.error("Failed to copy email:", err);
-    });
+    navigator.clipboard
+      .writeText(email)
+      .then(() => {
+        // Add a brief glow/flash effect on the icon
+        copyEmailBtn.classList.add("copied");
+        setTimeout(() => {
+          copyEmailBtn.classList.remove("copied");
+        }, 700);
+      })
+      .catch((err) => {
+        console.error("Failed to copy email:", err);
+      });
   });
 }
 
-// === MEMBERS PAGE: copy member email when clicking a member card ===
+// === MEMBER PROFILE PAGE: copy email button =========================
 
-const memberCards = document.querySelectorAll(".member-card");
+const profileCopyBtn = document.getElementById("profile-copy-btn");
+const profileEmailSpan = document.getElementById("profile-email");
 
-if (memberCards.length && navigator.clipboard) {
-  memberCards.forEach((card) => {
-    // Make it feel clickable
-    card.style.cursor = "pointer";
+if (profileCopyBtn && profileEmailSpan && navigator.clipboard) {
+  profileCopyBtn.addEventListener("click", () => {
+    const email = profileEmailSpan.textContent.trim();
 
-    card.addEventListener("click", () => {
-      const email = card.dataset.email;
-      if (!email) return;
-
-      navigator.clipboard.writeText(email).then(() => {
-        const nameEl = card.querySelector(".member-name");
-        if (!nameEl) return;
-
-        // Preserve original text the first time
-        if (!nameEl.dataset.originalText) {
-          nameEl.dataset.originalText = nameEl.textContent;
-        }
-
-        // Terminal-style feedback
-        nameEl.textContent = `Copied: ${email}`;
-        card.classList.add("member-copied");
-
+    navigator.clipboard
+      .writeText(email)
+      .then(() => {
+        profileCopyBtn.classList.add("copied");
+        const status = document.getElementById("profile-copy-status");
+        if (status) status.textContent = "Copied!";
         setTimeout(() => {
-          nameEl.textContent = nameEl.dataset.originalText;
-          card.classList.remove("member-copied");
-        }, 1200);
-      }).catch((err) => {
-        console.error("Failed to copy member email:", err);
+          profileCopyBtn.classList.remove("copied");
+          if (status) status.textContent = "";
+        }, 1000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy profile email:", err);
       });
+  });
+}
 
-      // === Projects page: category -> detail view switch ===
-      (function () {
-        const typesContainer = document.getElementById("project-types");
-        const detailsContainer = document.getElementById("project-details");
-        if (!typesContainer || !detailsContainer) return; // not on projects page
+// === PROJECTS PAGE: category -> detail view switch ==================
 
-        const backWrapper = document.getElementById("projects-back-types");
-        const typeLabel = document.getElementById("projects-current-type-label");
-        const detailCards = detailsContainer.querySelectorAll(".project-detail-card");
+(function () {
+  const typesContainer = document.getElementById("project-types");
+  const detailsContainer = document.getElementById("project-details");
+  if (!typesContainer || !detailsContainer) return; // not on projects page
 
-        const typeNames = {
-          clinical: "Clinical tools",
-          education: "Education",
-          lifestyle: "Lifestyle",
-          productivity: "Productivity",
-          misc: "Miscellaneous",
-        };
+  const backWrapper = document.getElementById("projects-back-types");
+  const typeLabel = document.getElementById("projects-current-type-label");
+  const detailCards = detailsContainer.querySelectorAll(".project-detail-card");
 
-        // When a project type is clicked
-        typesContainer.querySelectorAll(".project-type").forEach((link) => {
-          link.addEventListener("click", (e) => {
-            e.preventDefault();
-            const type = link.dataset.type;
-            if (!type) return;
+  const typeNames = {
+    clinical: "Clinical tools",
+    education: "Education",
+    lifestyle: "Lifestyle",
+    productivity: "Productivity",
+    misc: "Miscellaneous",
+  };
+
+  // When a project type is clicked
+  typesContainer.querySelectorAll(".project-type").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const type = link.dataset.type;
+      if (!type) return;
 
       // Update label
       if (typeLabel) {
@@ -174,8 +170,7 @@ if (memberCards.length && navigator.clipboard) {
 
       // Show only cards for that type
       detailCards.forEach((card) => {
-        card.style.display =
-          card.dataset.type === type ? "block" : "none";
+        card.style.display = card.dataset.type === type ? "block" : "none";
       });
 
       // Fade out type grid, fade in detail list
@@ -221,8 +216,3 @@ if (memberCards.length && navigator.clipboard) {
     }
   }
 })();
-
-    });
-  });
-}
-
