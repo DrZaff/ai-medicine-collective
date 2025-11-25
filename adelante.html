@@ -31,62 +31,97 @@
     <main class="section">
       <h2 class="section-title">ADELANTE REPORT</h2>
 
-      <p>
-        ADELANTE is a physician-informaticist–designed system that converts
-        medical-AI research PDFs into concise, evidence-strict, 1-page briefs
-        and info graphics for clinicians and trainees. Click
-        <a
-          href="files/adelante-methodology.pdf"
-          target="_blank"
-          rel="noopener"
-          class="adelante-learn-link"
-        >
-          Learn More
-        </a>
-        to see how ADELANTE ensures methodological rigor, prevents hallucinations,
-        and maintains a standardized, clinically relevant reporting structure.
-      </p>
+      <!-- Intro + hero image -->
+      <div class="adelante-layout">
+        <div class="adelante-intro">
+          <p>
+            ADELANTE is a physician-informaticist–designed system that converts medical-AI research PDFs into concise,
+            evidence-strict, 1-page briefs for clinicians and trainees. Click <span class="highlight">“Learn More”</span>
+            to see how ADELANTE ensures methodological rigor, prevents hallucinations, and maintains a standardized,
+            clinically relevant reporting structure.
+          </p>
 
-      <!-- ======== REPORTS DROPDOWN STACK ======== -->
-      <section class="adelante-section">
-        <div id="adelante-report-stack" class="report-stack">
-          <!-- Header row -->
-          <button type="button" class="report-stack-header">
-            <span class="report-stack-label">&gt; Reports</span>
-            <span class="report-stack-chevron">▾</span>
-          </button>
-
-          <!-- Collapsible list -->
-          <div class="report-stack-body hidden">
-            <ul class="report-stack-list">
-              <!-- EXAMPLE ITEMS — replace href + label with your own reports -->
-              <li class="report-stack-item">
-                <a
-                  href="reports/adelante-report-2025-11-24.pdf"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  2025-11-24 — Generative AI vs clinicians (diagnostic accuracy)
-                </a>
-              </li>
-
-              <li class="report-stack-item">
-                <a
-                  href="reports/adelante-report-2025-11-10.pdf"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  2025-11-10 — LLM triage support in emergency medicine
-                </a>
-              </li>
-
-              <!-- Add more reports here as you generate them -->
-            </ul>
-          </div>
+          <p>
+            <a
+              href="reports/ADELANTE_Methodology.pdf"
+              target="_blank"
+              rel="noopener"
+              class="adelante-learn-link"
+            >
+              &gt; Learn More (methodology PDF)
+            </a>
+          </p>
         </div>
-      </section>
 
-      <p><a href="index.html" class="back-link">&lt; Back</a></p>
+        <figure class="adelante-hero">
+          <!-- Save the uploaded image into your repo as, e.g., images/adelante-hero.png -->
+          <img src="images/adelante-hero.png" alt="Human and robotic hands reaching toward each other over a futuristic city" />
+        </figure>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- === DROPDOWN STACKS ====================================== -->
+
+      <div class="adelante-stack">
+
+        <!-- INFOGRAPHICS DROPDOWN -->
+        <details class="stack-item">
+          <summary class="stack-summary">
+            <span class="stack-label">// Infographics</span>
+            <span class="stack-chevron">▼</span>
+          </summary>
+
+          <ul class="stack-list">
+            <!-- Example entries — update href + label to your actual infographic files -->
+            <li>
+              <a
+                href="infographics/2025-11-24-llm-diagnostic-accuracy-infographic.pdf"
+                target="_blank"
+                rel="noopener"
+              >
+                2025-11-24 — Generative AI vs clinicians (diagnostic accuracy overview)
+              </a>
+            </li>
+            <!-- Add more <li> items here as you generate new infographics -->
+          </ul>
+        </details>
+
+        <!-- REPORTS DROPDOWN -->
+        <details class="stack-item">
+          <summary class="stack-summary">
+            <span class="stack-label">// Reports</span>
+            <span class="stack-chevron">▼</span>
+          </summary>
+
+          <ul class="stack-list">
+            <!-- Each line corresponds to one ADELANTE report PDF -->
+            <li>
+              <a
+                href="reports/2025-11-24-adelante-npj-digital-medicine-generative-vs-clinicians.pdf"
+                target="_blank"
+                rel="noopener"
+              >
+                2025-11-24 — Generative AI vs clinicians across medical tasks (*NPJ Digital Medicine*)
+              </a>
+            </li>
+
+            <!-- Copy + edit for more reports -->
+            <!--
+            <li>
+              <a href="reports/YYYY-MM-DD-some-paper.pdf" target="_blank" rel="noopener">
+                YYYY-MM-DD — Short description of the paper
+              </a>
+            </li>
+            -->
+          </ul>
+        </details>
+
+      </div>
+
+      <p>
+        <a href="index.html" class="back-link">&lt; Back</a>
+      </p>
     </main>
 
     <div class="horizontal-rule bottom-rule"></div>
@@ -100,4 +135,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
