@@ -764,8 +764,9 @@ button:hover {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 0.85rem;
+  font-family: "Courier New", monospace;
 }
 
 .profile-email-address {
@@ -776,7 +777,7 @@ button:hover {
   background: transparent;
   border: 1px solid var(--accent);
   color: var(--accent);
-  padding: 4px 10px;
+  padding: 4px 12px;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -785,6 +786,7 @@ button:hover {
 
 .copy-email-btn:hover {
   background: rgba(0, 255, 102, 0.08);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
 }
 
 .copy-email-btn.copied {
@@ -1424,6 +1426,7 @@ a:active {
     padding: 20px 16px;
   }
 }
+
 
 
 
