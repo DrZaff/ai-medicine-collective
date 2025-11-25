@@ -1,73 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Join – AI Medicine Collective</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="terminal-frame">
+<h2 class="section-title">JOIN</h2>
 
-    <div class="horizontal-rule"></div>
+<p>// Become part of the AI Medicine Collective</p>
 
-    <header>
-      <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
+<form id="join-form" action="https://formspree.io/f/mqaonqpr" method="POST" class="join-form">
+  <label>
+    Name:
+    <input type="text" name="name" required />
+  </label>
 
-      <nav class="nav">
-        <a href="index.html">HOME</a>
-        <a href="about.html">ABOUT</a>
-        <a href="members.html">MEMBERS</a>
-        <a href="schedule.html">MEETING SCHEDULE</a>
-        <a href="projects.html">PROJECTS</a>
-        <a href="adelante.html">ADELANTE REPORT</a>
-        <a href="resources.html">RESOURCES</a>
-        <a href="join.html">JOIN</a>
-      </nav>
+  <label>
+    Email:
+    <input type="email" name="email" required />
+  </label>
 
-      <div class="horizontal-rule"></div>
-    </header>
+  <button type="submit" class="join-submit">JOIN</button>
+</form>
 
-    <main class="section">
-      <h2 class="section-title">JOIN</h2>
+<p id="join-success" class="hidden success-message">
+  ✅ Request sent! We'll reach out soon.
+</p>
 
-      <p>
-        Interested in the <span class="highlight">AI Medicine Collective</span>?
-      </p>
-
-      <ul>
-        <li>Open to students, residents, fellows, faculty, & staff</li>
-        <li>No coding experience required</li>
-        <li>Curiosity about AI in healthcare is the only prerequisite</li>
-      </ul>
-
-      <p>
-        To join, contact Brandon Zaffuto:
-      </p>
-
-      <ul>
-        <li>
-          Email: <span id="join-email">zaffutbn@ucmail.uc.edu</span>
-          <span id="copy-email-btn" class="copy-icon" title="Copy email">⧉</span>
-        <li>Or message a current member (contact info on "Members" page)</li>
-      </ul>
-
-      <p><a href="index.html">&lt; Back</a></p>
-    </main>
-
-    <div class="horizontal-rule bottom-rule"></div>
-
-    <footer class="footer">
-      &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
-      <span class="cursor">█</span>
-    </footer>
-
-  </div>
-  <script src="script.js"></script>
-</body>
-</html>
-
-
-
-
-
+<p><a href="index.html" class="back-link">&lt; Back</a></p>
