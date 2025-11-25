@@ -1166,6 +1166,84 @@ button:hover {
   display: none;
 }
 
+/* ===== RESOURCE THUMB GRID (already added, keep or adjust) ===== */
+
+.resource-thumbs {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.resource-thumb {
+  margin: 0;
+  padding: 0;
+}
+
+.resource-thumb img {
+  width: 180px;
+  height: auto;
+  cursor: pointer;
+  border: 2px solid #00ff9c;
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  box-shadow: 0 0 10px rgba(0, 255, 156, 0.15);
+}
+
+.resource-thumb img:hover {
+  transform: scale(1.07);
+  box-shadow: 0 0 18px rgba(0, 255, 156, 0.4);
+}
+
+/* Hide any captions if present */
+.resource-thumb figcaption {
+  display: none;
+}
+
+/* ===== LIGHTBOX OVERLAY ===== */
+
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.lightbox-inner {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  border: 2px solid var(--accent);
+  background: radial-gradient(circle at top, #051505 0, #000 60%);
+  box-shadow: 0 0 30px rgba(0, 255, 102, 0.5);
+  padding: 10px;
+}
+
+.lightbox-img {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  border: 1px solid var(--accent);
+  background: rgba(0, 0, 0, 0.9);
+  color: var(--accent);
+  font-family: "Courier New", monospace;
+  font-size: 0.85rem;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.lightbox-close:hover {
+  background: rgba(0, 255, 102, 0.15);
+}
+
 
 
 
