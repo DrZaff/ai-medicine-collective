@@ -212,8 +212,15 @@ button:hover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 28px;
-  margin-top: 32px;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .landing-links {
+    gap: 10px;
+    margin-top: 16px;
+  }
 }
 
 .landing-item {
@@ -807,6 +814,7 @@ button:hover {
   text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
   text-decoration: underline;
 }
+
 
 
 
