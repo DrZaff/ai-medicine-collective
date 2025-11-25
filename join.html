@@ -29,54 +29,56 @@
     </header>
 
     <main class="section">
-      <h2 class="section-title">JOIN</h2>
+      <div class="join-box">
+        <h2 class="section-title">JOIN</h2>
 
-      <p>// Become part of the AI Medicine Collective.</p>
+        <p>// Become part of the AI Medicine Collective.</p>
 
-      <!-- JOIN FORM (now wired to Formspree) -->
-      <form
-        class="join-form"
-        action="https://formspree.io/f/mqaonqpr"
-        method="POST"
-      >
-        <!-- optional: tag which page it came from -->
-        <input type="hidden" name="source" value="AI Medicine Collective – Join page" />
+        <!-- JOIN FORM wired to Formspree -->
+        <form
+          class="join-form"
+          action="https://formspree.io/f/mqaonqpr"
+          method="POST"
+        >
+          <!-- optional: tag which page it came from -->
+          <input type="hidden" name="source" value="AI Medicine Collective – Join page" />
 
-        <div class="join-row">
-          <label for="join-name" class="join-label">Name</label>
-          <input
-            id="join-name"
-            name="name"
-            type="text"
-            class="join-input"
-            placeholder="Ada Lovelace"
-            autocomplete="name"
-            required
-          />
-        </div>
+          <div class="join-row">
+            <label for="join-name" class="join-label">Name</label>
+            <input
+              id="join-name"
+              name="name"
+              type="text"
+              class="join-input"
+              placeholder="Ada Lovelace"
+              autocomplete="name"
+              required
+            />
+          </div>
 
-        <div class="join-row">
-          <label for="join-email" class="join-label">Email</label>
-          <input
-            id="join-email"
-            name="email"
-            type="email"
-            class="join-input"
-            placeholder="you@example.com"
-            autocomplete="email"
-            required
-          />
-        </div>
+          <div class="join-row">
+            <label for="join-email" class="join-label">Email</label>
+            <input
+              id="join-email"
+              name="email"
+              type="email"
+              class="join-input"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            />
+          </div>
 
-        <button type="submit" class="join-submit">
-          JOIN
-        </button>
+          <button type="submit" class="join-submit">
+            JOIN
+          </button>
 
-        <p class="join-hint">
-          // Your request will be sent securely via Formspree.<br />
-          // You can also contact <span class="highlight">zaffutbn@ucmail.uc.edu</span> directly.
-        </p>
-      </form>
+          <p class="join-hint">
+            // Your request will be sent securely via Formspree.<br />
+            // You can also contact <span class="highlight">zaffutbn@ucmail.uc.edu</span> directly.
+          </p>
+        </form>
+      </div>
 
       <p><a href="index.html" class="back-link">&lt; Back</a></p>
     </main>
