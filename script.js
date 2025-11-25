@@ -9,8 +9,6 @@ const form = document.getElementById("password-form");
 const errorMsg = document.getElementById("error-message");
 const input = document.getElementById("password-input");
 
-// ------- Auth / gate -------
-
 function createLogoutButton() {
   if (document.getElementById("logout-btn")) return;
 
@@ -32,6 +30,7 @@ function showAuthBanner() {
   banner.className = "auth-banner";
   banner.textContent = "AUTHENTICATION ACCEPTED";
   document.body.appendChild(banner);
+
   setTimeout(() => banner.remove(), 1800);
 }
 
@@ -44,6 +43,7 @@ function unlockSite(withAnimation = true) {
   }
 
   createLogoutButton();
+
   if (withAnimation) showAuthBanner();
 }
 
@@ -52,7 +52,7 @@ if (sessionStorage.getItem("amc-auth") === "true") {
   unlockSite(false);
 }
 
-// Handle password form on index.html
+// Handle password form submission (index only)
 if (form) {
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -72,7 +72,15 @@ if (form) {
   });
 }
 
-// === JOIN PAGE: copy main contact email ===
+// === Global: style all "< Back" anchors as .back-link ================
+
+document.querySelectorAll("a").forEach((a) => {
+  if (a.textContent.trim().startsWith("< Back")) {
+    a.classList.add("back-link");
+  }
+});
+
+// === JOIN PAGE COPY EMAIL ===========================================
 
 const copyEmailBtn = document.getElementById("copy-email-btn");
 const joinEmailSpan = document.getElementById("join-email");
@@ -88,16 +96,12 @@ if (copyEmailBtn && joinEmailSpan && navigator.clipboard) {
   });
 }
 
-// === MEMBERS PAGE: (legacy) copy by clicking card =======================
-// Safe no-op on pages without data-email attributes.
+// === MEMBERS PAGE copy by clicking a card ===========================
 
 const memberCards = document.querySelectorAll(".member-card");
 
 if (memberCards.length && navigator.clipboard) {
   memberCards.forEach((card) => {
-    // Only treat as clickable if it actually has an email attached
-    if (!card.dataset.email) return;
-
     card.style.cursor = "pointer";
 
     card.addEventListener("click", () => {
@@ -124,38 +128,18 @@ if (memberCards.length && navigator.clipboard) {
   });
 }
 
-// === MEMBER PROFILE PAGE: "Copy my email" button =======================
-
-const profileCopyBtn = document.querySelector(".copy-email-btn");
-const profileEmailSpan = document.querySelector(".profile-email");
-
-if (profileCopyBtn && profileEmailSpan && navigator.clipboard) {
-  profileCopyBtn.addEventListener("click", () => {
-    const email = profileEmailSpan.textContent.trim();
-    if (!email) return;
-
-    navigator.clipboard.writeText(email).then(() => {
-      profileCopyBtn.classList.add("copied");
-      const statusEl = document.querySelector(".copy-status");
-      if (statusEl) statusEl.textContent = "Copied!";
-      setTimeout(() => {
-        profileCopyBtn.classList.remove("copied");
-        if (statusEl) statusEl.textContent = "";
-      }, 1000);
-    });
-  });
-}
-
-// === PROJECTS PAGE: type -> detail switching ===========================
+// === PROJECTS PAGE: type grid <-> detail list switching =============
 
 (function () {
   const typesContainer = document.getElementById("project-types");
   const detailsContainer = document.getElementById("project-details");
   if (!typesContainer || !detailsContainer) return; // not on projects page
 
-  const backWrapper = document.getElementById("projects-back-types");
   const typeLabel = document.getElementById("projects-current-type-label");
   const detailCards = detailsContainer.querySelectorAll(".project-detail-card");
+
+  // This is the bottom "< Back" link on the page
+  const backLink = document.querySelector("a.back-link");
 
   const typeNames = {
     clinical: "Clinical tools",
@@ -165,73 +149,79 @@ if (profileCopyBtn && profileEmailSpan && navigator.clipboard) {
     misc: "Miscellaneous",
   };
 
-  // Ensure correct initial state on load
-  detailsContainer.classList.add("hidden");
-  if (backWrapper) backWrapper.classList.add("hidden");
-  if (typeLabel) typeLabel.classList.add("hidden");
+  let showingDetails = false;
 
-  // When a project type is clicked
+  function showDetails(type) {
+    if (typeLabel) {
+      typeLabel.textContent = `// ${typeNames[type] || "Projects"}`;
+      typeLabel.classList.remove("hidden");
+    }
+
+    detailCards.forEach((card) => {
+      card.style.display = card.dataset.type === type ? "block" : "none";
+    });
+
+    typesContainer.classList.add("projects-fade-out");
+
+    setTimeout(() => {
+      typesContainer.classList.add("hidden");
+      typesContainer.classList.remove("projects-fade-out");
+
+      detailsContainer.classList.remove("hidden");
+      detailsContainer.classList.add("projects-fade-in");
+
+      setTimeout(() => {
+        detailsContainer.classList.remove("projects-fade-in");
+      }, 350);
+    }, 220);
+
+    showingDetails = true;
+  }
+
+  function showTypes() {
+    if (typeLabel) {
+      typeLabel.classList.add("hidden");
+      typeLabel.textContent = "";
+    }
+
+    detailsContainer.classList.add("projects-fade-out");
+
+    setTimeout(() => {
+      detailsContainer.classList.add("hidden");
+      detailsContainer.classList.remove("projects-fade-out");
+
+      typesContainer.classList.remove("hidden");
+      typesContainer.classList.add("projects-fade-in");
+
+      setTimeout(() => {
+        typesContainer.classList.remove("projects-fade-in");
+      }, 350);
+    }, 220);
+
+    showingDetails = false;
+  }
+
+  // Clicking a project type => drill down into that category
   typesContainer.querySelectorAll(".project-type").forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
-
       const type = link.dataset.type;
       if (!type) return;
-
-      // Label for the detail section, e.g. "// Clinical tools"
-      if (typeLabel) {
-        typeLabel.textContent = `// ${typeNames[type] || "Projects"}`;
-        typeLabel.classList.remove("hidden");
-      }
-
-      // Show only detail cards for that type
-      detailCards.forEach((card) => {
-        card.style.display = card.dataset.type === type ? "block" : "none";
-      });
-
-      // Fade out the grid, then hide it and show the details
-      typesContainer.classList.add("projects-fade-out");
-
-      setTimeout(() => {
-        typesContainer.classList.add("hidden");
-        typesContainer.classList.remove("projects-fade-out");
-
-        detailsContainer.classList.remove("hidden");
-        detailsContainer.classList.add("projects-fade-in");
-
-        if (backWrapper) backWrapper.classList.remove("hidden");
-
-        setTimeout(() => {
-          detailsContainer.classList.remove("projects-fade-in");
-        }, 350);
-      }, 220);
+      showDetails(type);
     });
   });
 
-  // Back to project types
-  if (backWrapper) {
-    const backLink = backWrapper.querySelector(".project-back-link");
-    if (!backLink) return;
-
+  // Bottom "< Back" link:
+  // - When details are showing -> intercept and go back to types
+  // - When on type grid -> behaves like normal link (to index.html)
+  if (backLink) {
     backLink.addEventListener("click", (e) => {
+      if (!showingDetails) {
+        // normal navigation to index.html
+        return;
+      }
       e.preventDefault();
-
-      detailsContainer.classList.add("projects-fade-out");
-
-      setTimeout(() => {
-        detailsContainer.classList.add("hidden");
-        detailsContainer.classList.remove("projects-fade-out");
-
-        typesContainer.classList.remove("hidden");
-        typesContainer.classList.add("projects-fade-in");
-
-        backWrapper.classList.add("hidden");
-        if (typeLabel) typeLabel.classList.add("hidden");
-
-        setTimeout(() => {
-          typesContainer.classList.remove("projects-fade-in");
-        }, 350);
-      }, 220);
+      showTypes();
     });
   }
 })();
