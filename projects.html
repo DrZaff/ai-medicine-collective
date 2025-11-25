@@ -20,8 +20,6 @@
         <a href="members.html">MEMBERS</a>
         <a href="schedule.html">MEETING SCHEDULE</a>
         <a href="projects.html">PROJECTS</a>
-        <a href="adelante.html">ADELANTE REPORT</a>
-        <a href="resources.html">RESOURCES</a>
         <a href="join.html">JOIN</a>
       </nav>
 
@@ -64,11 +62,7 @@
         </a>
       </div>
 
-      <!-- Back link + dynamic label (hidden initially) -->
-      <div id="projects-back-types" class="hidden">
-        <a href="#" class="project-back-link">&lt; Back to project types</a>
-      </div>
-
+      <!-- Dynamic label for selected type -->
       <h3 id="projects-current-type-label" class="section-subtitle hidden">
         <!-- JS will fill this, e.g. "// Clinical tools" -->
       </h3>
@@ -161,7 +155,7 @@
           </div>
         </article>
 
-        <!-- Lifestyle placeholder -->
+        <!-- Lifestyle -->
         <article
           class="project-item project-detail-card"
           data-type="lifestyle"
@@ -175,7 +169,7 @@
           </div>
         </article>
 
-        <!-- Productivity placeholder -->
+        <!-- Productivity -->
         <article
           class="project-item project-detail-card"
           data-type="productivity"
@@ -189,7 +183,7 @@
           </div>
         </article>
 
-        <!-- Misc placeholder -->
+        <!-- Misc -->
         <article
           class="project-item project-detail-card"
           data-type="misc"
@@ -204,7 +198,8 @@
         </article>
       </div>
 
-      <p><a href="index.html">&lt; Back</a></p>
+      <!-- Global back link (styled + re-used for project types) -->
+      <p><a href="index.html" class="back-link">&lt; Back</a></p>
     </main>
 
     <div class="horizontal-rule bottom-rule"></div>
@@ -215,97 +210,6 @@
     </footer>
   </div>
 
-  <!-- Inline script JUST for the projects page -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const typesContainer   = document.getElementById("project-types");
-      const detailsContainer = document.getElementById("project-details");
-      const backWrapper      = document.getElementById("projects-back-types");
-      const typeLabel        = document.getElementById("projects-current-type-label");
-      if (!typesContainer || !detailsContainer) return;
-
-      const detailCards = detailsContainer.querySelectorAll(".project-detail-card");
-
-      const typeNames = {
-        clinical: "Clinical tools",
-        education: "Education",
-        lifestyle: "Lifestyle",
-        productivity: "Productivity",
-        misc: "Miscellaneous"
-      };
-
-      // On page load: ensure details are hidden, types visible
-      typesContainer.classList.remove("hidden");
-      detailsContainer.classList.add("hidden");
-      if (backWrapper) backWrapper.classList.add("hidden");
-      if (typeLabel)   typeLabel.classList.add("hidden");
-
-      // Click a project type
-      typesContainer.querySelectorAll(".project-type").forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopImmediatePropagation(); // ignore any other handlers on this link
-
-          const type = link.dataset.type;
-          if (!type) return;
-
-          if (typeLabel) {
-            typeLabel.textContent = `// ${typeNames[type] || "Projects"}`;
-            typeLabel.classList.remove("hidden");
-          }
-
-          // show only matching detail cards
-          detailCards.forEach((card) => {
-            card.style.display = card.dataset.type === type ? "block" : "none";
-          });
-
-          // fade out types, then hide and show details
-          typesContainer.classList.add("projects-fade-out");
-          setTimeout(() => {
-            typesContainer.classList.add("hidden");
-            typesContainer.classList.remove("projects-fade-out");
-
-            detailsContainer.classList.remove("hidden");
-            detailsContainer.classList.add("projects-fade-in");
-
-            if (backWrapper) backWrapper.classList.remove("hidden");
-
-            setTimeout(() => {
-              detailsContainer.classList.remove("projects-fade-in");
-            }, 350);
-          }, 220);
-        });
-      });
-
-      // Back to project types
-      if (backWrapper) {
-        const backLink = backWrapper.querySelector(".project-back-link");
-        if (backLink) {
-          backLink.addEventListener("click", (e) => {
-            e.preventDefault();
-
-            detailsContainer.classList.add("projects-fade-out");
-            setTimeout(() => {
-              detailsContainer.classList.add("hidden");
-              detailsContainer.classList.remove("projects-fade-out");
-
-              typesContainer.classList.remove("hidden");
-              typesContainer.classList.add("projects-fade-in");
-
-              if (typeLabel) typeLabel.classList.add("hidden");
-              backWrapper.classList.add("hidden");
-
-              setTimeout(() => {
-                typesContainer.classList.remove("projects-fade-in");
-              }, 350);
-            }, 220);
-          });
-        }
-      }
-    });
-  </script>
-
   <script src="script.js"></script>
 </body>
 </html>
-
