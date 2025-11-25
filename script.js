@@ -9,6 +9,8 @@ const form = document.getElementById("password-form");
 const errorMsg = document.getElementById("error-message");
 const input = document.getElementById("password-input");
 
+// ------- Auth / gate -------
+
 function createLogoutButton() {
   if (document.getElementById("logout-btn")) return;
 
@@ -30,7 +32,6 @@ function showAuthBanner() {
   banner.className = "auth-banner";
   banner.textContent = "AUTHENTICATION ACCEPTED";
   document.body.appendChild(banner);
-
   setTimeout(() => banner.remove(), 1800);
 }
 
@@ -43,14 +44,15 @@ function unlockSite(withAnimation = true) {
   }
 
   createLogoutButton();
-
   if (withAnimation) showAuthBanner();
 }
 
+// Already authenticated in this tab?
 if (sessionStorage.getItem("amc-auth") === "true") {
   unlockSite(false);
 }
 
+// Handle password form on index.html
 if (form) {
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -70,7 +72,7 @@ if (form) {
   });
 }
 
-// === JOIN PAGE COPY EMAIL ===
+// === JOIN PAGE: copy main contact email ===
 
 const copyEmailBtn = document.getElementById("copy-email-btn");
 const joinEmailSpan = document.getElementById("join-email");
@@ -86,12 +88,16 @@ if (copyEmailBtn && joinEmailSpan && navigator.clipboard) {
   });
 }
 
-// === MEMBERS PAGE copy by clicking a card ===
+// === MEMBERS PAGE: (legacy) copy by clicking card =======================
+// Safe no-op on pages without data-email attributes.
 
 const memberCards = document.querySelectorAll(".member-card");
 
 if (memberCards.length && navigator.clipboard) {
   memberCards.forEach((card) => {
+    // Only treat as clickable if it actually has an email attached
+    if (!card.dataset.email) return;
+
     card.style.cursor = "pointer";
 
     card.addEventListener("click", () => {
@@ -118,12 +124,34 @@ if (memberCards.length && navigator.clipboard) {
   });
 }
 
-// === PROJECTS PAGE SWITCHING ===
+// === MEMBER PROFILE PAGE: "Copy my email" button =======================
+
+const profileCopyBtn = document.querySelector(".copy-email-btn");
+const profileEmailSpan = document.querySelector(".profile-email");
+
+if (profileCopyBtn && profileEmailSpan && navigator.clipboard) {
+  profileCopyBtn.addEventListener("click", () => {
+    const email = profileEmailSpan.textContent.trim();
+    if (!email) return;
+
+    navigator.clipboard.writeText(email).then(() => {
+      profileCopyBtn.classList.add("copied");
+      const statusEl = document.querySelector(".copy-status");
+      if (statusEl) statusEl.textContent = "Copied!";
+      setTimeout(() => {
+        profileCopyBtn.classList.remove("copied");
+        if (statusEl) statusEl.textContent = "";
+      }, 1000);
+    });
+  });
+}
+
+// === PROJECTS PAGE: type -> detail switching ===========================
 
 (function () {
   const typesContainer = document.getElementById("project-types");
   const detailsContainer = document.getElementById("project-details");
-  if (!typesContainer || !detailsContainer) return;
+  if (!typesContainer || !detailsContainer) return; // not on projects page
 
   const backWrapper = document.getElementById("projects-back-types");
   const typeLabel = document.getElementById("projects-current-type-label");
@@ -137,6 +165,12 @@ if (memberCards.length && navigator.clipboard) {
     misc: "Miscellaneous",
   };
 
+  // Ensure correct initial state on load
+  detailsContainer.classList.add("hidden");
+  if (backWrapper) backWrapper.classList.add("hidden");
+  if (typeLabel) typeLabel.classList.add("hidden");
+
+  // When a project type is clicked
   typesContainer.querySelectorAll(".project-type").forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
@@ -144,16 +178,18 @@ if (memberCards.length && navigator.clipboard) {
       const type = link.dataset.type;
       if (!type) return;
 
+      // Label for the detail section, e.g. "// Clinical tools"
       if (typeLabel) {
         typeLabel.textContent = `// ${typeNames[type] || "Projects"}`;
+        typeLabel.classList.remove("hidden");
       }
 
+      // Show only detail cards for that type
       detailCards.forEach((card) => {
-        card.style.display =
-          card.dataset.type === type ? "block" : "none";
+        card.style.display = card.dataset.type === type ? "block" : "none";
       });
 
-      // *** FADE OUT (fixed by CSS) ***
+      // Fade out the grid, then hide it and show the details
       typesContainer.classList.add("projects-fade-out");
 
       setTimeout(() => {
@@ -172,6 +208,7 @@ if (memberCards.length && navigator.clipboard) {
     });
   });
 
+  // Back to project types
   if (backWrapper) {
     const backLink = backWrapper.querySelector(".project-back-link");
     if (!backLink) return;
@@ -189,6 +226,7 @@ if (memberCards.length && navigator.clipboard) {
         typesContainer.classList.add("projects-fade-in");
 
         backWrapper.classList.add("hidden");
+        if (typeLabel) typeLabel.classList.add("hidden");
 
         setTimeout(() => {
           typesContainer.classList.remove("projects-fade-in");
