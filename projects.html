@@ -31,91 +31,175 @@
       <h2 class="section-title">PROJECTS</h2>
 
       <p class="note">
-        Click a project to open the associated file, page, or repo.
+        Click a project type to explore tools.
       </p>
       <p class="note small-note">
         Note: Custom GPT links require a paid ChatGPT subscription to use.
       </p>
 
-      <div class="projects-list">
+      <!-- PROJECT TYPE SELECTION -->
+      <div id="project-types" class="projects-list">
+        <a href="#" class="project-item project-type" data-type="clinical">
+          <span class="project-title">Clinical tools</span>
+          <span class="project-desc">// bedside algorithms & decision support</span>
+        </a>
 
-        <!-- VA Night Float Algorithm – Excel -->
-        <!-- Make sure the Excel file exists at: files/VA-Night-Float-Algorithm.xlsx -->
-        <a
-          href="files/VA-Night-Float-Algorithm.xlsx"
-          class="project-item"
-          target="_blank"
-          rel="noopener"
-        >
+        <a href="#" class="project-item project-type" data-type="education">
+          <span class="project-title">Education</span>
+          <span class="project-desc">// med learning & teaching workflows</span>
+        </a>
+
+        <a href="#" class="project-item project-type" data-type="lifestyle">
+          <span class="project-title">Lifestyle</span>
+          <span class="project-desc">// personality, wellness & fun builds</span>
+        </a>
+
+        <a href="#" class="project-item project-type" data-type="productivity">
+          <span class="project-title">Productivity</span>
+          <span class="project-desc">// time-savers, automation & summaries</span>
+        </a>
+
+        <a href="#" class="project-item project-type" data-type="misc">
+          <span class="project-title">Miscellaneous</span>
+          <span class="project-desc">// experiments that don’t fit anywhere else</span>
+        </a>
+      </div>
+
+      <!-- Back link shown only when viewing a category -->
+      <p id="projects-back-types" class="note hidden">
+        <a href="#" class="project-back-link">&lt; Back to project types</a>
+      </p>
+
+      <!-- PROJECTS FOR A GIVEN TYPE -->
+      <div id="project-details" class="projects-list hidden">
+
+        <!-- Label changes based on selected type -->
+        <p class="note" id="projects-current-type-label">// Clinical tools</p>
+
+        <!-- ===== CLINICAL TOOLS ===== -->
+
+        <div class="project-item project-detail-card" data-type="clinical">
           <span class="project-title">VA Night Float Algorithm – Excel</span>
-          <span class="project-desc">// automated patient assignment + triage logic</span>
-        </a>
+          <span class="project-desc">
+            // automated patient assignment + triage logic (spreadsheet workflow)
+          </span>
+          <div class="project-actions">
+            <!-- TODO: update href once you have a real PDF -->
+            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
+              Instructions (PDF)
+            </a>
+            <a
+              href="files/VA-Night-Float-Algorithm.xlsx"
+              class="project-launch-btn"
+              target="_blank"
+              rel="noopener"
+            >
+              LAUNCH
+            </a>
+          </div>
+        </div>
 
-        <!-- VA Night Float Algorithm – Custom GPT -->
-        <a
-          href="https://chatgpt.com/g/g-6912a44ed37081918d9ef6192c0e1d1b-va-night-call-algorithm"
-          class="project-item"
-          target="_blank"
-          rel="noopener"
-        >
+        <div class="project-item project-detail-card" data-type="clinical">
           <span class="project-title">VA Night Float Algorithm – Custom GPT</span>
-          <span class="project-desc">// interactive algorithm engine for patient assignment</span>
-        </a>
+          <span class="project-desc">
+            // conversational assistant that applies the night float assignment rules
+          </span>
+          <div class="project-actions">
+            <!-- TODO: update once you have a PDF write-up -->
+            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
+              Instructions (PDF)
+            </a>
+            <a
+              href="https://chatgpt.com/g/g-6912a44ed37081918d9ef6192c0e1d1b-va-night-call-algorithm"
+              class="project-launch-btn"
+              target="_blank"
+              rel="noopener"
+            >
+              LAUNCH
+            </a>
+          </div>
+        </div>
 
-        <!-- ANKIGen -->
-        <a
-          href="https://chatgpt.com/g/g-68e43efd7d608191ba161e3f1e6da8f8-ankigen-med"
-          class="project-item"
-          target="_blank"
-          rel="noopener"
-        >
+        <!-- ===== EDUCATION ===== -->
+
+        <div class="project-item project-detail-card" data-type="education">
           <span class="project-title">ANKIGen — Custom Anki Generator</span>
-          <span class="project-desc">// generate ANKI cards with tags from text</span>
-        </a>
+          <span class="project-desc">
+            // structured cloze + tag engine for medical learning cards
+          </span>
+          <div class="project-actions">
+            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
+              Instructions (PDF)
+            </a>
+            <a
+              href="https://chatgpt.com/g/g-68e43efd7d608191ba161e3f1e6da8f8-ankigen-med"
+              class="project-launch-btn"
+              target="_blank"
+              rel="noopener"
+            >
+              LAUNCH
+            </a>
+          </div>
+        </div>
 
-        <!-- Meeting Project Summarizer -->
-        <a
-          href="https://chatgpt.com/g/g-68d04208ab20819184d3a4013326ed30-project-meeting-summarizer"
-          class="project-item"
-          target="_blank"
-          rel="noopener"
-        >
+        <!-- ===== LIFESTYLE ===== -->
+
+        <div class="project-item project-detail-card" data-type="lifestyle">
+          <span class="project-title">
+            It's a Neapolitan World — AI Personality Survey
+          </span>
+          <span class="project-desc">
+            // playful chocolate / vanilla / strawberry archetype personality model
+          </span>
+          <div class="project-actions">
+            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
+              Instructions (PDF)
+            </a>
+            <a
+              href="https://chatgpt.com/g/g-68c8846d98948191a1bfba004e2b1dbf-it-s-a-neapolitan-world"
+              class="project-launch-btn"
+              target="_blank"
+              rel="noopener"
+            >
+              LAUNCH
+            </a>
+          </div>
+        </div>
+
+        <!-- ===== PRODUCTIVITY ===== -->
+
+        <div class="project-item project-detail-card" data-type="productivity">
           <span class="project-title">Meeting Project Summarizer</span>
-          <span class="project-desc">// turn meeting transcripts into LLM-powered summaries</span>
-        </a>
+          <span class="project-desc">
+            // LLM-powered meeting-to-summary workflow for project updates
+          </span>
+          <div class="project-actions">
+            <a href="#" class="project-doc-link" target="_blank" rel="noopener">
+              Instructions (PDF)
+            </a>
+            <a
+              href="https://chatgpt.com/g/g-68d04208ab20819184d3a4013326ed30-project-meeting-summarizer"
+              class="project-launch-btn"
+              target="_blank"
+              rel="noopener"
+            >
+              LAUNCH
+            </a>
+          </div>
+        </div>
 
-        <!-- Neapolitan World Survey -->
-        <a
-          href="https://chatgpt.com/g/g-68c8846d98948191a1bfba004e2b1dbf-it-s-a-neapolitan-world"
-          class="project-item"
-          target="_blank"
-          rel="noopener"
-        >
-          <span class="project-title">It's a Neapolitan World — AI Personality Survey</span>
-          <span class="project-desc">// chocolate / vanilla / strawberry archetype model</span>
-        </a>
+        <!-- ===== MISCELLANEOUS ===== -->
 
-        <!-- Personal Statement Writing Coach -->
-        <a
-          href="https://chatgpt.com/g/g-68e07a63873c8191b8678a002eea4b31-dr-sage-personal-statement-guru"
-          class="project-item"
-          target="_blank"
-          rel="noopener"
-        >
-          <span class="project-title">Dr Sage - Personal Statement Wrting Guru</span>
-          <span class="project-desc">// personal statement writing coach for residency applicants</span>
-        </a>
-
-        <!-- Life Cross Sections -->
-        <a
-          href="https://chatgpt.com/g/g-68b7826dbf108191bbe26bf6df2fff29-life-cross-sections"
-          class="project-item"
-          target="_blank"
-          rel="noopener"
-        >
-          <span class="project-title">Life Cross Sections: Introspection Tool</span>
-          <span class="project-desc">// determine core values and create personalized mission and vision statements</span>
-        </a>
+        <div class="project-item project-detail-card" data-type="misc">
+          <span class="project-title">Experimental builds (coming soon)</span>
+          <span class="project-desc">
+            // sandbox for future tools that don’t fit other categories yet
+          </span>
+          <div class="project-actions">
+            <span class="project-doc-link disabled">Instructions (PDF) – TBD</span>
+            <span class="project-launch-btn disabled">LAUNCH</span>
+          </div>
+        </div>
 
       </div>
 
@@ -130,10 +214,7 @@
     </footer>
 
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
