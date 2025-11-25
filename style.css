@@ -1265,6 +1265,20 @@ a:active {
   color: #00e5ff;
 }
 
+/* === PINK BACK BUTTON OVERRIDE === */
+
+.back-link {
+  color: #ff4da6 !important;     /* bright pink */
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: #ff80c7 !important;     /* lighter pink hover */
+  text-shadow: 0 0 6px #ff80c7;
+}
+
 
 
 
