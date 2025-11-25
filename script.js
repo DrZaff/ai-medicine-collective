@@ -249,4 +249,58 @@ if (memberCards.length && navigator.clipboard) {
   });
 })();
 
+// === RESOURCES PAGE: flyer lightbox ===
+(function () {
+  const thumbs = document.querySelectorAll(".resource-thumb img");
+  if (!thumbs.length) return; // not on resources page
+
+  // Create overlay once
+  const overlay = document.createElement("div");
+  overlay.className = "lightbox-overlay hidden";
+  overlay.innerHTML = `
+    <div class="lightbox-inner">
+      <button class="lightbox-close" aria-label="Close image">CLOSE</button>
+      <img class="lightbox-img" src="" alt="Club flyer" />
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const imgEl = overlay.querySelector(".lightbox-img");
+  const closeBtn = overlay.querySelector(".lightbox-close");
+
+  function openLightbox(fullSrc) {
+    imgEl.src = fullSrc;
+    overlay.classList.remove("hidden");
+  }
+
+  function closeLightbox() {
+    overlay.classList.add("hidden");
+    imgEl.src = "";
+  }
+
+  thumbs.forEach((thumb) => {
+    const fullSrc = thumb.dataset.full || thumb.src;
+    thumb.addEventListener("click", () => {
+      openLightbox(fullSrc);
+    });
+  });
+
+  // Close when clicking outside the image
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      closeLightbox();
+    }
+  });
+
+  closeBtn.addEventListener("click", closeLightbox);
+
+  // Escape key closes lightbox
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !overlay.classList.contains("hidden")) {
+      closeLightbox();
+    }
+  });
+})();
+
+
 
