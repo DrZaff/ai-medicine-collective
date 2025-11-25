@@ -404,6 +404,79 @@ button:hover {
   opacity: 0.85;
 }
 
+/* --- Project type switching --- */
+
+.project-type {
+  cursor: pointer;
+}
+
+/* fade helpers for switching between type grid and detail list */
+.projects-fade-out {
+  opacity: 0;
+  transition: opacity 0.22s ease-out;
+}
+
+.projects-fade-in {
+  opacity: 0;
+  animation: fadeInSoft 0.3s ease-out forwards;
+}
+
+/* Back link above project details */
+#projects-back-types {
+  margin-top: 12px;
+}
+
+.project-back-link {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.project-back-link:hover {
+  text-decoration: underline;
+}
+
+/* Detail cards extend the existing .project-item look */
+
+.project-detail-card {
+  position: relative;
+}
+
+/* Actions row inside each project card */
+.project-actions {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.project-doc-link {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.project-launch-btn {
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.project-launch-btn:hover {
+  background-color: rgba(0, 255, 102, 0.1);
+  box-shadow: 0 0 6px rgba(0, 255, 102, 0.4);
+}
+
+/* Disabled placeholders */
+.project-actions .disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* Fake "code comment" list style: use on <ul class="list-hash"> */
 .list-hash {
   list-style: none;
@@ -921,4 +994,5 @@ button:hover {
     flex: none;
   }
 }
+
 
