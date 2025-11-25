@@ -225,3 +225,28 @@ if (memberCards.length && navigator.clipboard) {
     });
   }
 })();
+
+// === ADELANTE REPORT PAGE – dropdown stack ====================
+
+(function () {
+  const stack = document.getElementById("adelante-report-stack");
+  if (!stack) return; // not on ADELANTE page
+
+  const header = stack.querySelector(".report-stack-header");
+  const body = stack.querySelector(".report-stack-body");
+
+  if (!header || !body) return;
+
+  header.addEventListener("click", () => {
+    const isHidden = body.classList.contains("hidden");
+    if (isHidden) {
+      body.classList.remove("hidden");
+      stack.classList.add("open");
+    } else {
+      body.classList.add("hidden");
+      stack.classList.remove("open");
+    }
+  });
+})();
+
+
