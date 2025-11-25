@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Member Profile – Billy Phillips</title>
+  <title>Member – Billy Phillips</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
   <div class="terminal-frame">
@@ -15,12 +15,14 @@
       <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
 
       <nav class="nav">
-        <a href="index.html">HOME</a>
-        <a href="about.html">ABOUT</a>
-        <a href="members.html">MEMBERS</a>
-        <a href="schedule.html">MEETING SCHEDULE</a>
-        <a href="projects.html">PROJECTS</a>
-        <a href="join.html">JOIN</a>
+        <a href="../index.html">HOME</a>
+        <a href="../about.html">ABOUT</a>
+        <a href="../members.html">MEMBERS</a>
+        <a href="../schedule.html">MEETING SCHEDULE</a>
+        <a href="../projects.html">PROJECTS</a>
+        <a href="../adelante.html">ADELANTE REPORT</a>
+        <a href="../resources.html">RESOURCES</a>
+        <a href="../join.html">JOIN</a>
       </nav>
 
       <div class="horizontal-rule"></div>
@@ -28,62 +30,54 @@
 
     <main class="section">
       <h2 class="section-title">MEMBER PROFILE</h2>
-      <p class="note">// Internal roster file: AI Medicine Collective</p>
+      <p class="note">// Internal roster file: AI Medicine Collective.</p>
 
       <div class="profile-layout">
-
-        <!-- Photo / mugshot side -->
-        <div class="profile-photo-side">
+        <aside class="profile-photo-side">
           <div class="profile-photo-frame">
-            <!-- When you have a real photo, swap this div for:
-                 <img src="images/brandon-zaffuto.jpg" alt="Brandon Zaffuto" />
-            -->
-            <div class="profile-photo-placeholder">
-              BILLY<br />PHILLIPS
-            </div>
+            <img
+              src="../images/members/billy-phillips.jpg"
+              alt="Billy Phillips"
+            />
           </div>
-        </div>
+        </aside>
 
-        <!-- Data / text side -->
-        <div class="profile-data-side">
+        <section class="profile-data-side">
           <h3 class="profile-name">Billy Phillips</h3>
           <p class="profile-role">Internal Medicine — PGY-3</p>
 
           <dl class="profile-fields">
-            <div>
-              <dt>Department</dt>
-              <dd>Internal Medicine</dd>
-            </div>
-            <div>
-              <dt>Role in collective</dt>
-              <dd>Teammate</dd>
-            </div>
-            <div>
-              <dt>Focus areas</dt>
-              <dd>AI for clinical workflows, medical education, automation, and ethics.</dd>
-            </div>
+            <dt>Department</dt>
+            <dd>Internal Medicine</dd>
+
+            <dt>Role in Collective</dt>
+            <dd>Health Systems & Policy Liaison</dd>
+
+            <dt>Focus areas</dt>
+            <dd>
+              AI and health economics, policy implications, and systems-level deployment.
+            </dd>
           </dl>
 
           <div class="profile-actions">
-            <span class="profile-email-label">Email:</span>
-            <span class="profile-email-value">philliwp@ucmail.uc.edu</span>
+            <span>Email:&nbsp;
+              <span id="profile-email">billy-email@ucmail.uc.edu</span>
+            </span>
             <button
-              class="copy-email-btn"
               type="button"
-              data-email="philliwp@ucmail.uc.edu"
+              class="copy-email-btn"
+              data-email="billy-email@ucmail.uc.edu"
             >
               Copy my email
             </button>
-            <span class="copy-status" aria-live="polite"></span>
+            <span class="copy-status"></span>
           </div>
-
-          <p class="note">
-            // Click &ldquo;Copy my email&rdquo; to copy the address to your clipboard.
-          </p>
-
-          <p><a href="members.html">&lt; Back to members</a></p>
-        </div>
+        </section>
       </div>
+
+      <p>
+        <a href="../members.html" class="back-link">&lt; Back to members</a>
+      </p>
     </main>
 
     <div class="horizontal-rule bottom-rule"></div>
@@ -92,30 +86,8 @@
       &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
       <span class="cursor">█</span>
     </footer>
-
   </div>
 
-  <!-- Copy-email logic just for this page -->
-  <script>
-    (function () {
-      const btn = document.querySelector(".copy-email-btn");
-      const status = document.querySelector(".copy-status");
-      if (!btn || !navigator.clipboard) return;
-
-      btn.addEventListener("click", () => {
-        const email = btn.dataset.email;
-        if (!email) return;
-
-        navigator.clipboard.writeText(email).then(() => {
-          btn.classList.add("copied");
-          if (status) status.textContent = "Copied!";
-          setTimeout(() => {
-            btn.classList.remove("copied");
-            if (status) status.textContent = "";
-          }, 1200);
-        });
-      });
-    })();
-  </script>
+  <script src="../script.js"></script>
 </body>
 </html>
