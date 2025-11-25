@@ -776,3 +776,149 @@ button:hover {
     font-size: 0.75rem;
   }
 }
+
+/* === Members page tweaks for profile links ========================= */
+
+/* Member cards are no longer clickable as a whole */
+.member-card {
+  cursor: default;
+}
+
+/* Make the member name look like a subtle link */
+.member-name .member-link {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px dashed transparent;
+}
+
+.member-name .member-link:hover {
+  border-bottom-color: var(--accent);
+  text-shadow: 0 0 4px rgba(0, 255, 102, 0.9);
+}
+
+/* === Member profile layout ========================================= */
+
+.profile-layout {
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+  align-items: stretch;
+}
+
+.profile-photo-side {
+  flex: 0 0 40%;
+}
+
+.profile-data-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Big “criminal-file” style photo frame */
+.profile-photo-frame {
+  border: 2px solid var(--accent);
+  background: radial-gradient(circle at top, #071707 0, #000 65%);
+  padding: 12px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(0, 255, 102, 0.25);
+}
+
+.profile-photo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+}
+
+/* Placeholder text if you don't have a photo yet */
+.profile-photo-placeholder {
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* Text panel */
+.profile-name {
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profile-role {
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.profile-fields {
+  font-size: 0.85rem;
+  border-top: 1px dashed var(--accent);
+  padding-top: 8px;
+}
+
+.profile-fields dt {
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.profile-fields dd {
+  margin: 0 0 6px;
+}
+
+/* Email section */
+.profile-actions {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--accent);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.copy-email-btn {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.copy-email-btn:hover {
+  background: rgba(0, 255, 102, 0.08);
+}
+
+.copy-email-btn.copied {
+  box-shadow: 0 0 10px #00ff9d;
+  border-color: #00ff9d;
+}
+
+.copy-status {
+  min-width: 80px;
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+/* Stack on small screens */
+@media (max-width: 720px) {
+  .profile-layout {
+    flex-direction: column;
+  }
+
+  .profile-photo-side {
+    flex: none;
+  }
+}
+
