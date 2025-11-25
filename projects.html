@@ -130,7 +130,7 @@
           </div>
         </article>
 
-        <!-- Education (placeholder examples) -->
+        <!-- Education -->
         <article
           class="project-item project-detail-card"
           data-type="education"
@@ -212,6 +212,96 @@
       <span class="cursor">█</span>
     </footer>
   </div>
+
+  <!-- Inline script JUST for the projects page -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const typesContainer   = document.getElementById("project-types");
+      const detailsContainer = document.getElementById("project-details");
+      const backWrapper      = document.getElementById("projects-back-types");
+      const typeLabel        = document.getElementById("projects-current-type-label");
+      if (!typesContainer || !detailsContainer) return;
+
+      const detailCards = detailsContainer.querySelectorAll(".project-detail-card");
+
+      const typeNames = {
+        clinical: "Clinical tools",
+        education: "Education",
+        lifestyle: "Lifestyle",
+        productivity: "Productivity",
+        misc: "Miscellaneous"
+      };
+
+      // On page load: ensure details are hidden, types visible
+      typesContainer.classList.remove("hidden");
+      detailsContainer.classList.add("hidden");
+      if (backWrapper) backWrapper.classList.add("hidden");
+      if (typeLabel)   typeLabel.classList.add("hidden");
+
+      // Click a project type
+      typesContainer.querySelectorAll(".project-type").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopImmediatePropagation(); // ignore any other handlers on this link
+
+          const type = link.dataset.type;
+          if (!type) return;
+
+          if (typeLabel) {
+            typeLabel.textContent = `// ${typeNames[type] || "Projects"}`;
+            typeLabel.classList.remove("hidden");
+          }
+
+          // show only matching detail cards
+          detailCards.forEach((card) => {
+            card.style.display = card.dataset.type === type ? "block" : "none";
+          });
+
+          // fade out types, then hide and show details
+          typesContainer.classList.add("projects-fade-out");
+          setTimeout(() => {
+            typesContainer.classList.add("hidden");
+            typesContainer.classList.remove("projects-fade-out");
+
+            detailsContainer.classList.remove("hidden");
+            detailsContainer.classList.add("projects-fade-in");
+
+            if (backWrapper) backWrapper.classList.remove("hidden");
+
+            setTimeout(() => {
+              detailsContainer.classList.remove("projects-fade-in");
+            }, 350);
+          }, 220);
+        });
+      });
+
+      // Back to project types
+      if (backWrapper) {
+        const backLink = backWrapper.querySelector(".project-back-link");
+        if (backLink) {
+          backLink.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            detailsContainer.classList.add("projects-fade-out");
+            setTimeout(() => {
+              detailsContainer.classList.add("hidden");
+              detailsContainer.classList.remove("projects-fade-out");
+
+              typesContainer.classList.remove("hidden");
+              typesContainer.classList.add("projects-fade-in");
+
+              if (typeLabel) typeLabel.classList.add("hidden");
+              backWrapper.classList.add("hidden");
+
+              setTimeout(() => {
+                typesContainer.classList.remove("projects-fade-in");
+              }, 350);
+            }, 220);
+          });
+        }
+      }
+    });
+  </script>
 
   <script src="script.js"></script>
 </body>
