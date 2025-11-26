@@ -444,6 +444,17 @@ button:hover {
   border-radius: 999px;
 }
 
+/* Ensure button colors don't change after click */
+.project-doc-link:visited {
+  color: #00e5ff;
+  border-color: #00e5ff;
+}
+
+.project-launch-btn:visited {
+  color: #ffe600;
+  border-color: #ffe600;
+}
+
 /* === MEETING SCHEDULE STYLES === */
 
 .meeting-section {
@@ -1426,6 +1437,7 @@ a:active {
     padding: 20px 16px;
   }
 }
+
 
 
 
