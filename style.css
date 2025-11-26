@@ -1302,97 +1302,57 @@ a:active {
   text-shadow: 0 0 6px #ff80c7;
 }
 
-/* JOIN FORM */
-.join-form {
+/* === JOIN PAGE FORM ========================================= */
+
+.join-layout {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 350px;
-  margin-top: 1.5rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 40px;
+  margin-top: 24px;
 }
 
-.join-form label {
-  color: #00ff9f;
-  font-weight: 600;
-}
-
-.join-form input {
-  background: #000;
-  border: 1px solid #00ff9f;
-  color: #00ff9f;
-  padding: 8px;
-  font-size: 1rem;
-}
-
-.join-submit {
-  background: #00ffff;
-  color: #000;
-  font-weight: 700;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  text-transform: uppercase;
-}
-
-.join-submit:hover {
-  background: #66ffff;
-  box-shadow: 0 0 10px #66ffff;
-}
-
-.success-message {
-  color: #00ff9f;
-  margin-top: 1rem;
-  font-weight: 600;
-}
-
-/* =========================================================
-   JOIN PAGE – FORM + LAYOUT
-   ========================================================= */
-
-/* Outer centered box */
+/* Form container box */
 .join-box {
   width: 420px;
-  margin: 40px auto;            /* Centers the box */
-  padding: 24px 20px;
+  margin: 0; /* no auto-centering – keeps it on the left */
+  padding: 24px;
   border: 1px solid var(--accent);
-  background: rgba(0, 0, 0, 0.65);
-  box-shadow: 0 0 14px rgba(0, 255, 102, 0.25);
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 12px rgba(255, 105, 180, 0.3);
 }
 
-/* Form wrapper */
 .join-form {
-  margin-top: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  border: none;         /* border now handled by .join-box */
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
-/* Label + input row */
 .join-row {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
-/* Label */
 .join-label {
-  font-size: 0.8rem;
+  min-width: 60px;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  opacity: 0.9;
 }
 
-/* Input field */
 .join-input {
-  width: 100%;
+  flex: 1;
+  min-width: 180px;
   background: transparent;
   border: 1px solid var(--accent);
   color: var(--text);
-  padding: 8px 10px;
+  padding: 6px 8px;
   font-family: "Courier New", monospace;
   font-size: 0.9rem;
-  border-radius: 4px;
 }
 
 .join-input:focus {
@@ -1400,43 +1360,64 @@ a:active {
   box-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
 }
 
-/* Submit button */
 .join-submit {
-  margin-top: 8px;
-  width: 100%;
-  padding: 10px 0;
+  margin-top: 12px;
+  padding: 8px 22px;
   border-radius: 999px;
   border: 1px solid #ff66cc;
   color: #ff66cc;
   background: transparent;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: 0.15s ease-out;
 }
 
 .join-submit:hover {
-  background: rgba(255, 102, 204, 0.1);
-  box-shadow: 0 0 12px rgba(255, 102, 204, 0.45);
+  background: rgba(255, 102, 204, 0.08);
+  box-shadow: 0 0 10px rgba(255, 102, 204, 0.4);
 }
 
-/* Hint text */
 .join-hint {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 0.8rem;
-  opacity: 0.8;
-  line-height: 1.4;
+  opacity: 0.85;
 }
 
-/* Mobile adjustments */
-@media (max-width: 480px) {
+/* RIGHT-SIDE ART */
+
+.join-art-box {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.join-art {
+  max-width: 420px;
+  width: 100%;
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 18px rgba(0, 255, 102, 0.5);
+}
+
+/* Stack vertically on smaller screens */
+@media (max-width: 900px) {
+  .join-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .join-box {
-    width: 95%;
-    margin: 24px auto;
-    padding: 20px 16px;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .join-art-box {
+    margin-top: 24px;
   }
 }
+
+
 
 
 
