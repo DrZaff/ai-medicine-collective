@@ -1302,7 +1302,7 @@ a:active {
   text-shadow: 0 0 6px #ff80c7;
 }
 
-/* === JOIN PAGE FORM ========================================= */
+/* === JOIN PAGE – two aligned neon panels ==================== */
 
 .join-layout {
   display: flex;
@@ -1312,21 +1312,43 @@ a:active {
   margin-top: 24px;
 }
 
-/* Form container box (neon panel) */
-.join-box {
-  width: 420px;
-  margin: 0;
-  padding: 24px;
+/* Shared neon panel look for both sides */
+.join-panel {
   border: 1px solid var(--accent);
   background: rgba(0, 0, 0, 0.6);
   box-shadow: 0 0 12px rgba(0, 255, 102, 0.35);
+  padding: 24px;
 }
 
+/* Left panel width */
+.join-box {
+  width: 420px;
+}
+
+/* Right panel width & centering of art */
+.join-art-box {
+  width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Art itself – fills the panel, blends with bg */
+.join-art {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border: none;
+  box-shadow: none;
+}
+
+/* Form internals */
 .join-form {
   border: none;
-  padding: 0;
   background: transparent;
   box-shadow: none;
+  margin: 0;
+  padding: 0;
 }
 
 .join-row {
@@ -1384,50 +1406,19 @@ a:active {
   opacity: 0.85;
 }
 
-/* RIGHT-SIDE ART – smaller, blended into background */
-.join-art-box {
-  flex: 0 0 260px;          /* fixed column width */
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.join-art {
-  max-width: 260px;
-  width: 100%;
-  border: none;             /* remove neon frame */
-  box-shadow: none;         /* no glow – blends with black */
-  display: block;
-}
-
-/* Stack vertically on smaller screens */
+/* Stack panels on smaller screens */
 @media (max-width: 900px) {
   .join-layout {
     flex-direction: column;
     align-items: center;
   }
 
-  .join-box {
+  .join-box,
+  .join-art-box {
     width: 100%;
     max-width: 420px;
   }
-
-  .join-art-box {
-    margin-top: 24px;
-    flex: 0 0 auto;
-  }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
