@@ -1718,5 +1718,16 @@ a:active {
   }
 }
 
+.meeting-date {
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  padding: 6px 10px;
+  border-radius: 6px;          /* ← No more circles */
+  display: inline-block;
+  min-width: 110px;            /* ← Makes all date boxes same width */
+  text-align: center;          /* ← Centers numbers inside */
+  font-family: "Courier New", monospace;
+  font-size: 0.85rem;
+}
+
 
 
