@@ -2,116 +2,176 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AI Medicine Collective</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VA Night Shift Algorithm – ClinicalToolsDEV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#050810" />
+
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180.png" />
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="terminal-frame">
-
-    <!-- TOP BORDER -->
-    <div class="horizontal-rule"></div>
-
-    <!-- HEADER (hidden until password is correct) -->
-    <header id="site-header" class="hidden">
-      <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
-      <div class="horizontal-rule"></div>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1 class="app-title">VA Night Shift Admissions Algorithm</h1>
+        <p class="app-subtitle">
+          Compact simulator for overnight admissions across Long, Medium, Post, Pre, and Short call teams.
+        </p>
+      </div>
+      <div class="app-meta">
+        <span class="app-badge">ClinicalToolsDEV</span>
+      </div>
     </header>
 
-    <!-- PASSWORD GATE -->
-    <section id="gate">
-      <h2 class="section-title">ACCESS REQUIRED</h2>
-      <p class="gate-text">
-        Enter the AI Medicine Collective password to continue.
-      </p>
-      <form id="password-form">
-        <label for="password-input" class="prompt">&gt; PASSWORD:</label>
-        <input
-          type="password"
-          id="password-input"
-          autocomplete="off"
-          required
-        />
-        <button type="submit">ENTER</button>
-      </form>
-      <p id="error-message" class="error hidden">
-        ACCESS DENIED. TRY AGAIN.
-      </p>
+    <main class="app-main">
+      <!-- Inputs card -->
+      <section class="card card-inputs">
+        <h2 class="card-title">Starting census</h2>
+        <p class="inputs-instruction">
+          Enter the starting census for each call team below. Team numbers are auto-assigned at midnight.
+        </p>
 
-      <p class="gate-hint">
-        # Hint: ask a member of the Collective.
-      </p>
+        <form id="tool-form" class="form-grid">
+          <div class="form-field form-field--inline">
+            <label for="L_start" class="field-label">
+              <span id="label-L">Long call (Team ?)</span>
+            </label>
+            <input id="L_start" name="L_start" type="number" step="1" min="0" class="field-input field-input--compact" />
+          </div>
 
-      <div class="horizontal-rule"></div>
-    </section>
+          <div class="form-field form-field--inline">
+            <label for="M_start" class="field-label">
+              <span id="label-M">Medium call (Team ?)</span>
+            </label>
+            <input id="M_start" name="M_start" type="number" step="1" min="0" class="field-input field-input--compact" />
+          </div>
 
-    <!-- MAIN CONTENT (hidden until password correct) -->
-    <main id="site-content" class="hidden">
+          <div class="form-field form-field--inline">
+            <label for="Post_start" class="field-label">
+              <span id="label-Post">Post call (Team ?)</span>
+            </label>
+            <input id="Post_start" name="Post_start" type="number" step="1" min="0" class="field-input field-input--compact" />
+          </div>
 
-      <section class="section landing-links">
+          <div class="form-field form-field--inline">
+            <label for="Pre_start" class="field-label">
+              <span id="label-Pre">Pre call (Team ?)</span>
+            </label>
+            <input id="Pre_start" name="Pre_start" type="number" step="1" min="0" class="field-input field-input--compact" />
+          </div>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="about.html">&gt; ABOUT</a>
-          </h2>
-        </div>
+          <div class="form-field form-field--inline">
+            <label for="S_start" class="field-label">
+              <span id="label-S">Short call (Team ?)</span>
+            </label>
+            <input id="S_start" name="S_start" type="number" step="1" min="0" class="field-input field-input--compact" />
+          </div>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="members.html">&gt; MEMBERS</a>
-          </h2>
-        </div>
+          <div class="form-field form-field--inline form-field--admissions">
+            <label for="numAdmissions" class="field-label">
+              <span>Number of simulated overnight admissions</span>
+            </label>
+            <input
+              id="numAdmissions"
+              name="numAdmissions"
+              type="number"
+              step="1"
+              min="1"
+              max="40"
+              class="field-input field-input--compact"
+              value="10"
+            />
+          </div>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="schedule.html">&gt; MEETING SCHEDULE</a>
-          </h2>
-        </div>
-
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="projects.html">&gt; PROJECTS</a>
-          </h2>
-        </div>
-
-        <!-- NEW: App Store link -->
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="appstore.html">&gt; APP STORE</a>
-          </h2>
-        </div>
-
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="adelante.html">&gt; ADELANTE REPORT</a>
-          </h2>
-        </div>
-
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="resources.html">&gt; RESOURCES</a>
-          </h2>
-        </div>
-
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="join.html">&gt; JOIN</a>
-          </h2>
-        </div>
-
+          <button type="submit" class="btn-primary btn-primary--full">
+            Run algorithm
+          </button>
+        </form>
       </section>
 
-      <div class="horizontal-rule bottom-rule"></div>
+      <!-- Results card -->
+      <section class="card card-results">
+        <h2 class="card-title">Admission sequence</h2>
+        <div id="results-container" class="results-body">
+          <p class="results-placeholder">
+            Enter starting censuses and tap "Run algorithm" to see the admission sequence by call team.
+          </p>
+        </div>
+      </section>
 
-      <footer class="footer">
-        &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
-        <span class="cursor">█</span>
-      </footer>
-
+      <!-- Flags / warnings card -->
+      <section class="card card-warnings">
+        <h2 class="card-title">Flags &amp; notes</h2>
+        <div id="flags-container" class="flags-body">
+          <p class="results-placeholder">
+            Capacity concerns and CALL CHIEF events will appear here.
+          </p>
+        </div>
+      </section>
     </main>
 
+    <footer class="app-footer">
+      <p class="credit-line">
+        This tool was developed by William Phillips, DO and Brandon Zaffuto, MD as part of the AI Medicine Collective.
+        For more information on the collective, visit <span class="credit-link">www.aimedicinecollective.com</span>
+        (password: <span class="credit-link">collective</span>).
+      </p>
+    </footer>
   </div>
 
+  <!-- iOS + Android INSTALL BANNER -->
+  <div id="ios-install-hint" class="ios-install-hint ios-install-hint-hidden">
+    <div class="ios-install-hint-icon">📱</div>
+    <div class="ios-install-hint-text">
+      <strong>Install this app</strong><br />
+      On iPhone: tap the <strong>Share</strong> button, then choose
+      <strong>Add to Home Screen</strong>.<br />
+      On Android: tap the <strong>⋮</strong> menu, then choose
+      <strong>Install app</strong> or <strong>Add to Home screen</strong>.
+    </div>
+    <button type="button" class="ios-install-hint-close" aria-label="Dismiss">
+      CLOSE
+    </button>
+  </div>
+
+  <!-- Existing JS -->
   <script src="script.js"></script>
+
+  <!-- Register Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("./service-worker.js")
+          .catch((err) => {
+            console.error("Service worker registration failed:", err);
+          });
+      });
+    }
+  </script>
+
+  <!-- iOS Install Hint Script -->
+  <script src="ios-install-hint.js"></script>
+
+  <!-- Hide banner when ?mode=desktop -->
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("mode") === "desktop") {
+        const hint = document.getElementById("ios-install-hint");
+        if (hint) {
+          hint.style.display = "none";
+          hint.classList.add("ios-install-hint-hidden");
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
