@@ -528,10 +528,14 @@ button:hover {
   opacity: 0.85;
 }
 
-/* === HOME PAGE APP STORE === */
+/* === APP STORE PAGE === */
 
-.app-store {
-  margin-top: 32px;
+.app-store-page a {
+  color: #ffd54f;
+}
+
+.app-store-page a:hover {
+  color: #fff59d;
 }
 
 .appstore-intro {
