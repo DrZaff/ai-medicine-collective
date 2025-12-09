@@ -606,3 +606,72 @@ button:hover {
   opacity: 1;
 }
 
+/* Global link styling */
+a {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 4px rgba(0, 255, 102, 0.8);
+}
+
+/* Turn lists of links into terminal-style cards (used on schedule/resources) */
+.section ul {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+.section ul li {
+  margin: 6px 0;
+}
+
+.section ul li a {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 255, 102, 0.35);
+  background: rgba(0, 0, 0, 0.8);
+  text-decoration: none;
+}
+
+.section ul li a:hover {
+  background: rgba(0, 255, 102, 0.06);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
+}
+
+/* Default content image styling */
+.section img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
+  border: 1px solid rgba(0, 255, 102, 0.25);
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.25);
+}
+
+/* --- Compact home layout (index) --- */
+.landing-links {
+  gap: 16px;       /* was 28px */
+  margin-top: 16px; /* was 32px */
+}
+
+/* --- Mobile layout tightening for content pages --- */
+@media (max-width: 600px) {
+  .terminal-frame {
+    max-width: 100%;
+    margin: 6px;
+    padding: 14px 10px 10px;
+  }
+
+  .headline {
+    font-size: 1.1rem;
+    margin: 2px 0 6px;
+  }
+
+  .section {
+    margin-top: 8px; /* slightly tighter than desktop */
+  }
+}
+

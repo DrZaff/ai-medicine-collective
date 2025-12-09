@@ -1,361 +1,336 @@
-// === AI Medicine Collective - soft gate + session memory + UI polish ===
+// HEART Score – ClinicalToolsDEV style
+// Logic is kept in pure functions for reuse across apps.
 
-const CLUB_PASSWORD = "collective";
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("tool-form");
+  const resultsContainer = document.getElementById("results-container");
+  const flagsContainer = document.getElementById("flags-container");
 
-const header = document.getElementById("site-header");
-const gate = document.getElementById("gate");
-const main = document.getElementById("site-content");
-const form = document.getElementById("password-form");
-const errorMsg = document.getElementById("error-message");
-const input = document.getElementById("password-input");
+  if (!form) return;
 
-function createLogoutButton() {
-  if (document.getElementById("logout-btn")) return;
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
 
-  const btn = document.createElement("button");
-  btn.id = "logout-btn";
-  btn.className = "logout-btn";
-  btn.textContent = "LOGOUT";
+    const inputs = readInputs();
+    const validationErrors = validateInputs(inputs);
 
-  btn.addEventListener("click", () => {
-    sessionStorage.removeItem("amc-auth");
-    window.location.href = "index.html";
-  });
-
-  document.body.appendChild(btn);
-}
-
-function showAuthBanner() {
-  const banner = document.createElement("div");
-  banner.className = "auth-banner";
-  banner.textContent = "AUTHENTICATION ACCEPTED";
-  document.body.appendChild(banner);
-
-  setTimeout(() => banner.remove(), 1800);
-}
-
-function unlockSite(withAnimation = true) {
-  if (gate) gate.classList.add("hidden");
-  if (header) header.classList.remove("hidden");
-  if (main) {
-    main.classList.remove("hidden");
-    main.classList.add("fade-in");
-  }
-
-  createLogoutButton();
-
-  if (withAnimation) showAuthBanner();
-}
-
-// Already authenticated in this tab?
-if (sessionStorage.getItem("amc-auth") === "true") {
-  unlockSite(false);
-}
-
-// Handle password form submission (index only)
-if (form) {
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    const value = input.value.trim();
-
-    if (value === CLUB_PASSWORD) {
-      sessionStorage.setItem("amc-auth", "true");
-      if (errorMsg) errorMsg.classList.add("hidden");
-      unlockSite(true);
-      input.value = "";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      if (errorMsg) errorMsg.classList.remove("hidden");
-      input.value = "";
-      input.focus();
+    if (validationErrors.length > 0) {
+      renderValidationErrors(resultsContainer, validationErrors);
+      flagsContainer.innerHTML = "";
+      return;
     }
+
+    const calcResults = performCalculations(inputs);
+    const interpretation = interpretResults(calcResults);
+    const flags = deriveFlags(calcResults, interpretation);
+
+    renderResults(resultsContainer, calcResults, interpretation);
+    renderFlags(flagsContainer, flags);
   });
-}
-
-// === Global: style all "< Back" anchors as .back-link ================
-
-document.querySelectorAll("a").forEach((a) => {
-  if (a.textContent.trim().startsWith("< Back")) {
-    a.classList.add("back-link");
-  }
 });
 
-// === JOIN PAGE COPY EMAIL ===========================================
+// ---- Input Handling ----
 
-const copyEmailBtn = document.getElementById("copy-email-btn");
-const joinEmailSpan = document.getElementById("join-email");
+function readInputs() {
+  const historyScore = parseInt(
+    document.getElementById("historyScore").value,
+    10
+  );
+  const ecgScore = parseInt(document.getElementById("ecgScore").value, 10);
+  const tropScore = parseInt(document.getElementById("tropScore").value, 10);
+  const ageYears = parseFloat(document.getElementById("ageYears").value);
 
-if (copyEmailBtn && joinEmailSpan && navigator.clipboard) {
-  copyEmailBtn.addEventListener("click", () => {
-    const email = joinEmailSpan.textContent.trim();
-
-    navigator.clipboard.writeText(email).then(() => {
-      copyEmailBtn.classList.add("copied");
-      setTimeout(() => copyEmailBtn.classList.remove("copied"), 700);
-    });
+  const riskFactorCheckboxes = document.querySelectorAll(
+    ".risk-factor"
+  );
+  const riskFactors = [];
+  riskFactorCheckboxes.forEach((cb) => {
+    if (cb.checked) riskFactors.push(cb.value);
   });
-}
 
-// === MEMBERS PAGE copy by clicking a card ===========================
-
-const memberCards = document.querySelectorAll(".member-card");
-
-if (memberCards.length && navigator.clipboard) {
-  memberCards.forEach((card) => {
-    card.style.cursor = "pointer";
-
-    card.addEventListener("click", () => {
-      const email = card.dataset.email;
-      if (!email) return;
-
-      navigator.clipboard.writeText(email).then(() => {
-        const nameEl = card.querySelector(".member-name");
-        if (!nameEl) return;
-
-        if (!nameEl.dataset.originalText) {
-          nameEl.dataset.originalText = nameEl.textContent;
-        }
-
-        nameEl.textContent = `Copied: ${email}`;
-        card.classList.add("member-copied");
-
-        setTimeout(() => {
-          nameEl.textContent = nameEl.dataset.originalText;
-          card.classList.remove("member-copied");
-        }, 1200);
-      });
-    });
-  });
-}
-
-// === MEMBER PROFILE: copy email button ========================
-
-(function () {
-  const btn = document.querySelector(".copy-email-btn");
-  const emailSpan = document.querySelector(".profile-email-address");
-
-  if (!btn || !emailSpan || !navigator.clipboard) return;
-
-  btn.addEventListener("click", () => {
-    const email = emailSpan.textContent.trim();
-    if (!email) return;
-
-    navigator.clipboard
-      .writeText(email)
-      .then(() => {
-        const originalText = btn.textContent;
-        btn.textContent = "COPIED!";
-        btn.classList.add("copied");
-
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.classList.remove("copied");
-        }, 900);
-      })
-      .catch((err) => {
-        console.error("Failed to copy email:", err);
-      });
-  });
-})();
-
-// === PROJECTS PAGE: type grid <-> detail list switching =============
-
-(function () {
-  const typesContainer = document.getElementById("project-types");
-  const detailsContainer = document.getElementById("project-details");
-  if (!typesContainer || !detailsContainer) return; // not on projects page
-
-  const typeLabel = document.getElementById("projects-current-type-label");
-  const detailCards = detailsContainer.querySelectorAll(".project-detail-card");
-
-  // This is the bottom "< Back" link on the page
-  const backLink = document.querySelector("a.back-link");
-
-  const typeNames = {
-    clinical: "Clinical tools",
-    education: "Education",
-    lifestyle: "Lifestyle",
-    productivity: "Productivity",
-    misc: "Miscellaneous",
+  return {
+    historyScore,
+    ecgScore,
+    tropScore,
+    ageYears,
+    riskFactors,
   };
+}
 
-  let showingDetails = false;
+function validateInputs(inputs) {
+  const errors = [];
 
-  function showDetails(type) {
-    if (typeLabel) {
-      typeLabel.textContent = `// ${typeNames[type] || "Projects"}`;
-      typeLabel.classList.remove("hidden");
-    }
-
-    detailCards.forEach((card) => {
-      card.style.display = card.dataset.type === type ? "block" : "none";
-    });
-
-    typesContainer.classList.add("projects-fade-out");
-
-    setTimeout(() => {
-      typesContainer.classList.add("hidden");
-      typesContainer.classList.remove("projects-fade-out");
-
-      detailsContainer.classList.remove("hidden");
-      detailsContainer.classList.add("projects-fade-in");
-
-      setTimeout(() => {
-        detailsContainer.classList.remove("projects-fade-in");
-      }, 350);
-    }, 220);
-
-    showingDetails = true;
+  if (Number.isNaN(inputs.historyScore)) {
+    errors.push("History category is required.");
+  }
+  if (Number.isNaN(inputs.ecgScore)) {
+    errors.push("ECG category is required.");
+  }
+  if (Number.isNaN(inputs.tropScore)) {
+    errors.push("Troponin category is required.");
+  }
+  if (Number.isNaN(inputs.ageYears)) {
+    errors.push("Age is required and must be a number.");
+  } else if (inputs.ageYears < 0 || inputs.ageYears > 120) {
+    errors.push("Age appears outside typical human range (0–120).");
   }
 
-  function showTypes() {
-    if (typeLabel) {
-      typeLabel.classList.add("hidden");
-      typeLabel.textContent = "";
-    }
+  return errors;
+}
 
-    detailsContainer.classList.add("projects-fade-out");
+// ---- Core Calculations ----
 
-    setTimeout(() => {
-      detailsContainer.classList.add("hidden");
-      detailsContainer.classList.remove("projects-fade-out");
+function performCalculations(inputs) {
+  const agePoints = calculateHeartAgePoints(inputs.ageYears);
+  const riskFactorPoints = calculateHeartRiskFactorPoints(
+    inputs.riskFactors
+  );
 
-      typesContainer.classList.remove("hidden");
-      typesContainer.classList.add("projects-fade-in");
+  const totalScore =
+    inputs.historyScore +
+    inputs.ecgScore +
+    agePoints +
+    riskFactorPoints +
+    inputs.tropScore;
 
-      setTimeout(() => {
-        typesContainer.classList.remove("projects-fade-in");
-      }, 350);
-    }, 220);
+  const riskCategory = classifyHeartRiskCategory(totalScore);
 
-    showingDetails = false;
+  return {
+    ageYears: inputs.ageYears,
+    historyScore: inputs.historyScore,
+    ecgScore: inputs.ecgScore,
+    tropScore: inputs.tropScore,
+    riskFactors: inputs.riskFactors,
+    agePoints,
+    riskFactorPoints,
+    totalScore,
+    riskCategory,
+  };
+}
+
+// Pure helper functions – portable to RN/Swift/Flutter
+
+function calculateHeartAgePoints(ageYears) {
+  if (ageYears < 45) return 0;
+  if (ageYears < 65) return 1;
+  return 2;
+}
+
+function calculateHeartRiskFactorPoints(riskFactors) {
+  if (!riskFactors || riskFactors.length === 0) return 0;
+
+  const hasKnownAthero = riskFactors.includes("knownAthero");
+  // All checkboxes except knownAthero contribute to count
+  const count = riskFactors.filter((rf) => rf !== "knownAthero").length;
+
+  if (hasKnownAthero) {
+    // By definition, known atherosclerotic disease → 2 points
+    return 2;
   }
 
-  // Clicking a project type => drill down into that category
-  typesContainer.querySelectorAll(".project-type").forEach((link) => {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      const type = link.dataset.type;
-      if (!type) return;
-      showDetails(type);
-    });
-  });
+  if (count === 0) return 0;
+  if (count <= 2) return 1;
+  return 2;
+}
 
-  // Bottom "< Back" link:
-  // - When details are showing -> intercept and go back to types
-  // - When on type grid -> behaves like normal link (to index.html)
-  if (backLink) {
-    backLink.addEventListener("click", (e) => {
-      if (!showingDetails) {
-        // normal navigation to index.html
-        return;
-      }
-      e.preventDefault();
-      showTypes();
+function classifyHeartRiskCategory(totalScore) {
+  if (totalScore <= 3) return "low";
+  if (totalScore <= 6) return "intermediate";
+  return "high";
+}
+
+// ---- Interpretation ----
+
+function interpretResults(results) {
+  let summary = "";
+  const notes = [];
+
+  if (results.riskCategory === "low") {
+    summary = "Low-risk HEART score (0–3).";
+    notes.push(
+      "Associated with 0.9–1.7% risk of MACE; in the HEART score study, these patients were typically discharged."
+    );
+  } else if (results.riskCategory === "intermediate") {
+    summary = "Intermediate-risk HEART score (4–6).";
+    notes.push(
+      "Associated with a 12–16.6% estimated risk of MACE; in the HEART score study, these patients were typically admitted to the hospital."
+    );
+  } else {
+    summary = "High-risk HEART score (7–10).";
+    notes.push(
+      "Associated with 50–65% risk of MACE; in the HEART score study, these patients were candidates for early invasive measures."
+    );
+  }
+
+  // MACE definition – shown for all risk categories
+  notes.push(
+    "Major adverse cardiac events (MACE): acute myocardial infarction, need for percutaneous coronary intervention or coronary artery bypass graft, or death within 6 weeks."
+  );
+
+  if (results.ageYears < 18) {
+    notes.push(
+      "HEART score was developed for adult chest pain populations; use in younger patients is not well validated."
+    );
+  }
+
+  return {
+    summary,
+    notes,
+  };
+}
+
+// ---- Flags / Alerts ----
+
+function deriveFlags(results, interpretation) {
+  const flags = [];
+
+  // Risk-based flags
+  if (results.riskCategory === "high") {
+    flags.push({
+      level: "danger",
+      message:
+        "High-risk HEART score (≥7). Consider urgent evaluation per ACS protocol.",
+    });
+  } else if (results.riskCategory === "intermediate") {
+    flags.push({
+      level: "warning",
+      message:
+        "Intermediate-risk HEART score (4–6). Requires close clinical follow-up and appropriate testing.",
     });
   }
-})();
 
-// === ADELANTE REPORT PAGE – dropdown stack ====================
+  // Age-related flags
+  if (results.ageYears < 18) {
+    flags.push({
+      level: "warning",
+      message:
+        "Tool is primarily validated for adult chest pain populations (≥18 years).",
+    });
+  }
 
-(function () {
-  const stack = document.getElementById("adelante-report-stack");
-  if (!stack) return; // not on ADELANTE page
+  return flags;
+}
 
-  const header = stack.querySelector(".report-stack-header");
-  const body = stack.querySelector(".report-stack-body");
+// ---- Rendering ----
 
-  if (!header || !body) return;
-
-  header.addEventListener("click", () => {
-    const isHidden = body.classList.contains("hidden");
-    if (isHidden) {
-      body.classList.remove("hidden");
-      stack.classList.add("open");
-    } else {
-      body.classList.add("hidden");
-      stack.classList.remove("open");
-    }
-  });
-})();
-
-// === RESOURCES PAGE: flyer lightbox ===
-(function () {
-  const thumbs = document.querySelectorAll(".resource-thumb img");
-  if (!thumbs.length) return; // not on resources page
-
-  // Create overlay once
-  const overlay = document.createElement("div");
-  overlay.className = "lightbox-overlay hidden";
-  overlay.innerHTML = `
-    <div class="lightbox-inner">
-      <button class="lightbox-close" aria-label="Close image">CLOSE</button>
-      <img class="lightbox-img" src="" alt="Club flyer" />
+function renderValidationErrors(container, errors) {
+  container.innerHTML = `
+    <div class="results-errors">
+      <h3>Check your inputs</h3>
+      <ul>
+        ${errors.map((err) => `<li>${err}</li>`).join("")}
+      </ul>
     </div>
   `;
-  document.body.appendChild(overlay);
-
-  const imgEl = overlay.querySelector(".lightbox-img");
-  const closeBtn = overlay.querySelector(".lightbox-close");
-
-  function openLightbox(fullSrc) {
-    imgEl.src = fullSrc;
-    overlay.classList.remove("hidden");
-  }
-
-  function closeLightbox() {
-    overlay.classList.add("hidden");
-    imgEl.src = "";
-  }
-
-  thumbs.forEach((thumb) => {
-    const fullSrc = thumb.dataset.full || thumb.src;
-    thumb.addEventListener("click", () => {
-      openLightbox(fullSrc);
-    });
-  });
-
-  // Close when clicking outside the image
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) {
-      closeLightbox();
-    }
-  });
-
-  closeBtn.addEventListener("click", closeLightbox);
-
-  // Escape key closes lightbox
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !overlay.classList.contains("hidden")) {
-      closeLightbox();
-    }
-  });
-})();
-
-// JOIN FORM SUCCESS
-const joinForm = document.getElementById("join-form");
-const joinSuccess = document.getElementById("join-success");
-
-if (joinForm) {
-  joinForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(joinForm);
-
-    const response = await fetch(joinForm.action, {
-      method: "POST",
-      body: formData,
-      headers: { Accept: "application/json" },
-    });
-
-    if (response.ok) {
-      joinForm.reset();
-      joinSuccess.classList.remove("hidden");
-    }
-  });
 }
 
+function renderResults(container, results, interpretation) {
+  const riskLabel =
+    results.riskCategory === "low"
+      ? "Low"
+      : results.riskCategory === "intermediate"
+      ? "Intermediate"
+      : "High";
 
+  const riskClass =
+    results.riskCategory === "high"
+      ? "results-value results-value--danger"
+      : "results-value results-value--accent";
 
+  container.innerHTML = `
+    <div class="results-section">
+      <h3>Key Values</h3>
+      <ul class="results-list">
+        <li>
+          <span class="results-label">History component</span>
+          <span class="results-value">${results.historyScore} pts</span>
+        </li>
+        <li>
+          <span class="results-label">ECG component</span>
+          <span class="results-value">${results.ecgScore} pts</span>
+        </li>
+        <li>
+          <span class="results-label">Age component</span>
+          <span class="results-value">${results.agePoints} pts (Age ${formatNumber(
+            results.ageYears,
+            0
+          )} yrs)</span>
+        </li>
+        <li>
+          <span class="results-label">Risk factor component</span>
+          <span class="results-value">${results.riskFactorPoints} pts</span>
+        </li>
+        <li>
+          <span class="results-label">Troponin component</span>
+          <span class="results-value">${results.tropScore} pts</span>
+        </li>
+        <li>
+          <span class="results-label">Total HEART score</span>
+          <span class="${riskClass}">${results.totalScore} / 10</span>
+        </li>
+        <li>
+          <span class="results-label">Risk category</span>
+          <span class="${riskClass}">${riskLabel} risk</span>
+        </li>
+      </ul>
 
+      <h3>Interpretation</h3>
+      <p>${interpretation.summary}</p>
+      ${
+        interpretation.notes?.length
+          ? `<ul>${interpretation.notes
+              .map((note) => `<li>${note}</li>`)
+              .join("")}</ul>`
+          : ""
+      }
+    </div>
+  `;
+}
 
+function renderFlags(container, flags) {
+  if (!flags || flags.length === 0) {
+    container.innerHTML = `
+      <p class="results-placeholder">
+        No critical flags based on the provided values. Always correlate clinically.
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = flags
+    .map((flag) => {
+      const cls =
+        flag.level === "danger"
+          ? "flag-pill flag-pill--danger"
+          : "flag-pill flag-pill--warning";
+      return `<div class="${cls}">${flag.message}</div>`;
+    })
+    .join("");
+}
+
+function formatNumber(value, decimals = 2) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  return Number(value).toFixed(decimals);
+}
+
+// ---- Exportable Core Logic (for future unified app) ----
+// Example of a reusable function you can import elsewhere.
+
+function calculateHeartScoreFromRaw(inputs) {
+  const agePoints = calculateHeartAgePoints(inputs.ageYears);
+  const riskFactorPoints = calculateHeartRiskFactorPoints(inputs.riskFactors);
+  const totalScore =
+    inputs.historyScore +
+    inputs.ecgScore +
+    agePoints +
+    riskFactorPoints +
+    inputs.tropScore;
+  const riskCategory = classifyHeartRiskCategory(totalScore);
+
+  return {
+    totalScore,
+    riskCategory,
+    agePoints,
+    riskFactorPoints,
+  };
+}
