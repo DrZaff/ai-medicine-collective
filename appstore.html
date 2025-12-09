@@ -59,19 +59,59 @@
       text-decoration: underline;
     }
 
-    /* Phone: 2 apps per row, slightly smaller icons */
+    /* Phone: clean 2-per-row layout with centered icons */
     @media (max-width: 720px) {
-      .app-store-page .app-grid {
-        grid-template-columns: repeat(2, minmax(120px, 1fr));
-        gap: 1.25rem;
-      }
 
-      .app-store-page .app-icon-img {
-        width: 96px;
-        height: 96px;
-      }
-    }
+  .app-store-page .app-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* always 2 per row */
+    gap: 1.2rem;
+    justify-items: center; /* center cards */
+  }
 
+  /* Card sizing so nothing overflows */
+  .app-store-page .app-card {
+    width: 100%;
+    max-width: 160px;      /* prevents cards from stretching too wide */
+    padding: 1rem 0.5rem;  /* tighter mobile padding */
+    text-align: center;
+  }
+
+  /* Icon sizing */
+  .app-store-page .app-icon-img {
+    width: 85px;
+    height: 85px;
+    object-fit: cover;
+  }
+
+  /* Slightly tighten text spacing on small screens */
+  .app-store-page .app-name {
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+  }
+
+  .app-store-page .app-desktop-link {
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+  }
+}
+
+/* Ultra-small phones (iPhone SE, older Androids) */
+@media (max-width: 400px) {
+  .app-store-page .app-grid {
+    gap: 0.8rem;
+  }
+
+  .app-store-page .app-card {
+    max-width: 140px;
+  }
+
+  .app-store-page .app-icon-img {
+    width: 78px;
+    height: 78px;
+  }
+}
+    
     /* Desktop: lock to 5 cards per row */
     @media (min-width: 1024px) {
       .app-store-page .app-grid {
@@ -265,5 +305,6 @@
   </div>
 </body>
 </html>
+
 
 
