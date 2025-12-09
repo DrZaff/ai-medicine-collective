@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Member – Hannah Dempsey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <div class="terminal-frame">
+
+    <div class="horizontal-rule"></div>
+
+    <header>
+      <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
+
+      <nav class="nav">
+        <a href="../index.html">HOME</a>
+        <a href="../about.html">ABOUT</a>
+        <a href="../members.html">MEMBERS</a>
+        <a href="../schedule.html">MEETING SCHEDULE</a>
+        <a href="../projects.html">PROJECTS</a>
+        <a href="../adelante.html">ADELANTE REPORT</a>
+        <a href="../resources.html">RESOURCES</a>
+        <a href="../join.html">JOIN</a>
+      </nav>
+
+      <div class="horizontal-rule"></div>
+    </header>
+
+    <main class="section">
+      <h2 class="section-title">MEMBER PROFILE</h2>
+      <p class="note">// Internal roster file: AI Medicine Collective.</p>
+
+      <div class="profile-layout">
+        <!-- PHOTO SIDE -->
+        <aside class="profile-photo-side">
+          <div class="profile-photo-frame">
+            <img
+              src="../images/members/hannah-dempsey.jpg"
+              alt="Hannah Dempsey"
+            />
+          </div>
+        </aside>
+
+        <!-- DATA SIDE -->
+        <section class="profile-data-side">
+          <h3 class="profile-name">Hannah Dempsey</h3>
+          <p class="profile-role">Internal Medicine — PGY-3</p>
+
+          <dl class="profile-fields">
+            <dt>Department</dt>
+            <dd>Internal Medicine</dd>
+
+            <dt>Role in Collective</dt>
+            <dd>Team Member</dd>
+
+            <dt>Focus areas</dt>
+            <dd>
+              TBD.
+            </dd>
+          </dl>
+
+          <div class="profile-actions">
+            <span>Email: </span>
+            <span class="profile-email-address">dempsehm@ucmail.uc.edu</span>
+            <button type="button" class="copy-email-btn">COPY MY EMAIL</button>
+          </div>
+        </section>
+      </div>
+
+      <p>
+        <a href="../members.html" class="back-link">&lt; Back</a>
+      </p>
+    </main>
+
+    <div class="horizontal-rule bottom-rule"></div>
+
+    <footer class="footer">
+      &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+      <span class="cursor">█</span>
+    </footer>
+  </div>
+
+  <script src="../script.js"></script>
+</body>
+</html>
