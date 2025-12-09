@@ -1,5 +1,3 @@
-/* === ARCHIVED STYLES (unchanged) ============================= */
-
 :root {
   --bg: #020802;
   --bg-inner: #000000;
@@ -724,9 +722,9 @@ button:hover {
 .profile-photo-frame img {
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  object-position: center top;
+  aspect-ratio: 4 / 5;            /* consistent portrait ratio */
+  object-fit: cover;              /* fill frame without distortion */
+  object-position: center top;    /* bias crop toward the top (face) */
   display: block;
   filter: grayscale(1);
 }
@@ -925,7 +923,7 @@ button:hover {
   display: inline-block;
   margin-top: 6px;
   text-decoration: none;
-  color: #ffcc33;
+  color: #ffcc33;          /* warm yellow to stand out */
   font-weight: bold;
   letter-spacing: 0.05em;
 }
@@ -980,7 +978,7 @@ button:hover {
 }
 
 .stack-summary::-webkit-details-marker {
-  display: none;
+  display: none; /* hide default marker */
 }
 
 .stack-label {
@@ -1030,7 +1028,7 @@ button:hover {
   }
 
   .adelante-hero {
-    order: -1;
+    order: -1;           /* put image above text on small screens */
   }
 }
 
@@ -1040,7 +1038,7 @@ button:hover {
   margin-top: 14px;
   font-weight: bold;
   text-decoration: none;
-  color: #ff4081;
+  color: #ff4081;            /* bright pink to stand out */
 }
 
 .back-link:hover {
@@ -1049,8 +1047,9 @@ button:hover {
 
 /* === Global BACK links ===================================== */
 
+/* Make all "< Back" links pop (bright magenta, bold) */
 .back-link {
-  color: #ff6ad5;
+  color: #ff6ad5;                /* bright neon pink */
   font-weight: bold;
   text-decoration: none;
   letter-spacing: 0.04em;
@@ -1105,6 +1104,93 @@ button:hover {
 }
 
 /* Thumbnails grid for flyers */
+.resource-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.resource-thumb {
+  margin: 0;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.resource-thumb img {
+  width: 100%;
+  max-width: 220px;
+  border: 1px solid rgba(0, 255, 102, 0.45);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.25);
+  display: block;
+}
+
+.resource-thumb img:hover {
+  border-color: #ffcc33;
+  box-shadow: 0 0 12px rgba(255, 204, 51, 0.7);
+  transform: translateY(-1px);
+}
+
+.resource-thumb figcaption {
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+/* === THUMBNAIL GALLERY === */
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.thumbnail-item img {
+  width: 100%;
+  max-width: 140px;
+  height: auto;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  transition: 0.15s ease-out;
+}
+
+.thumbnail-item img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+}
+
+/* ===== RESOURCE THUMB GRID FIXES ===== */
+
+.resource-thumbs {
+  display: flex;
+  gap: 20px;               /* smaller spacing */
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.resource-thumb {
+  margin: 0;
+  padding: 0;
+}
+
+.resource-thumb img {
+  width: 180px;
+  height: auto;
+  cursor: pointer;
+  border: 2px solid #00ff9c;
+  transition: transform 0.15s ease-in-out;
+}
+
+.resource-thumb img:hover {
+  transform: scale(1.07);
+}
+
+/* Remove captions */
+.resource-thumb figcaption {
+  display: none;
+}
+
+/* ===== RESOURCE THUMB GRID (already added, keep or adjust) ===== */
+
 .resource-thumbs {
   display: flex;
   gap: 20px;
@@ -1184,18 +1270,18 @@ button:hover {
 /* ===== TERMINAL LINK FIX ===== */
 
 a {
-  color: #00ff80;
+  color: #00ff80;           /* neon green */
   text-decoration: none;
   font-weight: 600;
 }
 
 a:hover {
-  color: #00e5ff;
+  color: #00e5ff;           /* cyan hover */
   text-shadow: 0 0 6px #00e5ff;
 }
 
 a:visited {
-  color: #00ff80;
+  color: #00ff80;           /* keep green, no purple */
 }
 
 a:active {
@@ -1205,14 +1291,14 @@ a:active {
 /* === PINK BACK BUTTON OVERRIDE === */
 
 .back-link {
-  color: #ff4da6 !important;
+  color: #ff4da6 !important;     /* bright pink */
   font-weight: 700;
   font-size: 1.1rem;
   text-decoration: none;
 }
 
 .back-link:hover {
-  color: #ff80c7 !important;
+  color: #ff80c7 !important;     /* lighter pink hover */
   text-shadow: 0 0 6px #ff80c7;
 }
 
@@ -1334,379 +1420,19 @@ a:active {
   }
 }
 
-/* === END OF ARCHIVED STYLES ================================= */
 
 
-/* === NEW: APP STORE GRID ===================================== */
 
-.appstore-intro {
-  max-width: 720px;
-}
 
-.appstore-intro a.appstore-link {
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
 
-.appstore-intro a.appstore-link:hover {
-  color: #fff5aa;
-  text-shadow: 0 0 6px rgba(255, 230, 0, 0.8);
-}
 
-.appstore-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 18px;
-}
 
-.app-card {
-  width: 160px;
-  padding: 10px 8px;
-  border: 1px solid rgba(0, 255, 102, 0.28);
-  background: rgba(0, 0, 0, 0.8);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
-  text-align: center;
-}
 
-.app-card-icon img {
-  width: 96px;
-  height: 96px;
-  border-radius: 24px;
-  display: block;
-  margin: 0 auto 8px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
-}
 
-.app-card-icon:hover img {
-  transform: translateY(-2px);
-  box-shadow: 0 0 14px rgba(255, 230, 0, 0.7);
-}
 
-.app-card-title {
-  margin: 0 0 4px;
-  font-size: 0.9rem;
-  color: #ffe600;
-}
 
-.app-card-link {
-  font-size: 0.75rem;
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
 
-.app-card-link:hover {
-  color: #fff5aa;
-}
 
-/* tighter layout on small screens */
-@media (max-width: 600px) {
-  .appstore-grid {
-    justify-content: center;
-    gap: 18px;
-  }
 
-  .app-card {
-    width: 44vw;
-    max-width: 180px;
-  }
 
-  .app-card-icon img {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-/* === MEETING SCHEDULE CARDS =================================== */
-
-.meeting-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.meeting-item {
-  font-size: 0.9rem;
-}
-
-.meeting-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 10px;
-  border-radius: 3px;
-  border: 1px solid rgba(0, 255, 102, 0.35);
-  background: rgba(0, 0, 0, 0.8);
-  text-decoration: none;
-  color: var(--text);
-  transition: 0.15s ease-out;
-}
-
-.meeting-link:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.22);
-  transform: translateX(4px);
-}
-
-.meeting-date {
-  font-family: "Courier New", monospace;
-  font-size: 0.8rem;
-  opacity: 0.9;
-  min-width: 110px;
-}
-
-.meeting-title {
-  flex: 1;
-}
-
-.meeting-status {
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 999px;
-  padding: 2px 10px;
-  border: 1px solid rgba(0, 255, 102, 0.6);
-}
-
-/* Pink "< Back" link so it pops */
-.back-link {
-  display: inline-block;
-  margin-top: 14px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #ff6ad5;
-}
-
-.back-link:hover {
-  text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
-}
-
-/* === NEW: INDEX LANDING SPACING OVERRIDE ===================== */
-
-.landing-links {
-  gap: 8px;
-  margin-top: 12px;
-}
-
-@media (max-width: 600px) {
-  .landing-links {
-    gap: 6px;
-    margin-top: 8px;
-  }
-}
-
-
-/* === NEW: iOS FOCUS ZOOM FIX ================================= */
-
-@media (max-width: 600px) {
-  input,
-  select,
-  textarea,
-  button {
-    font-size: 16px;
-    -webkit-text-size-adjust: 100%;
-  }
-}
-
-/* === APP STORE – ICON GRID ===================================== */
-
-.appstore-intro {
-  max-width: 720px;
-}
-
-/* Make the ClinicalToolsDEV link pop a bit */
-.appstore-intro a.appstore-link {
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.appstore-intro a.appstore-link:hover {
-  color: #fff5aa;
-  text-shadow: 0 0 6px rgba(255, 230, 0, 0.8);
-}
-
-/* Lay out icons in a row that wraps if needed */
-.appstore-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 18px;
-}
-
-/* Each app “card” */
-.app-card {
-  width: 150px;
-  text-align: center;
-}
-
-/* SMALL ICONS! */
-.app-card-icon img {
-  width: 96px;
-  height: 96px;
-  border-radius: 24px;
-  display: block;
-  margin: 0 auto 6px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
-}
-
-.app-card-icon:hover img {
-  transform: translateY(-2px);
-  box-shadow: 0 0 14px rgba(255, 230, 0, 0.7);
-}
-
-/* Title + “use on computer” link */
-.app-card-title {
-  margin: 0 0 2px;
-  font-size: 0.9rem;
-  color: #ffe600;
-}
-
-.app-card-link {
-  font-size: 0.75rem;
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.app-card-link:hover {
-  color: #fff5aa;
-}
-
-/* Tighten on small screens */
-@media (max-width: 600px) {
-  .appstore-grid {
-    justify-content: center;
-    gap: 18px;
-  }
-
-  .app-card {
-    width: 42vw;
-    max-width: 170px;
-  }
-
-  .app-card-icon img {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-/* === APP STORE – ICON GRID ===================================== */
-
-.appstore-intro {
-  max-width: 720px;
-}
-
-.appstore-link {
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.appstore-link:hover {
-  color: #fff5aa;
-  text-shadow: 0 0 6px rgba(255, 230, 0, 0.8);
-}
-
-.appstore-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 18px;
-}
-
-.app-card {
-  width: 160px;
-  text-align: center;
-}
-
-/* Glowing green box just around icon + title */
-.app-card-inner {
-  padding: 14px 12px 10px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 255, 102, 0.35);
-  background: rgba(0, 0, 0, 0.85);
-  box-shadow: 0 0 16px rgba(0, 255, 102, 0.18);
-}
-
-.app-card-icon img {
-  width: 96px;
-  height: 96px;
-  border-radius: 24px;
-  display: block;
-  margin: 0 auto 6px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
-}
-
-.app-card-icon:hover img {
-  transform: translateY(-2px);
-  box-shadow: 0 0 14px rgba(255, 230, 0, 0.7);
-}
-
-.app-card-title {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #ffe600;
-}
-
-/* "use on computer" lives outside the box */
-.app-card-link {
-  display: inline-block;
-  margin-top: 4px;
-  font-size: 0.75rem;
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.app-card-link:hover {
-  color: #fff5aa;
-}
-
-/* Mobile: two apps per row, smaller icons */
-@media (max-width: 600px) {
-  .appstore-grid {
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .app-card {
-    width: 45vw;
-    max-width: 170px;
-  }
-
-  .app-card-icon img {
-    width: 72px;
-    height: 72px;
-  }
-}
-
-.project-back-link {
-  color: var(--accent-pink);
-}
-
-.project-back-link:hover {
-  color: #ff9fe0;
-}
-
-/* Extra mobile tweaks for JOIN / signup layout */
-@media (max-width: 480px) {
-  .join-panel {
-    padding: 16px;
-  }
-
-  .join-submit {
-    width: 100%;
-    text-align: center;
-  }
-}
 
