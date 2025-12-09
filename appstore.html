@@ -5,6 +5,72 @@
   <title>App Store – AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Page-specific layout tweaks -->
+  <style>
+    /* App grid layout overrides */
+    .app-store-page .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1.75rem;
+      margin-top: 2rem;
+    }
+
+    .app-store-page .app-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 1.25rem 1.75rem;
+      border: 1px solid var(--border-strong, #22c55e60);
+      box-shadow: 0 0 0 1px var(--border-soft, #22c55e40);
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .app-store-page .app-icon-launch {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .app-store-page .app-icon-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 18px;
+      display: block;
+    }
+
+    .app-store-page .app-name {
+      margin-top: 0.35rem;
+      font-weight: 700;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .app-store-page .app-desktop-link {
+      margin-top: 0.75rem; /* roughly halfway between icon and card bottom */
+      font-size: 0.8rem;
+      text-decoration: underline;
+    }
+
+    /* Phone: 2 apps per row, slightly smaller icons */
+    @media (max-width: 720px) {
+      .app-store-page .app-grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        gap: 1.25rem;
+      }
+
+      .app-store-page .app-icon-img {
+        width: 96px;
+        height: 96px;
+      }
+    }
+
+    /* Desktop: lock to 5 cards per row */
+    @media (min-width: 1024px) {
+      .app-store-page .app-grid {
+        grid-template-columns: repeat(5, minmax(140px, 1fr));
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="terminal-frame">
@@ -38,12 +104,8 @@
           href="https://chatgpt.com/g/g-69327e70b56881919d9d47197683eca7-clinicaltoolsdev"
           target="_blank"
           rel="noopener"
-          class="appstore-link"
-        >
-          ClinicalToolsDEV
-        </a>,
-        a custom GPT that guides clinical tools app creation step-by-step—no prior
-        coding experience required.
+        >ClinicalToolsDEV</a>, a custom GPT that guides clinical tools app
+        creation step-by-step—no prior coding experience required.
       </p>
 
       <p class="note">
@@ -52,142 +114,139 @@
         To use on desktop: click <code>use on computer</code> under any app.
       </p>
 
-      <section class="appstore-grid">
+      <div class="app-grid">
+
         <!-- Acid-Base Calculator -->
-        <article class="app-card">
-          <div class="app-card-inner">
-            <a
-              class="app-card-icon"
-              href="https://acid-base-calculator.netlify.app/"
-              target="_blank"
-              rel="noopener"
-              aria-label="Open Acid-Base Calculator app"
-            >
-              <img
-                src="images/applogos/ABG_logo_512.png"
-                alt="Acid-Base Calculator icon"
-              />
-            </a>
-            <h3 class="app-card-title">Acid-Base Calculator</h3>
-          </div>
+        <div class="app-card">
           <a
-            class="app-card-link"
-            href="https://acid-base-calculator.netlify.app/?mode=desktop"
+            class="app-icon-launch"
+            href="https://acid-base-calculator.netlify.app/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Open Acid-Base Calculator app"
+          >
+            <img
+              src="images/applogos/ABG_logo_512.png"
+              alt="Acid-Base Calculator icon"
+              class="app-icon-img"
+            />
+          </a>
+          <div class="app-name">Acid-Base Calculator</div>
+          <a
+            class="app-desktop-link"
+            href="https://acid-base-calculator.netlify.app/?desktop=1"
             target="_blank"
             rel="noopener"
           >
             use on computer
           </a>
-        </article>
+        </div>
 
         <!-- HEART Score Calculator -->
-        <article class="app-card">
-          <div class="app-card-inner">
-            <a
-              class="app-card-icon"
-              href="https://heart-score-calculator.netlify.app/"
-              target="_blank"
-              rel="noopener"
-              aria-label="Open HEART Score Calculator app"
-            >
-              <img
-                src="images/applogos/HS_logo_512.png"
-                alt="HEART Score Calculator icon"
-              />
-            </a>
-            <h3 class="app-card-title">HEART Score Calculator</h3>
-          </div>
+        <div class="app-card">
           <a
-            class="app-card-link"
-            href="https://heart-score-calculator.netlify.app/?mode=desktop"
+            class="app-icon-launch"
+            href="https://heart-score-calculator.netlify.app/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Open HEART Score Calculator app"
+          >
+            <img
+              src="images/applogos/HS_logo_512.png"
+              alt="HEART Score Calculator icon"
+              class="app-icon-img"
+            />
+          </a>
+          <div class="app-name">HEART Score Calculator</div>
+          <a
+            class="app-desktop-link"
+            href="https://heart-score-calculator.netlify.app/?desktop=1"
             target="_blank"
             rel="noopener"
           >
             use on computer
           </a>
-        </article>
+        </div>
 
         <!-- QT Interval Corrector -->
-        <article class="app-card">
-          <div class="app-card-inner">
-            <a
-              class="app-card-icon"
-              href="https://qtc-calc.netlify.app/"
-              target="_blank"
-              rel="noopener"
-              aria-label="Open QT Interval Corrector app"
-            >
-              <img
-                src="images/applogos/QTC_logo_512.png"
-                alt="QT Interval Corrector icon"
-              />
-            </a>
-            <h3 class="app-card-title">QT Interval Corrector</h3>
-          </div>
+        <div class="app-card">
           <a
-            class="app-card-link"
-            href="https://qtc-calc.netlify.app/?mode=desktop"
+            class="app-icon-launch"
+            href="https://qtc-calc.netlify.app/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Open QT Interval Corrector app"
+          >
+            <img
+              src="images/applogos/QTC_logo_512.png"
+              alt="QT Interval Corrector icon"
+              class="app-icon-img"
+            />
+          </a>
+          <div class="app-name">QT Interval Corrector</div>
+          <a
+            class="app-desktop-link"
+            href="https://qtc-calc.netlify.app/?desktop=1"
             target="_blank"
             rel="noopener"
           >
             use on computer
           </a>
-        </article>
+        </div>
 
         <!-- Thyroid Workup Assistant -->
-        <article class="app-card">
-          <div class="app-card-inner">
-            <a
-              class="app-card-icon"
-              href="https://thyroid-cascader.netlify.app/"
-              target="_blank"
-              rel="noopener"
-              aria-label="Open Thyroid Workup Assistant app"
-            >
-              <img
-                src="images/applogos/TC_logo_512.png"
-                alt="Thyroid Workup Assistant icon"
-              />
-            </a>
-            <h3 class="app-card-title">Thyroid Workup Assistant</h3>
-          </div>
+        <div class="app-card">
           <a
-            class="app-card-link"
-            href="https://thyroid-cascader.netlify.app/?mode=desktop"
+            class="app-icon-launch"
+            href="https://thyroid-cascader.netlify.app/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Open Thyroid Workup Assistant app"
+          >
+            <img
+              src="images/applogos/TC_logo_512.png"
+              alt="Thyroid Workup Assistant icon"
+              class="app-icon-img"
+            />
+          </a>
+          <div class="app-name">Thyroid Workup Assistant</div>
+          <a
+            class="app-desktop-link"
+            href="https://thyroid-cascader.netlify.app/?desktop=1"
             target="_blank"
             rel="noopener"
           >
             use on computer
           </a>
-        </article>
+        </div>
 
         <!-- VA Night Float Algorithm -->
-        <article class="app-card">
-          <div class="app-card-inner">
-            <a
-              class="app-card-icon"
-              href="https://va-night-algorithm.netlify.app/"
-              target="_blank"
-              rel="noopener"
-              aria-label="Open VA Night Float Algorithm app"
-            >
-              <img
-                src="images/applogos/NF_logo_512.png"
-                alt="VA Night Float Algorithm icon"
-              />
-            </a>
-            <h3 class="app-card-title">VA Night Float Algorithm</h3>
-          </div>
+        <div class="app-card">
           <a
-            class="app-card-link"
-            href="https://va-night-algorithm.netlify.app/?mode=desktop"
+            class="app-icon-launch"
+            href="https://va-night-algorithm.netlify.app/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Open VA Night Float Algorithm app"
+          >
+            <img
+              src="images/applogos/NF_logo_512.png"
+              alt="VA Night Float Algorithm icon"
+              class="app-icon-img"
+            />
+          </a>
+          <div class="app-name">VA Night Float Algorithm</div>
+          <a
+            class="app-desktop-link"
+            href="https://va-night-algorithm.netlify.app/?desktop=1"
             target="_blank"
             rel="noopener"
           >
             use on computer
           </a>
-        </article>
-      </section>
+        </div>
+
+      </div>
     </main>
 
     <div class="horizontal-rule bottom-rule"></div>
@@ -197,7 +256,5 @@
       <span class="cursor">█</span>
     </footer>
   </div>
-
-  <script src="script.js"></script>
 </body>
 </html>
