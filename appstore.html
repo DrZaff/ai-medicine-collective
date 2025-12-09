@@ -5,85 +5,6 @@
   <title>App Store – AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Page-specific layout tweaks -->
-  <style>
-    /* App grid layout overrides */
-    .app-store-page .app-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1.75rem;
-      margin-top: 2rem;
-    }
-
-    .app-store-page .app-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1rem 1.25rem 1.75rem;
-      border: 1px solid var(--border-strong, #22c55e60);
-      box-shadow: 0 0 0 1px var(--border-soft, #22c55e40);
-      background: rgba(0, 0, 0, 0.35);
-    }
-
-    .app-store-page .app-icon-launch {
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-
-    .app-store-page .app-icon-img {
-      width: 120px;
-      height: 120px;
-      border-radius: 18px;
-      display: block;
-      transition:
-        transform 0.15s ease-out,
-        box-shadow 0.15s ease-out,
-        filter 0.15s ease-out;
-    }
-
-    /* Hover glow for app icons on desktop */
-    @media (hover: hover) and (pointer: fine) {
-      .app-store-page .app-icon-launch:hover .app-icon-img {
-        transform: translateY(-2px) scale(1.06);
-        box-shadow: 0 0 16px rgba(34, 197, 94, 0.45);
-        filter: brightness(1.08);
-      }
-    }
-
-    .app-store-page .app-name {
-      margin-top: 0.35rem;
-      font-weight: 700;
-      text-align: center;
-      font-size: 0.9rem;
-    }
-
-    .app-store-page .app-desktop-link {
-      margin-top: 0.75rem; /* roughly halfway between icon and card bottom */
-      font-size: 0.8rem;
-      text-decoration: underline;
-    }
-
-    /* Phone: 2 apps per row, slightly smaller icons to avoid overlap */
-    @media (max-width: 720px) {
-      .app-store-page .app-grid {
-        grid-template-columns: repeat(2, minmax(120px, 1fr));
-        gap: 1.25rem;
-      }
-
-      .app-store-page .app-icon-img {
-        width: 88px;
-        height: 88px;
-      }
-    }
-
-    /* Desktop: lock to 5 cards per row */
-    @media (min-width: 1024px) {
-      .app-store-page .app-grid {
-        grid-template-columns: repeat(5, minmax(140px, 1fr));
-      }
-    }
-  </style>
 </head>
 <body>
   <div class="terminal-frame">
@@ -138,24 +59,24 @@
     </section>
 
     <!-- MAIN CONTENT (hidden until auth) -->
-    <main id="site-content" class="hidden app-store-page">
+    <main id="site-content" class="hidden section">
+
       <section class="appstore-intro">
         <h2 class="section-title">:: CLINICAL TOOL APP STORE ::</h2>
         <p class="section-subtitle">
           Modular decision-support micro-apps built by and for clinicians.
         </p>
         <p class="body-text">
-          Tap an icon to launch the app on your current device.
-          Use the <span class="accent">"use on computer"</span> link if you prefer a
-          desktop workflow.
+          Tap an icon to launch the app on your current device. Use the
+          <span class="accent">"use on computer"</span> link if you prefer a desktop workflow.
         </p>
       </section>
 
-      <section class="app-grid" aria-label="Clinical tools">
+      <section class="appstore-grid" aria-label="Clinical tools">
         <!-- Acid–Base Calculator -->
         <div class="app-card">
           <a
-            class="app-icon-launch"
+            class="app-card-icon"
             href="https://acid-base-calculator.netlify.app/"
             target="_blank"
             rel="noopener"
@@ -164,12 +85,11 @@
             <img
               src="images/applogos/ABG_logo_512.png"
               alt="Acid-Base Calculator icon"
-              class="app-icon-img"
             />
           </a>
-          <div class="app-name">Acid-Base Calculator</div>
+          <p class="app-card-title">Acid-Base Calculator</p>
           <a
-            class="app-desktop-link"
+            class="app-card-link"
             href="https://acid-base-calculator.netlify.app/?desktop=1"
             target="_blank"
             rel="noopener"
@@ -181,7 +101,7 @@
         <!-- HEART Score Calculator -->
         <div class="app-card">
           <a
-            class="app-icon-launch"
+            class="app-card-icon"
             href="https://heart-score-calculator.netlify.app/"
             target="_blank"
             rel="noopener"
@@ -190,12 +110,11 @@
             <img
               src="images/applogos/HS_logo_512.png"
               alt="HEART Score Calculator icon"
-              class="app-icon-img"
             />
           </a>
-          <div class="app-name">HEART Score Calculator</div>
+          <p class="app-card-title">HEART Score Calculator</p>
           <a
-            class="app-desktop-link"
+            class="app-card-link"
             href="https://heart-score-calculator.netlify.app/"
             target="_blank"
             rel="noopener"
@@ -204,41 +123,29 @@
           </a>
         </div>
 
-        <!-- QTc Calculator (placeholder) -->
+        <!-- QTc Calculator (coming soon, no broken icon) -->
         <div class="app-card">
-          <a
-            class="app-icon-launch"
-            href="#"
-            aria-label="QTc Calculator (coming soon)"
-          >
-            <img
-              src="images/applogos/QT_logo_512.png"
-              alt="QTc Calculator icon"
-              class="app-icon-img"
-            />
-          </a>
-          <div class="app-name">QTc Calculator</div>
-          <span class="app-desktop-link">coming soon</span>
+          <div class="app-card-icon">
+            <!-- Add a real <img> later when your QTc icon file is ready -->
+            <span style="display:block;font-size:0.8rem;opacity:0.8;">
+              QTc Calculator icon
+            </span>
+          </div>
+          <p class="app-card-title">QTc Calculator</p>
+          <span class="app-card-link">coming soon</span>
         </div>
 
-        <!-- Thyroid Cascader (placeholder) -->
+        <!-- Thyroid Cascader (coming soon, no broken icon) -->
         <div class="app-card">
-          <a
-            class="app-icon-launch"
-            href="#"
-            aria-label="Thyroid Cascader (coming soon)"
-          >
-            <img
-              src="images/applogos/THYROID_logo_512.png"
-              alt="Thyroid Cascader icon"
-              class="app-icon-img"
-            />
-          </a>
-          <div class="app-name">Thyroid Cascader</div>
-          <span class="app-desktop-link">coming soon</span>
+          <div class="app-card-icon">
+            <!-- Add a real <img> later when your Thyroid icon file is ready -->
+            <span style="display:block;font-size:0.8rem;opacity:0.8;">
+              Thyroid Cascader icon
+            </span>
+          </div>
+          <p class="app-card-title">Thyroid Cascader</p>
+          <span class="app-card-link">coming soon</span>
         </div>
-
-        <!-- Future app slots... -->
       </section>
 
       <p class="body-text" style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.85;">
@@ -246,7 +153,9 @@
         Always cross-check with clinical judgement and institutional protocols.
       </p>
 
-      <a href="index.html" class="back-link">← BACK TO HOME</a>
+      <p>
+        <a href="index.html" class="back-link">← BACK TO HOME</a>
+      </p>
     </main>
 
   </div>

@@ -5,6 +5,102 @@
   <title>Meeting Schedule – AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Page-specific meeting layout -->
+  <style>
+    .ms-section {
+      margin-top: 18px;
+    }
+
+    .ms-list {
+      margin: 10px 0 24px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .ms-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 3px;
+      border: 1px solid rgba(0, 255, 102, 0.28);
+      background: rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
+    }
+
+    .ms-link {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      text-decoration: none;
+      color: var(--text);
+      transition: 0.15s ease-out;
+    }
+
+    .ms-link:hover {
+      border-color: transparent;
+      text-shadow: 0 0 6px rgba(0, 255, 102, 0.7);
+    }
+
+    .ms-date {
+      font-family: "Courier New", monospace;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 102, 0.4);
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .ms-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .ms-cta {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 102, 0.6);
+      color: var(--text);
+      text-decoration: none;
+      background: rgba(0, 0, 0, 0.9);
+      white-space: nowrap;
+      transition: 0.15s ease-out;
+    }
+
+    .ms-cta:hover {
+      background: rgba(0, 255, 102, 0.15);
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+    }
+
+    .ms-cta--minutes {
+      border-color: rgba(255, 255, 255, 0.6);
+      color: #ffffff;
+    }
+
+    .ms-cta--signup {
+      border-color: rgba(0, 255, 102, 0.8);
+      color: #00ff66;
+    }
+
+    /* Mobile: stack button under row so it never overlaps box */
+    @media (max-width: 600px) {
+      .ms-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .ms-cta {
+        align-self: flex-end;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="terminal-frame">
@@ -32,71 +128,49 @@
     <main class="section">
       <h2 class="section-title">MEETING SCHEDULE</h2>
 
-      <!-- PAST MEETINGS -->
-      <section class="meeting-section past-section">
-        <h3 class="section-subtitle">// Past meetings</h3>
+      <!-- Past meetings -->
+      <section class="ms-section">
+        <p>// Past meetings</p>
+        <p>Click a past meeting to open its minutes file.</p>
 
-        <p class="note small-note">
-          Click a past meeting to open its minutes file.
-        </p>
-
-        <ul class="meeting-list">
-          <!-- 2025-11-04 AI Club Formation -->
-          <li class="meeting-item past">
-            <a
-              href="minutes/2025-11-04-ai-club-formation-minutes.pdf"
-              class="meeting-link"
-              target="_blank"
-              rel="noopener"
-            >
-              <span class="meeting-date">2025-11-04</span>
-              <span class="meeting-title">AI Club Formation</span>
-              <span class="meeting-status tag-past">MINUTES</span>
+        <ul class="ms-list">
+          <li class="ms-row">
+            <a href="#" class="ms-link" target="_blank">
+              <span class="ms-date">2025-11-04</span>
+              <span class="ms-title">AI Club Formation</span>
             </a>
+            <a href="#" class="ms-cta ms-cta--minutes" target="_blank">MINUTES</a>
           </li>
         </ul>
       </section>
 
-      <!-- UPCOMING MEETINGS -->
-      <section class="meeting-section upcoming-section">
-        <h3 class="section-subtitle">// Upcoming meetings</h3>
+      <!-- Upcoming meetings -->
+      <section class="ms-section">
+        <p>// Upcoming meetings</p>
+        <p>Click a future meeting to input availability.</p>
 
-        <p class="note small-note">
-          Click a future meeting to input availability.
-        </p>
-
-        <ul class="meeting-list">
-          <!-- Next planned meeting -->
-
-            <li class="meeting-item upcoming">
-            <a
-              href="https://doodle.com/group-poll/participate/avJAw8ma"
-              class="meeting-link"
-              target="_blank"
-              rel="noopener"
-            >
-              <span class="meeting-date">2025-12-10 (19:00 EST)</span>
-              <span class="meeting-title">Monthly meeting (DECEMBER): Website, Updates, and Forward Movement</span>
-              <span class="meeting-status tag-upcoming">SIGNUP</span>
+        <ul class="ms-list">
+          <li class="ms-row">
+            <a href="#" class="ms-link" target="_blank">
+              <span class="ms-date">2025-12-10 (19:00 EST)</span>
+              <span class="ms-title">
+                Monthly meeting (DECEMBER): Website, Updates, and Forward Movement
+              </span>
             </a>
+            <a href="#" class="ms-cta ms-cta--signup" target="_blank">SIGNUP</a>
           </li>
-          
-          <li class="meeting-item upcoming">
-            <a
-              href="https://www.doodle.com/your-signup-link-here"
-              class="meeting-link"
-              target="_blank"
-              rel="noopener"
-            >
-              <span class="meeting-date">TBD</span>
-              <span class="meeting-title">Guest speaker: Dr Laurah Turner</span>
-              <span class="meeting-status tag-upcoming">SIGNUP</span>
+
+          <li class="ms-row">
+            <a href="#" class="ms-link" target="_blank">
+              <span class="ms-date">TBD</span>
+              <span class="ms-title">Guest speaker: Dr Laurah Turner</span>
             </a>
+            <a href="#" class="ms-cta ms-cta--signup" target="_blank">SIGNUP</a>
           </li>
         </ul>
       </section>
 
-      <p><a href="index.html">&lt; Back</a></p>
+      <p><a href="index.html" class="back-link">&lt; Back</a></p>
     </main>
 
     <div class="horizontal-rule bottom-rule"></div>
@@ -107,12 +181,5 @@
     </footer>
 
   </div>
-  <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-

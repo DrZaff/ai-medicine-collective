@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -31,61 +31,43 @@
 
     <main class="section">
       <h2 class="section-title">JOIN</h2>
-      <p>// Become part of the AI Medicine Collective.</p>
 
-      <div class="join-layout">
+      <p>
+        Interested in being part of the AI Medicine Collective? Fill out the form
+        below and we’ll be in touch with meeting details, projects, and ways to
+        get involved.
+      </p>
 
-        <!-- LEFT: JOIN FORM PANEL -->
-        <form
-          class="join-form join-panel join-box"
-          action="https://formspree.io/f/mqaonqpr"
-          method="POST"
+      <form
+        class="join-form"
+        action="https://forms.gle/your-google-form-id"
+        method="get"
+        target="_blank"
+      >
+        <p class="note">
+          This button will open the official interest form in a new tab.
+        </p>
+
+        <button
+          type="submit"
+          class="btn-primary"
+          style="
+            background: #ff9900;
+            border-color: #ffb347;
+            color: #050810;
+            font-weight: 700;
+            padding: 10px 18px;
+            min-width: 240px;
+          "
         >
-          <input type="hidden" name="source"
-            value="AI Medicine Collective – Join page" />
+          JOIN THE COLLECTIVE
+        </button>
+      </form>
 
-          <div class="join-row">
-            <label for="join-name" class="join-label">Name</label>
-            <input
-              id="join-name"
-              name="name"
-              type="text"
-              class="join-input"
-              placeholder="Ada Lovelace"
-              autocomplete="name"
-              required
-            />
-          </div>
-
-          <div class="join-row">
-            <label for="join-email" class="join-label">Email</label>
-            <input
-              id="join-email"
-              name="email"
-              type="email"
-              class="join-input"
-              placeholder="you@example.com"
-              autocomplete="email"
-              required
-            />
-          </div>
-
-          <button type="submit" class="join-submit">
-            JOIN
-          </button>
-
-          <p class="join-hint">
-            // Your request will be sent securely via Formspree.<br />
-            // You can also contact <span class="highlight">zaffutbn@ucmail.uc.edu</span> directly.
-          </p>
-        </form>
-
-        <!-- RIGHT: IMAGE PANEL -->
-        <div class="join-panel join-art-box">
-          <img src="images/join-art.png" alt="AI Medicine Symbol" class="join-art" />
-        </div>
-
-      </div>
+      <p class="note">
+        You can also reach out directly to the organizers if you have questions
+        or want to propose a project.
+      </p>
 
       <p><a href="index.html" class="back-link">&lt; Back</a></p>
     </main>
@@ -97,9 +79,5 @@
       <span class="cursor">█</span>
     </footer>
   </div>
-
-  <script src="script.js"></script>
 </body>
 </html>
-
-
