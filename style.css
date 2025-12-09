@@ -1447,3 +1447,88 @@ a:active {
     -webkit-text-size-adjust: 100%;
   }
 }
+
+/* === APP STORE – ICON GRID ===================================== */
+
+.appstore-intro {
+  max-width: 720px;
+}
+
+/* Make the ClinicalToolsDEV link pop a bit */
+.appstore-intro a.appstore-link {
+  color: #ffe600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.appstore-intro a.appstore-link:hover {
+  color: #fff5aa;
+  text-shadow: 0 0 6px rgba(255, 230, 0, 0.8);
+}
+
+/* Lay out icons in a row that wraps if needed */
+.appstore-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 18px;
+}
+
+/* Each app “card” */
+.app-card {
+  width: 150px;
+  text-align: center;
+}
+
+/* SMALL ICONS! */
+.app-card-icon img {
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  display: block;
+  margin: 0 auto 6px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+}
+
+.app-card-icon:hover img {
+  transform: translateY(-2px);
+  box-shadow: 0 0 14px rgba(255, 230, 0, 0.7);
+}
+
+/* Title + “use on computer” link */
+.app-card-title {
+  margin: 0 0 2px;
+  font-size: 0.9rem;
+  color: #ffe600;
+}
+
+.app-card-link {
+  font-size: 0.75rem;
+  color: #ffe600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.app-card-link:hover {
+  color: #fff5aa;
+}
+
+/* Tighten on small screens */
+@media (max-width: 600px) {
+  .appstore-grid {
+    justify-content: center;
+    gap: 18px;
+  }
+
+  .app-card {
+    width: 42vw;
+    max-width: 170px;
+  }
+
+  .app-card-icon img {
+    width: 80px;
+    height: 80px;
+  }
+}
+
