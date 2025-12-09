@@ -38,6 +38,14 @@
       display: block;
     }
 
+     /* Hover glow for app icons on desktop */
+    @media (hover: hover) and (pointer: fine) {
+      .app-store-page .app-icon-launch:hover .app-icon-img {
+        transform: translateY(-2px) scale(1.06);
+        box-shadow: 0 0 16px rgba(34, 197, 94, 0.45);
+        filter: brightness(1.08);
+      }
+    }
     .app-store-page .app-name {
       margin-top: 0.35rem;
       font-weight: 700;
@@ -258,3 +266,4 @@
   </div>
 </body>
 </html>
+
