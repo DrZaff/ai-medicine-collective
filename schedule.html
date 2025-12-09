@@ -50,11 +50,13 @@
       font-family: "Courier New", monospace;
       font-size: 0.8rem;
       padding: 4px 10px;
-      border-radius: 999px;
+      border-radius: 6px;                     /* ← small rectangle instead of circle */
       border: 1px solid rgba(0, 255, 102, 0.4);
       background: rgba(0, 0, 0, 0.7);
-    }
-
+     display: inline-block;
+      min-width: 110px;                       /* ← keeps all date boxes same width */
+      text-align: center;                     /* ← numbers centered inside */
+}
     .ms-title {
       font-size: 0.9rem;
       font-weight: 700;
@@ -183,3 +185,4 @@
   </div>
 </body>
 </html>
+
