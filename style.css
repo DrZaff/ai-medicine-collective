@@ -1697,3 +1697,16 @@ a:active {
 .project-back-link:hover {
   color: #ff9fe0;
 }
+
+/* Extra mobile tweaks for JOIN / signup layout */
+@media (max-width: 480px) {
+  .join-panel {
+    padding: 16px;
+  }
+
+  .join-submit {
+    width: 100%;
+    text-align: center;
+  }
+}
+

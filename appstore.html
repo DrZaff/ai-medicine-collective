@@ -8,7 +8,7 @@
 
   <!-- Page-specific layout tweaks -->
   <style>
-    /* Grid + cards */
+    /* App grid layout overrides */
     .app-store-page .app-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -21,9 +21,9 @@
       flex-direction: column;
       align-items: center;
       padding: 1rem 1.25rem 1.75rem;
-      border: 1px solid rgba(0, 255, 102, 0.25);
-      box-shadow: 0 0 8px rgba(0, 255, 102, 0.12);
-      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid var(--border-strong, #22c55e60);
+      box-shadow: 0 0 0 1px var(--border-soft, #22c55e40);
+      background: rgba(0, 0, 0, 0.35);
     }
 
     .app-store-page .app-icon-launch {
@@ -36,18 +36,19 @@
       height: 120px;
       border-radius: 18px;
       display: block;
-      margin: 0 auto;
       transition:
         transform 0.15s ease-out,
         box-shadow 0.15s ease-out,
         filter 0.15s ease-out;
     }
 
-    /* Hover glow like the old projects cards */
-    .app-store-page .app-icon-launch:hover .app-icon-img {
-      box-shadow: 0 0 14px rgba(0, 255, 102, 0.55);
-      transform: translateY(-3px);
-      filter: brightness(1.1);
+    /* Hover glow for app icons on desktop */
+    @media (hover: hover) and (pointer: fine) {
+      .app-store-page .app-icon-launch:hover .app-icon-img {
+        transform: translateY(-2px) scale(1.06);
+        box-shadow: 0 0 16px rgba(34, 197, 94, 0.45);
+        filter: brightness(1.08);
+      }
     }
 
     .app-store-page .app-name {
@@ -57,41 +58,199 @@
       font-size: 0.9rem;
     }
 
-    /* "use on computer" sits between icon + bottom */
     .app-store-page .app-desktop-link {
-      margin-top: 0.95rem;
+      margin-top: 0.75rem; /* roughly halfway between icon and card bottom */
       font-size: 0.8rem;
       text-decoration: underline;
     }
 
-    /* Phone: 2 apps per row, smaller icons so they don't overlap */
+    /* Phone: 2 apps per row, slightly smaller icons to avoid overlap */
     @media (max-width: 720px) {
       .app-store-page .app-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1.1rem;
-      }
-
-      .app-store-page .app-card {
-        padding: 0.9rem 0.4rem 1.3rem;
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        gap: 1.25rem;
       }
 
       .app-store-page .app-icon-img {
-        width: 82px;
-        height: 82px;
-      }
-
-      .app-store-page .app-name {
-        font-size: 0.8rem;
-      }
-
-      .app-store-page .app-desktop-link {
-        margin-top: 0.7rem;
-        font-size: 0.75rem;
+        width: 88px;
+        height: 88px;
       }
     }
 
-    /* Desktop: lock to 5 per row */
+    /* Desktop: lock to 5 cards per row */
     @media (min-width: 1024px) {
       .app-store-page .app-grid {
         grid-template-columns: repeat(5, minmax(140px, 1fr));
       }
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal-frame">
+
+    <div class="horizontal-rule"></div>
+
+    <header>
+      <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
+
+      <nav class="nav">
+        <a href="index.html">HOME</a>
+        <a href="about.html">ABOUT</a>
+        <a href="members.html">MEMBERS</a>
+        <a href="schedule.html">MEETING SCHEDULE</a>
+        <a href="projects.html">PROJECTS</a>
+        <a href="appstore.html">APP STORE</a>
+        <a href="adelante.html">ADELANTE REPORT</a>
+        <a href="resources.html">RESOURCES</a>
+        <a href="join.html">JOIN</a>
+      </nav>
+
+      <div class="horizontal-rule"></div>
+    </header>
+
+    <!-- PASSWORD GATE (shared) -->
+    <section id="gate" class="gate">
+      <p class="prompt-line">
+        <span class="prompt">:: ACCESS RESTRICTED ::</span>
+      </p>
+      <p class="gate-text">
+        This area is for AI Medicine Collective members.
+        Enter the access key to continue.
+      </p>
+
+      <form id="password-form" class="password-form">
+        <label for="password-input" class="prompt">&gt; PASSWORD:</label>
+        <input
+          type="password"
+          id="password-input"
+          autocomplete="off"
+          required
+        />
+        <button type="submit">ENTER</button>
+      </form>
+      <p id="error-message" class="error hidden">
+        ACCESS DENIED. TRY AGAIN.
+      </p>
+
+      <p class="gate-hint">
+        # Hint: ask Brandon if you&rsquo;re supposed to be here.
+      </p>
+    </section>
+
+    <!-- MAIN CONTENT (hidden until auth) -->
+    <main id="site-content" class="hidden app-store-page">
+      <section class="appstore-intro">
+        <h2 class="section-title">:: CLINICAL TOOL APP STORE ::</h2>
+        <p class="section-subtitle">
+          Modular decision-support micro-apps built by and for clinicians.
+        </p>
+        <p class="body-text">
+          Tap an icon to launch the app on your current device.
+          Use the <span class="accent">"use on computer"</span> link if you prefer a
+          desktop workflow.
+        </p>
+      </section>
+
+      <section class="app-grid" aria-label="Clinical tools">
+        <!-- Acid–Base Calculator -->
+        <div class="app-card">
+          <a
+            class="app-icon-launch"
+            href="https://acid-base-calculator.netlify.app/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Open Acid-Base Calculator app"
+          >
+            <img
+              src="images/applogos/ABG_logo_512.png"
+              alt="Acid-Base Calculator icon"
+              class="app-icon-img"
+            />
+          </a>
+          <div class="app-name">Acid-Base Calculator</div>
+          <a
+            class="app-desktop-link"
+            href="https://acid-base-calculator.netlify.app/?desktop=1"
+            target="_blank"
+            rel="noopener"
+          >
+            use on computer
+          </a>
+        </div>
+
+        <!-- HEART Score Calculator -->
+        <div class="app-card">
+          <a
+            class="app-icon-launch"
+            href="https://heart-score-calculator.netlify.app/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Open HEART Score Calculator app"
+          >
+            <img
+              src="images/applogos/HS_logo_512.png"
+              alt="HEART Score Calculator icon"
+              class="app-icon-img"
+            />
+          </a>
+          <div class="app-name">HEART Score Calculator</div>
+          <a
+            class="app-desktop-link"
+            href="https://heart-score-calculator.netlify.app/"
+            target="_blank"
+            rel="noopener"
+          >
+            use on computer
+          </a>
+        </div>
+
+        <!-- QTc Calculator (placeholder) -->
+        <div class="app-card">
+          <a
+            class="app-icon-launch"
+            href="#"
+            aria-label="QTc Calculator (coming soon)"
+          >
+            <img
+              src="images/applogos/QT_logo_512.png"
+              alt="QTc Calculator icon"
+              class="app-icon-img"
+            />
+          </a>
+          <div class="app-name">QTc Calculator</div>
+          <span class="app-desktop-link">coming soon</span>
+        </div>
+
+        <!-- Thyroid Cascader (placeholder) -->
+        <div class="app-card">
+          <a
+            class="app-icon-launch"
+            href="#"
+            aria-label="Thyroid Cascader (coming soon)"
+          >
+            <img
+              src="images/applogos/THYROID_logo_512.png"
+              alt="Thyroid Cascader icon"
+              class="app-icon-img"
+            />
+          </a>
+          <div class="app-name">Thyroid Cascader</div>
+          <span class="app-desktop-link">coming soon</span>
+        </div>
+
+        <!-- Future app slots... -->
+      </section>
+
+      <p class="body-text" style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.85;">
+        # Beta notice: These tools are experimental and for educational use only.
+        Always cross-check with clinical judgement and institutional protocols.
+      </p>
+
+      <a href="index.html" class="back-link">← BACK TO HOME</a>
+    </main>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
