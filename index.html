@@ -21,26 +21,15 @@
     <!-- PASSWORD GATE -->
     <section id="gate">
       <h2 class="section-title">ACCESS REQUIRED</h2>
-      <p class="gate-text">
-        Enter the AI Medicine Collective password to continue.
-      </p>
+      <p class="gate-text">Enter the AI Medicine Collective password to continue.</p>
       <form id="password-form">
         <label for="password-input" class="prompt">&gt; PASSWORD:</label>
-        <input
-          type="password"
-          id="password-input"
-          autocomplete="off"
-          required
-        />
+        <input type="password" id="password-input" autocomplete="off" required />
         <button type="submit">ENTER</button>
       </form>
-      <p id="error-message" class="error hidden">
-        ACCESS DENIED. TRY AGAIN.
-      </p>
+      <p id="error-message" class="error hidden">ACCESS DENIED. TRY AGAIN.</p>
 
-      <p class="gate-hint">
-        # Hint: ask a member of the Collective.
-      </p>
+      <p class="gate-hint"># Hint: ask a member of the Collective.</p>
 
       <div class="horizontal-rule"></div>
     </section>
@@ -48,51 +37,31 @@
     <!-- MAIN CONTENT (hidden until password correct) -->
     <main id="site-content" class="hidden">
 
-      <section class="section landing-links">
+      <!-- Compact nav (keeps hacker vibe, gives quick access) -->
+      <nav class="nav nav--index">
+        <a href="about.html">ABOUT</a>
+        <a href="members.html">MEMBERS</a>
+        <a href="schedule.html">MEETINGS</a>
+        <a href="projects.html">PROJECTS</a>
+        <a href="appstore.html">APP STORE</a>
+        <a href="adelante.html">ADELANTE</a>
+        <a href="resources.html">RESOURCES</a>
+        <a href="join.html">JOIN</a>
+      </nav>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="about.html">&gt; ABOUT</a>
-          </h2>
+      <!-- News feed -->
+      <section class="section news">
+        <div class="news-header">
+          <h2 class="section-title">LATEST DISPATCHES</h2>
+          <div class="news-controls">
+            <input id="news-search" class="news-search" type="search" placeholder="> search" aria-label="Search articles" />
+            <button id="news-clear" class="news-clear" type="button">CLEAR</button>
+          </div>
         </div>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="members.html">&gt; MEMBERS</a>
-          </h2>
-        </div>
+        <div id="news-grid" class="news-grid" aria-live="polite"></div>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="schedule.html">&gt; MEETING SCHEDULE</a>
-          </h2>
-        </div>
-
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="projects.html">&gt; PROJECTS</a>
-          </h2>
-        </div>
-
-        <!-- NEW: App Store link -->
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="appstore.html">&gt; APP STORE</a>
-          </h2>
-        </div>
-
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="resources.html">&gt; RESOURCES</a>
-          </h2>
-        </div>
-
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="join.html">&gt; JOIN</a>
-          </h2>
-        </div>
-
+        <p class="note news-note">Tip: click a card to open a full-screen article view. Press <span class="kbd">ESC</span> to close.</p>
       </section>
 
       <div class="horizontal-rule bottom-rule"></div>
@@ -106,7 +75,301 @@
 
   </div>
 
+  <!-- Existing gate logic lives here in your current site. Keep it. -->
   <script src="script.js"></script>
+
+  <!-- NEWS + ARTICLE VIEW (self-contained; no dependencies) -->
+  <script>
+    (function () {
+      const ARTICLES = [
+        {
+          id: "adelante-2025-12-01",
+          title: "ADELANTE Report: Burnout & Well-Being — What the data actually says",
+          date: "2025-12-01",
+          source: "AI Medicine Collective",
+          tags: ["ADELANTE", "Well-being"],
+          image: "images/news/adelante-burnout.jpg",
+          deck: "A plain-language brief + key numbers you can actually use.",
+          content: `
+            <h1>ADELANTE Report: Burnout &amp; Well-Being</h1>
+            <p class="article-meta">${new Date("2025-12-01").toDateString()} • AI Medicine Collective</p>
+            <div class="article-rule"></div>
+            <p>
+              This is a placeholder article body. Swap this content with your real ADELANTE summary.
+            </p>
+            <h2>Key Findings</h2>
+            <ul>
+              <li>Finding #1 (numbers go here)</li>
+              <li>Finding #2 (numbers go here)</li>
+              <li>Finding #3 (numbers go here)</li>
+            </ul>
+            <h2>Why it matters</h2>
+            <p>
+              Short, trainee-friendly interpretation in your signature hacker-minimal format.
+            </p>
+          `
+        },
+        {
+          id: "guest-speaker-turner",
+          title: "Guest Speaker: Laurah Turner — Practical AI in clinical workflows",
+          date: "2025-11-15",
+          source: "AI Medicine Collective",
+          tags: ["Talk", "Workflow"],
+          image: "images/news/guest-speaker.jpg",
+          deck: "What we learned + the top takeaways for residents.",
+          content: `
+            <h1>Guest Speaker: Laurah Turner</h1>
+            <p class="article-meta">${new Date("2025-11-15").toDateString()} • AI Medicine Collective</p>
+            <div class="article-rule"></div>
+            <p>Placeholder notes for the talk.</p>
+            <h2>Highlights</h2>
+            <ol>
+              <li>Use case #1</li>
+              <li>Use case #2</li>
+              <li>Use case #3</li>
+            </ol>
+            <h2>Links</h2>
+            <ul>
+              <li><a href="resources.html">Resources page</a></li>
+              <li><a href="schedule.html">Meeting schedule</a></li>
+            </ul>
+          `
+        },
+        {
+          id: "tool-drop-heart",
+          title: "Tool Drop: HEART score calculator (PWA) — now in the App Store",
+          date: "2025-10-28",
+          source: "ClinicalToolsDEV",
+          tags: ["Tool", "PWA"],
+          image: "images/news/tool-drop.jpg",
+          deck: "Fast bedside risk stratification with a clean mobile-first UI.",
+          content: `
+            <h1>Tool Drop: HEART Score Calculator</h1>
+            <p class="article-meta">${new Date("2025-10-28").toDateString()} • ClinicalToolsDEV</p>
+            <div class="article-rule"></div>
+            <p>
+              Add screenshots / quick instructions here. You can also embed a link to the app.
+            </p>
+            <p><a href="appstore.html">Open the App Store</a></p>
+          `
+        },
+        {
+          id: "club-update-site",
+          title: "Site Update: Newsfeed + full-screen articles (terminal aesthetic preserved)",
+          date: "2025-12-18",
+          source: "aimedicinecollective.com",
+          tags: ["Update", "Website"],
+          image: "images/news/site-update.jpg",
+          deck: "A new homepage layout built for fast scanning + deep reading.",
+          content: `
+            <h1>Site Update: Newsfeed + Full-Screen Articles</h1>
+            <p class="article-meta">${new Date("2025-12-18").toDateString()} • aimedicinecollective.com</p>
+            <div class="article-rule"></div>
+            <p>
+              The homepage now works like a hacker-grade newsroom: scan cards, click to deep-read.
+            </p>
+            <h2>Design rules</h2>
+            <ul>
+              <li>Cards = fast scan. Full view = slow read.</li>
+              <li>No clutter. No gimmicks. Green glow stays.</li>
+              <li>Keyboard-friendly: ESC closes, focus stays sane.</li>
+            </ul>
+          `
+        },
+        {
+          id: "research-brief-irb",
+          title: "Write to Match: IRB progress + next steps",
+          date: "2025-09-05",
+          source: "AI Medicine Collective",
+          tags: ["Research", "MedEd"],
+          image: "images/news/research-brief.jpg",
+          deck: "Where the project stands + what we need next.",
+          content: `
+            <h1>Write to Match: IRB progress</h1>
+            <p class="article-meta">${new Date("2025-09-05").toDateString()} • AI Medicine Collective</p>
+            <div class="article-rule"></div>
+            <p>Placeholder content for your internal update.</p>
+            <h2>Open tasks</h2>
+            <ul>
+              <li>Finalize training</li>
+              <li>Collect survey feedback</li>
+              <li>Prep dissemination targets</li>
+            </ul>
+          `
+        },
+        {
+          id: "meeting-minutes-rollup",
+          title: "Meeting Minutes Rollup: What we shipped this month",
+          date: "2025-08-31",
+          source: "AI Medicine Collective",
+          tags: ["Meeting", "Ops"],
+          image: "images/news/meeting-rollup.jpg",
+          deck: "A quick rollup of decisions, demos, and next actions.",
+          content: `
+            <h1>Meeting Minutes Rollup</h1>
+            <p class="article-meta">${new Date("2025-08-31").toDateString()} • AI Medicine Collective</p>
+            <div class="article-rule"></div>
+            <p>
+              This view is designed to be simple and readable (Wikipedia-dark inspired) while staying on-brand.
+            </p>
+          `
+        }
+      ];
+
+      const grid = document.getElementById("news-grid");
+      const search = document.getElementById("news-search");
+      const clear = document.getElementById("news-clear");
+
+      function formatDate(iso) {
+        try {
+          const d = new Date(iso + "T00:00:00");
+          return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
+        } catch (_) {
+          return iso;
+        }
+      }
+
+      function safeImage(url) {
+        // allow empty; CSS will show a fallback pattern
+        return (url || "").trim();
+      }
+
+      function buildCard(a) {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "news-card";
+        card.setAttribute("data-article-id", a.id);
+        card.setAttribute("aria-label", `Open article: ${a.title}`);
+
+        const img = safeImage(a.image);
+        card.style.setProperty("--card-img", img ? `url('${img}')` : "none");
+
+        const tags = (a.tags || []).slice(0, 3).map(t => `<span class="news-tag">${t}</span>`).join(" ");
+
+        card.innerHTML = `
+          <div class="news-thumb" aria-hidden="true"></div>
+          <div class="news-body">
+            <div class="news-top">
+              <div class="news-tags">${tags}</div>
+              <div class="news-date">${formatDate(a.date)}</div>
+            </div>
+            <h3 class="news-title">${a.title}</h3>
+            <p class="news-deck">${a.deck || ""}</p>
+            <div class="news-source">${a.source || ""}</div>
+          </div>
+        `;
+
+        card.addEventListener("click", () => openArticle(a.id));
+        return card;
+      }
+
+      function render(list) {
+        if (!grid) return;
+        grid.innerHTML = "";
+        list.forEach(a => grid.appendChild(buildCard(a)));
+      }
+
+      // --- Fullscreen article overlay ---
+      let overlay = null;
+      let lastFocus = null;
+
+      function ensureOverlay() {
+        if (overlay) return overlay;
+
+        overlay = document.createElement("div");
+        overlay.className = "article-overlay";
+        overlay.innerHTML = `
+          <div class="article-shell" role="dialog" aria-modal="true" aria-label="Article view">
+            <button class="article-close" type="button" aria-label="Close article">CLOSE ✕</button>
+            <div class="article-layout">
+              <aside class="article-aside" aria-hidden="true">
+                <div class="article-aside-box">
+                  <div class="article-aside-title">:: DISPATCH ::</div>
+                  <div class="article-aside-body">
+                    <div class="article-aside-line">&gt; scan → click → read</div>
+                    <div class="article-aside-line">&gt; ESC to close</div>
+                    <div class="article-aside-line">&gt; /resources for more</div>
+                  </div>
+                </div>
+              </aside>
+              <article class="article" id="article-content"></article>
+            </div>
+          </div>
+        `;
+
+        overlay.addEventListener("click", (e) => {
+          // clicking the dim background closes
+          if (e.target === overlay) closeArticle();
+        });
+
+        overlay.querySelector(".article-close").addEventListener("click", closeArticle);
+
+        document.addEventListener("keydown", (e) => {
+          if (!overlay || !overlay.classList.contains("open")) return;
+          if (e.key === "Escape") closeArticle();
+        });
+
+        document.body.appendChild(overlay);
+        return overlay;
+      }
+
+      function openArticle(id) {
+        const a = ARTICLES.find(x => x.id === id);
+        if (!a) return;
+
+        lastFocus = document.activeElement;
+
+        const o = ensureOverlay();
+        const node = o.querySelector("#article-content");
+
+        // If image fails, it just falls back to pattern.
+        const hero = safeImage(a.image)
+          ? `<div class="article-hero" style="background-image:url('${a.image}')"></div>`
+          : `<div class="article-hero article-hero--fallback"></div>`;
+
+        node.innerHTML = `
+          ${hero}
+          <div class="article-inner">
+            ${a.content || ""}
+          </div>
+        `;
+
+        document.documentElement.classList.add("no-scroll");
+        o.classList.add("open");
+
+        // Focus close button for keyboard users
+        const closeBtn = o.querySelector(".article-close");
+        closeBtn && closeBtn.focus();
+      }
+
+      function closeArticle() {
+        if (!overlay) return;
+        overlay.classList.remove("open");
+        document.documentElement.classList.remove("no-scroll");
+        if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+      }
+
+      // --- Search ---
+      function applyFilter() {
+        const q = (search?.value || "").trim().toLowerCase();
+        if (!q) {
+          render(ARTICLES);
+          return;
+        }
+        const filtered = ARTICLES.filter(a => {
+          const hay = [a.title, a.deck, a.source, ...(a.tags || [])].join(" ").toLowerCase();
+          return hay.includes(q);
+        });
+        render(filtered);
+      }
+
+      // Render immediately (grid exists only after gate unlock, but safe to call)
+      document.addEventListener("DOMContentLoaded", () => {
+        render(ARTICLES);
+        search && search.addEventListener("input", applyFilter);
+        clear && clear.addEventListener("click", () => { if (search) search.value = ""; applyFilter(); });
+      });
+    })();
+  </script>
 </body>
 </html>
-

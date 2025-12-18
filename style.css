@@ -1341,6 +1341,298 @@ a:active {
 /* === END OF ARCHIVED STYLES ================================= */
 
 
+/* ======================================================================
+   NEWS FEED + FULL-SCREEN ARTICLE VIEWER (Index)
+   ====================================================================== */
+
+.news-section .note {
+  margin-top: 2px;
+}
+
+/* Responsive tile grid (DarkNews-inspired, but minimal) */
+.news-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .news-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.news-card {
+  text-align: left;
+  width: 100%;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.82);
+  border: 1px solid rgba(0, 255, 102, 0.28);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.12);
+  cursor: pointer;
+  overflow: hidden;
+  transition: 0.15s ease-out;
+}
+
+.news-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(0, 255, 102, 0.25);
+  transform: translateY(-1px);
+}
+
+.news-card:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 255, 102, 0.35), 0 0 18px rgba(0, 255, 102, 0.22);
+}
+
+.news-card-img {
+  height: 150px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 255, 102, 0.18) 0, rgba(0, 0, 0, 0) 55%),
+    linear-gradient(180deg, rgba(0, 255, 102, 0.08), rgba(0, 0, 0, 0.95));
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid rgba(0, 255, 102, 0.2);
+  filter: saturate(0.95) contrast(1.05);
+}
+
+.news-card-meta {
+  padding: 10px 10px 12px;
+}
+
+.news-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+}
+
+.news-card-sub {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.news-card-tags {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 255, 102, 0.45);
+  background: rgba(0, 255, 102, 0.07);
+  color: var(--text);
+}
+
+/* Full-screen modal reader (Wikipedia-dark inspired) */
+.no-scroll {
+  overflow: hidden;
+}
+
+.article-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.article-shell {
+  width: min(1200px, 100%);
+  height: min(88vh, 900px);
+  border: 2px solid var(--accent);
+  background: radial-gradient(circle at top, #071707 0, #000 65%);
+  box-shadow: 0 0 28px rgba(0, 255, 102, 0.35);
+  display: flex;
+  flex-direction: column;
+}
+
+.article-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px dashed rgba(0, 255, 102, 0.6);
+}
+
+.article-close {
+  width: 38px;
+  height: 30px;
+  padding: 0;
+  line-height: 1;
+  font-size: 1.2rem;
+  border-radius: 4px;
+}
+
+.article-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.article-kbd {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(0, 255, 102, 0.5);
+  padding: 2px 6px;
+  opacity: 0.85;
+}
+
+.article-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  padding: 14px;
+  overflow: hidden;
+}
+
+@media (max-width: 860px) {
+  .article-body {
+    grid-template-columns: 1fr;
+  }
+  .article-sidebar {
+    display: none;
+  }
+}
+
+.article-sidebar {
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.article-sidecard {
+  border: 1px solid rgba(0, 255, 102, 0.35);
+  background: rgba(0, 0, 0, 0.72);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.12);
+  padding: 10px 10px 12px;
+}
+
+.article-side-title {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.article-side-meta {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.article-side-tags {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.article-side-actions {
+  margin-top: 12px;
+  display: flex;
+}
+
+.article-action {
+  font-size: 0.7rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.1em;
+}
+
+.article-main {
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.article-title {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.article-meta {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.article-content {
+  margin-top: 14px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.article-content h3 {
+  margin: 18px 0 8px;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.article-content ul {
+  padding-left: 18px;
+}
+
+.article-lede {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.article-footnote {
+  opacity: 0.85;
+  font-size: 0.85rem;
+}
+
+.article-hr {
+  margin: 16px 0;
+  border-top: 1px dashed rgba(0, 255, 102, 0.55);
+}
+
+/* Small toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%) translateY(10px);
+  opacity: 0;
+  pointer-events: none;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 255, 102, 0.6);
+  background: rgba(0, 0, 0, 0.92);
+  box-shadow: 0 0 18px rgba(0, 255, 102, 0.22);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 10000;
+  transition: 0.18s ease-out;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+
 /* === NEW: APP STORE GRID ===================================== */
 
 .appstore-intro {
