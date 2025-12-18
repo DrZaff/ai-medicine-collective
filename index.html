@@ -37,31 +37,30 @@
     <!-- MAIN CONTENT (hidden until password correct) -->
     <main id="site-content" class="hidden">
 
-      <!-- Compact nav (keeps hacker vibe, gives quick access) -->
-      <nav class="nav nav--index">
-        <a href="about.html">ABOUT</a>
-        <a href="members.html">MEMBERS</a>
-        <a href="schedule.html">MEETINGS</a>
-        <a href="projects.html">PROJECTS</a>
-        <a href="appstore.html">APP STORE</a>
-        <a href="adelante.html">ADELANTE</a>
-        <a href="resources.html">RESOURCES</a>
-        <a href="join.html">JOIN</a>
-      </nav>
-
-      <!-- News feed -->
-      <section class="section news">
-        <div class="news-header">
-          <h2 class="section-title">LATEST DISPATCHES</h2>
-          <div class="news-controls">
-            <input id="news-search" class="news-search" type="search" placeholder="> search" aria-label="Search articles" />
-            <button id="news-clear" class="news-clear" type="button">CLEAR</button>
-          </div>
+      <!-- Horizontal strips (Don Rum-style): links + news tiles spanning across -->
+      <section class="strip strip--links" aria-label="Site links">
+        <div class="strip-header">
+          <h2 class="strip-title">LINKS</h2>
+          <p class="strip-hint">scroll →</p>
         </div>
+        <div class="hstrip" role="list">
+          <a class="tile tile--link" href="about.html" role="listitem"><span class="tile-title">ABOUT</span><span class="tile-sub">who we are</span></a>
+          <a class="tile tile--link" href="members.html" role="listitem"><span class="tile-title">MEMBERS</span><span class="tile-sub">roster</span></a>
+          <a class="tile tile--link" href="schedule.html" role="listitem"><span class="tile-title">MEETING SCHEDULE</span><span class="tile-sub">dates + agendas</span></a>
+          <a class="tile tile--link" href="projects.html" role="listitem"><span class="tile-title">PROJECTS</span><span class="tile-sub">in the lab</span></a>
+          <a class="tile tile--link" href="appstore.html" role="listitem"><span class="tile-title">APP STORE</span><span class="tile-sub">tools</span></a>
+          <a class="tile tile--link" href="adelante.html" role="listitem"><span class="tile-title">ADELANTE REPORT</span><span class="tile-sub">briefs</span></a>
+          <a class="tile tile--link" href="resources.html" role="listitem"><span class="tile-title">RESOURCES</span><span class="tile-sub">links + docs</span></a>
+          <a class="tile tile--link" href="join.html" role="listitem"><span class="tile-title">JOIN</span><span class="tile-sub">get involved</span></a>
+        </div>
+      </section>
 
-        <div id="news-grid" class="news-grid" aria-live="polite"></div>
-
-        <p class="note news-note">Tip: click a card to open a full-screen article view. Press <span class="kbd">ESC</span> to close.</p>
+      <section class="strip strip--news" aria-label="News">
+        <div class="strip-header">
+          <h2 class="strip-title">NEWS</h2>
+          <p class="strip-hint">click to open • <span class="kbd">ESC</span> closes</p>
+        </div>
+        <div id="news-strip" class="hstrip" role="list" aria-live="polite"></div>
       </section>
 
       <div class="horizontal-rule bottom-rule"></div>
@@ -216,9 +215,7 @@
         }
       ];
 
-      const grid = document.getElementById("news-grid");
-      const search = document.getElementById("news-search");
-      const clear = document.getElementById("news-clear");
+      const strip = document.getElementById("news-strip");
 
       function formatDate(iso) {
         try {
@@ -234,39 +231,38 @@
         return (url || "").trim();
       }
 
-      function buildCard(a) {
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = "news-card";
-        card.setAttribute("data-article-id", a.id);
-        card.setAttribute("aria-label", `Open article: ${a.title}`);
+      function buildTile(a) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "tile tile--news";
+        btn.setAttribute("data-article-id", a.id);
+        btn.setAttribute("role", "listitem");
+        btn.setAttribute("aria-label", `Open article: ${a.title}`);
 
         const img = safeImage(a.image);
-        card.style.setProperty("--card-img", img ? `url('${img}')` : "none");
+        btn.style.setProperty("--tile-img", img ? `url('${img}')` : "none");
 
-        const tags = (a.tags || []).slice(0, 3).map(t => `<span class="news-tag">${t}</span>`).join(" ");
-
-        card.innerHTML = `
-          <div class="news-thumb" aria-hidden="true"></div>
-          <div class="news-body">
-            <div class="news-top">
-              <div class="news-tags">${tags}</div>
-              <div class="news-date">${formatDate(a.date)}</div>
+        const tags = (a.tags || []).slice(0, 3).map(t => `<span class="chip">${t}</span>`).join(" ");
+        btn.innerHTML = `
+          <div class="tile-media" aria-hidden="true"></div>
+          <div class="tile-body">
+            <div class="tile-top">
+              <div class="tile-chips">${tags}</div>
+              <div class="tile-date">${formatDate(a.date)}</div>
             </div>
-            <h3 class="news-title">${a.title}</h3>
-            <p class="news-deck">${a.deck || ""}</p>
-            <div class="news-source">${a.source || ""}</div>
+            <div class="tile-title">${a.title}</div>
+            <div class="tile-sub">${a.deck || ""}</div>
           </div>
         `;
 
-        card.addEventListener("click", () => openArticle(a.id));
-        return card;
+        btn.addEventListener("click", () => openArticle(a.id));
+        return btn;
       }
 
       function render(list) {
-        if (!grid) return;
-        grid.innerHTML = "";
-        list.forEach(a => grid.appendChild(buildCard(a)));
+        if (!strip) return;
+        strip.innerHTML = "";
+        list.forEach(a => strip.appendChild(buildTile(a)));
       }
 
       // --- Fullscreen article overlay ---
@@ -349,25 +345,10 @@
         if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
       }
 
-      // --- Search ---
-      function applyFilter() {
-        const q = (search?.value || "").trim().toLowerCase();
-        if (!q) {
-          render(ARTICLES);
-          return;
-        }
-        const filtered = ARTICLES.filter(a => {
-          const hay = [a.title, a.deck, a.source, ...(a.tags || [])].join(" ").toLowerCase();
-          return hay.includes(q);
-        });
-        render(filtered);
-      }
-
-      // Render immediately (grid exists only after gate unlock, but safe to call)
+      // Render immediately. (Strip exists only after gate unlock, but safe to call.)
       document.addEventListener("DOMContentLoaded", () => {
-        render(ARTICLES);
-        search && search.addEventListener("input", applyFilter);
-        clear && clear.addEventListener("click", () => { if (search) search.value = ""; applyFilter(); });
+        const sorted = [...ARTICLES].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+        render(sorted);
       });
     })();
   </script>
