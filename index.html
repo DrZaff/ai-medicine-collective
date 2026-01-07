@@ -7,12 +7,11 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="terminal-frame">
+  <div class="terminal-frame terminal-frame--index">
 
-    <!-- TOP BORDER -->
     <div class="horizontal-rule"></div>
 
-    <!-- HEADER (hidden until password is correct) -->
+    <!-- Header is shown only after successful password -->
     <header id="site-header" class="hidden">
       <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
       <div class="horizontal-rule"></div>
@@ -21,92 +20,385 @@
     <!-- PASSWORD GATE -->
     <section id="gate">
       <h2 class="section-title">ACCESS REQUIRED</h2>
-      <p class="gate-text">
-        Enter the AI Medicine Collective password to continue.
-      </p>
+      <p class="gate-text">Enter the AI Medicine Collective password to continue.</p>
       <form id="password-form">
         <label for="password-input" class="prompt">&gt; PASSWORD:</label>
-        <input
-          type="password"
-          id="password-input"
-          autocomplete="off"
-          required
-        />
+        <input type="password" id="password-input" autocomplete="off" required />
         <button type="submit">ENTER</button>
       </form>
-      <p id="error-message" class="error hidden">
-        ACCESS DENIED. TRY AGAIN.
-      </p>
-
-      <p class="gate-hint">
-        # Hint: ask a member of the Collective.
-      </p>
-
+      <p id="error-message" class="error hidden">ACCESS DENIED. TRY AGAIN.</p>
+      <p class="gate-hint"># Hint: ask a member of the Collective.</p>
       <div class="horizontal-rule"></div>
     </section>
 
     <!-- MAIN CONTENT (hidden until password correct) -->
     <main id="site-content" class="hidden">
 
-      <section class="section landing-links">
-
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="about.html">&gt; ABOUT</a>
-          </h2>
+      <div class="vs-shell">
+        <!-- activity bar (minimal, purely aesthetic) -->
+        <div class="activity-bar" aria-hidden="true">
+          <div class="ab-icon">&gt;_</div>
+          <div class="ab-icon">○</div>
+          <div class="ab-icon">⌕</div>
+          <div class="ab-icon">☰</div>
+          <div class="ab-spacer"></div>
+          <div class="ab-icon">⚙</div>
         </div>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="members.html">&gt; MEMBERS</a>
-          </h2>
-        </div>
+        <!-- explorer sidebar -->
+        <aside class="sidebar" aria-label="Explorer">
+          <div class="sidebar-top">
+            <div class="sidebar-title">EXPLORER</div>
+            <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Toggle sidebar">☰</button>
+          </div>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="schedule.html">&gt; MEETING SCHEDULE</a>
-          </h2>
-        </div>
+          <div class="sidebar-group">
+            <div class="sidebar-group-title">ROOT/AI-MEDICINE-COLLECTIVE</div>
+            <nav class="sidebar-nav" aria-label="Site pages">
+              <a class="sidebar-link" href="about.html">about.md</a>
+              <a class="sidebar-link" href="members.html">members_list.db</a>
+              <a class="sidebar-link" href="schedule.html">meeting_schedule.md</a>
+              <a class="sidebar-link" href="projects.html">projects.md</a>
+              <a class="sidebar-link" href="appstore.html">app_store.md</a>
+              <a class="sidebar-link" href="adelante.html">adelante_report.md</a>
+              <a class="sidebar-link" href="resources.html">resources.md</a>
+              <a class="sidebar-link" href="join.html">join.md</a>
+            </nav>
+          </div>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="projects.html">&gt; PROJECTS</a>
-          </h2>
-        </div>
+          <div class="sidebar-group">
+            <div class="sidebar-group-title">ARCHIVE</div>
+            <div class="sidebar-muted">coming soon…</div>
+          </div>
+        </aside>
 
-        <!-- NEW: App Store link -->
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="appstore.html">&gt; APP STORE</a>
-          </h2>
-        </div>
+        <!-- main scroll area -->
+        <section class="workbench" aria-label="Workbench">
+          <header class="workbench-top">
+            <div class="tab">
+              <span class="tab-dot"></span>
+              <span class="tab-dot"></span>
+              <span class="tab-dot"></span>
+              <span class="tab-title">file</span>
+              <span class="tab-file">index.md</span>
+            </div>
+          </header>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="resources.html">&gt; RESOURCES</a>
-          </h2>
-        </div>
+          <div class="workbench-scroll" id="workbench-scroll">
+            <section class="landing">
+              <h2 class="landing-title">AI Medicine Collective</h2>
+              <p class="landing-sub">terminal-first community for building practical clinical AI</p>
+              <div class="landing-cta">
+                <a class="btn" href="projects.html">OPEN PROJECTS</a>
+                <a class="btn" href="schedule.html">NEXT MEETING</a>
+                <button class="btn" type="button" id="jump-news">JUMP: NEWS</button>
+              </div>
+              <div class="section-divider"></div>
+            </section>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="join.html">&gt; JOIN</a>
-          </h2>
-        </div>
+            <!-- Latest News (matches your screenshot style) -->
+            <section id="latest-news" class="feed-section" aria-label="Latest News">
+              <h2 class="feed-title"><span class="feed-icon">📡</span> Latest News</h2>
+              <div id="news-feed" class="news-feed" aria-live="polite"></div>
+            </section>
 
-      </section>
+            <!-- Latest Research (card layout) -->
+            <section id="latest-research" class="feed-section" aria-label="Latest Research">
+              <h2 class="feed-title"><span class="feed-icon">∿</span> Latest Research</h2>
+              <div id="research-grid" class="research-grid" aria-live="polite"></div>
+            </section>
 
-      <div class="horizontal-rule bottom-rule"></div>
+            <div class="horizontal-rule bottom-rule"></div>
 
-      <footer class="footer">
-        &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
-        <span class="cursor">█</span>
-      </footer>
+            <footer class="footer">
+              &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+              <span class="cursor">█</span>
+            </footer>
+          </div>
+        </section>
+      </div>
 
     </main>
 
   </div>
 
+  <!-- Existing password gate logic lives here in your current site. Keep it. -->
   <script src="script.js"></script>
+
+  <script>
+    (function () {
+      // ---------------------------------------------------------------------
+      // Content
+      // ---------------------------------------------------------------------
+      const ARTICLES = [
+        {
+          id: "news_relay_01",
+          title: "DeepMind Announces Med-Gemini: A New Benchmark for Medical AI",
+          date: "2024-05-20",
+          source: "AI Medicine Collective",
+          deck: "A new suite of highly capable multimodal models fine-tuned for the medical domain, showing breakthrough reasoning capabilities.",
+          image: "images/news/medgemini.jpg",
+          content: `
+            <h1>DeepMind Announces Med-Gemini: A New Benchmark for Medical AI</h1>
+            <p class="article-meta">${new Date("2024-05-20").toDateString()} • AI Medicine Collective</p>
+            <div class="article-rule"></div>
+            <p>Replace this with the actual summary + links. Keep it short, clean, and readable.</p>
+            <h2>Why it matters</h2>
+            <ul>
+              <li>Multimodal clinical reasoning is moving quickly.</li>
+              <li>Benchmarks are becoming more domain-specific.</li>
+              <li>We can translate these findings into resident-friendly tools.</li>
+            </ul>
+          `
+        },
+        {
+          id: "news_relay_02",
+          title: "FDA Clears AI-Powered Diagnostic Tool for Rural Clinics",
+          date: "2024-05-15",
+          source: "AI Medicine Collective",
+          deck: "Increased accessibility to specialized care as autonomous screening devices receive landmark approval for cardiovascular detection.",
+          image: "images/news/fda-tool.jpg",
+          content: `
+            <h1>FDA Clears AI-Powered Diagnostic Tool for Rural Clinics</h1>
+            <p class="article-meta">${new Date("2024-05-15").toDateString()} • AI Medicine Collective</p>
+            <div class="article-rule"></div>
+            <p>Swap in the real brief: what was cleared, what the evidence looked like, and the practical caveats.</p>
+          `
+        },
+        {
+          id: "news_relay_03",
+          title: "The Ethics of Generative AI in Patient Documentation",
+          date: "2024-05-12",
+          source: "AI Medicine Collective",
+          deck: "A pragmatic framework for where genAI helps, where it harms, and how to use it responsibly in clinical notes.",
+          image: "images/news/ethics-docs.jpg",
+          content: `
+            <h1>The Ethics of Generative AI in Patient Documentation</h1>
+            <p class="article-meta">${new Date("2024-05-12").toDateString()} • AI Medicine Collective</p>
+            <div class="article-rule"></div>
+            <p>Replace with your curated ethics takeaways.</p>
+            <h2>Principles</h2>
+            <ul>
+              <li>Transparency</li>
+              <li>Clinical accountability</li>
+              <li>Privacy &amp; data minimization</li>
+              <li>Bias awareness</li>
+            </ul>
+          `
+        }
+      ];
+
+      const RESEARCH = [
+        {
+          id: "rsh_882",
+          title: "Foundation Models for Pathological Image Analysis",
+          venue: "Pre-print",
+          code: "RSH-882",
+          deck: "Summary: Evaluation of zero-shot transfer learning in identifying rare oncological markers across disparate histology datasets.",
+          image: "images/research/pathology.jpg",
+          cta: "READ_SUMMARY.PY",
+          content: `
+            <h1>Foundation Models for Pathological Image Analysis</h1>
+            <p class="article-meta">Pre-print • ${new Date("2024-05-01").toDateString()} • ${"RSH-882"}</p>
+            <div class="article-rule"></div>
+            <p>Drop your 6–10 bullet summary here + any caveats.</p>
+          `
+        },
+        {
+          id: "rsh_311",
+          title: "Scalable Privacy for Federated Clinical Learning",
+          venue: "Nature Med",
+          code: "RSH-311",
+          deck: "Summary: Implementation of differentially private synthetic data generation for cross-institutional rare disease research.",
+          image: "images/research/privacy.jpg",
+          cta: "READ_SUMMARY.PY",
+          content: `
+            <h1>Scalable Privacy for Federated Clinical Learning</h1>
+            <p class="article-meta">Nature Med • ${new Date("2024-04-18").toDateString()} • ${"RSH-311"}</p>
+            <div class="article-rule"></div>
+            <p>Swap in the real summary: methods, results, limitations, and why it matters for us.</p>
+          `
+        }
+      ];
+
+      // ---------------------------------------------------------------------
+      // Rendering
+      // ---------------------------------------------------------------------
+      const newsFeed = document.getElementById("news-feed");
+      const researchGrid = document.getElementById("research-grid");
+
+      function formatDateCompact(iso) {
+        try {
+          const d = new Date(iso + "T00:00:00");
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          return `${y}.${m}.${day}`;
+        } catch (_) {
+          return iso;
+        }
+      }
+
+      // Fullscreen article overlay (shared for news + research)
+      let overlay = null;
+      let lastFocus = null;
+
+      function ensureOverlay() {
+        if (overlay) return overlay;
+
+        overlay = document.createElement("div");
+        overlay.className = "article-overlay";
+        overlay.innerHTML = `
+          <div class="article-shell" role="dialog" aria-modal="true" aria-label="Article view">
+            <button class="article-close" type="button" aria-label="Close article">CLOSE ✕</button>
+            <div class="article-layout">
+              <aside class="article-aside" aria-hidden="true">
+                <div class="article-aside-box">
+                  <div class="article-aside-title">:: DISPATCH ::</div>
+                  <div class="article-aside-body">
+                    <div class="article-aside-line">&gt; scan → click → read</div>
+                    <div class="article-aside-line">&gt; ESC to close</div>
+                    <div class="article-aside-line">&gt; /resources for more</div>
+                  </div>
+                </div>
+              </aside>
+              <article class="article" id="article-content"></article>
+            </div>
+          </div>
+        `;
+
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) closeArticle();
+        });
+
+        overlay.querySelector(".article-close").addEventListener("click", closeArticle);
+
+        document.addEventListener("keydown", (e) => {
+          if (!overlay || !overlay.classList.contains("open")) return;
+          if (e.key === "Escape") closeArticle();
+        });
+
+        document.body.appendChild(overlay);
+        return overlay;
+      }
+
+      function safeImage(url) {
+        return (url || "").trim();
+      }
+
+      function openArticle(item) {
+        if (!item) return;
+        lastFocus = document.activeElement;
+
+        const o = ensureOverlay();
+        const node = o.querySelector("#article-content");
+
+        const hero = safeImage(item.image)
+          ? `<div class="article-hero" style="background-image:url('${item.image}')"></div>`
+          : `<div class="article-hero article-hero--fallback"></div>`;
+
+        node.innerHTML = `
+          ${hero}
+          <div class="article-inner">
+            ${item.content || ""}
+          </div>
+        `;
+
+        document.documentElement.classList.add("no-scroll");
+        o.classList.add("open");
+
+        const closeBtn = o.querySelector(".article-close");
+        closeBtn && closeBtn.focus();
+      }
+
+      function closeArticle() {
+        if (!overlay) return;
+        overlay.classList.remove("open");
+        document.documentElement.classList.remove("no-scroll");
+        if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+      }
+
+      function renderNews() {
+        if (!newsFeed) return;
+        newsFeed.innerHTML = "";
+
+        ARTICLES.forEach((a, idx) => {
+          const row = document.createElement("article");
+          row.className = "news-row";
+          const relay = String(idx + 1).padStart(2, "0");
+
+          row.innerHTML = `
+            <div class="news-row-meta">
+              <div class="news-row-date">${formatDateCompact(a.date)} // NEWS_RELAY_${relay}</div>
+              <button class="news-row-open" type="button">OPEN</button>
+            </div>
+            <h3 class="news-row-title"></h3>
+            <p class="news-row-deck"></p>
+          `;
+
+          row.querySelector(".news-row-title").textContent = a.title;
+          row.querySelector(".news-row-deck").textContent = a.deck || "";
+
+          const openBtn = row.querySelector(".news-row-open");
+          openBtn.addEventListener("click", () => openArticle(a));
+          row.querySelector(".news-row-title").addEventListener("click", () => openArticle(a));
+          row.querySelector(".news-row-title").classList.add("clickable");
+
+          newsFeed.appendChild(row);
+        });
+      }
+
+      function renderResearch() {
+        if (!researchGrid) return;
+        researchGrid.innerHTML = "";
+
+        RESEARCH.forEach((r) => {
+          const card = document.createElement("button");
+          card.type = "button";
+          card.className = "research-card";
+
+          const badge = (r.venue || "").toUpperCase();
+
+          card.innerHTML = `
+            <div class="research-card-top">
+              <span class="research-badge">${badge}</span>
+              <span class="research-code">#${r.code || ""}</span>
+            </div>
+            <h3 class="research-title">${r.title}</h3>
+            <p class="research-deck">${r.deck || ""}</p>
+            <div class="research-cta">${r.cta || "READ"} &gt;</div>
+          `;
+
+          card.addEventListener("click", () => openArticle(r));
+          researchGrid.appendChild(card);
+        });
+      }
+
+      // Sidebar mobile toggle
+      const toggleBtn = document.getElementById("sidebar-toggle");
+      const shell = document.querySelector(".vs-shell");
+
+      toggleBtn && toggleBtn.addEventListener("click", () => {
+        if (!shell) return;
+        shell.classList.toggle("sidebar-collapsed");
+      });
+
+      // Jump button
+      const jumpNews = document.getElementById("jump-news");
+      jumpNews && jumpNews.addEventListener("click", () => {
+        const s = document.getElementById("workbench-scroll");
+        const target = document.getElementById("latest-news");
+        if (s && target) {
+          const top = target.offsetTop - 12;
+          s.scrollTo({ top, behavior: "smooth" });
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        renderNews();
+        renderResearch();
+      });
+    })();
+  </script>
 </body>
 </html>
-
