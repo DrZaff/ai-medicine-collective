@@ -3,107 +3,114 @@
 <head>
   <meta charset="UTF-8" />
   <title>AI Medicine Collective</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <div class="terminal-frame">
 
-    <!-- TOP BORDER -->
-    <div class="horizontal-rule"></div>
-
-    <!-- HEADER (hidden until password is correct) -->
-    <header id="site-header" class="hidden">
-      <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
-      <div class="horizontal-rule"></div>
-    </header>
-
     <!-- PASSWORD GATE -->
-    <section id="gate">
-      <h2 class="section-title">ACCESS REQUIRED</h2>
-      <p class="gate-text">
-        Enter the AI Medicine Collective password to continue.
-      </p>
-      <form id="password-form">
-        <label for="password-input" class="prompt">&gt; PASSWORD:</label>
-        <input
-          type="password"
-          id="password-input"
-          autocomplete="off"
-          required
-        />
-        <button type="submit">ENTER</button>
-      </form>
-      <p id="error-message" class="error hidden">
-        ACCESS DENIED. TRY AGAIN.
-      </p>
+    <section id="gate" class="gate">
+      <div class="gate-box">
+        <h1>ACCESS REQUIRED</h1>
+        <p>Enter the AI Medicine Collective password to continue.</p>
 
-      <p class="gate-hint">
-        # Hint: ask a member of the Collective.
-      </p>
+        <form id="password-form">
+          <label>&gt; PASSWORD:</label>
+          <input id="password-input" type="password" autocomplete="off" />
+          <button type="submit">ENTER</button>
+        </form>
 
-      <div class="horizontal-rule"></div>
+        <p id="error-message" class="error hidden">ACCESS DENIED</p>
+        <p class="hint"># Hint: ask a member of the Collective.</p>
+      </div>
     </section>
 
-    <!-- MAIN CONTENT (hidden until password correct) -->
-    <main id="site-content" class="hidden">
+    <!-- MAIN APP -->
+    <main id="app" class="hidden">
 
-      <section class="section landing-links">
+      <header class="site-header">
+        <h1>:: AI MEDICINE COLLECTIVE ::</h1>
+      </header>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="about.html">&gt; ABOUT</a>
-          </h2>
-        </div>
+      <div class="vs-shell">
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="members.html">&gt; MEMBERS</a>
-          </h2>
-        </div>
+        <!-- ACTIVITY BAR -->
+        <nav class="activity">
+          <button id="sidebar-toggle">☰</button>
+        </nav>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="schedule.html">&gt; MEETING SCHEDULE</a>
-          </h2>
-        </div>
+        <!-- EXPLORER -->
+        <aside class="sidebar" id="sidebar">
+          <h2>EXPLORER</h2>
+          <a href="#">ABOUT</a>
+          <a href="#">MEMBERS</a>
+          <a href="#">MEETINGS</a>
+          <a href="#">PROJECTS</a>
+          <a href="#">APP STORE</a>
+          <a href="#">ADELANTE REPORT</a>
+          <a href="#">RESOURCES</a>
+          <a href="#">JOIN</a>
+        </aside>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="projects.html">&gt; PROJECTS</a>
-          </h2>
-        </div>
+        <!-- WORKBENCH -->
+        <section class="workbench">
+          <div class="workbench-scroll">
 
-        <!-- NEW: App Store link -->
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="appstore.html">&gt; APP STORE</a>
-          </h2>
-        </div>
+            <section class="hero">
+              <h2>AI Medicine Collective</h2>
+              <p>Terminal-first community for building practical clinical AI.</p>
+            </section>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="resources.html">&gt; RESOURCES</a>
-          </h2>
-        </div>
+            <section id="latest-news">
+              <h3>📡 Latest News</h3>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="join.html">&gt; JOIN</a>
-          </h2>
-        </div>
+              <article class="news-item" data-id="1">
+                <span class="meta">2024.05.20 // NEWS_RELAY_01</span>
+                <h4>DeepMind Announces Med-Gemini</h4>
+                <p>A new benchmark for multimodal medical AI.</p>
+                <button class="open-article">OPEN</button>
+              </article>
 
-      </section>
+              <article class="news-item" data-id="2">
+                <span class="meta">2024.05.15 // NEWS_RELAY_02</span>
+                <h4>FDA Clears AI Diagnostic Tool</h4>
+                <p>Approval expands access for rural clinics.</p>
+                <button class="open-article">OPEN</button>
+              </article>
+            </section>
 
-      <div class="horizontal-rule bottom-rule"></div>
+            <section id="latest-research">
+              <h3>∿ Latest Research</h3>
 
-      <footer class="footer">
-        &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
-        <span class="cursor">█</span>
-      </footer>
+              <div class="research-card">
+                <span class="tag">PRE-PRINT</span>
+                <h4>Foundation Models for Pathology</h4>
+                <p>Evaluating zero-shot learning across histology datasets.</p>
+                <button class="open-article">READ</button>
+              </div>
 
+              <div class="research-card">
+                <span class="tag">NATURE MED</span>
+                <h4>Federated Clinical Learning</h4>
+                <p>Privacy-preserving training across institutions.</p>
+                <button class="open-article">READ</button>
+              </div>
+            </section>
+
+          </div>
+        </section>
+      </div>
     </main>
+  </div>
 
+  <!-- MODAL -->
+  <div id="overlay" class="overlay hidden" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Article">
+      <button id="close-overlay" class="modal-close" type="button" aria-label="Close">✕</button>
+      <article id="overlay-content"></article>
+    </div>
   </div>
 
   <script src="script.js"></script>
