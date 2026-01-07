@@ -254,23 +254,23 @@ body{
   opacity:.9;
 }
 
-/* ---------- MODAL (FIXED) ---------- */
+/* ---------- MODAL (constrained + always closable) ---------- */
 .overlay{
   position: fixed;
   inset: 0;
   z-index: 9999;
   background: rgba(0,0,0,.78);
-  padding: 26px;              /* guarantees click-outside area */
+  padding: 28px;                 /* ensures click-outside area exists */
   display:flex;
   align-items:center;
   justify-content:center;
 }
 
 .modal{
-  width: min(900px, calc(100vw - 80px));
-  height: min(720px, calc(100vh - 80px));
-  border: 2px solid var(--g);
-  box-shadow: 0 0 26px var(--glow);
+  width: min(860px, calc(100vw - 120px));
+  height: min(620px, calc(100vh - 140px));
+  border: 2px solid #00ff66;
+  box-shadow: 0 0 26px rgba(0,255,102,.25);
   background: #000;
   overflow:auto;
   padding: 22px 22px 26px 22px;
@@ -282,8 +282,8 @@ body{
   top: 10px;
   right: 10px;
   background: transparent;
-  border: 1px solid var(--line);
-  color: var(--g);
+  border: 1px solid rgba(0,255,102,.65);
+  color: #00ff66;
   width: 34px;
   height: 34px;
   cursor:pointer;
@@ -299,4 +299,139 @@ body{
   .sidebar{ display:none; }
   .sidebar.show{ display:block; position:absolute; left:48px; top:52px; bottom:0; width: 240px; background:#000; z-index:10; }
   #latest-research .research-grid{ grid-template-columns: 1fr; }
+}
+
+/* ====== POLISH PASS (drop-in overrides) ====== */
+
+/* tighter, more “VS Code” layout */
+:root{
+  --g:#00ff66;
+  --line: rgba(0,255,102,.55);
+  --soft: rgba(0,255,102,.22);
+  --bg:#000;
+}
+
+/* make the frame feel intentional (less floaty) */
+.terminal-frame{
+  background:
+    radial-gradient(circle at 20% 10%, rgba(0,255,102,.08), transparent 55%),
+    radial-gradient(circle at 70% 30%, rgba(0,255,102,.05), transparent 60%);
+}
+
+/* header: reduce visual weight + align */
+.site-header{
+  padding: 8px 12px;
+  border-bottom: 1px dashed var(--line);
+}
+.site-header h1{
+  font-size: 22px;
+  letter-spacing: 2px;
+  opacity: .95;
+}
+
+/* bring everything into a single alignment column */
+.workbench-scroll{
+  padding: 16px 18px 22px 18px;
+}
+
+/* sidebar: less empty space, more “explorer” */
+.sidebar{
+  padding: 12px 10px;
+}
+.sidebar a{
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  opacity: .95;
+}
+.sidebar a:hover{
+  border-color: var(--line);
+  box-shadow: 0 0 10px rgba(0,255,102,.12);
+}
+
+/* optional: make it feel “selected” when you wire active pages later */
+.sidebar a.active{
+  border-color: var(--line);
+  background: rgba(0,255,102,.06);
+}
+
+/* hero: make it quieter so news/research is the focus */
+.hero{
+  border: 1px solid var(--soft);
+  background: rgba(0,255,102,.03);
+  padding: 14px 14px;
+  margin-bottom: 16px;
+}
+.hero h2{
+  font-size: 28px;
+  margin: 0 0 6px 0;
+}
+.hero p{
+  margin: 0;
+  opacity: .85;
+  line-height: 1.5;
+}
+
+/* section headers: consistent spacing */
+#latest-news h3,
+#latest-research h3{
+  margin: 18px 0 10px 0;
+  font-size: 18px;
+  opacity: .95;
+}
+
+/* cards: unify border weight + spacing */
+.news-item,
+.research-card{
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.65);
+  padding: 14px 14px 14px 14px;
+  margin-bottom: 12px;
+}
+
+/* news layout: push OPEN into the corner without boxing the whole thing */
+.news-item{
+  padding-right: 92px; /* room for OPEN button */
+}
+.news-item h4{
+  font-size: 22px;
+  margin: 8px 0 6px 0;
+}
+.news-item p{
+  margin: 0;
+  opacity: .88;
+  line-height: 1.45;
+}
+
+/* buttons: less chunky + more consistent */
+.open-article{
+  border: 1px solid var(--line);
+  background: rgba(0,255,102,.04);
+  padding: 6px 12px;
+  letter-spacing: 1px;
+}
+.open-article:hover{
+  box-shadow: 0 0 12px rgba(0,255,102,.18);
+}
+
+/* research grid: make the list feel intentionally grouped */
+#latest-research .research-grid{
+  margin-top: 6px;
+  gap: 12px;
+}
+.research-card .tag{
+  border: 1px solid var(--soft);
+  background: rgba(0,255,102,.04);
+}
+
+/* reduce “glow spam” globally */
+.sidebar a:hover,
+.activity button:hover,
+.open-article:hover{
+  box-shadow: 0 0 12px rgba(0,255,102,.16);
+}
+
+/* make everything feel less “fat” */
+.meta, .tag{
+  letter-spacing: .5px;
 }
