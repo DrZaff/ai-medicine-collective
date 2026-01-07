@@ -1,90 +1,169 @@
-// -------------------- PASSWORD GATE --------------------
-const PASSWORD = "adelante"; // change this
+// === AI Medicine Collective - soft gate + session memory + UI polish ===
+
+// Change this if you want a different password:
+const CLUB_PASSWORD = "collective";
+
+const header = document.getElementById("site-header");
 const gate = document.getElementById("gate");
-const app = document.getElementById("app");
+const main = document.getElementById("site-content");
 const form = document.getElementById("password-form");
+const errorMsg = document.getElementById("error-message");
 const input = document.getElementById("password-input");
-const error = document.getElementById("error-message");
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const ok = input.value === PASSWORD;
-  if (ok) {
-    gate.classList.add("hidden");
-    app.classList.remove("hidden");
-    error.classList.add("hidden");
-    input.value = "";
-  } else {
-    error.classList.remove("hidden");
-  }
-});
+// Create logout button (top-right), works on all pages once authenticated
+function createLogoutButton() {
+  if (document.getElementById("logout-btn")) return;
 
-// -------------------- SIDEBAR TOGGLE (MOBILE) --------------------
-const sidebar = document.getElementById("sidebar");
-const toggleBtn = document.getElementById("sidebar-toggle");
+  const btn = document.createElement("button");
+  btn.id = "logout-btn";
+  btn.className = "logout-btn";
+  btn.textContent = "LOGOUT";
 
-toggleBtn.addEventListener("click", () => {
-  sidebar.classList.toggle("show");
-});
-
-// -------------------- MODAL READER --------------------
-const overlay = document.getElementById("overlay");
-const overlayContent = document.getElementById("overlay-content");
-const closeOverlayBtn = document.getElementById("close-overlay");
-
-// demo content builder (replace with your real news later)
-function openReader({ title, date, source, bodyHtml }) {
-  overlayContent.innerHTML = `
-    <h2 style="margin-top:0">${title}</h2>
-    <p style="opacity:.8;margin-top:6px">${date} • ${source}</p>
-    <hr style="border:0;border-top:1px solid rgba(0,255,102,.25);margin:16px 0" />
-    ${bodyHtml}
-  `;
-
-  overlay.classList.remove("hidden");
-  overlay.setAttribute("aria-hidden", "false");
-
-  // prevent background scroll / weird focus issues
-  document.body.style.overflow = "hidden";
-}
-
-function closeReader() {
-  overlay.classList.add("hidden");
-  overlay.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "hidden"; // keep page locked
-}
-
-// Close button
-closeOverlayBtn.addEventListener("click", closeReader);
-
-// Click outside modal closes (THIS is the part you wanted)
-overlay.addEventListener("click", (e) => {
-  if (e.target === overlay) closeReader();
-});
-
-// ESC closes
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && !overlay.classList.contains("hidden")) closeReader();
-});
-
-// Hook up buttons
-document.querySelectorAll(".open-article").forEach((btn, idx) => {
   btn.addEventListener("click", () => {
-    openReader({
-      title: idx === 0 ? "DeepMind Announces Med-Gemini" : "FDA Clears AI Diagnostic Tool",
-      date: idx === 0 ? "2024.05.20" : "2024.05.15",
-      source: "AI Medicine Collective",
-      bodyHtml: `
-        <p style="line-height:1.6">
-          Replace this with your real summary + links. Keep it short, clean, and readable.
-        </p>
-        <h3>Why it matters</h3>
-        <ul>
-          <li>Multimodal clinical reasoning is moving quickly.</li>
-          <li>Benchmarks are becoming domain-specific.</li>
-          <li>We can translate findings into resident-friendly tools.</li>
-        </ul>
-      `
+    sessionStorage.removeItem("amc-auth");
+    // Reload index page and show the gate again
+    window.location.href = "index.html";
+  });
+
+  document.body.appendChild(btn);
+}
+
+// Minimal auth banner
+function showAuthBanner() {
+  const banner = document.createElement("div");
+  banner.className = "auth-banner";
+  banner.textContent = "AUTHENTICATION ACCEPTED";
+  document.body.appendChild(banner);
+
+  setTimeout(() => {
+    if (banner && banner.parentNode) {
+      banner.remove();
+    }
+  }, 1800);
+}
+
+// Unlock the site UI
+function unlockSite(withAnimation = true) {
+  if (gate) gate.classList.add("hidden");
+  if (header) header.classList.remove("hidden");
+  if (main) {
+    main.classList.remove("hidden");
+    main.classList.add("fade-in");
+  }
+
+  // Show logout button on any page once authenticated
+  createLogoutButton();
+
+  // Only show banner when just authenticated
+  if (withAnimation) {
+    showAuthBanner();
+  }
+}
+
+// If already authenticated in this tab, skip the gate
+if (sessionStorage.getItem("amc-auth") === "true") {
+  unlockSite(false); // no banner/animation on refresh/back
+}
+
+// Handle password form submission (index.html only)
+if (form) {
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const value = input.value.trim();
+
+    if (value === CLUB_PASSWORD) {
+      sessionStorage.setItem("amc-auth", "true");
+
+      if (errorMsg) errorMsg.classList.add("hidden");
+      unlockSite(true);
+      input.value = "";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      if (errorMsg) errorMsg.classList.remove("hidden");
+      input.value = "";
+      input.focus();
+    }
+  });
+}
+
+/* ========= PROJECTS PAGE BEHAVIOR (category → detail toggle) ========= */
+
+function initProjectsPage() {
+  const typesContainer = document.getElementById("project-types");
+  const detailsContainer = document.getElementById("project-details");
+  const typeLabel = document.getElementById("projects-current-type-label");
+  const typeLinks = document.querySelectorAll(".project-type");
+  const backLink = document.querySelector(".back-link");
+
+  if (!typesContainer || !detailsContainer || !typeLabel) return; // not on projects page
+
+  function labelForType(type) {
+    switch (type) {
+      case "clinical":
+        return "// Clinical tools";
+      case "education":
+        return "// Education";
+      case "lifestyle":
+        return "// Lifestyle";
+      case "productivity":
+        return "// Productivity";
+      case "misc":
+        return "// Miscellaneous";
+      default:
+        return "// Projects";
+    }
+  }
+
+  function showTypesGrid() {
+    typesContainer.classList.remove("hidden");
+    detailsContainer.classList.add("hidden");
+    typeLabel.classList.add("hidden");
+  }
+
+  function showDetailsForType(type) {
+    typesContainer.classList.add("hidden");
+    detailsContainer.classList.remove("hidden");
+
+    typeLabel.textContent = labelForType(type);
+    typeLabel.classList.remove("hidden");
+
+    const cards = detailsContainer.querySelectorAll(".project-detail-card");
+    cards.forEach((card) => {
+      if (card.dataset.type === type) {
+        card.classList.remove("hidden");
+      } else {
+        card.classList.add("hidden");
+      }
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Default state: grid only
+  showTypesGrid();
+
+  // Clicking a type shows its details
+  typeLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const type = link.dataset.type;
+      if (!type) return;
+      showDetailsForType(type);
     });
   });
-});
+
+  // Global "< Back" link: if details are visible, go back to grid
+  if (backLink) {
+    backLink.addEventListener("click", (e) => {
+      if (!typesContainer.classList.contains("hidden")) {
+        return; // already in grid mode → let normal link behavior occur
+      }
+      e.preventDefault();
+      showTypesGrid();
+    });
+  }
+}
+
+// Initialize projects behavior once DOM is ready
+document.addEventListener("DOMContentLoaded", initProjectsPage);
