@@ -65,7 +65,7 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 
 ### Terminal-style elements (use these, don't invent new ones)
 - **Frame:** all content inside `.terminal-frame`: max-width `900px`, `2px solid var(--accent)` border, green glow `box-shadow: 0 0 25px rgba(0,255,102,0.4)`.
-- **Header:** `:: AI MEDICINE COLLECTIVE ::` centered, followed by the shared `.nav` and a `.horizontal-rule`.
+- **Header:** `:: AI MEDICINE COLLECTIVE ::` centered, followed by the shared `.nav` and a `.horizontal-rule`. On phones (≤600px) `script.js` collapses the nav behind a `> MENU [+]` toggle, so **every page must load `script.js`**.
 - **Rules:** sections separated by `2px dashed var(--accent)` (`.horizontal-rule`) or `1px dashed` (`.section-divider`).
 - **Voice:** captions and notes written as code comments (`// Current roster`); links and prompts prefixed with `>` (`> PASSWORD:`, `> ABOUT`); back links are `< Back`.
 - **Footer:** `> echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"` + blinking `█` cursor, on every page.
@@ -76,9 +76,9 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 - **Accordions:** use native `<details>/<summary>` styled like `.resource-group` / `.stack-item`.
 
 ### Spacing and layout
-- Page padding `16px`; frame padding `24px 20px 16px`.
+- Page padding `16px`; frame padding `24px 20px 16px` (`16px 12px 12px` on phones ≤480px).
 - Gaps on a small, consistent scale: `6, 8, 10, 12, 14, 16, 18, 24, 32px`. Cards pad `8–12px`; panels pad `24px` (`16px` on phones).
-- Mobile-first breakpoints already in use: `480px`, `600px`, `720px`, `900px`. Every page must work at 375px wide with no sideways scrolling.
+- Mobile-first breakpoints already in use: `480px`, `600px`, `720px`, `900px`. Every page must work down to 320px wide with no sideways scrolling or clipped text. In flex/grid layouts that stack on phones, give text columns `min-width: 0` rather than a fixed minimum width.
 
 ### Code conventions
 - Shared styles go in `style.css` under the matching `/* === SECTION === */` block; edit an existing rule rather than appending a second copy of the same selector at the bottom. Avoid page-level `<style>` blocks. Respect the ordering notes in `style.css` (e.g. the LINKS block must stay below NAV, LANDING PAGE and ADELANTE).

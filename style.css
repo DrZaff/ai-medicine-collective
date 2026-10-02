@@ -76,6 +76,18 @@ body {
   display: none !important;
 }
 
+/* Phones: slimmer frame padding and a headline that fits on 1–2 lines */
+@media (max-width: 480px) {
+  .terminal-frame {
+    padding: 16px 12px 12px;
+  }
+
+  .headline {
+    font-size: 1.25rem;
+    letter-spacing: 0.06em;
+  }
+}
+
 
 /* === NAV ===================================================== */
 
@@ -102,6 +114,45 @@ body {
   border-bottom-color: var(--accent);
   background-color: rgba(0, 255, 102, 0.05);
   text-shadow: 0 0 4px rgba(0, 255, 102, 0.9);
+}
+
+/* Phone menu: script.js adds a "> MENU" toggle and .nav--collapsible.
+   Without JavaScript the full nav simply stays visible. */
+.nav-toggle {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .nav-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .nav-toggle[aria-expanded="true"] {
+    box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+  }
+
+  .nav--collapsible {
+    display: none;
+  }
+
+  .nav--collapsible.is-open {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .nav--collapsible.is-open a {
+    padding: 8px 6px;
+    text-align: center;
+    border-color: rgba(0, 255, 102, 0.25);
+  }
 }
 
 
@@ -629,6 +680,7 @@ button:hover {
 
 .profile-email-address {
   font-weight: bold;
+  overflow-wrap: anywhere; /* long emails wrap instead of overflowing */
 }
 
 .copy-email-btn {
@@ -666,6 +718,12 @@ button:hover {
 
   .profile-photo-frame {
     max-width: 260px;
+  }
+
+  /* Let the text column shrink to the screen instead of forcing 260px */
+  .profile-data-side {
+    min-width: 0;
+    max-width: 100%;
   }
 }
 

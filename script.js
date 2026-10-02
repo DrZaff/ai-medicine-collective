@@ -168,6 +168,47 @@ function initProjectsPage() {
 // Initialize projects behavior once DOM is ready
 document.addEventListener("DOMContentLoaded", initProjectsPage);
 
+/* ========= ALL PAGES: collapsible menu on phones ========= */
+
+// Adds a "> MENU" button before each .nav. CSS only collapses the nav
+// (and shows the button) at phone widths; desktop is unaffected.
+function initMobileNav() {
+  document.querySelectorAll(".nav").forEach((nav, i) => {
+    if (!nav.id) nav.id = i ? `site-nav-${i}` : "site-nav";
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "nav-toggle";
+    btn.setAttribute("aria-controls", nav.id);
+    btn.setAttribute("aria-expanded", "false");
+    btn.innerHTML =
+      '<span>&gt; MENU</span><span class="nav-toggle-icon" aria-hidden="true">[+]</span>';
+
+    const icon = btn.querySelector(".nav-toggle-icon");
+
+    function setOpen(open) {
+      nav.classList.toggle("is-open", open);
+      btn.setAttribute("aria-expanded", String(open));
+      icon.textContent = open ? "[-]" : "[+]";
+    }
+
+    btn.addEventListener("click", () => setOpen(!nav.classList.contains("is-open")));
+
+    // Escape closes an open menu
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && nav.classList.contains("is-open")) {
+        setOpen(false);
+        btn.focus();
+      }
+    });
+
+    nav.classList.add("nav--collapsible");
+    nav.parentNode.insertBefore(btn, nav);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initMobileNav);
+
 /* ========= MEMBER PROFILE: copy email button ========= */
 
 // Copy text to the clipboard; falls back to a hidden textarea where the

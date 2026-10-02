@@ -102,6 +102,12 @@
       .ms-cta {
         align-self: flex-end;
       }
+
+      /* Let long titles drop below the date instead of overflowing */
+      .ms-link {
+        flex-wrap: wrap;
+        gap: 6px 18px;
+      }
     }
   </style>
 </head>
@@ -183,6 +189,8 @@
     </footer>
 
   </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
 
