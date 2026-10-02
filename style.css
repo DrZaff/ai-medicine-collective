@@ -1,4 +1,13 @@
-/* === ARCHIVED STYLES (unchanged) ============================= */
+/* =============================================================
+   AI MEDICINE COLLECTIVE — shared stylesheet
+   Design rules live in CLAUDE.md ("minimalist hacker terminal").
+   Sections are ordered on purpose: the global LINKS block must stay
+   after NAV, LANDING PAGE and ADELANTE so their link colors keep the
+   same precedence for visited links.
+   ============================================================= */
+
+
+/* === TOKENS ================================================== */
 
 :root {
   --bg: #020802;
@@ -7,6 +16,9 @@
   --accent: #00cc55;
   --error: #ff5555;
 }
+
+
+/* === BASE ==================================================== */
 
 * {
   box-sizing: border-box;
@@ -28,6 +40,10 @@ body {
 @keyframes crtFade {
   from { opacity: 0; filter: brightness(0.3); }
   to { opacity: 1; filter: brightness(1); }
+}
+
+@media (max-width: 600px) {
+  body { align-items: flex-start; }
 }
 
 .terminal-frame {
@@ -56,7 +72,13 @@ body {
   text-shadow: 0 0 4px rgba(0, 255, 102, 0.8);
 }
 
-/* Nav */
+.hidden {
+  display: none !important;
+}
+
+
+/* === NAV ===================================================== */
+
 .nav {
   display: flex;
   flex-wrap: wrap;
@@ -81,6 +103,9 @@ body {
   background-color: rgba(0, 255, 102, 0.05);
   text-shadow: 0 0 4px rgba(0, 255, 102, 0.9);
 }
+
+
+/* === SECTIONS & TEXT ========================================= */
 
 .section {
   margin-top: 12px;
@@ -118,12 +143,73 @@ body {
   opacity: 0.85;
 }
 
-/* Password Gate */
+.error {
+  margin-top: 8px;
+  color: var(--error);
+  font-size: 0.85rem;
+}
+
+
+/* === BUTTONS ================================================= */
+
+button {
+  background-color: transparent;
+  border: 1px solid var(--accent);
+  color: var(--text);
+  padding: 6px 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: inherit;
+  font-size: 0.8rem;
+}
+
+button:hover {
+  background-color: rgba(0, 255, 102, 0.1);
+}
+
+
+/* === FOOTER ================================================== */
+
+.footer {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cursor {
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+
+/* === ANIMATION HELPERS ======================================= */
+
+.fade-in {
+  opacity: 0;
+  animation: fadeInSoft 0.45s ease-out forwards;
+}
+
+@keyframes fadeInSoft {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* === PASSWORD GATE, AUTH BANNER, LOGOUT ====================== */
+
 #gate { text-align: left; }
 
-.gate-text,
-.gate-hint {
+.gate-text {
   font-size: 0.95rem;
+}
+
+.gate-hint {
+  margin-top: 12px;
+  opacity: 0.75;
+  font-size: 0.85rem;
 }
 
 .prompt {
@@ -152,125 +238,6 @@ body {
   box-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
 }
 
-button {
-  background-color: transparent;
-  border: 1px solid var(--accent);
-  color: var(--text);
-  padding: 6px 12px;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-family: inherit;
-  font-size: 0.8rem;
-}
-
-button:hover {
-  background-color: rgba(0, 255, 102, 0.1);
-}
-
-.error {
-  margin-top: 8px;
-  color: var(--error);
-  font-size: 0.85rem;
-}
-
-.gate-hint {
-  margin-top: 12px;
-  opacity: 0.75;
-  font-size: 0.85rem;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Column layout for lists */
-.list-columns {
-  columns: 2;
-  column-gap: 24px;
-}
-
-@media (max-width: 600px) {
-  .list-columns { columns: 1; }
-  body { align-items: flex-start; }
-}
-
-/* Footer */
-.footer {
-  margin-top: 8px;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.cursor {
-  animation: blink 1s step-start infinite;
-}
-
-@keyframes blink { 50% { opacity: 0; } }
-
-/* Landing page */
-.landing-links {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 14px;
-  margin-top: 20px;
-}
-
-@media (max-width: 600px) {
-  .landing-links {
-    gap: 10px;
-    margin-top: 16px;
-  }
-}
-
-.landing-item {
-  text-align: left;
-}
-
-.landing-title a {
-  font-size: 2rem;
-  text-decoration: none;
-  color: var(--text);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border-bottom: 1px solid transparent;
-}
-
-.landing-title a:hover {
-  color: var(--accent);
-  text-shadow: 0 0 6px rgba(0, 255, 102, 0.8);
-  border-bottom-color: var(--accent);
-}
-
-@media (max-width: 600px) {
-  .landing-links { align-items: center; }
-  .landing-item { text-align: center; }
-}
-
-.fade-in {
-  opacity: 0;
-  animation: fadeInSoft 0.45s ease-out forwards;
-}
-
-@keyframes fadeInSoft {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* NEW fadeOut animation */
-@keyframes fadeOutSoft {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(2px); }
-}
-
-/* --- FIXED fade-out behavior --- */
-.projects-fade-out {
-  animation: fadeOutSoft 0.22s ease-out forwards;
-}
-
-/* Auth banner */
 .auth-banner {
   position: fixed;
   top: 12px;
@@ -297,7 +264,6 @@ button:hover {
   100% { opacity: 0; transform: translateX(-50%) translateY(-4px); }
 }
 
-/* Logout button */
 .logout-btn {
   position: fixed;
   top: 12px;
@@ -319,7 +285,48 @@ button:hover {
   background: rgba(0, 255, 102, 0.08);
 }
 
-/* === PROJECTS PAGE === */
+
+/* === LANDING PAGE ============================================ */
+
+.landing-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.landing-item {
+  text-align: left;
+}
+
+.landing-title a {
+  font-size: 2rem;
+  text-decoration: none;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid transparent;
+}
+
+.landing-title a:hover {
+  color: var(--accent);
+  text-shadow: 0 0 6px rgba(0, 255, 102, 0.8);
+  border-bottom-color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .landing-links {
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .landing-item { text-align: center; }
+}
+
+
+/* === PROJECTS PAGE =========================================== */
 
 .projects-list {
   display: flex;
@@ -362,32 +369,11 @@ button:hover {
   cursor: pointer;
 }
 
-/* fade-in helper */
-.projects-fade-in {
-  opacity: 0;
-  animation: fadeInSoft 0.3s ease-out forwards;
-}
-
-/* Back link */
-#projects-back-types {
-  margin-top: 12px;
-}
-
-.project-back-link {
-  color: var(--text);
-  text-decoration: none;
-}
-
-.project-back-link:hover {
-  text-decoration: underline;
-}
-
 .project-detail-card {
   position: relative;
 }
 
-/* === Project action buttons (Instructions + Launch) =================== */
-
+/* Instructions + Launch buttons */
 .project-actions {
   margin-top: 10px;
   display: flex;
@@ -396,7 +382,6 @@ button:hover {
   font-size: 0.85rem;
 }
 
-/* Base pill style for both buttons */
 .project-doc-link,
 .project-launch-btn {
   display: inline-block;
@@ -439,14 +424,7 @@ button:hover {
   transform: translateY(-1px);
 }
 
-/* Disabled placeholders stay subtle */
-.project-actions .disabled {
-  opacity: 0.55;
-  cursor: default;
-  border-radius: 999px;
-}
-
-/* Ensure button colors don't change after click */
+/* Keep button colors after a link has been visited */
 .project-doc-link:visited {
   color: #00e5ff;
   border-color: #00e5ff;
@@ -457,138 +435,8 @@ button:hover {
   border-color: #ffe600;
 }
 
-/* === MEETING SCHEDULE STYLES === */
 
-.meeting-section {
-  margin-top: 18px;
-}
-
-/* Past vs upcoming section headings */
-.past-section .section-subtitle {
-  color: var(--accent);
-}
-
-.upcoming-section .section-subtitle {
-  color: var(--accent);
-}
-
-/* Smaller, secondary note under Past meetings */
-.small-note {
-  font-size: 0.8rem;
-  margin-top: 2px;
-  margin-bottom: 8px;
-  opacity: 0.8;
-}
-
-.meeting-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.meeting-item {
-  font-size: 0.9rem;
-}
-
-/* Shared meeting row styles */
-.meeting-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 8px;
-  border: 1px solid rgba(0, 255, 102, 0.25);
-  background: rgba(0, 0, 0, 0.75);
-  text-decoration: none;
-  color: var(--text);
-  transition: 0.15s ease-out;
-}
-
-.meeting-link:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.25);
-  transform: translateX(4px);
-}
-
-.meeting-date {
-  border: 1px solid rgba(0, 255, 102, 0.4);
-  padding: 6px 10px;
-  border-radius: 6px;          /* ← No more circles */
-  display: inline-block;
-  min-width: 110px;            /* ← Makes all date boxes same width */
-  text-align: center;          /* ← Centers numbers inside */
-  font-family: "Courier New", monospace;
-  font-size: 0.85rem;
-}
-
-.meeting-title {
-  flex: 1;
-}
-
-.meeting-status {
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 10px;
-  padding: 1px 6px;
-  border: 1px solid;
-}
-
-.tag-past {
-  border-color: #888888;
-  color: #bbbbbb;
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.tag-upcoming {
-  border-color: #00ff66;
-  color: #00ff66;
-  background: rgba(0, 255, 102, 0.08);
-}
-
-.meeting-item.past .meeting-link {
-  background: rgba(0, 0, 0, 0.6);
-  border-color: rgba(0, 255, 102, 0.15);
-}
-
-.meeting-item.past .meeting-title,
-.meeting-item.past .meeting-date {
-  opacity: 0.8;
-}
-
-.meeting-item.upcoming .meeting-link {
-  background: rgba(0, 255, 102, 0.06);
-  border-color: rgba(0, 255, 102, 0.4);
-}
-
-.meeting-item.upcoming .meeting-title {
-  font-weight: bold;
-}
-
-/* === JOIN PAGE COPY ICON === */
-
-.copy-icon {
-  cursor: pointer;
-  margin-left: 10px;
-  font-size: 1.2rem;
-  color: #00ff99;
-  user-select: none;
-  transition: color 0.2s ease, text-shadow 0.2s ease;
-}
-
-.copy-icon:hover {
-  color: #66ffcc;
-  text-shadow: 0 0 6px #00ffcc;
-}
-
-.copy-icon.copied {
-  color: #00ff99;
-  text-shadow: 0 0 10px #00ff99;
-}
-
-/* === MEMBERS GRID & CARDS ========================= */
+/* === MEMBERS GRID & CARDS ==================================== */
 
 .member-grid {
   display: grid;
@@ -614,9 +462,8 @@ button:hover {
   box-shadow: 0 0 14px rgba(0, 255, 102, 0.25);
 }
 
-/* Avatar / Initials circle */
-.member-avatar,
-.member-initials {
+/* Initials circle */
+.member-avatar {
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -632,7 +479,6 @@ button:hover {
   opacity: 0.9;
 }
 
-/* Text */
 .member-text {
   display: flex;
   flex-direction: column;
@@ -680,14 +526,6 @@ button:hover {
   background: rgba(255, 179, 71, 0.1);
 }
 
-/* Small screen tweak */
-@media (max-width: 480px) {
-  .member-card { padding: 8px; }
-  .member-name { font-size: 0.9rem; }
-  .member-meta { font-size: 0.75rem; }
-}
-
-/* Member name is now a link */
 .member-name .member-link {
   color: var(--text);
   text-decoration: none;
@@ -699,7 +537,14 @@ button:hover {
   text-shadow: 0 0 4px rgba(0, 255, 102, 0.9);
 }
 
-/* === MEMBER PROFILE LAYOUT ================================== */
+@media (max-width: 480px) {
+  .member-card { padding: 8px; }
+  .member-name { font-size: 0.9rem; }
+  .member-meta { font-size: 0.75rem; }
+}
+
+
+/* === MEMBER PROFILE ========================================== */
 
 .profile-layout {
   display: flex;
@@ -709,13 +554,11 @@ button:hover {
   margin-top: 24px;
 }
 
-/* Left side: photo */
 .profile-photo-side {
   flex: 0 0 260px;
   max-width: 260px;
 }
 
-/* Photo frame */
 .profile-photo-frame {
   width: 100%;
   border: 2px solid var(--accent);
@@ -724,7 +567,7 @@ button:hover {
   box-shadow: 0 0 16px rgba(0, 255, 102, 0.25);
 }
 
-/* Photo itself – keep heads in frame and consistent size */
+/* Keep heads in frame and photos a consistent size */
 .profile-photo-frame img {
   width: 100%;
   height: auto;
@@ -735,7 +578,6 @@ button:hover {
   filter: grayscale(1);
 }
 
-/* Right side: text panel */
 .profile-data-side {
   flex: 1;
   min-width: 260px;
@@ -755,7 +597,6 @@ button:hover {
   margin-bottom: 6px;
 }
 
-/* Info fields */
 .profile-fields {
   font-size: 0.85rem;
   border-top: 1px dashed var(--accent);
@@ -828,89 +669,8 @@ button:hover {
   }
 }
 
-/* === ADELANTE REPORT – dropdown stack ======================== */
 
-.adelante-section {
-  margin-top: 20px;
-}
-
-/* Container with a subtle stacked-card feel */
-.report-stack {
-  max-width: 720px;
-  margin-top: 12px;
-}
-
-/* Header bar that toggles the list */
-.report-stack-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
-  border: 1px solid rgba(0, 255, 102, 0.5);
-  background: radial-gradient(circle at top, #071707 0, #000 70%);
-  color: var(--text);
-  font-family: "Courier New", monospace;
-  font-size: 0.95rem;
-  text-align: left;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.25);
-}
-
-.report-stack-header:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 14px rgba(0, 255, 102, 0.35);
-}
-
-.report-stack-label {
-  flex: 1;
-}
-
-.report-stack-chevron {
-  margin-left: 10px;
-  font-size: 0.9rem;
-}
-
-/* Body (collapsible) */
-.report-stack-body {
-  border: 1px solid rgba(0, 255, 102, 0.3);
-  border-top: none;
-  background: rgba(0, 0, 0, 0.85);
-  padding: 8px 10px 10px;
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.18);
-}
-
-/* When open, adjust chevron */
-.report-stack.open .report-stack-chevron {
-  transform: rotate(180deg);
-}
-
-/* List styling */
-.report-stack-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.report-stack-item + .report-stack-item {
-  margin-top: 6px;
-}
-
-.report-stack-item a {
-  color: var(--text);
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.report-stack-item a:hover {
-  color: var(--accent);
-  text-shadow: 0 0 4px rgba(0, 255, 102, 0.85);
-  text-decoration: underline;
-}
-
-/* === ADELANTE REPORT LAYOUT ==================================== */
+/* === ADELANTE REPORT ========================================= */
 
 .adelante-layout {
   display: flex;
@@ -938,7 +698,6 @@ button:hover {
   text-shadow: 0 0 6px rgba(255, 204, 51, 0.9);
 }
 
-/* Hero image block */
 .adelante-hero {
   flex: 1 1 260px;
   margin: 0;
@@ -955,7 +714,7 @@ button:hover {
   filter: saturate(1.1);
 }
 
-/* Stack / accordion visuals */
+/* Dropdown stacks */
 .adelante-stack {
   margin-top: 18px;
   display: flex;
@@ -998,12 +757,10 @@ button:hover {
   opacity: 0.9;
 }
 
-/* Flip chevron on open */
 .stack-item[open] .stack-chevron {
   transform: rotate(180deg);
 }
 
-/* Inside list */
 .stack-list {
   list-style: none;
   margin: 0;
@@ -1027,7 +784,6 @@ button:hover {
   border-bottom-color: var(--accent);
 }
 
-/* Responsive stack */
 @media (max-width: 700px) {
   .adelante-layout {
     flex-direction: column;
@@ -1038,35 +794,8 @@ button:hover {
   }
 }
 
-/* Back link styling (shared across site) */
-.back-link {
-  display: inline-block;
-  margin-top: 14px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #ff4081;
-}
 
-.back-link:hover {
-  text-shadow: 0 0 6px rgba(255, 64, 129, 0.9);
-}
-
-/* === Global BACK links ===================================== */
-
-.back-link {
-  color: #ff6ad5;
-  font-weight: bold;
-  text-decoration: none;
-  letter-spacing: 0.04em;
-}
-
-.back-link:hover {
-  color: #ffc1ff;
-  text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
-  text-decoration: underline;
-}
-
-/* === RESOURCES PAGE ============================================ */
+/* === RESOURCES PAGE ========================================== */
 
 .resource-accordion {
   margin-top: 16px;
@@ -1075,14 +804,12 @@ button:hover {
   gap: 10px;
 }
 
-/* Each dropdown block */
 .resource-group {
   border: 1px solid rgba(0, 255, 102, 0.35);
   background: rgba(0, 0, 0, 0.8);
   box-shadow: 0 0 8px rgba(0, 255, 102, 0.12);
 }
 
-/* Summary line */
 .resource-summary {
   cursor: pointer;
   padding: 8px 10px;
@@ -1096,19 +823,18 @@ button:hover {
   display: none;
 }
 
-/* Fake chevron using text */
+/* Text chevron */
 .resource-summary::before {
   content: "> ";
   color: var(--accent);
 }
 
-/* Body inside the open dropdown */
 .resource-body {
   border-top: 1px dashed var(--accent);
   padding: 8px 12px 10px;
 }
 
-/* Thumbnails grid for flyers */
+/* Flyer thumbnails */
 .resource-thumbs {
   display: flex;
   gap: 20px;
@@ -1135,13 +861,11 @@ button:hover {
   box-shadow: 0 0 18px rgba(0, 255, 156, 0.4);
 }
 
-/* Hide any captions if present */
 .resource-thumb figcaption {
   display: none;
 }
 
-/* ===== LIGHTBOX OVERLAY ===== */
-
+/* Full-size flyer overlay */
 .lightbox-overlay {
   position: fixed;
   inset: 0;
@@ -1185,7 +909,8 @@ button:hover {
   background: rgba(0, 255, 102, 0.15);
 }
 
-/* ===== TERMINAL LINK FIX ===== */
+
+/* === LINKS (keep after NAV, LANDING PAGE and ADELANTE) ======= */
 
 a {
   color: #00ff80;
@@ -1206,21 +931,29 @@ a:active {
   color: #00e5ff;
 }
 
-/* === PINK BACK BUTTON OVERRIDE === */
-
+/* Pink "< Back" link so it pops (stays pink once visited) */
 .back-link {
-  color: #ff4da6 !important;
+  display: inline-block;
+  margin-top: 14px;
+  color: #ff4da6;
   font-weight: 700;
   font-size: 1.1rem;
+  letter-spacing: 0.04em;
   text-decoration: none;
 }
 
-.back-link:hover {
-  color: #ff80c7 !important;
-  text-shadow: 0 0 6px #ff80c7;
+.back-link:visited {
+  color: #ff4da6;
 }
 
-/* === JOIN PAGE – two aligned neon panels ==================== */
+.back-link:hover {
+  color: #ff80c7;
+  text-decoration: underline;
+  text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
+}
+
+
+/* === JOIN PAGE =============================================== */
 
 .join-layout {
   display: flex;
@@ -1238,12 +971,10 @@ a:active {
   padding: 24px;
 }
 
-/* Left panel width */
 .join-box {
   width: 420px;
 }
 
-/* Right panel width & centering of art */
 .join-art-box {
   width: 320px;
   display: flex;
@@ -1251,7 +982,6 @@ a:active {
   justify-content: center;
 }
 
-/* Art itself – fills the panel, blends with bg */
 .join-art {
   max-width: 100%;
   height: auto;
@@ -1260,7 +990,8 @@ a:active {
   box-shadow: none;
 }
 
-/* Form internals */
+/* The form is also a .join-panel; this strips the panel look from it
+   (must stay after .join-panel) */
 .join-form {
   border: none;
   background: transparent;
@@ -1324,7 +1055,6 @@ a:active {
   opacity: 0.85;
 }
 
-/* Stack panels on smaller screens */
 @media (max-width: 900px) {
   .join-layout {
     flex-direction: column;
@@ -1338,10 +1068,57 @@ a:active {
   }
 }
 
-/* === END OF ARCHIVED STYLES ================================= */
+/* Must stay after .join-form: restores panel padding on the form */
+@media (max-width: 480px) {
+  .join-panel {
+    padding: 16px;
+  }
+
+  .join-submit {
+    width: 100%;
+    text-align: center;
+  }
+}
 
 
-/* === ABOUT PAGE – GUIDE AVATAR ================================ */
+/* === APP STORE =============================================== */
+/* Page layout lives in appstore.html; these are the shared card basics. */
+
+.appstore-intro {
+  max-width: 720px;
+}
+
+.app-card {
+  width: 160px;
+  padding: 10px 8px;
+  border: 1px solid rgba(0, 255, 102, 0.28);
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .app-card {
+    width: 45vw;
+    max-width: 170px;
+  }
+}
+
+
+/* === iOS FOCUS ZOOM FIX (keep after BUTTONS) ================= */
+
+@media (max-width: 600px) {
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+
+/* === ABOUT PAGE – GUIDE AVATAR =============================== */
 
 .guide {
   max-width: 520px;
@@ -1452,395 +1229,3 @@ a:active {
     flex: 1 1 auto;
   }
 }
-
-
-/* === NEW: APP STORE GRID ===================================== */
-
-.appstore-intro {
-  max-width: 720px;
-}
-
-.appstore-intro a.appstore-link {
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.appstore-intro a.appstore-link:hover {
-  color: #fff5aa;
-  text-shadow: 0 0 6px rgba(255, 230, 0, 0.8);
-}
-
-.appstore-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 18px;
-}
-
-.app-card {
-  width: 160px;
-  padding: 10px 8px;
-  border: 1px solid rgba(0, 255, 102, 0.28);
-  background: rgba(0, 0, 0, 0.8);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
-  text-align: center;
-}
-
-.app-card-icon img {
-  width: 96px;
-  height: 96px;
-  border-radius: 24px;
-  display: block;
-  margin: 0 auto 8px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
-}
-
-.app-card-icon:hover img {
-  transform: translateY(-2px);
-  box-shadow: 0 0 14px rgba(255, 230, 0, 0.7);
-}
-
-.app-card-title {
-  margin: 0 0 4px;
-  font-size: 0.9rem;
-  color: #ffe600;
-}
-
-.app-card-link {
-  font-size: 0.75rem;
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.app-card-link:hover {
-  color: #fff5aa;
-}
-
-/* tighter layout on small screens */
-@media (max-width: 600px) {
-  .appstore-grid {
-    justify-content: center;
-    gap: 18px;
-  }
-
-  .app-card {
-    width: 44vw;
-    max-width: 180px;
-  }
-
-  .app-card-icon img {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-/* === MEETING SCHEDULE CARDS =================================== */
-
-.meeting-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.meeting-item {
-  font-size: 0.9rem;
-}
-
-.meeting-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 10px;
-  border-radius: 3px;
-  border: 1px solid rgba(0, 255, 102, 0.35);
-  background: rgba(0, 0, 0, 0.8);
-  text-decoration: none;
-  color: var(--text);
-  transition: 0.15s ease-out;
-}
-
-.meeting-link:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.22);
-  transform: translateX(4px);
-}
-
-.meeting-date {
-  border: 1px solid rgba(0, 255, 102, 0.4);
-  padding: 6px 10px;
-  border-radius: 6px;          /* ← No more circles */
-  display: inline-block;
-  min-width: 110px;            /* ← Makes all date boxes same width */
-  text-align: center;          /* ← Centers numbers inside */
-  font-family: "Courier New", monospace;
-  font-size: 0.85rem;
-}
-
-.meeting-title {
-  flex: 1;
-}
-
-.meeting-status {
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 999px;
-  padding: 2px 10px;
-  border: 1px solid rgba(0, 255, 102, 0.6);
-}
-
-/* Pink "< Back" link so it pops */
-.back-link {
-  display: inline-block;
-  margin-top: 14px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #ff6ad5;
-}
-
-.back-link:hover {
-  text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
-}
-
-/* === NEW: INDEX LANDING SPACING OVERRIDE ===================== */
-
-.landing-links {
-  gap: 8px;
-  margin-top: 12px;
-}
-
-@media (max-width: 600px) {
-  .landing-links {
-    gap: 6px;
-    margin-top: 8px;
-  }
-}
-
-
-/* === NEW: iOS FOCUS ZOOM FIX ================================= */
-
-@media (max-width: 600px) {
-  input,
-  select,
-  textarea,
-  button {
-    font-size: 16px;
-    -webkit-text-size-adjust: 100%;
-  }
-}
-
-/* === APP STORE – ICON GRID ===================================== */
-
-.appstore-intro {
-  max-width: 720px;
-}
-
-/* Make the ClinicalToolsDEV link pop a bit */
-.appstore-intro a.appstore-link {
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.appstore-intro a.appstore-link:hover {
-  color: #fff5aa;
-  text-shadow: 0 0 6px rgba(255, 230, 0, 0.8);
-}
-
-/* Lay out icons in a row that wraps if needed */
-.appstore-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 18px;
-}
-
-/* Each app “card” */
-.app-card {
-  width: 150px;
-  text-align: center;
-}
-
-/* SMALL ICONS! */
-.app-card-icon img {
-  width: 96px;
-  height: 96px;
-  border-radius: 24px;
-  display: block;
-  margin: 0 auto 6px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
-}
-
-.app-card-icon:hover img {
-  transform: translateY(-2px);
-  box-shadow: 0 0 14px rgba(255, 230, 0, 0.7);
-}
-
-/* Title + “use on computer” link */
-.app-card-title {
-  margin: 0 0 2px;
-  font-size: 0.9rem;
-  color: #ffe600;
-}
-
-.app-card-link {
-  font-size: 0.75rem;
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.app-card-link:hover {
-  color: #fff5aa;
-}
-
-/* Tighten on small screens */
-@media (max-width: 600px) {
-  .appstore-grid {
-    justify-content: center;
-    gap: 18px;
-  }
-
-  .app-card {
-    width: 42vw;
-    max-width: 170px;
-  }
-
-  .app-card-icon img {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-/* === APP STORE – ICON GRID ===================================== */
-
-.appstore-intro {
-  max-width: 720px;
-}
-
-.appstore-link {
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.appstore-link:hover {
-  color: #fff5aa;
-  text-shadow: 0 0 6px rgba(255, 230, 0, 0.8);
-}
-
-.appstore-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 18px;
-}
-
-.app-card {
-  width: 160px;
-  text-align: center;
-}
-
-/* Glowing green box just around icon + title */
-.app-card-inner {
-  padding: 14px 12px 10px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 255, 102, 0.35);
-  background: rgba(0, 0, 0, 0.85);
-  box-shadow: 0 0 16px rgba(0, 255, 102, 0.18);
-}
-
-.app-card-icon img {
-  width: 96px;
-  height: 96px;
-  border-radius: 24px;
-  display: block;
-  margin: 0 auto 6px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
-}
-
-.app-card-icon:hover img {
-  transform: translateY(-2px);
-  box-shadow: 0 0 14px rgba(255, 230, 0, 0.7);
-}
-
-.app-card-title {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #ffe600;
-}
-
-/* "use on computer" lives outside the box */
-.app-card-link {
-  display: inline-block;
-  margin-top: 4px;
-  font-size: 0.75rem;
-  color: #ffe600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.app-card-link:hover {
-  color: #fff5aa;
-}
-
-/* Mobile: two apps per row, smaller icons */
-@media (max-width: 600px) {
-  .appstore-grid {
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .app-card {
-    width: 45vw;
-    max-width: 170px;
-  }
-
-  .app-card-icon img {
-    width: 72px;
-    height: 72px;
-  }
-}
-
-.project-back-link {
-  color: var(--accent-pink);
-}
-
-.project-back-link:hover {
-  color: #ff9fe0;
-}
-
-/* Extra mobile tweaks for JOIN / signup layout */
-@media (max-width: 480px) {
-  .join-panel {
-    padding: 16px;
-  }
-
-  .join-submit {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-.meeting-date {
-  border: 1px solid rgba(0, 255, 102, 0.4);
-  padding: 6px 10px;
-  border-radius: 6px;          /* ← No more circles */
-  display: inline-block;
-  min-width: 110px;            /* ← Makes all date boxes same width */
-  text-align: center;          /* ← Centers numbers inside */
-  font-family: "Courier New", monospace;
-  font-size: 0.85rem;
-}
-
-
-
