@@ -1,0 +1,5 @@
+# Netlify build: the site is plain static files; the only build step
+# generates blog/index.json from blog/posts/*.json (standard-library Python).
+[build]
+  publish = "."
+  command = "python3 scripts/blog_agent/build_index.py"

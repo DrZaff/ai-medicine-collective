@@ -1,0 +1,62 @@
+# Every Friday, assembles the week's published blog posts into an email-ready
+# newsletter (HTML + plain text) and opens a PR for review. No AI call and no
+# secrets needed. Sending to the listserv is not automated yet.
+#
+# Needs: Settings > Actions > General > Workflow permissions >
+#        "Allow GitHub Actions to create and approve pull requests"
+
+name: Weekly newsletter draft
+
+on:
+  schedule:
+    - cron: "0 14 * * 5" # Fridays, 10 AM EDT / 9 AM EST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build newsletter
+        id: build
+        run: python scripts/blog_agent/newsletter.py
+
+      - name: Open pull request
+        if: steps.build.outputs.created == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DATE: ${{ steps.build.outputs.date }}
+          COUNT: ${{ steps.build.outputs.post_count }}
+        run: |
+          branch="newsletter/$DATE"
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "::notice::A newsletter branch for $DATE already exists; not opening another."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add "newsletter/$DATE.html" "newsletter/$DATE.txt"
+          git commit -m "Newsletter draft for week ending $DATE"
+          git push -u origin "$branch"
+          {
+            echo "Weekly newsletter built from **$COUNT** published blog post(s)."
+            echo
+            echo "- Email-ready HTML: \`newsletter/$DATE.html\` (open the Netlify deploy preview to see it)"
+            echo "- Plain-text version: \`newsletter/$DATE.txt\`"
+            echo
+            echo "Merging keeps a web copy at \`/newsletter/$DATE.html\`. Sending it to the listserv is still manual."
+          } > "$RUNNER_TEMP/body.md"
+          gh pr create --base main --head "$branch" \
+            --title "Newsletter draft: week ending $DATE" \
+            --body-file "$RUNNER_TEMP/body.md"
