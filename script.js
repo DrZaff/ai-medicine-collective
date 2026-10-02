@@ -167,3 +167,123 @@ function initProjectsPage() {
 
 // Initialize projects behavior once DOM is ready
 document.addEventListener("DOMContentLoaded", initProjectsPage);
+
+/* ========= MEMBER PROFILE: copy email button ========= */
+
+// Copy text to the clipboard; falls back to a hidden textarea where the
+// Clipboard API is unavailable (e.g. pages opened over plain http).
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+
+  return new Promise((resolve, reject) => {
+    const temp = document.createElement("textarea");
+    temp.value = text;
+    temp.setAttribute("readonly", "");
+    temp.style.position = "fixed";
+    temp.style.opacity = "0";
+    document.body.appendChild(temp);
+    temp.select();
+    const ok = document.execCommand("copy");
+    temp.remove();
+    ok ? resolve() : reject(new Error("Copy command failed"));
+  });
+}
+
+function initCopyEmailButton() {
+  const btn = document.querySelector(".copy-email-btn");
+  const emailSpan = document.querySelector(".profile-email-address");
+
+  if (!btn || !emailSpan) return; // not on a member profile
+
+  const originalText = btn.textContent;
+
+  btn.addEventListener("click", () => {
+    const email = emailSpan.textContent.trim();
+    if (!email) return;
+
+    copyText(email)
+      .then(() => {
+        btn.textContent = "COPIED!";
+        btn.classList.add("copied");
+      })
+      .catch(() => {
+        btn.textContent = "COPY FAILED";
+      })
+      .finally(() => {
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove("copied");
+        }, 1200);
+      });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initCopyEmailButton);
+
+/* ========= RESOURCES PAGE: flyer lightbox ========= */
+
+function initFlyerLightbox() {
+  const thumbs = document.querySelectorAll(".resource-thumb img");
+  if (!thumbs.length) return; // not on resources page
+
+  // Create overlay once
+  const overlay = document.createElement("div");
+  overlay.className = "lightbox-overlay hidden";
+  overlay.innerHTML = `
+    <div class="lightbox-inner">
+      <button type="button" class="lightbox-close" aria-label="Close image">CLOSE</button>
+      <img class="lightbox-img" src="" alt="" />
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const imgEl = overlay.querySelector(".lightbox-img");
+  const closeBtn = overlay.querySelector(".lightbox-close");
+  let lastThumb = null;
+
+  function openLightbox(thumb) {
+    lastThumb = thumb;
+    imgEl.src = thumb.dataset.full || thumb.src;
+    imgEl.alt = thumb.alt;
+    overlay.classList.remove("hidden");
+    closeBtn.focus();
+  }
+
+  function closeLightbox() {
+    overlay.classList.add("hidden");
+    imgEl.src = "";
+    if (lastThumb) lastThumb.focus();
+  }
+
+  thumbs.forEach((thumb) => {
+    // Make thumbnails reachable and openable from the keyboard
+    thumb.tabIndex = 0;
+    thumb.setAttribute("role", "button");
+
+    thumb.addEventListener("click", () => openLightbox(thumb));
+    thumb.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openLightbox(thumb);
+      }
+    });
+  });
+
+  // Close when clicking outside the image
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeLightbox();
+  });
+
+  closeBtn.addEventListener("click", closeLightbox);
+
+  // Escape key closes lightbox
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !overlay.classList.contains("hidden")) {
+      closeLightbox();
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initFlyerLightbox);
