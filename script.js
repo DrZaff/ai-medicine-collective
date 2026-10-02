@@ -287,3 +287,100 @@ function initFlyerLightbox() {
 }
 
 document.addEventListener("DOMContentLoaded", initFlyerLightbox);
+
+/* ========= ABOUT PAGE: guide avatar (idle loop <-> intro) ========= */
+
+function initGuideAvatar() {
+  const guide = document.querySelector(".guide");
+  const idle = document.getElementById("guide-idle");
+  const intro = document.getElementById("guide-intro");
+  const playBtn = document.getElementById("guide-play");
+  const stopBtn = document.getElementById("guide-stop");
+  const ccBtn = document.getElementById("guide-cc");
+  const statusText = document.getElementById("guide-status-text");
+
+  if (!guide || !idle || !intro || !playBtn) return; // not on about page
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  function setStatus(text) {
+    if (statusText) statusText.textContent = "> " + text;
+  }
+
+  function startIdle() {
+    if (reduceMotion.matches) {
+      idle.pause(); // show the still poster frame instead
+      return;
+    }
+    idle.play().catch(() => {}); // autoplay may be blocked; poster still shows
+  }
+
+  function showIdle() {
+    intro.pause();
+    guide.classList.remove("is-playing");
+    playBtn.innerHTML = "&#9654; PLAY INTRO";
+    stopBtn.classList.add("hidden");
+    setStatus("GUIDE ONLINE");
+    startIdle();
+  }
+
+  function playIntro() {
+    guide.classList.add("is-playing");
+    idle.pause();
+    intro.play().catch(() => showIdle());
+    playBtn.innerHTML = "&#10074;&#10074; PAUSE";
+    stopBtn.classList.remove("hidden");
+    setStatus("TRANSMITTING INTRO");
+  }
+
+  function pauseIntro() {
+    intro.pause();
+    playBtn.innerHTML = "&#9654; RESUME";
+    setStatus("INTRO PAUSED");
+  }
+
+  playBtn.addEventListener("click", () => {
+    if (!guide.classList.contains("is-playing")) {
+      intro.currentTime = 0;
+      playIntro();
+    } else if (intro.paused) {
+      playIntro();
+    } else {
+      pauseIntro();
+    }
+  });
+
+  stopBtn.addEventListener("click", () => {
+    showIdle();
+    intro.currentTime = 0;
+    playBtn.focus();
+  });
+
+  intro.addEventListener("ended", () => {
+    showIdle();
+    intro.currentTime = 0;
+  });
+
+  // Captions on/off
+  if (ccBtn && intro.textTracks.length) {
+    const track = intro.textTracks[0];
+    track.mode = "showing";
+
+    ccBtn.addEventListener("click", () => {
+      const on = track.mode !== "showing";
+      track.mode = on ? "showing" : "hidden";
+      ccBtn.textContent = on ? "CC: ON" : "CC: OFF";
+      ccBtn.setAttribute("aria-pressed", String(on));
+    });
+  } else if (ccBtn) {
+    ccBtn.classList.add("hidden");
+  }
+
+  reduceMotion.addEventListener("change", () => {
+    if (!guide.classList.contains("is-playing")) startIdle();
+  });
+
+  startIdle();
+}
+
+document.addEventListener("DOMContentLoaded", initGuideAvatar);

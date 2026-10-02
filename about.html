@@ -34,20 +34,92 @@
 
       <p class="note">// Introduction to the AI Medicine Collective</p>
 
-      <!-- Embedded video -->
-      <div class="video-wrapper">
-        <video
-          width="100%"
-          height="auto"
-          controls
-          preload="metadata"
-          style="border: 1px solid var(--accent); box-shadow: 0 0 10px rgba(0,255,102,0.25);"
-        >
-          <source src="AI MC.mp4" type="video/mp4" />
-          Your browser does not support embedded video.
-        </video>
-      </div>
-      </p>
+      <!-- GUIDE AVATAR
+           Idle loop plays silently on load; PLAY INTRO crossfades to the
+           full talking intro, then returns to idle. Assets live in media/about/:
+           guide-idle.mp4 (silent seamless loop built from the intro's final
+           pause), guide-intro.mp4, guide-intro.vtt (captions), guide-poster.jpg.
+           The guide is an AI-generated character (D-ID). -->
+      <section class="guide" aria-label="AI guide introduction">
+        <div class="guide-status" aria-live="polite">
+          <span id="guide-status-text">&gt; GUIDE ONLINE</span>
+          <span class="cursor" aria-hidden="true">█</span>
+        </div>
+
+        <div class="guide-screen">
+          <video
+            id="guide-idle"
+            class="guide-video"
+            src="media/about/guide-idle.mp4"
+            poster="media/about/guide-poster.jpg"
+            muted
+            loop
+            autoplay
+            playsinline
+            preload="auto"
+            aria-hidden="true"
+            tabindex="-1"
+          ></video>
+
+          <video
+            id="guide-intro"
+            class="guide-video guide-video--intro"
+            poster="media/about/guide-poster.jpg"
+            playsinline
+            preload="metadata"
+            aria-label="Introduction video from the AI Medicine Collective guide"
+          >
+            <source src="media/about/guide-intro.mp4" type="video/mp4" />
+            <track
+              kind="captions"
+              src="media/about/guide-intro.vtt"
+              srclang="en"
+              label="English"
+              default
+            />
+          </video>
+
+          <div class="guide-scanlines" aria-hidden="true"></div>
+        </div>
+
+        <div class="guide-controls">
+          <button type="button" id="guide-play" class="guide-btn guide-btn--play">
+            &#9654; PLAY INTRO
+          </button>
+          <button type="button" id="guide-stop" class="guide-btn hidden">
+            &#9632; STOP
+          </button>
+          <button type="button" id="guide-cc" class="guide-btn" aria-pressed="true">
+            CC: ON
+          </button>
+        </div>
+
+        <noscript>
+          <p class="note">
+            <a href="media/about/guide-intro.mp4">&gt; Watch the intro video</a>
+          </p>
+        </noscript>
+
+        <details class="resource-group guide-transcript">
+          <summary class="resource-summary">// Transcript</summary>
+          <div class="resource-body">
+            <p>
+              Welcome to the AI Medicine Collective, where clinicians, trainees,
+              researchers, and curious thinkers explore the evolving edge of AI
+              in healthcare.
+            </p>
+            <p>
+              We share practical tools, ethical guidance, and creative
+              experimentation across every training level. No technical
+              background required.
+            </p>
+            <p>
+              If you're ready to push the boundaries of what medicine can be,
+              click <a href="join.html">Join</a> above to become a member.
+            </p>
+          </div>
+        </details>
+      </section>
 
       <p><a href="index.html">&lt; Back</a></p>
     </main>
