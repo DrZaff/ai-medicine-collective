@@ -8,7 +8,8 @@ Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds,
 
 - **Stack today:** plain static HTML, one shared stylesheet (`style.css`), one shared script (`script.js`). No framework, no build step, no backend.
 - **Forms:** the Join form posts to Formspree (`https://formspree.io/f/mqaonqpr`).
-- **Hosting:** not determined from the repo (GitHub Pages is off). Confirm with the owner before changing anything deployment-related.
+- **Hosting:** Netlify (site `ai-medicine-collective`, https://ai-medicine-collective.netlify.app), connected to this repo: every PR gets a deploy preview (`deploy-preview-<N>--ai-medicine-collective.netlify.app`) and every merge to `main` publishes to production.
+- **Login (phase 2):** Supabase Auth with Google sign-in, members only. One-time admin setup steps: [docs/auth-setup.md](docs/auth-setup.md).
 - **Preview locally:** serve the folder (e.g. `python -m http.server`) and open `http://localhost:8000`. Don't just double-click files; that hides path bugs.
 
 ## Non-negotiable rules
