@@ -311,6 +311,126 @@ function initJoinForm() {
 
 document.addEventListener("DOMContentLoaded", initJoinForm);
 
+/* ========= BLOG PAGE: daily briefings ========= */
+
+// Reads blog/index.json (built on deploy by scripts/blog_agent/build_index.py)
+// and renders one post from blog/posts/<date>.json. Post text comes from an
+// AI draft, so everything is inserted as text, never as HTML.
+function initBlog() {
+  const app = document.getElementById("blog-app");
+  if (!app) return; // not on blog page
+
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+
+  const safeHref = (url) => {
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.href : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const showStatus = (text) => {
+    app.replaceChildren(el("p", "blog-status", text));
+  };
+
+  function renderPost(post) {
+    const article = el("article", "blog-post");
+    article.append(
+      el("p", "blog-date", `// ${post.date}`),
+      el("h3", "blog-headline", post.headline),
+      el("p", "blog-intro", post.intro)
+    );
+
+    const list = el("ol", "blog-items");
+    for (const item of post.items || []) {
+      const li = el("li", "blog-item");
+      const head = el("div", "blog-item-head");
+      head.append(el("span", "blog-cat", item.category));
+
+      const href = safeHref(item.url);
+      if (href) {
+        const link = el("a", "blog-item-title", item.title);
+        link.href = href;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        head.append(link);
+      } else {
+        head.append(el("span", "blog-item-title", item.title));
+      }
+
+      li.append(
+        head,
+        el("p", "blog-source", `${item.source} · ${item.published}`),
+        el("p", "blog-summary", item.summary),
+        el("p", "blog-why", `> Why it matters: ${item.why_it_matters}`)
+      );
+      list.append(li);
+    }
+    article.append(list);
+
+    if (post.tags && post.tags.length) {
+      const tags = el("div", "blog-tags");
+      post.tags.forEach((tag) => tags.append(el("span", "blog-tag", tag)));
+      article.append(tags);
+    }
+    return article;
+  }
+
+  function renderArchive(index, currentDate) {
+    const section = el("section", "blog-archive");
+    section.append(el("h3", "subsection-title", "// Archive"));
+    const list = el("ul", "blog-archive-list");
+    for (const entry of index.slice(0, 60)) {
+      const li = el("li");
+      li.append(el("span", "blog-archive-date", entry.date));
+      const link = el("a", null, entry.headline);
+      link.href = `blog.html?date=${encodeURIComponent(entry.date)}`;
+      if (entry.date === currentDate) link.setAttribute("aria-current", "page");
+      li.append(link);
+      list.append(li);
+    }
+    section.append(list);
+    return section;
+  }
+
+  (async () => {
+    let index;
+    try {
+      const response = await fetch("blog/index.json", { cache: "no-cache" });
+      index = response.ok ? await response.json() : [];
+    } catch {
+      index = [];
+    }
+
+    if (!Array.isArray(index) || index.length === 0) {
+      showStatus("> No briefings yet. The first one is on its way.");
+      return;
+    }
+
+    const requested = new URLSearchParams(location.search).get("date");
+    const entry = index.find((e) => e.date === requested) || index[0];
+
+    try {
+      const response = await fetch(`blog/posts/${encodeURIComponent(entry.date)}.json`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const post = await response.json();
+      app.replaceChildren(renderPost(post), renderArchive(index, entry.date));
+      document.title = `${post.headline} – AI Medicine Collective`;
+    } catch {
+      showStatus("> Couldn't load this briefing. Please try again later.");
+    }
+  })();
+}
+
+document.addEventListener("DOMContentLoaded", initBlog);
+
 /* ========= MEMBER PROFILE: copy email button ========= */
 
 // Copy text to the clipboard; falls back to a hidden textarea where the
