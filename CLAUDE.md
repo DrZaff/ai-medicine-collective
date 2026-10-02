@@ -9,7 +9,8 @@ Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds,
 - **Stack today:** plain static HTML, one shared stylesheet (`style.css`), one shared script (`script.js`). No framework, no build step, no backend.
 - **Forms:** the Join form posts to Formspree (`https://formspree.io/f/mqaonqpr`).
 - **Hosting:** Netlify (site `ai-medicine-collective`, https://ai-medicine-collective.netlify.app), connected to this repo: every PR gets a deploy preview (`deploy-preview-<N>--ai-medicine-collective.netlify.app`) and every merge to `main` publishes to production.
-- **Login (phase 2):** Supabase Auth with Google sign-in, members only. One-time admin setup steps: [docs/auth-setup.md](docs/auth-setup.md).
+- **Login (phase 2):** Supabase Auth with Google sign-in, members only. One-time admin setup steps: [docs/auth-setup.md](docs/auth-setup.md) (not done yet; the owner wants to do it together in a later session).
+- **Who sees what (decided):** signed-out visitors see Home, About, Members (names only) and Join. Everything new (Projects hub, Learning Materials, Chat) is members-only, enforced by database rules rather than hidden pages.
 - **Preview locally:** serve the folder (e.g. `python -m http.server`) and open `http://localhost:8000`. Don't just double-click files; that hides path bugs.
 
 ## Non-negotiable rules
@@ -92,7 +93,7 @@ Work these phases in sequence. Each phase is its own set of branches and PRs. Do
 
 1. **Design refresh + realistic About-page avatar.** Polish the terminal look within the rules above; clean up duplicated CSS; fix known broken links and filenames. Replace the About page's video-only intro with a realistic avatar of the club that fits the terminal frame.
 2. **Backend setup.** Add real authentication (replacing the client-side password gate), a database, and roles: member, moderator, admin. All secrets in environment variables (Rule 2).
-3. **Merged Members / Join page.** One page combining the roster and sign-up. Joining creates an account request that moderators approve; approved members manage their own profile.
+3. **Merged Members / Join page.** One page combining the roster and sign-up. Joining creates an account request that moderators approve; approved members manage their own profile. *Front end done early:* `members.html` has the roster plus a `#join` request form that currently emails requests via Formspree; `join.html` just forwards there. After phase 2, switch the form to Google sign-in plus a pending account.
 4. **Projects hub.** Members submit projects → moderator review → published. Includes comments on projects and a contact-relay so visitors can message a project's creator without exposing their email.
 5. **Learning Materials.** Folder-organized library that reuses the Projects submission → moderation → publish pipeline (don't build a second one).
 6. **Topic-based chat.** Member chat organized by topic/channel, with moderator tools and the no-PHI notice (Rule 3).
