@@ -73,7 +73,7 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 - **Boxes and cards:** near-black fill `rgba(0,0,0,0.7–0.85)`, `1px` green border at ~25–40% opacity, brightening to `--accent` on hover. Square corners (`0–4px`); pills (`999px`) only for buttons and tags.
 - **Buttons:** transparent background, `1px` colored border, UPPERCASE text, faint tinted fill on hover.
 - **Motion:** subtle only: `crtFade` on page load, `fadeInSoft` for revealed content, `blink` for cursors, ≤0.45s. Nothing bouncy or attention-grabbing.
-- **Accordions:** use native `<details>/<summary>` styled like `.resource-group` / `.stack-item`.
+- **Accordions:** use native `<details>/<summary>` styled like `.resource-group`.
 
 ### Spacing and layout
 - Page padding `16px`; frame padding `24px 20px 16px` (`16px 12px 12px` on phones ≤480px).
@@ -81,7 +81,7 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 - Mobile-first breakpoints already in use: `480px`, `600px`, `720px`, `900px`. Every page must work down to 320px wide with no sideways scrolling or clipped text. In flex/grid layouts that stack on phones, give text columns `min-width: 0` rather than a fixed minimum width.
 
 ### Code conventions
-- Shared styles go in `style.css` under the matching `/* === SECTION === */` block; edit an existing rule rather than appending a second copy of the same selector at the bottom. Avoid page-level `<style>` blocks. Respect the ordering notes in `style.css` (e.g. the LINKS block must stay below NAV, LANDING PAGE and ADELANTE).
+- Shared styles go in `style.css` under the matching `/* === SECTION === */` block; edit an existing rule rather than appending a second copy of the same selector at the bottom. Avoid page-level `<style>` blocks. Respect the ordering notes in `style.css` (e.g. the LINKS block must stay below NAV and LANDING PAGE).
 - Every page uses the same header, nav, and footer markup. When the nav changes, update it on **every** page, including `member/*.html`.
 - Images need meaningful `alt` text. Compress large images (aim < 500 KB) and use thumbnails for previews.
 

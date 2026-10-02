@@ -2,8 +2,8 @@
    AI MEDICINE COLLECTIVE — shared stylesheet
    Design rules live in CLAUDE.md ("minimalist hacker terminal").
    Sections are ordered on purpose: the global LINKS block must stay
-   after NAV, LANDING PAGE and ADELANTE so their link colors keep the
-   same precedence for visited links.
+   after NAV and LANDING PAGE so their link colors keep the same
+   precedence for visited links.
    ============================================================= */
 
 
@@ -728,131 +728,6 @@ button:hover {
 }
 
 
-/* === ADELANTE REPORT ========================================= */
-
-.adelante-layout {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  align-items: flex-start;
-  margin-top: 10px;
-}
-
-.adelante-intro {
-  flex: 1 1 260px;
-  max-width: 480px;
-}
-
-.adelante-learn-link {
-  display: inline-block;
-  margin-top: 6px;
-  text-decoration: none;
-  color: #ffcc33;
-  font-weight: bold;
-  letter-spacing: 0.05em;
-}
-
-.adelante-learn-link:hover {
-  text-shadow: 0 0 6px rgba(255, 204, 51, 0.9);
-}
-
-.adelante-hero {
-  flex: 1 1 260px;
-  margin: 0;
-  border: 1px solid var(--accent);
-  padding: 6px;
-  background: radial-gradient(circle at top, #051515 0, #000 70%);
-  box-shadow: 0 0 16px rgba(0, 255, 102, 0.3);
-}
-
-.adelante-hero img {
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: saturate(1.1);
-}
-
-/* Dropdown stacks */
-.adelante-stack {
-  margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.stack-item {
-  border: 1px solid rgba(0, 255, 102, 0.4);
-  background: rgba(0, 0, 0, 0.85);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-}
-
-.stack-item[open] {
-  box-shadow: 0 0 14px rgba(0, 255, 102, 0.35);
-}
-
-.stack-summary {
-  list-style: none;
-  padding: 8px 10px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  user-select: none;
-}
-
-.stack-summary::-webkit-details-marker {
-  display: none;
-}
-
-.stack-label {
-  font-size: 0.95rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.stack-chevron {
-  font-size: 0.8rem;
-  opacity: 0.9;
-}
-
-.stack-item[open] .stack-chevron {
-  transform: rotate(180deg);
-}
-
-.stack-list {
-  list-style: none;
-  margin: 0;
-  padding: 6px 12px 10px;
-  font-size: 0.9rem;
-}
-
-.stack-list li {
-  margin: 4px 0;
-}
-
-.stack-list a {
-  color: var(--text);
-  text-decoration: none;
-  border-bottom: 1px dashed rgba(0, 255, 102, 0.4);
-}
-
-.stack-list a:hover {
-  color: var(--accent);
-  text-shadow: 0 0 4px rgba(0, 255, 102, 0.9);
-  border-bottom-color: var(--accent);
-}
-
-@media (max-width: 700px) {
-  .adelante-layout {
-    flex-direction: column;
-  }
-
-  .adelante-hero {
-    order: -1;
-  }
-}
-
-
 /* === RESOURCES PAGE ========================================== */
 
 .resource-accordion {
@@ -968,7 +843,7 @@ button:hover {
 }
 
 
-/* === LINKS (keep after NAV, LANDING PAGE and ADELANTE) ======= */
+/* === LINKS (keep after NAV and LANDING PAGE) ================= */
 
 a {
   color: #00ff80;
