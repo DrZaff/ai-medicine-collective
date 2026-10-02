@@ -81,7 +81,7 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 - Mobile-first breakpoints already in use: `480px`, `600px`, `720px`, `900px`. Every page must work at 375px wide with no sideways scrolling.
 
 ### Code conventions
-- Shared styles go in `style.css` under a clearly labeled `/* === SECTION === */` block. Avoid page-level `<style>` blocks. Before adding a rule, check it doesn't already exist (the file has duplicates to clean up).
+- Shared styles go in `style.css` under the matching `/* === SECTION === */` block; edit an existing rule rather than appending a second copy of the same selector at the bottom. Avoid page-level `<style>` blocks. Respect the ordering notes in `style.css` (e.g. the LINKS block must stay below NAV, LANDING PAGE and ADELANTE).
 - Every page uses the same header, nav, and footer markup. When the nav changes, update it on **every** page, including `member/*.html`.
 - Images need meaningful `alt` text. Compress large images (aim < 500 KB) and use thumbnails for previews.
 
