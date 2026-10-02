@@ -487,30 +487,75 @@ button:hover {
 }
 
 
-/* === MEMBERS GRID & CARDS ==================================== */
+/* === MEMBERS PAGE: ROSTER ==================================== */
 
-.member-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 14px 18px;
-  margin-top: 12px;
+.roster-stats {
+  font-size: 0.85rem;
 }
 
-.member-card {
+.subsection-title {
+  margin: 18px 0 8px;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Program filter (buttons added by script.js) */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 6px;
+}
+
+.filter-btn {
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  border-color: rgba(0, 255, 102, 0.4);
+}
+
+.filter-btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  background-color: rgba(0, 255, 102, 0.15);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+}
+
+.roster-hint {
+  margin: 4px 0 10px;
+}
+
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+  gap: 12px;
+}
+
+/* Whole card is the link to the profile */
+.roster-card,
+.roster-card:visited {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: 12px;
+  padding: 10px 12px;
   border: 1px solid rgba(0, 255, 102, 0.25);
   background: rgba(0, 0, 0, 0.7);
   box-shadow: 0 0 8px rgba(0, 255, 102, 0.08);
-  cursor: default;
+  color: var(--text);
+  font-weight: normal;
+  text-decoration: none;
   transition: 0.15s ease-out;
 }
 
-.member-card:hover {
+.roster-card:hover,
+.roster-card:focus-visible {
+  color: var(--text);
+  text-shadow: none;
   border-color: var(--accent);
   box-shadow: 0 0 14px rgba(0, 255, 102, 0.25);
+  transform: translateX(4px);
 }
 
 /* Initials circle */
@@ -530,23 +575,53 @@ button:hover {
   opacity: 0.9;
 }
 
-.member-text {
+.roster-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
+  min-width: 0;
 }
 
-.member-name {
+.roster-name {
   font-size: 0.95rem;
   font-weight: bold;
 }
 
-.member-meta {
+.roster-meta {
   font-size: 0.8rem;
   opacity: 0.9;
 }
 
-.member-tags { margin-top: 2px; }
+.roster-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.roster-role {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.roster-go {
+  margin-left: auto;
+  font-weight: bold;
+  opacity: 0.6;
+}
+
+.roster-card:hover .roster-go {
+  opacity: 1;
+}
+
+/* The [hidden] attribute loses to display:flex/grid without this */
+.filter-bar[hidden],
+.roster-card[hidden] {
+  display: none;
+}
 
 /* Department tags */
 .member-tag {
@@ -577,21 +652,10 @@ button:hover {
   background: rgba(255, 179, 71, 0.1);
 }
 
-.member-name .member-link {
-  color: var(--text);
-  text-decoration: none;
-  border-bottom: 1px dashed transparent;
-}
-
-.member-name .member-link:hover {
-  border-bottom-color: var(--accent);
-  text-shadow: 0 0 4px rgba(0, 255, 102, 0.9);
-}
-
 @media (max-width: 480px) {
-  .member-card { padding: 8px; }
-  .member-name { font-size: 0.9rem; }
-  .member-meta { font-size: 0.75rem; }
+  .roster-card { padding: 8px 10px; }
+  .roster-name { font-size: 0.9rem; }
+  .roster-meta { font-size: 0.75rem; }
 }
 
 
@@ -886,14 +950,18 @@ a:active {
 }
 
 
-/* === JOIN PAGE =============================================== */
+/* === MEMBERS PAGE: JOIN REQUEST ============================== */
+
+.join-section {
+  scroll-margin-top: 16px;
+}
 
 .join-layout {
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
   gap: 32px;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 /* Shared neon panel look for both sides */
@@ -905,11 +973,12 @@ a:active {
 }
 
 .join-box {
-  width: 420px;
+  width: 460px;
+  max-width: 100%;
 }
 
 .join-art-box {
-  width: 320px;
+  width: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -919,18 +988,6 @@ a:active {
   max-width: 100%;
   height: auto;
   display: block;
-  border: none;
-  box-shadow: none;
-}
-
-/* The form is also a .join-panel; this strips the panel look from it
-   (must stay after .join-panel) */
-.join-form {
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  margin: 0;
-  padding: 0;
 }
 
 .join-row {
@@ -941,8 +998,14 @@ a:active {
   margin-bottom: 10px;
 }
 
+.join-row--stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
 .join-label {
-  min-width: 60px;
+  min-width: 72px;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -964,22 +1027,97 @@ a:active {
   box-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
 }
 
+select.join-input option {
+  background: #000;
+  color: var(--text);
+}
+
+textarea.join-input {
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* Interest checkboxes as toggle chips */
+.join-interests {
+  border: none;
+  margin: 4px 0 12px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.join-interests legend {
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.interest-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.interest-chip input {
+  accent-color: #00cc55;
+  margin: 0;
+}
+
+.interest-chip:has(input:checked) {
+  border-color: var(--accent);
+  background: rgba(0, 255, 102, 0.12);
+}
+
 .join-submit {
-  margin-top: 12px;
+  margin-top: 6px;
   padding: 8px 22px;
   border-radius: 999px;
-  border: 1px solid #ff66cc;
-  color: #ff66cc;
+  border: 1px solid #ff4da6;
+  color: #ff4da6;
   background: transparent;
   font-size: 0.8rem;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
 }
 
-.join-submit:hover {
-  background: rgba(255, 102, 204, 0.08);
-  box-shadow: 0 0 10px rgba(255, 102, 204, 0.4);
+.join-submit:hover,
+.join-submit:focus-visible {
+  background: rgba(255, 77, 166, 0.08);
+  box-shadow: 0 0 10px rgba(255, 77, 166, 0.4);
+}
+
+.join-submit:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.join-status {
+  min-height: 1em;
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+}
+
+.join-status.is-error {
+  color: var(--error);
+}
+
+/* Shown in place of the form after a successful request */
+.join-success {
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.35);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 24px;
+}
+
+.join-success p {
+  margin: 0 0 8px;
 }
 
 .join-hint {
@@ -988,20 +1126,36 @@ a:active {
   opacity: 0.85;
 }
 
+/* Spam trap: off-screen for people, still in the form for bots */
+.join-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 @media (max-width: 900px) {
   .join-layout {
     flex-direction: column;
     align-items: center;
   }
 
-  .join-box,
+  .join-box {
+    width: 100%;
+    max-width: 460px;
+  }
+
   .join-art-box {
     width: 100%;
-    max-width: 420px;
+    max-width: 460px;
+  }
+
+  .join-art {
+    max-height: 260px;
   }
 }
 
-/* Must stay after .join-form: restores panel padding on the form */
 @media (max-width: 480px) {
   .join-panel {
     padding: 16px;
@@ -1010,6 +1164,11 @@ a:active {
   .join-submit {
     width: 100%;
     text-align: center;
+  }
+
+  .join-label {
+    min-width: 0;
+    width: 100%;
   }
 }
 

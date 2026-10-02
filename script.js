@@ -209,6 +209,108 @@ function initMobileNav() {
 
 document.addEventListener("DOMContentLoaded", initMobileNav);
 
+/* ========= MEMBERS PAGE: program filter ========= */
+
+// Builds ALL / IM / MED-PEDS / EM buttons from the cards' data-program
+// values. Without JavaScript the full roster simply shows.
+function initRosterFilter() {
+  const bar = document.querySelector(".filter-bar[data-filter-for]");
+  if (!bar) return; // not on members page
+
+  const grid = document.getElementById(bar.dataset.filterFor);
+  if (!grid) return;
+
+  const cards = [...grid.querySelectorAll("[data-program]")];
+  const labels = { all: "ALL", im: "IM", medpeds: "MED/PEDS", em: "EM" };
+  const programs = ["all", ...new Set(cards.map((c) => c.dataset.program))];
+
+  bar.setAttribute("role", "group");
+  bar.setAttribute("aria-label", "Filter members by program");
+
+  const buttons = programs.map((program) => {
+    const count =
+      program === "all"
+        ? cards.length
+        : cards.filter((c) => c.dataset.program === program).length;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "filter-btn";
+    btn.dataset.program = program;
+    btn.textContent = `${labels[program] || program.toUpperCase()} (${count})`;
+    btn.setAttribute("aria-pressed", String(program === "all"));
+    bar.appendChild(btn);
+    return btn;
+  });
+
+  bar.addEventListener("click", (e) => {
+    const btn = e.target.closest(".filter-btn");
+    if (!btn) return;
+
+    const program = btn.dataset.program;
+    buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+    cards.forEach((card) => {
+      card.hidden = program !== "all" && card.dataset.program !== program;
+    });
+  });
+
+  bar.hidden = false;
+}
+
+document.addEventListener("DOMContentLoaded", initRosterFilter);
+
+/* ========= MEMBERS PAGE: join request form ========= */
+
+// Sends the request to Formspree in the background and shows the result on
+// the page. Without JavaScript the form posts normally (Formspree's page).
+function initJoinForm() {
+  const form = document.getElementById("join-form");
+  const status = document.getElementById("join-status");
+  if (!form || !status || !window.fetch) return;
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    status.textContent = "> TRANSMITTING...";
+    status.classList.remove("is-error");
+    submitBtn.disabled = true;
+
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const email = form.querySelector('[name="email"]').value.trim();
+      const success = document.createElement("div");
+      success.className = "join-success join-box";
+      success.setAttribute("role", "status");
+      success.setAttribute("tabindex", "-1");
+      success.innerHTML = `
+        <p class="highlight">&gt; REQUEST RECEIVED</p>
+        <p>Thanks! A moderator will review your request and reply to
+        <strong></strong>.</p>
+        <p class="note">// You can close this page.</p>
+      `;
+      success.querySelector("strong").textContent = email;
+      form.replaceWith(success);
+      success.focus();
+    } catch (err) {
+      status.textContent =
+        "> TRANSMISSION FAILED. Please try again, or email zaffutbn@ucmail.uc.edu.";
+      status.classList.add("is-error");
+      submitBtn.disabled = false;
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initJoinForm);
+
 /* ========= MEMBER PROFILE: copy email button ========= */
 
 // Copy text to the clipboard; falls back to a hidden textarea where the
