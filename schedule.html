@@ -5,111 +5,6 @@
   <title>Meeting Schedule – AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Page-specific meeting layout -->
-  <style>
-    .ms-section {
-      margin-top: 18px;
-    }
-
-    .ms-list {
-      margin: 10px 0 24px;
-      padding: 0;
-      list-style: none;
-    }
-
-    .ms-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-      padding: 8px 10px;
-      border-radius: 3px;
-      border: 1px solid rgba(0, 255, 102, 0.28);
-      background: rgba(0, 0, 0, 0.8);
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
-    }
-
-    .ms-link {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      text-decoration: none;
-      color: var(--text);
-      transition: 0.15s ease-out;
-    }
-
-    .ms-link:hover {
-      border-color: transparent;
-      text-shadow: 0 0 6px rgba(0, 255, 102, 0.7);
-    }
-
-    .ms-date {
-      font-family: "Courier New", monospace;
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      border-radius: 6px;                     /* ← small rectangle instead of circle */
-      border: 1px solid rgba(0, 255, 102, 0.4);
-      background: rgba(0, 0, 0, 0.7);
-     display: inline-block;
-      min-width: 110px;                       /* ← keeps all date boxes same width */
-      text-align: center;                     /* ← numbers centered inside */
-}
-    
-    .ms-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-    }
-
-    .ms-cta {
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 4px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 255, 102, 0.6);
-      color: var(--text);
-      text-decoration: none;
-      background: rgba(0, 0, 0, 0.9);
-      white-space: nowrap;
-      transition: 0.15s ease-out;
-    }
-
-    .ms-cta:hover {
-      background: rgba(0, 255, 102, 0.15);
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
-    }
-
-    .ms-cta--minutes {
-      border-color: rgba(255, 255, 255, 0.6);
-      color: #ffffff;
-    }
-
-    .ms-cta--signup {
-      border-color: rgba(0, 255, 102, 0.8);
-      color: #00ff66;
-    }
-
-    /* Mobile: stack button under row so it never overlaps box */
-    @media (max-width: 600px) {
-      .ms-row {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .ms-cta {
-        align-self: flex-end;
-      }
-
-      /* Let long titles drop below the date instead of overflowing */
-      .ms-link {
-        flex-wrap: wrap;
-        gap: 6px 18px;
-      }
-    }
-  </style>
 </head>
 <body>
   <div class="terminal-frame">
@@ -155,17 +50,15 @@
       <!-- Upcoming meetings -->
       <section class="ms-section">
         <p>// Upcoming meetings</p>
-        <p>Click a future meeting to input availability.</p>
+        <p>Dates and sign-up links will be posted here once scheduled.</p>
 
         <ul class="ms-list">
           <li class="ms-row">
-            <a href="https://doodle.com/meeting/organize/id/avJAw8ma" class="ms-link" target="_blank">
-              <span class="ms-date">2025-12-10 (19:00 EST)</span>
-              <span class="ms-title">
-                Monthly meeting (DECEMBER)
-              </span>
-            </a>
-            <a href="https://doodle.com/meeting/organize/id/avJAw8ma" class="ms-cta ms-cta--signup" target="_blank">SIGNUP</a>
+            <span class="ms-link">
+              <span class="ms-date">TBD</span>
+              <span class="ms-title">Next monthly meeting</span>
+            </span>
+            <span class="ms-cta">COMING SOON</span>
           </li>
 
           <li class="ms-row">
