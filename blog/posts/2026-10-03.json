@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-03",
+  "headline": "A student-built roadmap for what medical students should learn about AI, and when",
+  "intro": "Today's briefing covers a new consensus framework that sets out which AI competencies medical students need and at what point in undergraduate training to teach them. It is useful reading for curriculum committees writing formal AI teaching into the preclinical and clinical years.",
+  "items": [
+    {
+      "title": "What and when: a Delphi study identifying AI competencies and learning objectives for medical students",
+      "source": "Frontiers in Digital Health",
+      "url": "https://www.frontiersin.org/journals/digital-health/articles/10.3389/fdgth.2026.1918847/full",
+      "published": "2026-09-30",
+      "category": "education",
+      "summary": "A team at the University of Navarra School of Medicine in Spain ran a four-round modified Delphi process between May 2024 and January 2025. Fourteen medical students and two professors proposed and rated possible learning objectives, and 10 international experts in medical education and AI then checked the results. The panel settled on 7 competencies and 37 learning objectives that medical graduates need for working with AI, plus suggested timing for teaching them across undergraduate medical education.",
+      "why_it_matters": "Most schools still have no structured AI curriculum, and this peer-reviewed framework gives curriculum leaders a ready list of what to teach and when. Because students helped write it, it may also be a useful model for including learners in AI curriculum design. It came from one school, so programs should adapt it to their own setting."
+    }
+  ],
+  "tags": [
+    "ai competencies",
+    "curriculum design",
+    "delphi study",
+    "generative ai",
+    "student partnership",
+    "undergraduate medical education"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
