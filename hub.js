@@ -61,7 +61,7 @@ const PROJECT_STATUS_LABELS = { pending: "IN REVIEW", published: "PUBLISHED", re
 
 const PROJECT_COLUMNS =
   "id, kind, folder, title, category, description, link_url, file_path, file_name, status, review_note, created_at, " +
-  "author:profiles!projects_author_id_fkey(id, full_name, email, avatar_url)";
+  "author:profiles!projects_author_id_fkey(id, full_name, avatar_url)";
 
 /* ========= shared pieces ========= */
 
@@ -89,7 +89,7 @@ function httpsUrl(url) {
 }
 
 function authorName(project) {
-  return (project.author && (project.author.full_name || project.author.email)) || "Unknown member";
+  return (project.author && project.author.full_name) || "Member";
 }
 
 // Private files have no public address: ask for a short-lived link, then open it.
@@ -366,16 +366,23 @@ function initHubPage() {
     byline.append(avatar(project.author || {}), who);
     article.append(byline, el("p", "hub-description", project.description), projectLinks(project, status));
 
-    // Contact the author: the email is shown only on request, to signed-in members
-    if (project.author && project.author.email) {
-      const contact = el("div", "hub-contact");
-      contact.append(button("CONTACT THE AUTHOR", "hub-contact-btn", () => {
-        const mail = hubLink(project.author.email,
-          `mailto:${project.author.email}?subject=${encodeURIComponent(`AI Medicine Collective: ${project.title}`)}`);
-        contact.replaceChildren(el("span", null, "Email: "), mail,
-          el("span", "note", " // for questions, suggestions or collaboration"));
-      }));
-      article.append(contact);
+    // Contact the author: a private message to their inbox on this site.
+    // No email address is shown to either side.
+    if (project.author && project.author.id === me.id) {
+      const own = el("div", "hub-contact");
+      own.append(el("span", "note", "// This is yours. Messages from members arrive in your "),
+        hubLink("inbox", "inbox.html"), el("span", "note", "."));
+      article.append(own);
+    } else if (project.author && project.status === "published") {
+      article.append(contactForm(project));
+    }
+
+    // Authors can fix an item that isn't published yet
+    if (project.author && project.author.id === me.id && project.status !== "published") {
+      const edit = el("p", "hub-edit");
+      edit.append(hubLink(project.status === "rejected" ? "> EDIT AND RESUBMIT" : "> EDIT",
+        `${kind.page}?view=edit&project=${encodeURIComponent(project.id)}`, "account-mod-link"));
+      article.append(edit);
     }
 
     if (isModerator()) {
@@ -409,6 +416,49 @@ function initHubPage() {
     show(...nodes);
   }
 
+  function contactForm(project) {
+    const wrap = el("div", "hub-contact");
+    wrap.append(button("CONTACT THE AUTHOR", "hub-contact-btn", () => {
+      const form = el("form", "hub-comment-form hub-contact-form");
+      const label = el("label", "join-label", `Private message to ${authorName(project)}`);
+      label.htmlFor = "hub-contact-input";
+      const input = el("textarea", "join-input");
+      input.id = "hub-contact-input";
+      input.rows = 4;
+      input.maxLength = 2000;
+      input.required = true;
+      input.placeholder = "Questions, suggestions, or an idea to collaborate on.";
+      const send = el("button", "join-submit", "> Send message");
+      send.type = "submit";
+      const formStatus = el("p", "join-status");
+      formStatus.setAttribute("role", "status");
+      form.append(label, input, send, formStatus,
+        el("p", "join-hint", "// Only the author sees this, in their inbox on this site. No email addresses are shared. No patient information."));
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const body = input.value.trim();
+        if (!body) return;
+        send.disabled = true;
+        const { error } = await db.from("project_messages").insert({
+          project_id: project.id, sender_id: me.id, recipient_id: project.author.id, body,
+        });
+        if (error) {
+          console.error(error);
+          send.disabled = false;
+          formStatus.textContent = "> COULD NOT SEND. Please try again.";
+          formStatus.classList.add("is-error");
+          return;
+        }
+        wrap.replaceChildren(el("span", "account-status", "> MESSAGE SENT. "),
+          el("span", "note", "Replies will arrive in your "), hubLink("inbox", "inbox.html"), el("span", "note", "."));
+      });
+      wrap.replaceChildren(form);
+      input.focus();
+    }));
+    return wrap;
+  }
+
   async function review(project, newStatus, note, statusNode) {
     statusNode.textContent = "> SAVING...";
     statusNode.classList.remove("is-error");
@@ -425,7 +475,7 @@ function initHubPage() {
     const section = el("section", "hub-comments");
     const { data: comments, error } = await db
       .from("project_comments")
-      .select("id, body, created_at, author:profiles!project_comments_author_id_fkey(id, full_name, email, avatar_url)")
+      .select("id, body, created_at, author:profiles!project_comments_author_id_fkey(id, full_name, avatar_url)")
       .eq("project_id", project.id)
       .order("created_at", { ascending: true });
 
@@ -441,7 +491,7 @@ function initHubPage() {
       const who = el("div", "account-who");
       const author = comment.author || {};
       who.append(
-        el("span", "account-name", author.full_name || author.email || "Member"),
+        el("span", "account-name", author.full_name || "Member"),
         el("span", "note", `// ${formatDate(comment.created_at)}`),
         el("span", "hub-comment-body", comment.body)
       );
@@ -494,7 +544,8 @@ function initHubPage() {
 
   /* ---- submit form ---- */
 
-  async function renderSubmit() {
+  // With `existing`, the same form edits an unpublished item instead.
+  async function renderSubmit(existing) {
     let folders = [];
     if (isMaterial) {
       try {
@@ -562,10 +613,20 @@ function initHubPage() {
     confirmBox.required = true;
     confirmRow.append(confirmBox, " I confirm this contains no patient information of any kind.");
 
-    const submit = el("button", "join-submit", "> Submit for review");
+    const submit = el("button", "join-submit",
+      !existing ? "> Submit for review" : existing.status === "rejected" ? "> Save and resubmit" : "> Save changes");
     submit.type = "submit";
     const status = el("p", "join-status");
     status.setAttribute("role", "status");
+
+    if (existing) {
+      title.value = existing.title;
+      category.value = existing.category;
+      if (folder) folder.value = existing.folder || "";
+      description.value = existing.description;
+      link.value = existing.link_url || "";
+      form.prepend(el("p", "account-status", `> EDITING: ${existing.title}`));
+    }
 
     form.append(field("Title", title));
     if (folder) form.append(field("Folder", folder));
@@ -574,7 +635,9 @@ function initHubPage() {
       field("Description", description, true),
       field("Link", link),
       field("File", file),
-      el("p", "join-hint", `// Optional file, up to ${PROJECT_FILE_MAX_MB} MB: PDF, image, Word, PowerPoint, Excel or text.`),
+      el("p", "join-hint", existing && existing.file_name
+        ? `// Current file: ${existing.file_name}. Choose a new one only to replace it (up to ${PROJECT_FILE_MAX_MB} MB).`
+        : `// Optional file, up to ${PROJECT_FILE_MAX_MB} MB: PDF, image, Word, PowerPoint, Excel or text.`),
       confirmRow,
       submit,
       status,
@@ -605,8 +668,8 @@ function initHubPage() {
         category: category.value,
         description: description.value.trim(),
         link_url: link.value.trim() || null,
-        file_path: null,
-        file_name: null,
+        file_path: existing ? existing.file_path : null,
+        file_name: existing ? existing.file_name : null,
       };
       if (row.description.length < 20) return setError("> PLEASE WRITE A LONGER DESCRIPTION (20+ CHARACTERS).");
 
@@ -623,6 +686,29 @@ function initHubPage() {
         }
         row.file_path = path;
         row.file_name = chosen.name.slice(0, 150);
+      }
+
+      if (existing) {
+        status.textContent = "> SAVING...";
+        // author_id and kind can't change; the database only accepts these columns
+        const { title: t, category: c, description: d, link_url, file_path, file_name } = row;
+        const changes = { title: t, category: c, description: d, link_url, file_path, file_name };
+        if (isMaterial) changes.folder = row.folder;
+        const { error: updateError } = await db.from("projects").update(changes).eq("id", existing.id);
+        if (updateError) {
+          console.error(updateError);
+          return setError("> COULD NOT SAVE. Please try again.");
+        }
+        if (existing.status === "rejected") {
+          const { error: resubmitError } = await db.rpc("resubmit_project", { target: existing.id });
+          if (resubmitError) {
+            console.error(resubmitError);
+            return setError("> SAVED, BUT COULD NOT RESUBMIT. Please try again.");
+          }
+          notifyOrganizersOfProject(me, row);
+        }
+        window.location.href = `${kind.page}?project=${encodeURIComponent(existing.id)}`;
+        return;
       }
 
       status.textContent = "> SUBMITTING...";
@@ -642,7 +728,20 @@ function initHubPage() {
       show(toolbar("submit"), done);
     });
 
-    show(toolbar("submit"), form);
+    show(toolbar(existing ? null : "submit"), form);
+  }
+
+  // Open the edit form for one of the person's own unpublished items
+  async function renderEdit(id) {
+    const { data: project, error } = await db
+      .from("projects").select(PROJECT_COLUMNS).eq("id", id).maybeSingle();
+    if (error) return fail(`> COULD NOT LOAD THIS ${kind.noun.toUpperCase()}. Please refresh the page.`);
+    if (!project || !project.author || project.author.id !== me.id || project.status === "published" || project.kind !== kindKey) {
+      show(toolbar(null), el("p", "account-status is-error", "> THIS CAN'T BE EDITED"),
+        el("p", "note", "// You can edit your own submissions until they're published. To change a published one, ask a moderator."));
+      return;
+    }
+    await renderSubmit(project);
   }
 
   /* ---- start ---- */
@@ -665,7 +764,8 @@ function initHubPage() {
       }
       me = profile;
 
-      if (params.get("project")) await renderProject(params.get("project"));
+      if (params.get("view") === "edit" && params.get("project")) await renderEdit(params.get("project"));
+      else if (params.get("project")) await renderProject(params.get("project"));
       else if (params.get("view") === "submit") await renderSubmit();
       else if (params.get("view") === "mine") await renderMine();
       else await renderList();

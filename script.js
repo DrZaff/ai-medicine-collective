@@ -14,6 +14,7 @@ const AUTH_STORAGE_KEY = "sb-ahwnarhmuzxgjindreuz-auth-token";
 // Also cosmetic: someone who edits this value only sees links to pages that
 // will still refuse them.
 const MEMBER_ROLE_HINT_KEY = "amc-member-role";
+const MEMBER_UNREAD_HINT_KEY = "amc-unread"; // unread inbox messages, also from auth.js
 
 function readSignedInRole() {
   try {
@@ -48,10 +49,18 @@ function renderMembersBar(role) {
   const prefix = accountLink.getAttribute("href").replace(/account\.html$/, "");
   const here = window.location.pathname.split("/").pop().replace(/\.html$/, "");
 
+  let unread = 0;
+  try {
+    unread = parseInt(localStorage.getItem(MEMBER_UNREAD_HINT_KEY), 10) || 0;
+  } catch {
+    // no count shown
+  }
+
   const items = [
     ["hub", "PROJECTS HUB"],
     ["learn", "LEARNING"],
     ["chat", "CHAT"],
+    ["inbox", unread > 0 ? `INBOX (${unread})` : "INBOX"],
   ];
   if (role === "moderator" || role === "admin") items.push(["moderate", "MODERATION"]);
 
@@ -69,6 +78,7 @@ function renderMembersBar(role) {
     link.href = `${prefix}${page}.html`;
     link.textContent = text;
     if (page === here) link.setAttribute("aria-current", "page");
+    if (page === "inbox" && unread > 0) link.classList.add("members-bar-unread");
     bar.append(link);
   }
 

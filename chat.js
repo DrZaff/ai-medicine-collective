@@ -14,7 +14,7 @@ const CHAT_MAX_LENGTH = 2000;   // must match the CHECK in migration 005
 
 const CHAT_MESSAGE_COLUMNS =
   "id, topic_id, body, created_at, " +
-  "author:profiles!chat_messages_author_id_fkey(id, full_name, email, avatar_url)";
+  "author:profiles!chat_messages_author_id_fkey(id, full_name, avatar_url)";
 
 // "14:05" for today, "Oct 3, 2026 14:05" for earlier days
 function chatTime(iso) {
@@ -28,7 +28,8 @@ function initChatPage() {
   if (!app) return;
 
   let me = null;
-  let topics = [];
+  let topics = [];         // active topics
+  let archivedTopics = []; // only loaded for moderators
   let topic = null;        // the open topic
   let messages = [];       // oldest first
   let channel = null;      // live-update subscription for the open topic
@@ -43,6 +44,7 @@ function initChatPage() {
   topicBar.setAttribute("aria-label", "Chat topics");
   const topicTitle = el("h3", "subsection-title chat-topic-title");
   const topicNote = el("p", "note chat-topic-note");
+  const archiveBtn = button("ARCHIVE TOPIC", "chat-archive", () => setArchived(!topic.archived));
   const earlier = button("LOAD EARLIER MESSAGES", "chat-earlier", () => loadEarlier());
   const log = el("ul", "chat-log");
   log.setAttribute("role", "log");
@@ -78,11 +80,12 @@ function initChatPage() {
   async function loadTopics() {
     const { data, error } = await db
       .from("chat_topics")
-      .select("id, name, description, position")
-      .eq("archived", false)
+      .select("id, name, description, position, archived")
       .order("position", { ascending: true });
     if (error) throw error;
-    topics = data;
+    topics = data.filter((t) => !t.archived);
+    // Members never see archived topics; moderators can reopen them
+    archivedTopics = isModerator() ? data.filter((t) => t.archived) : [];
   }
 
   function renderTopicBar() {
@@ -92,9 +95,28 @@ function initChatPage() {
       tab.setAttribute("aria-pressed", String(!!topic && item.id === topic.id));
       topicBar.append(tab);
     }
+    for (const item of archivedTopics) {
+      const tab = button(`${item.name.toUpperCase()} (ARCHIVED)`, "hub-tab chat-tab chat-tab--archived",
+        () => openTopic(item.id, true));
+      tab.setAttribute("aria-pressed", String(!!topic && item.id === topic.id));
+      topicBar.append(tab);
+    }
     if (isModerator()) {
       topicBar.append(button("+ NEW TOPIC", "hub-tab chat-tab chat-tab--new", addTopic));
     }
+  }
+
+  // Archiving hides a topic from members and stops new posts; its history stays.
+  async function setArchived(archived) {
+    const target = topic;
+    const question = archived
+      ? `Archive "${target.name}"? Members will no longer see it. You can restore it later.`
+      : `Restore "${target.name}" so members can see and post in it again?`;
+    if (!window.confirm(question)) return;
+    const { error } = await db.from("chat_topics").update({ archived }).eq("id", target.id);
+    if (error) return setStatus(`> COULD NOT ${archived ? "ARCHIVE" : "RESTORE"} THE TOPIC: ${error.message}`, true);
+    await loadTopics();
+    openTopic(archived ? null : target.id, true);
   }
 
   async function addTopic() {
@@ -125,7 +147,7 @@ function initChatPage() {
     const meta = el("div", "chat-meta");
     const time = el("time", "chat-time", chatTime(message.created_at));
     time.dateTime = message.created_at;
-    meta.append(el("span", "chat-author", author.full_name || author.email || "Member"), time);
+    meta.append(el("span", "chat-author", author.full_name || "Member"), time);
     text.append(meta, el("div", "chat-body", message.body));
     item.append(avatar(author), text);
 
@@ -246,15 +268,20 @@ function initChatPage() {
   }
 
   async function openTopic(id, updateAddress) {
-    const next = topics.find((t) => t.id === id) || topics[0];
+    const next = [...topics, ...archivedTopics].find((t) => t.id === id) || topics[0] || archivedTopics[0];
     if (!next) return;
     stopListening();
     topic = next;
     setStatus("");
     renderTopicBar();
     topicTitle.textContent = `// ${topic.name}`;
-    topicNote.textContent = topic.description || "";
-    topicNote.hidden = !topic.description;
+    topicNote.textContent = topic.archived
+      ? "Archived: members can't see or post in this topic."
+      : topic.description || "";
+    topicNote.hidden = !topicNote.textContent;
+    archiveBtn.hidden = !isModerator();
+    archiveBtn.textContent = topic.archived ? "RESTORE TOPIC" : "ARCHIVE TOPIC";
+    form.hidden = !!topic.archived; // the database refuses posts to archived topics
     log.replaceChildren(el("li", "note", "> LOADING MESSAGES..."));
     if (updateAddress) {
       history.replaceState(null, "", `${window.location.pathname}?topic=${encodeURIComponent(topic.id)}`);
@@ -314,14 +341,14 @@ function initChatPage() {
       me = profile;
 
       await loadTopics();
-      if (!topics.length) {
+      if (!topics.length && !archivedTopics.length) {
         app.replaceChildren(el("p", "note", "// No chat topics yet."));
         if (isModerator()) app.append(button("+ NEW TOPIC", "hub-tab chat-tab chat-tab--new", addTopic), status);
         return;
       }
 
       app.replaceChildren(
-        topicBar, topicTitle, topicNote, earlier, log, form, status,
+        topicBar, topicTitle, topicNote, archiveBtn, earlier, log, form, status,
         el("p", "join-hint", "// Members only. Be kind, and never post patient information.")
       );
       await openTopic(new URLSearchParams(window.location.search).get("topic"), false);
