@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-03",
+  "headline": "FDA's device center puts final AI-enabled device guidance at the top of its FY2027 agenda",
+  "intro": "Today's briefing has just one item. My search turned up very little that was published between October 1 and 3, and I ran out of search capacity before I could check medical education journals, preprint servers and school announcements properly. The one item we could confirm is FDA's newly announced list of planned AI device guidance for fiscal year 2027.",
+  "items": [
+    {
+      "title": "FDA's device center releases guidance agenda for FY 2027",
+      "source": "RAPS Regulatory Focus",
+      "url": "https://www.raps.org/resource/fda-s-device-center-releases-guidance-agenda-for-fy-2027.html",
+      "published": "2026-10-02",
+      "category": "policy",
+      "summary": "On October 1, FDA's Center for Devices and Radiological Health (CDRH) released its list of planned guidance documents for fiscal year 2027. Its top priorities include finalizing two drafts: the January 2025 guidance on managing AI-enabled device software across a product's full lifecycle, and the August 2024 guidance on predetermined change control plans, which let manufacturers update approved devices in agreed ways. CDRH also listed a top-priority draft guidance on generative AI conversational devices for mental health disorders, put risk assessment for generative AI devices in its lowest-priority tier, and is taking public comments until November 30, 2026. This summary comes from a trade-news report of the FDA announcement.",
+      "why_it_matters": "These guidance documents will shape how the AI tools trainees use in the clinic get cleared and updated after they reach the market. That makes them useful material for teaching on AI oversight and safety. Educators covering mental health chatbots should note that FDA plans specific guidance on generative AI conversational devices in this area."
+    }
+  ],
+  "tags": [
+    "ai-enabled devices",
+    "digital mental health",
+    "fda",
+    "generative ai",
+    "policy",
+    "regulation"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
