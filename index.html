@@ -4,49 +4,20 @@
   <meta charset="UTF-8" />
   <title>AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A hub for grassroots AI initiatives in medicine, run by residents at the University of Cincinnati." />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="terminal-frame">
 
-    <!-- TOP BORDER -->
     <div class="horizontal-rule"></div>
 
-    <!-- HEADER (hidden until password is correct) -->
-    <header id="site-header" class="hidden">
+    <header>
       <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
       <div class="horizontal-rule"></div>
     </header>
 
-    <!-- PASSWORD GATE -->
-    <section id="gate">
-      <h2 class="section-title">ACCESS REQUIRED</h2>
-      <p class="gate-text">
-        Enter the AI Medicine Collective password to continue.
-      </p>
-      <form id="password-form">
-        <label for="password-input" class="prompt">&gt; PASSWORD:</label>
-        <input
-          type="password"
-          id="password-input"
-          autocomplete="off"
-          required
-        />
-        <button type="submit">ENTER</button>
-      </form>
-      <p id="error-message" class="error hidden">
-        ACCESS DENIED. TRY AGAIN.
-      </p>
-
-      <p class="gate-hint">
-        # Hint: ask a member of the Collective.
-      </p>
-
-      <div class="horizontal-rule"></div>
-    </section>
-
-    <!-- MAIN CONTENT (hidden until password correct) -->
-    <main id="site-content" class="hidden">
+    <main>
 
       <section class="section landing-links">
 
@@ -74,7 +45,6 @@
           </h2>
         </div>
 
-        <!-- NEW: App Store link -->
         <div class="landing-item">
           <h2 class="landing-title">
             <a href="appstore.html">&gt; APP STORE</a>
@@ -96,6 +66,12 @@
         <div class="landing-item">
           <h2 class="landing-title">
             <a href="members.html#join">&gt; JOIN</a>
+          </h2>
+        </div>
+
+        <div class="landing-item">
+          <h2 class="landing-title">
+            <a href="account.html" data-account-link="&gt; ACCOUNT">&gt; SIGN IN</a>
           </h2>
         </div>
 

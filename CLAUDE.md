@@ -6,7 +6,7 @@ Guidance for Claude (and any contributor) working in this repo. Read it fully be
 
 Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds, EM) building AI tools for medicine.
 
-- **Stack today:** plain static HTML, one shared stylesheet (`style.css`), one shared script (`script.js`). No framework, no build step, no backend.
+- **Stack today:** plain static HTML, one shared stylesheet (`style.css`), one shared script (`script.js`), plus `auth.js` (sign-in, account and moderation pages only). No framework. Backend is Supabase (see "Backend" below).
 - **Forms:** the Join form posts to Formspree (`https://formspree.io/f/mqaonqpr`).
 - **Hosting:** Netlify (site `ai-medicine-collective`, https://ai-medicine-collective.netlify.app), connected to this repo: every PR gets a deploy preview (`deploy-preview-<N>--ai-medicine-collective.netlify.app`) and every merge to `main` publishes to production.
 - **Login (phase 2):** Supabase Auth with Google sign-in, members only. The Supabase project and Google client were set up on 2026-10-03 following [docs/auth-setup.md](docs/auth-setup.md).
@@ -21,6 +21,7 @@ Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds,
 - **Roles** (`public.profiles.role`): `pending` → `member` → `moderator` → `admin`, plus `rejected`. New sign-ins get a `pending` profile automatically. Roles change only through the SQL functions `approve_member`, `reject_member` (moderators) and `set_member_role` (admins), never by editing the column.
 - **Database changes are migration files:** add `supabase/migrations/NNN_description.sql` (next number, never edit one that has been run). The owner runs each file once in the Supabase SQL Editor; Claude has no database access and verifies through the public API only.
 - **Every new table must:** enable row level security, have explicit policies, and `grant` only what's needed to `authenticated` (the project has "automatically expose new tables" off). Signed-out visitors (`anon`) get no table access. Use `public.is_member()`, `is_moderator()` and `is_admin()` in policies.
+- **Sign-in on the site:** `account.html` (Google sign-in, status, display name, sign out) and `moderate.html` (approve/decline requests; admins set roles). Both load the pinned Supabase library (with an integrity hash) and `auth.js`. Other pages only check `localStorage` for the session key to relabel the nav's SIGN IN link as ACCOUNT; that is cosmetic. `auth.js` and `script.js` share one global scope on those two pages, so top-level names must not collide.
 - Members-only means **the data is protected by these rules**. Page files are always public, so never put member content in static HTML.
 
 ## Blog agent
@@ -45,7 +46,7 @@ Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds,
 - Never commit API keys, tokens, passwords, database URLs, service-account files, or `.env` files. The repo is **public**.
 - Secrets live in the hosting provider's environment variables or a secrets manager. Keep `.env*` in `.gitignore`.
 - If a secret is ever committed, treat it as leaked: rotate it immediately. Deleting the commit is not enough.
-- Client-side code is public. Anything in HTML/JS (e.g. the current password gate in `script.js`) is visible to everyone and is **not** security.
+- Client-side code is public. Anything in HTML/JS is visible to everyone and is **not** security; access control lives in the database rules.
 
 ### 3. No patient information, anywhere
 - No protected health information (PHI) on the site, in the repo, in uploads, comments, chat, blog posts, social posts, or newsletters. That includes names, dates, MRNs, images, case details, or anything that could identify a patient.
@@ -112,7 +113,7 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 Work these phases in sequence. Each phase is its own set of branches and PRs. Don't start building a later phase's features early.
 
 1. **Design refresh + realistic About-page avatar.** Polish the terminal look within the rules above; clean up duplicated CSS; fix known broken links and filenames. Replace the About page's video-only intro with a realistic avatar of the club that fits the terminal frame.
-2. **Backend setup.** Add real authentication (replacing the client-side password gate), a database, and roles: member, moderator, admin. All secrets in environment variables (Rule 2).
+2. **Backend setup.** Add real authentication (replacing the client-side password gate), a database, and roles: member, moderator, admin. All secrets in environment variables (Rule 2). *Done:* Google sign-in, the `profiles` table with roles, the account page and the moderation page; the old shared-password screen is removed and the home page is public.
 3. **Merged Members / Join page.** One page combining the roster and sign-up. Joining creates an account request that moderators approve; approved members manage their own profile. *Front end done early:* `members.html` has the roster plus a `#join` request form that currently emails requests via Formspree; `join.html` just forwards there. After phase 2, switch the form to Google sign-in plus a pending account.
 4. **Projects hub.** Members submit projects → moderator review → published. Includes comments on projects and a contact-relay so visitors can message a project's creator without exposing their email.
 5. **Learning Materials.** Folder-organized library that reuses the Projects submission → moderation → publish pipeline (don't build a second one).

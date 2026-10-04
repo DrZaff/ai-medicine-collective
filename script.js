@@ -1,91 +1,29 @@
-// === AI Medicine Collective - soft gate + session memory + UI polish ===
+// === AI Medicine Collective - shared page behavior ===
+// (Sign-in, account and moderation code lives in auth.js.)
 
-// Change this if you want a different password:
-const CLUB_PASSWORD = "collective";
+/* ========= ALL PAGES: SIGN IN / ACCOUNT link ========= */
 
-const header = document.getElementById("site-header");
-const gate = document.getElementById("gate");
-const main = document.getElementById("site-content");
-const form = document.getElementById("password-form");
-const errorMsg = document.getElementById("error-message");
-const input = document.getElementById("password-input");
+// Supabase keeps the signed-in session in localStorage under this key (set in
+// auth.js). Pages that don't load the Supabase library just check whether it
+// exists, to relabel "SIGN IN" links as "ACCOUNT". This is cosmetic only:
+// access to member data is enforced by the database.
+const AUTH_STORAGE_KEY = "sb-ahwnarhmuzxgjindreuz-auth-token";
 
-// Create logout button (top-right), works on all pages once authenticated
-function createLogoutButton() {
-  if (document.getElementById("logout-btn")) return;
-
-  const btn = document.createElement("button");
-  btn.id = "logout-btn";
-  btn.className = "logout-btn";
-  btn.textContent = "LOGOUT";
-
-  btn.addEventListener("click", () => {
-    sessionStorage.removeItem("amc-auth");
-    // Reload index page and show the gate again
-    window.location.href = "index.html";
-  });
-
-  document.body.appendChild(btn);
-}
-
-// Minimal auth banner
-function showAuthBanner() {
-  const banner = document.createElement("div");
-  banner.className = "auth-banner";
-  banner.textContent = "AUTHENTICATION ACCEPTED";
-  document.body.appendChild(banner);
-
-  setTimeout(() => {
-    if (banner && banner.parentNode) {
-      banner.remove();
-    }
-  }, 1800);
-}
-
-// Unlock the site UI
-function unlockSite(withAnimation = true) {
-  if (gate) gate.classList.add("hidden");
-  if (header) header.classList.remove("hidden");
-  if (main) {
-    main.classList.remove("hidden");
-    main.classList.add("fade-in");
+function initAccountLinks() {
+  let signedIn = false;
+  try {
+    signedIn = !!localStorage.getItem(AUTH_STORAGE_KEY);
+  } catch {
+    // localStorage unavailable (private mode, blocked): leave links as SIGN IN
   }
+  if (!signedIn) return;
 
-  // Show logout button on any page once authenticated
-  createLogoutButton();
-
-  // Only show banner when just authenticated
-  if (withAnimation) {
-    showAuthBanner();
-  }
-}
-
-// If already authenticated in this tab, skip the gate
-if (sessionStorage.getItem("amc-auth") === "true") {
-  unlockSite(false); // no banner/animation on refresh/back
-}
-
-// Handle password form submission (index.html only)
-if (form) {
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    const value = input.value.trim();
-
-    if (value === CLUB_PASSWORD) {
-      sessionStorage.setItem("amc-auth", "true");
-
-      if (errorMsg) errorMsg.classList.add("hidden");
-      unlockSite(true);
-      input.value = "";
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      if (errorMsg) errorMsg.classList.remove("hidden");
-      input.value = "";
-      input.focus();
-    }
+  document.querySelectorAll("[data-account-link]").forEach((link) => {
+    link.textContent = link.dataset.accountLink;
   });
 }
+
+document.addEventListener("DOMContentLoaded", initAccountLinks);
 
 /* ========= PROJECTS PAGE BEHAVIOR (category → detail toggle) ========= */
 
