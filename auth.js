@@ -189,8 +189,13 @@ function initAccountPage() {
       } else {
         panel.append(
           el("p", "account-status", "> ACCESS GRANTED"),
-          el("p", null, "You're an approved member. The Projects hub, Learning Materials and Chat will appear here as they launch.")
+          el("p", null, "You're an approved member. Learning Materials and Chat will appear here as they launch.")
         );
+        const hub = el("p");
+        const hubLinkNode = el("a", "account-mod-link", "> OPEN PROJECTS HUB");
+        hubLinkNode.href = "hub.html";
+        hub.append(hubLinkNode);
+        panel.append(hub);
         if (profile.role === "moderator" || profile.role === "admin") {
           const mod = el("p");
           const link = el("a", "account-mod-link", "> OPEN MODERATION");

@@ -482,6 +482,195 @@ button:hover {
 }
 
 
+/* === PROJECTS HUB (hub.js) =================================== */
+
+.hub-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.hub-tab,
+.hub-tab:visited {
+  padding: 4px 14px;
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.hub-tab:hover,
+.hub-tab[aria-current="page"] {
+  color: var(--text);
+  text-shadow: none;
+  border-color: var(--accent);
+  background: rgba(0, 255, 102, 0.15);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+}
+
+/* Primary action = neon yellow */
+.hub-tab--submit,
+.hub-tab--submit:visited {
+  border-color: #ffe600;
+  color: #ffe600;
+}
+
+.hub-tab--submit:hover,
+.hub-tab--submit[aria-current="page"] {
+  color: #ffe600;
+  border-color: #ffe600;
+  background: rgba(255, 230, 0, 0.15);
+  box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
+}
+
+/* Project cards are links; keep terminal colors instead of link colors */
+.hub-card,
+.hub-card:visited {
+  font-weight: normal;
+  color: var(--text);
+}
+
+.hub-card:hover {
+  color: var(--text);
+  text-shadow: none;
+}
+
+.hub-card[hidden] {
+  display: none;
+}
+
+.hub-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.hub-cat {
+  border-color: rgba(0, 255, 102, 0.5);
+}
+
+.hub-card-meta {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.status-pending {
+  border-color: #ffb347;
+  color: #ffb347;
+  background: rgba(255, 179, 71, 0.1);
+}
+
+.status-rejected {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.status-published {
+  border-color: var(--accent);
+}
+
+.hub-review-note {
+  margin: -8px 0 0;
+}
+
+.hub-detail {
+  border: 1px solid var(--accent);
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.35);
+  padding: 20px;
+}
+
+.hub-title {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+}
+
+.hub-byline {
+  margin: 12px 0;
+}
+
+/* Keep the author's line breaks; never run long words past the frame */
+.hub-description,
+.hub-comment-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.hub-contact {
+  margin-top: 14px;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.hub-mod-actions {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--accent);
+}
+
+.hub-status:empty {
+  display: none;
+}
+
+.hub-comments {
+  margin-top: 8px;
+}
+
+.hub-comment {
+  align-items: flex-start;
+}
+
+.hub-comment-body {
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
+
+.hub-comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hub-comment-form .join-submit {
+  align-self: flex-start;
+}
+
+.hub-submit-form {
+  max-width: 640px;
+}
+
+.hub-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 0;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.hub-confirm input {
+  accent-color: #00cc55;
+  margin-top: 3px;
+}
+
+.hub-review-row {
+  align-items: flex-start;
+}
+
+@media (max-width: 480px) {
+  .hub-detail {
+    padding: 14px;
+  }
+}
+
+
 /* === LANDING PAGE ============================================ */
 
 .landing-links {
