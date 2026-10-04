@@ -245,38 +245,69 @@ function initHubPage() {
     if (isMaterial) {
       nodes.push(...(await folderNodes(projects)));
     } else if (!projects.length) {
-      nodes.push(el("p", "note", "// No projects published yet. Be the first to submit one."));
+      nodes.push(emptyState("// No projects published yet", "Be the first to share one.",
+        me ? kind.submitLabel : "> SIGN IN TO SUBMIT", me ? `${kind.page}?view=submit` : "account.html"));
     } else {
       nodes.push(...categoryNodes(projects));
     }
     show(...nodes);
   }
 
-  // Projects: one list with category filter buttons
+  // Projects: a search box, category filter buttons with counts, and a
+  // compact grid of cards
   function categoryNodes(projects) {
-    const list = el("div", "projects-list");
+    const list = el("div", "projects-list hub-grid");
     const cards = projects.map((project) => {
       const card = projectCard(project, false);
       card.dataset.category = project.category;
+      card.dataset.search = `${project.title} ${project.description} ${project.category} ${authorName(project)}`.toLowerCase();
       list.append(card);
       return card;
     });
+
+    const search = el("input", "join-input directory-search");
+    search.type = "search";
+    search.placeholder = "Search projects";
+    search.setAttribute("aria-label", "Search projects by name, description or author");
+
+    const shown = el("p", "roster-stats");
+    shown.setAttribute("role", "status");
+    const none = el("p", "note", "// No projects match that. Try a different word or category.");
+
+    let category = "All";
+    const apply = () => {
+      const term = search.value.trim().toLowerCase();
+      let visible = 0;
+      cards.forEach((card) => {
+        card.hidden = (category !== "All" && card.dataset.category !== category)
+          || (!!term && !card.dataset.search.includes(term));
+        if (!card.hidden) visible++;
+      });
+      shown.textContent = visible === cards.length
+        ? `> ${cards.length} project${cards.length === 1 ? "" : "s"}`
+        : `> ${visible} of ${cards.length} projects`;
+      none.hidden = visible > 0;
+    };
 
     const used = kind.categories.filter((c) => projects.some((p) => p.category === c));
     const filter = el("div", "filter-bar");
     filter.setAttribute("role", "group");
     filter.setAttribute("aria-label", "Filter projects by category");
-    const buttons = ["All", ...used].map((category) => {
-      const count = category === "All" ? projects.length : projects.filter((p) => p.category === category).length;
-      const btn = button(`${category.toUpperCase()} (${count})`, "filter-btn", () => {
+    const buttons = ["All", ...used].map((name) => {
+      const count = name === "All" ? projects.length : projects.filter((p) => p.category === name).length;
+      const btn = button(`${name.toUpperCase()} (${count})`, "filter-btn", () => {
+        category = name;
         buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-        cards.forEach((card) => { card.hidden = category !== "All" && card.dataset.category !== category; });
+        apply();
       });
-      btn.setAttribute("aria-pressed", String(category === "All"));
+      btn.setAttribute("aria-pressed", String(name === "All"));
       filter.append(btn);
       return btn;
     });
-    return [filter, list];
+
+    search.addEventListener("input", apply);
+    apply();
+    return [search, filter, shown, list, none];
   }
 
   // Materials: one fold-out section per folder
@@ -334,7 +365,8 @@ function initHubPage() {
 
     const nodes = [toolbar("mine")];
     if (!projects.length) {
-      nodes.push(el("p", "note", `// You haven't submitted a ${kind.noun} yet.`));
+      nodes.push(emptyState(`// No submissions yet`, `You haven't submitted a ${kind.noun}. A moderator reviews each one before it's published.`,
+        kind.submitLabel, `${kind.page}?view=submit`));
     } else {
       const list = el("div", "projects-list");
       for (const project of projects) {
@@ -777,7 +809,7 @@ function initHubPage() {
   /* ---- start ---- */
 
   (async () => {
-    show(el("p", "account-status", "> CHECKING ACCESS..."));
+    show(loadingBlock());
     try {
       const { session, profile } = await getSessionAndProfile();
       const approved = !!profile && ["member", "moderator", "admin"].includes(profile.role);

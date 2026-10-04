@@ -127,6 +127,33 @@ function avatar(profile) {
   return el("span", "member-avatar", initials);
 }
 
+// Placeholder shown while a page loads. It takes up roughly the room the
+// content will, so the page doesn't jump when the content arrives.
+function loadingBlock(label) {
+  const wrap = el("div", "loading");
+  wrap.setAttribute("role", "status");
+  wrap.append(el("p", "loading-label", label || "> LOADING..."));
+  for (let i = 0; i < 3; i++) {
+    const bar = el("div", "loading-bar");
+    bar.setAttribute("aria-hidden", "true");
+    wrap.append(bar);
+  }
+  return wrap;
+}
+
+// "Nothing here yet", with a next step when there is one
+function emptyState(title, text, linkText, href) {
+  const wrap = el("div", "empty-state");
+  wrap.append(el("p", "empty-state-title", title));
+  if (text) wrap.append(el("p", "empty-state-text", text));
+  if (linkText && href) {
+    const link = el("a", "btn", linkText);
+    link.href = href;
+    wrap.append(link);
+  }
+  return wrap;
+}
+
 async function getSessionAndProfile() {
   const { data: { session } } = await db.auth.getSession();
   if (!session) {
@@ -234,38 +261,12 @@ function initAccountPage() {
           el("p", null, `Your membership request was not approved. If you think this is a mistake, email ${CONTACT_EMAIL}.`)
         );
       } else {
+        panel.classList.add("account-panel--wide");
+        const firstName = (profile.full_name || "").trim().split(/\s+/)[0];
         panel.append(
-          el("p", "account-status", "> ACCESS GRANTED"),
-          el("p", null, "You're an approved member. Everything below is open to you.")
+          el("p", "account-status", firstName ? `> WELCOME BACK, ${firstName.toUpperCase()}` : "> WELCOME BACK"),
+          dashboard(profile)
         );
-        const hub = el("p");
-        const hubLinkNode = el("a", "account-mod-link", "> OPEN PROJECTS HUB (submit and discuss)");
-        hubLinkNode.href = "hub.html";
-        hub.append(hubLinkNode);
-        const learn = el("p");
-        const learnLinkNode = el("a", "account-mod-link", "> OPEN LEARNING MATERIALS");
-        learnLinkNode.href = "learn.html";
-        learn.append(learnLinkNode);
-        const chat = el("p");
-        const chatLinkNode = el("a", "account-mod-link", "> OPEN CHAT");
-        chatLinkNode.href = "chat.html";
-        chat.append(chatLinkNode);
-        const inbox = el("p");
-        const inboxLinkNode = el("a", "account-mod-link", "> OPEN INBOX");
-        inboxLinkNode.href = "inbox.html";
-        inbox.append(inboxLinkNode);
-        const directory = el("p");
-        const directoryLinkNode = el("a", "account-mod-link", "> OPEN MEMBER DIRECTORY");
-        directoryLinkNode.href = "directory.html";
-        directory.append(directoryLinkNode);
-        panel.append(hub, learn, chat, directory, inbox);
-        if (profile.role === "moderator" || profile.role === "admin") {
-          const mod = el("p");
-          const link = el("a", "account-mod-link", "> OPEN MODERATION");
-          link.href = "moderate.html";
-          mod.append(link);
-          panel.append(mod);
-        }
       }
 
       if (profile.role !== "rejected") {
@@ -288,6 +289,132 @@ function initAccountPage() {
       const target = document.getElementById("profile");
       if (target) target.scrollIntoView();
     }
+  }
+
+  // Member home: one card per area, each filled in the background with a
+  // live number. A card that can't load its number still works as a link.
+  function dashboard(profile) {
+    const wrap = el("div", "dash");
+    const grid = el("div", "dash-grid");
+    const isMod = profile.role === "moderator" || profile.role === "admin";
+
+    const card = (title, href, hint) => {
+      const link = el("a", "dash-card");
+      link.href = href;
+      const value = el("span", "dash-value", "…");
+      const note = el("span", "dash-note", hint);
+      link.append(el("span", "dash-title", title), value, note);
+      grid.append(link);
+      return { link, value, note };
+    };
+    const count = (query) => query.then(({ count: n, error }) => (error ? null : n || 0));
+    const fill = async (target, work) => {
+      try {
+        await work();
+      } catch (err) {
+        console.error(err);
+        target.value.textContent = "—";
+      }
+    };
+
+    const inbox = card("// Inbox", "inbox.html", "private messages");
+    const mine = card("// My submissions", "hub.html?view=mine", "projects and materials");
+    const chat = card("// Chat", "chat.html", "latest message");
+    const people = card("// Directory", "directory.html", "members");
+    const hub = card("// Projects hub", "hub.html", "published projects");
+    const learn = card("// Learning", "learn.html", "published materials");
+    const mod = isMod ? card("// Moderation", "moderate.html", "waiting for review") : null;
+
+    fill(inbox, async () => {
+      const n = await count(db.from("project_messages").select("id", { count: "exact", head: true })
+        .eq("recipient_id", profile.id).is("read_at", null));
+      inbox.value.textContent = n === null ? "—" : String(n);
+      inbox.note.textContent = n === 1 ? "unread message" : "unread messages";
+      if (n > 0) inbox.link.classList.add("dash-card--alert");
+    });
+
+    const attention = el("div", "dash-attention");
+    fill(mine, async () => {
+      const { data, error } = await db.from("projects")
+        .select("id, kind, title, status, created_at")
+        .eq("author_id", profile.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const by = (status) => data.filter((p) => p.status === status).length;
+      mine.value.textContent = String(data.length);
+      mine.note.textContent = data.length
+        ? `${by("published")} published · ${by("pending")} in review · ${by("rejected")} not approved`
+        : "nothing submitted yet";
+
+      // Anything still waiting, or sent back, is listed under the cards
+      const open = data.filter((p) => p.status !== "published").slice(0, 5);
+      if (open.length) {
+        attention.append(el("h3", "subsection-title", "// Your items in progress"));
+        const list = el("ul", "dash-list");
+        for (const item of open) {
+          const li = el("li");
+          const link = el("a", null, item.title);
+          link.href = `${item.kind === "material" ? "learn.html" : "hub.html"}?project=${encodeURIComponent(item.id)}`;
+          li.append(link, el("span", `member-tag status-${item.status}`,
+            item.status === "pending" ? "IN REVIEW" : "NOT APPROVED"));
+          list.append(li);
+        }
+        attention.append(list);
+      }
+    });
+
+    fill(chat, async () => {
+      const { data, error } = await db.from("chat_messages")
+        .select("body, created_at, topic_id, author:profiles!chat_messages_author_id_fkey(full_name)")
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      const last = data[0];
+      if (!last) {
+        chat.value.textContent = "0";
+        chat.note.textContent = "no messages yet. Start one.";
+        return;
+      }
+      chat.link.href = `chat.html?topic=${encodeURIComponent(last.topic_id)}`;
+      chat.value.textContent = formatDate(last.created_at);
+      chat.value.classList.add("dash-value--small");
+      const text = last.body.length > 70 ? `${last.body.slice(0, 70).trimEnd()}…` : last.body;
+      chat.note.textContent = `${(last.author && last.author.full_name) || "Member"}: ${text}`;
+    });
+
+    fill(people, async () => {
+      const n = await count(db.from("profiles").select("id", { count: "exact", head: true })
+        .in("role", APPROVED_ROLES));
+      people.value.textContent = n === null ? "—" : String(n);
+      people.note.textContent = n === 1 ? "member" : "members";
+    });
+
+    const published = (kind) => count(db.from("projects").select("id", { count: "exact", head: true })
+      .eq("kind", kind).eq("status", "published"));
+    fill(hub, async () => {
+      const n = await published("project");
+      hub.value.textContent = n === null ? "—" : String(n);
+    });
+    fill(learn, async () => {
+      const n = await published("material");
+      learn.value.textContent = n === null ? "—" : String(n);
+    });
+
+    if (mod) {
+      fill(mod, async () => {
+        const [requests, items] = await Promise.all([
+          count(db.from("profiles").select("id", { count: "exact", head: true }).eq("role", "pending")),
+          count(db.from("projects").select("id", { count: "exact", head: true }).eq("status", "pending")),
+        ]);
+        const total = (requests || 0) + (items || 0);
+        mod.value.textContent = requests === null || items === null ? "—" : String(total);
+        mod.note.textContent = `${requests || 0} requests · ${items || 0} submissions waiting`;
+        if (total > 0) mod.link.classList.add("dash-card--alert");
+      });
+    }
+
+    wrap.append(grid, attention);
+    return wrap;
   }
 
   // "About you": role, program, interests, message. Folded away once filled in.
@@ -548,7 +675,7 @@ function initAccountPage() {
     return;
   }
 
-  show(el("p", "account-status", "> CHECKING SESSION..."));
+  show(loadingBlock("> CHECKING SESSION..."));
   refresh();
 
   // Re-render when sign-in completes or the session ends in another tab
@@ -706,7 +833,7 @@ function initModerationPage() {
   }
 
   (async () => {
-    show(el("p", "account-status", "> CHECKING ACCESS..."));
+    show(loadingBlock("> CHECKING ACCESS..."));
     try {
       const { session, profile } = await getSessionAndProfile();
       if (!session) return gate("> SIGN IN REQUIRED", "> Go to sign in", "account.html");

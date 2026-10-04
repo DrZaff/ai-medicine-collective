@@ -13,68 +13,139 @@
     <div class="horizontal-rule"></div>
 
     <header>
-      <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
+      <h1 class="headline"><a href="index.html">:: AI MEDICINE COLLECTIVE ::</a></h1>
+
+      <nav class="nav" aria-label="Main">
+        <a href="about.html">ABOUT</a>
+        <a href="members.html">MEMBERS</a>
+        <a href="schedule.html">MEETINGS</a>
+        <a href="hub.html">PROJECTS</a>
+        <a href="resources.html">RESOURCES</a>
+        <a href="blog.html">BLOG</a>
+        <a href="members.html#join" class="nav-cta" data-signed-out-only>JOIN</a>
+        <a href="account.html" class="nav-account" data-account-link="ACCOUNT">SIGN IN</a>
+      </nav>
+
       <div class="horizontal-rule"></div>
     </header>
 
     <main>
 
-      <section class="section landing-links">
-
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="about.html">&gt; ABOUT</a>
-          </h2>
+      <section class="hero">
+        <p class="hero-kicker">// University of Cincinnati &middot; Est. 2025</p>
+        <h2 class="hero-title">
+          Grassroots AI<br />
+          in medicine<span class="cursor" aria-hidden="true">_</span>
+        </h2>
+        <p class="hero-text">
+          Clinicians, trainees and curious thinkers exploring the evolving edge
+          of AI in healthcare. We build practical tools, share what works, and
+          teach each other. No technical background required.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="members.html#join" data-signed-out-only>&gt; Join the Collective</a>
+          <a class="btn" href="hub.html">&gt; Browse projects</a>
+          <a class="btn" href="about.html">&gt; Meet the guide</a>
         </div>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="members.html">&gt; MEMBERS</a>
-          </h2>
-        </div>
+        <dl class="hero-stats">
+          <div class="hero-stat">
+            <dt id="home-project-count">&mdash;</dt>
+            <dd>projects in the hub</dd>
+          </div>
+          <div class="hero-stat">
+            <dt>3</dt>
+            <dd>residency programs</dd>
+          </div>
+          <div class="hero-stat">
+            <dt>3&times;</dt>
+            <dd>briefings a week</dd>
+          </div>
+        </dl>
+      </section>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="schedule.html">&gt; MEETING SCHEDULE</a>
-          </h2>
-        </div>
+      <!-- Live panels. The briefing and project panels are filled by
+           script.js (initHome); the text here shows if that fails.
+           The meeting panel is plain HTML: update it together with
+           schedule.html. -->
+      <section class="home-panels" aria-label="What's new">
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="hub.html">&gt; PROJECTS</a>
-          </h2>
-        </div>
+        <article class="home-panel">
+          <h3 class="home-panel-title">// Latest briefing</h3>
+          <div class="home-panel-body" id="home-briefing">
+            <p>AI-in-medical-education news and research, reviewed by a human, three times a week.</p>
+          </div>
+          <a class="home-panel-link" href="blog.html">&gt; OPEN THE BLOG</a>
+        </article>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="appstore.html">&gt; APP STORE</a>
-          </h2>
-        </div>
+        <article class="home-panel">
+          <h3 class="home-panel-title">// New in the hub</h3>
+          <div class="home-panel-body" id="home-projects">
+            <p>Tools and projects from the Collective and its members, open for anyone to browse.</p>
+          </div>
+          <a class="home-panel-link" href="hub.html">&gt; ALL PROJECTS</a>
+        </article>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="resources.html">&gt; RESOURCES</a>
-          </h2>
-        </div>
+        <article class="home-panel">
+          <h3 class="home-panel-title">// Next meeting</h3>
+          <div class="home-panel-body">
+            <ul class="home-list">
+              <li>
+                <span class="home-list-title">Next monthly meeting</span>
+                <span class="home-list-meta">Date to be announced</span>
+              </li>
+              <li>
+                <span class="home-list-title">Guest speaker: Dr Laurah Turner</span>
+                <span class="home-list-meta">Date to be announced</span>
+              </li>
+            </ul>
+          </div>
+          <a class="home-panel-link" href="schedule.html">&gt; SCHEDULE AND MINUTES</a>
+        </article>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="blog.html">&gt; BLOG</a>
-          </h2>
-        </div>
+      </section>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="members.html#join">&gt; JOIN</a>
-          </h2>
-        </div>
+      <section class="home-explore" aria-labelledby="explore-heading">
+        <h3 id="explore-heading" class="subsection-title">// Explore</h3>
 
-        <div class="landing-item">
-          <h2 class="landing-title">
-            <a href="account.html" data-account-link="&gt; ACCOUNT">&gt; SIGN IN</a>
-          </h2>
+        <div class="tile-grid">
+          <a class="tile" href="about.html">
+            <span class="tile-title">&gt; ABOUT</span>
+            <span class="tile-text">Who we are, introduced by our AI guide.</span>
+          </a>
+          <a class="tile" href="members.html">
+            <span class="tile-title">&gt; MEMBERS</span>
+            <span class="tile-text">The core team, and how to join.</span>
+          </a>
+          <a class="tile" href="schedule.html">
+            <span class="tile-title">&gt; MEETINGS</span>
+            <span class="tile-text">Upcoming dates and past minutes.</span>
+          </a>
+          <a class="tile" href="hub.html">
+            <span class="tile-title">&gt; PROJECTS</span>
+            <span class="tile-text">AI tools built by members. Open to browse.</span>
+          </a>
+          <a class="tile" href="appstore.html">
+            <span class="tile-title">&gt; APP STORE</span>
+            <span class="tile-text">One-tap launcher for our clinical apps.</span>
+          </a>
+          <a class="tile" href="resources.html">
+            <span class="tile-title">&gt; RESOURCES</span>
+            <span class="tile-text">Flyers and links for learning AI.</span>
+          </a>
+          <a class="tile" href="blog.html">
+            <span class="tile-title">&gt; BLOG</span>
+            <span class="tile-text">Briefings on AI in medical education.</span>
+          </a>
+          <a class="tile" href="learn.html">
+            <span class="tile-title">&gt; LEARNING <span class="tile-tag">MEMBERS</span></span>
+            <span class="tile-text">Presentations, modules and guides.</span>
+          </a>
+          <a class="tile" href="chat.html">
+            <span class="tile-title">&gt; CHAT <span class="tile-tag">MEMBERS</span></span>
+            <span class="tile-text">Ask anything, organized by topic.</span>
+          </a>
         </div>
-
       </section>
 
       <div class="horizontal-rule bottom-rule"></div>

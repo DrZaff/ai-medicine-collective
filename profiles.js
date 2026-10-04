@@ -13,7 +13,10 @@
 const MEMBER_PROFILE_COLUMNS =
   "id, full_name, avatar_url, role, created_at, program, training_level, focus_areas, bio, contact_email, link_url";
 
-const MEMBER_CARD_COLUMNS = "id, full_name, avatar_url, role, program, training_level";
+const MEMBER_CARD_COLUMNS = "id, full_name, avatar_url, role, created_at, program, training_level, focus_areas";
+
+// Members who joined in the last two weeks get a NEW tag in the directory
+const MEMBER_NEW_DAYS = 14;
 
 function memberSubtitle(person) {
   return [person.program, person.training_level].filter(Boolean).join(" · ");
@@ -42,7 +45,7 @@ function initDirectoryPage() {
   if (!app) return;
 
   (async () => {
-    app.replaceChildren(el("p", "account-status", "> CHECKING ACCESS..."));
+    app.replaceChildren(loadingBlock("> CHECKING ACCESS..."));
     try {
       const me = await requireMember(app, "The directory lists the Collective's members and what they work on.");
       if (!me) return;
@@ -59,12 +62,15 @@ function initDirectoryPage() {
         return;
       }
 
-      const count = el("p", "roster-stats", `> ${people.length} member${people.length === 1 ? "" : "s"}`);
+      const total = `${people.length} member${people.length === 1 ? "" : "s"}`;
+      const count = el("p", "roster-stats", `> ${total}`);
+      count.setAttribute("role", "status");
+      const newSince = Date.now() - MEMBER_NEW_DAYS * 24 * 60 * 60 * 1000;
 
       const search = el("input", "join-input directory-search");
       search.type = "search";
-      search.placeholder = "Filter by name or program";
-      search.setAttribute("aria-label", "Filter members by name or program");
+      search.placeholder = "Search by name, program or focus";
+      search.setAttribute("aria-label", "Search members by name, program or focus area");
 
       const grid = el("div", "roster-grid");
       const cards = people.map((person) => {
@@ -74,16 +80,23 @@ function initDirectoryPage() {
         text.append(el("span", "roster-name", person.full_name || "Member"));
         const subtitle = memberSubtitle(person);
         if (subtitle) text.append(el("span", "roster-meta", subtitle));
-        if (person.role !== "member" || person.id === me.id) {
+        // What they work on, so the directory helps you find collaborators
+        if (person.focus_areas) {
+          const focus = person.focus_areas.length > 70 ? `${person.focus_areas.slice(0, 70).trimEnd()}…` : person.focus_areas;
+          text.append(el("span", "roster-focus", `// ${focus}`));
+        }
+        const isNew = new Date(person.created_at).getTime() > newSince;
+        if (person.role !== "member" || person.id === me.id || isNew) {
           const tags = el("span", "roster-tags");
           if (person.role !== "member") tags.append(roleTag(person.role));
+          if (isNew) tags.append(el("span", "member-tag member-tag--new", "NEW"));
           if (person.id === me.id) tags.append(el("span", "roster-role", "You"));
           text.append(tags);
         }
         const go = el("span", "roster-go", ">");
         go.setAttribute("aria-hidden", "true");
         card.append(avatar(person), text, go);
-        card.dataset.search = `${person.full_name || ""} ${person.program || ""} ${person.training_level || ""}`.toLowerCase();
+        card.dataset.search = `${person.full_name || ""} ${person.program || ""} ${person.training_level || ""} ${person.focus_areas || ""}`.toLowerCase();
         grid.append(card);
         return card;
       });
@@ -97,6 +110,7 @@ function initDirectoryPage() {
           card.hidden = !!term && !card.dataset.search.includes(term);
           if (!card.hidden) shown++;
         });
+        count.textContent = shown === cards.length ? `> ${total}` : `> ${shown} of ${total}`;
         none.hidden = shown > 0;
       });
 
@@ -124,7 +138,7 @@ function initProfilePage() {
   };
 
   (async () => {
-    app.replaceChildren(el("p", "account-status", "> CHECKING ACCESS..."));
+    app.replaceChildren(loadingBlock("> CHECKING ACCESS..."));
     try {
       const me = await requireMember(app, "Member profiles are visible to the Collective's members.");
       if (!me) return;
