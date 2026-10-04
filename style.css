@@ -194,6 +194,11 @@ body {
   opacity: 0.85;
 }
 
+/* Long-form text pages (privacy policy) */
+.policy li {
+  margin-bottom: 6px;
+}
+
 .error {
   margin-top: 8px;
   color: var(--error);
