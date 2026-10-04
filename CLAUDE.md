@@ -9,9 +9,19 @@ Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds,
 - **Stack today:** plain static HTML, one shared stylesheet (`style.css`), one shared script (`script.js`). No framework, no build step, no backend.
 - **Forms:** the Join form posts to Formspree (`https://formspree.io/f/mqaonqpr`).
 - **Hosting:** Netlify (site `ai-medicine-collective`, https://ai-medicine-collective.netlify.app), connected to this repo: every PR gets a deploy preview (`deploy-preview-<N>--ai-medicine-collective.netlify.app`) and every merge to `main` publishes to production.
-- **Login (phase 2):** Supabase Auth with Google sign-in, members only. One-time admin setup steps: [docs/auth-setup.md](docs/auth-setup.md) (not done yet; the owner wants to do it together in a later session).
+- **Login (phase 2):** Supabase Auth with Google sign-in, members only. The Supabase project and Google client were set up on 2026-10-03 following [docs/auth-setup.md](docs/auth-setup.md).
 - **Who sees what (decided):** signed-out visitors see Home, About, Members (names only), Join and the Blog. Everything new (Projects hub, Learning Materials, Chat) is members-only, enforced by database rules rather than hidden pages.
 - **Build step:** Netlify runs `python3 scripts/blog_agent/build_index.py` (see `netlify.toml`), which generates `blog/index.json`. That file is gitignored; run the script locally before previewing `blog.html`.
+
+## Backend (Supabase)
+
+- **Project URL:** `https://ahwnarhmuzxgjindreuz.supabase.co`
+- **Publishable key (public by design, safe in site code):** `sb_publishable_3C4xXn0j3GiunX-t6cd0HQ_ze_yTErT`
+- **Never in the repo or chat:** the secret / `service_role` key, the database password, the Google client secret (Rule 2).
+- **Roles** (`public.profiles.role`): `pending` → `member` → `moderator` → `admin`, plus `rejected`. New sign-ins get a `pending` profile automatically. Roles change only through the SQL functions `approve_member`, `reject_member` (moderators) and `set_member_role` (admins), never by editing the column.
+- **Database changes are migration files:** add `supabase/migrations/NNN_description.sql` (next number, never edit one that has been run). The owner runs each file once in the Supabase SQL Editor; Claude has no database access and verifies through the public API only.
+- **Every new table must:** enable row level security, have explicit policies, and `grant` only what's needed to `authenticated` (the project has "automatically expose new tables" off). Signed-out visitors (`anon`) get no table access. Use `public.is_member()`, `is_moderator()` and `is_admin()` in policies.
+- Members-only means **the data is protected by these rules**. Page files are always public, so never put member content in static HTML.
 
 ## Blog agent
 

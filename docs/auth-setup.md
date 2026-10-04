@@ -128,6 +128,44 @@ Deleting the message or commit is not enough (see CLAUDE.md, Rule 2).
 
 ---
 
+## Part 5: Create the member tables
+
+The database starts empty. Each file in `supabase/migrations/` is run **once,
+in number order**, by an admin:
+
+1. Open the file on GitHub (for example
+   `supabase/migrations/001_profiles_and_roles.sql`), click **Raw**, and copy
+   everything.
+2. In Supabase, open **SQL Editor** (left sidebar), click **New query**, and
+   paste.
+3. Click **Run**. It should say **Success. No rows returned.**
+
+If it shows an error, don't run it again. Copy the error message to whoever is
+building the site.
+
+### Make yourself the first admin
+
+Everyone who signs in starts as `pending`, including you. After you have signed
+in to the site with Google **once**, run this in the SQL Editor, with your own
+Google email:
+
+```sql
+update public.profiles
+   set role = 'admin', approved_at = now()
+ where email = 'you@example.com';
+```
+
+It should say **Success** and report 1 row. From then on, approve members and
+change roles from the site's moderator page, not from SQL.
+
+### Turn off email-and-password sign-up
+
+The site only offers Google sign-in. In Supabase, go to **Authentication →
+Sign In / Providers → Email** and turn **Enable Email provider** off, so nobody
+can create an account another way.
+
+---
+
 ## Checklist
 
 - [ ] Supabase project `ai-medicine-collective` created
@@ -135,6 +173,9 @@ Deleting the message or commit is not enough (see CLAUDE.md, Rule 2).
 - [ ] Client ID and secret saved in Supabase, Google provider turned **on**
 - [ ] Site URL and the 3 redirect URLs added in Supabase
 - [ ] Project URL and publishable/anon key handed to the developer
+- [ ] Email provider turned **off** (Google only)
+- [ ] Migration files run in the SQL Editor, in order
+- [ ] First admin set (after signing in once)
 
 ## Troubleshooting
 
