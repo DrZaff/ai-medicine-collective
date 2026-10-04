@@ -1242,6 +1242,14 @@ button:hover {
   margin-top: 8px;
 }
 
+.chat-project-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+
 /* === TOOLS LAUNCHER (script.js initTools) ==================== */
 
 .tools-actions {

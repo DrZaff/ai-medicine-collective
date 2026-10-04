@@ -16,6 +16,11 @@ const CHAT_MESSAGE_COLUMNS =
   "id, topic_id, body, created_at, " +
   "author:profiles!chat_messages_author_id_fkey(id, full_name, avatar_url)";
 
+// Migration 010 adds project_id (set when a message announces a newly
+// published project). It is asked for until a request shows the column
+// isn't there yet; then the page carries on without it.
+let chatColumns = `${CHAT_MESSAGE_COLUMNS}, project_id`;
+
 // "14:05" for today, "Oct 3, 2026 14:05" for earlier days
 function chatTime(iso) {
   const when = new Date(iso);
@@ -149,6 +154,11 @@ function initChatPage() {
     time.dateTime = message.created_at;
     meta.append(el("span", "chat-author", author.full_name || "Member"), time);
     text.append(meta, el("div", "chat-body", message.body));
+    if (message.project_id) {
+      const open = el("a", "chat-project-link", "> OPEN IN THE HUB");
+      open.href = `hub.html?project=${encodeURIComponent(message.project_id)}`;
+      text.append(open);
+    }
     item.append(avatar(author), text);
 
     if (isModerator() || author.id === me.id) {
@@ -184,10 +194,14 @@ function initChatPage() {
   async function loadLatest() {
     const { data, error } = await db
       .from("chat_messages")
-      .select(CHAT_MESSAGE_COLUMNS)
+      .select(chatColumns)
       .eq("topic_id", topic.id)
       .order("created_at", { ascending: false })
       .limit(CHAT_PAGE_SIZE);
+    if (error && chatColumns !== CHAT_MESSAGE_COLUMNS) {
+      chatColumns = CHAT_MESSAGE_COLUMNS; // before migration 010
+      return loadLatest();
+    }
     if (error) return setStatus("> COULD NOT LOAD MESSAGES. Please refresh the page.", true);
 
     messages = data.slice().reverse();
@@ -202,7 +216,7 @@ function initChatPage() {
     earlier.disabled = true;
     const { data, error } = await db
       .from("chat_messages")
-      .select(CHAT_MESSAGE_COLUMNS)
+      .select(chatColumns)
       .eq("topic_id", topic.id)
       .lt("created_at", messages[0].created_at)
       .order("created_at", { ascending: false })
@@ -225,7 +239,7 @@ function initChatPage() {
     loadingNew = true;
     try {
       const topicId = topic.id;
-      let query = db.from("chat_messages").select(CHAT_MESSAGE_COLUMNS).eq("topic_id", topicId);
+      let query = db.from("chat_messages").select(chatColumns).eq("topic_id", topicId);
       if (messages.length) query = query.gte("created_at", messages[messages.length - 1].created_at);
       const { data, error } = await query.order("created_at", { ascending: true }).limit(CHAT_PAGE_SIZE * 2);
       if (error || !topic || topic.id !== topicId) return;
