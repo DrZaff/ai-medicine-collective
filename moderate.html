@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Blog – AI Medicine Collective</title>
+  <title>Moderation – AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Briefings on AI in medical education, three times a week: news and research, summarized and reviewed by the AI Medicine Collective." />
+  <meta name="robots" content="noindex" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -32,21 +32,17 @@
     </header>
 
     <main class="section">
-      <h2 class="section-title">BLOG</h2>
+      <h2 class="section-title">MODERATION</h2>
 
-      <p class="note">
-        // AI in medical education: news and research from the past week,
-        posted Mondays, Wednesdays and Fridays. Drafted by an AI agent and reviewed by the
-        Collective before it's published. Always check the original source.
-      </p>
+      <p class="note">// Review membership requests and manage roles. Moderators and admins only.</p>
 
-      <!-- Filled by script.js from blog/index.json and blog/posts/<date>.json -->
-      <div id="blog-app" class="blog-app" aria-live="polite">
-        <p class="blog-status">&gt; LOADING BRIEFINGS...</p>
+      <!-- Filled by auth.js -->
+      <div id="moderate-app" class="account-app" aria-live="polite">
+        <p class="account-status">&gt; LOADING...</p>
       </div>
 
       <noscript>
-        <p>&gt; The blog needs JavaScript to load posts.</p>
+        <p>&gt; This page needs JavaScript.</p>
       </noscript>
 
       <p><a href="index.html" class="back-link">&lt; Back</a></p>
@@ -61,6 +57,10 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"
+    integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok"
+    crossorigin="anonymous"></script>
+  <script src="auth.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
