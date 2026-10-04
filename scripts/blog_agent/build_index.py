@@ -1,7 +1,7 @@
 """Build blog/index.json from blog/posts/*.json.
 
 Runs as the Netlify build command (see netlify.toml) so the index is never
-committed: each daily draft PR only adds its own post file, and PRs can't
+committed: each draft PR only adds its own post file, and PRs can't
 conflict with each other. Standard library only.
 
 Run it locally before previewing the blog page:

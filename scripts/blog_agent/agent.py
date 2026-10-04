@@ -1,9 +1,9 @@
-"""Daily blog agent for the AI Medicine Collective.
+"""Blog agent for the AI Medicine Collective (runs Mon/Wed/Fri).
 
-Asks Claude (with web search) for the last ~72 hours of AI-in-medical-education
+Asks Claude (with web search) for the last 7 days of AI-in-medical-education
 news and research, keeps only items whose links came from the actual search
 results, and writes blog/posts/YYYY-MM-DD.json. The GitHub workflow
-(.github/workflows/daily-blog.yml) then opens a pull request; merging it is the
+(.github/workflows/blog-draft.yml) then opens a pull request; merging it is the
 human review step that publishes the post.
 
 Usage:
@@ -29,8 +29,8 @@ POSTS_DIR = ROOT / "blog" / "posts"
 
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"
-LOOKBACK_HOURS = 72
-RECENT_DAYS_TO_AVOID = 14
+LOOKBACK_DAYS = 7
+RECENT_DAYS_TO_AVOID = 21  # must stay longer than LOOKBACK_DAYS
 MAX_PAUSE_RESUMES = 5
 
 # Tool budgets. Fetched pages are the main cost (they count as input tokens),
@@ -49,11 +49,12 @@ PRICE_PER_WEB_SEARCH = 0.01
 CATEGORIES = ["education", "research", "news", "policy", "tool"]
 
 SYSTEM_PROMPT = """\
-You are the editor of the AI Medicine Collective's daily briefing, read by \
+You are the editor of the AI Medicine Collective's briefing, published three \
+times a week and read by \
 medical students, residents, and faculty who want to keep up with AI in \
 medicine without wading through hype.
 
-Each day you find and summarize the most useful recent items about AI in \
+For each briefing you find and summarize the most useful recent items about AI in \
 medical education, plus a small number of notable AI-in-medicine research, \
 policy, or tool updates that matter to trainees and educators.
 
@@ -77,16 +78,16 @@ conclusions. Say plainly when something is a preprint, a press release, or \
 an opinion piece.
 - Never include patient-identifiable information of any kind.
 - Skip items already covered recently (you are given that list).
-- Quality over quantity: 3 to 6 items is ideal. If fewer qualify, return \
+- Quality over quantity: 3 to 5 items is ideal. If fewer qualify, return \
 fewer. If nothing qualifies, return an empty items list.
 - Write in clear, plain language for busy clinicians. Each summary is 2 to 3 \
 sentences; "why it matters" is 1 to 2 sentences aimed at learners and \
 educators.
-- The headline is a short, specific title for the whole day's briefing (no \
-clickbait). The intro is 1 to 2 sentences tying the day's items together.
+- The headline is a short, specific title for the whole briefing (no \
+clickbait). The intro is 1 to 2 sentences tying the items together.
 - Everything you write is published for readers. Never mention your search \
 process, tools, limits, what you could not find or check, or how many items \
-there are. If the day is thin, simply return fewer items with a normal intro.
+there are. If the week is thin, simply return fewer items with a normal intro.
 - You have a limited number of searches and page fetches. Use your searches \
 on medical-education topics first, and fetch a page only when the search \
 result does not give you enough to summarize it accurately.
@@ -183,14 +184,14 @@ def collect_urls(value, found: set[str]) -> None:
 
 
 def build_user_prompt(date: dt.date, avoid: list[dict]) -> str:
-    window_start = date - dt.timedelta(hours=LOOKBACK_HOURS)
+    window_start = date - dt.timedelta(days=LOOKBACK_DAYS)
     covered = [
         f"- {item['title']} ({item['url']})"
         for post in avoid for item in post.get("items", [])
     ]
     covered_text = "\n".join(covered) if covered else "(none)"
     return (
-        f"Today is {date.isoformat()}. Prepare today's briefing.\n\n"
+        f"Today is {date.isoformat()}. Prepare this briefing.\n\n"
         f"Lookback window: items published from {window_start.isoformat()} "
         f"through {date.isoformat()}.\n\n"
         f"Already covered in the last {RECENT_DAYS_TO_AVOID} days (do not repeat):\n"
@@ -329,7 +330,7 @@ def write_pr_body(path: Path, post: dict, dropped: list[str], usage: dict | None
         "- [ ] No patient information anywhere",
         "- [ ] Nothing misleading, overstated, or off-topic",
         "",
-        "To skip today's post, close this PR without merging.",
+        "To skip this post, close this PR without merging.",
     ]
     if usage is not None:
         lines += [
@@ -383,7 +384,7 @@ def main() -> int:
         print(f"Dropped: {reason}")
 
     if not items:
-        print("No verified items today; no post written.")
+        print("No verified items; no post written.")
         set_output("post_created", "false")
         return 0
 

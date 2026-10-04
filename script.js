@@ -311,7 +311,7 @@ function initJoinForm() {
 
 document.addEventListener("DOMContentLoaded", initJoinForm);
 
-/* ========= BLOG PAGE: daily briefings ========= */
+/* ========= BLOG PAGE: briefings ========= */
 
 // Reads blog/index.json (built on deploy by scripts/blog_agent/build_index.py)
 // and renders one post from blog/posts/<date>.json. Post text comes from an
