@@ -664,6 +664,23 @@ button:hover {
   align-items: flex-start;
 }
 
+/* Learning Materials: cards inside a folder, and the moderator's add button */
+.hub-folder-list {
+  margin-top: 8px;
+}
+
+.hub-new-folder {
+  margin-top: 12px;
+  border-radius: 999px;
+  letter-spacing: 0.08em;
+}
+
+.hub-mod-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
 @media (max-width: 480px) {
   .hub-detail {
     padding: 14px;
