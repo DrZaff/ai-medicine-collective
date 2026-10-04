@@ -33,6 +33,11 @@ function initAccountLinks() {
     link.textContent = role === null ? link.dataset.signedOutLabel : link.dataset.accountLink;
   });
 
+  // JOIN links are for people who haven't signed in yet
+  document.querySelectorAll("[data-signed-out-only]").forEach((link) => {
+    link.hidden = role !== null;
+  });
+
   renderMembersBar(role);
 }
 
@@ -94,6 +99,22 @@ document.addEventListener("DOMContentLoaded", initAccountLinks);
 // auth.js fires this after it learns (or clears) the role on the current page
 window.addEventListener("amc-role-changed", initAccountLinks);
 
+/* ========= ALL PAGES: mark the current page in the menu ========= */
+
+function initCurrentNav() {
+  const path = window.location.pathname;
+  let here = path.split("/").pop().replace(/\.html$/, "") || "index";
+  if (/\/member\/[^/]*$/.test(path)) here = "members"; // the hand-made profile pages
+  if (here === "appstore" || here === "projects") here = "hub";
+
+  document.querySelectorAll(".nav a").forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    if (href.split("/").pop().replace(/\.html$/, "") === here) link.setAttribute("aria-current", "page");
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initCurrentNav);
+
 /* ========= ALL PAGES: collapsible menu on phones ========= */
 
 // Adds a "> MENU" button before each .nav. CSS only collapses the nav
@@ -134,6 +155,84 @@ function initMobileNav() {
 }
 
 document.addEventListener("DOMContentLoaded", initMobileNav);
+
+/* ========= HOME PAGE: live panels ========= */
+
+// The same public address and publishable key as auth.js (public by design).
+// The home page doesn't load the Supabase library; it asks for the newest
+// published projects, which anyone may read, with a plain request.
+const PUBLIC_API_URL = "https://ahwnarhmuzxgjindreuz.supabase.co/rest/v1";
+const PUBLIC_API_KEY = "sb_publishable_3C4xXn0j3GiunX-t6cd0HQ_ze_yTErT";
+
+// Fills "Latest briefing" and "New in the hub". If either request fails the
+// panel keeps the plain text already in index.html. Text only, never HTML.
+function initHome() {
+  const briefing = document.getElementById("home-briefing");
+  const projects = document.getElementById("home-projects");
+  if (!briefing || !projects) return; // not on the home page
+
+  const node = (tag, className, text) => {
+    const made = document.createElement(tag);
+    if (className) made.className = className;
+    if (text !== undefined) made.textContent = text;
+    return made;
+  };
+
+  (async () => {
+    try {
+      const response = await fetch("blog/index.json", { cache: "no-cache" });
+      const index = response.ok ? await response.json() : [];
+      const entry = Array.isArray(index) ? index[0] : null;
+      if (!entry || !/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) return;
+
+      const link = node("a", "home-headline", entry.headline);
+      link.href = `blog.html?date=${entry.date}`;
+      const nodes = [node("p", "home-list-meta", `// ${entry.date}`), link];
+
+      try {
+        const post = await (await fetch(`blog/posts/${entry.date}.json`)).json();
+        const intro = String(post.intro || "");
+        if (intro) nodes.push(node("p", "home-panel-text", intro.length > 170 ? `${intro.slice(0, 170).trimEnd()}…` : intro));
+      } catch {
+        // headline alone is fine
+      }
+      briefing.replaceChildren(...nodes);
+    } catch {
+      // keep the plain text
+    }
+  })();
+
+  (async () => {
+    try {
+      const response = await fetch(
+        `${PUBLIC_API_URL}/projects?select=id,title,category&kind=eq.project&status=eq.published&order=created_at.desc,title.asc&limit=4`,
+        { headers: { apikey: PUBLIC_API_KEY, Prefer: "count=exact" } }
+      );
+      if (!response.ok) return;
+      const rows = await response.json();
+      if (!Array.isArray(rows) || !rows.length) return;
+
+      const list = node("ul", "home-list");
+      for (const row of rows) {
+        const item = node("li");
+        const link = node("a", "home-list-title", row.title);
+        link.href = `hub.html?project=${encodeURIComponent(row.id)}`;
+        item.append(link, node("span", "home-list-meta", row.category));
+        list.append(item);
+      }
+      projects.replaceChildren(list);
+
+      // "0-3/16": the part after the slash is the total
+      const total = parseInt((response.headers.get("content-range") || "").split("/")[1], 10);
+      const counter = document.getElementById("home-project-count");
+      if (counter && total > 0) counter.textContent = String(total);
+    } catch {
+      // keep the plain text
+    }
+  })();
+}
+
+document.addEventListener("DOMContentLoaded", initHome);
 
 /* ========= MEMBERS PAGE: program filter ========= */
 

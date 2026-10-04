@@ -134,10 +134,9 @@ function initInboxPage() {
 
     const threads = buildThreads(messages);
     if (!threads.length) {
-      app.replaceChildren(
-        el("p", "note", "// No messages yet."),
-        el("p", null, "When a member contacts you about one of your projects or materials, or replies to a message you sent, it shows up here.")
-      );
+      app.replaceChildren(emptyState("// No messages yet",
+        "When a member contacts you about one of your projects or materials, or replies to a message you sent, it shows up here.",
+        "> BROWSE PROJECTS", "hub.html"));
     } else {
       const accordion = el("section", "resource-accordion");
       threads.forEach((thread) => accordion.append(threadNode(thread, openKey)));
@@ -153,7 +152,7 @@ function initInboxPage() {
   }
 
   (async () => {
-    app.replaceChildren(el("p", "account-status", "> CHECKING ACCESS..."));
+    app.replaceChildren(loadingBlock("> CHECKING ACCESS..."));
     try {
       const { session, profile } = await getSessionAndProfile();
       const gate = (text, linkText) => {

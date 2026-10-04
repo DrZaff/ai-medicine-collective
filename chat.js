@@ -327,7 +327,7 @@ function initChatPage() {
   };
 
   (async () => {
-    app.replaceChildren(el("p", "account-status", "> CHECKING ACCESS..."));
+    app.replaceChildren(loadingBlock("> CHECKING ACCESS..."));
     try {
       const { session, profile } = await getSessionAndProfile();
       if (!session) {
@@ -342,7 +342,8 @@ function initChatPage() {
 
       await loadTopics();
       if (!topics.length && !archivedTopics.length) {
-        app.replaceChildren(el("p", "note", "// No chat topics yet."));
+        app.replaceChildren(emptyState("// No chat topics yet",
+          isModerator() ? "Add the first topic to open the chat." : "A moderator will open the first topic soon."));
         if (isModerator()) app.append(button("+ NEW TOPIC", "hub-tab chat-tab chat-tab--new", addTopic), status);
         return;
       }

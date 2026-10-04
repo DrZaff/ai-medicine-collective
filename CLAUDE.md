@@ -23,7 +23,7 @@ Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds,
 - **Member emails are private (006):** `authenticated` can select only `id, full_name, avatar_url, role, created_at, approved_at, approved_by` from `profiles`. Never add `email` to a `profiles` select or embed. A person's own email comes from their session (`session.user.email`); moderators get the list through `member_emails()`.
 - **Database changes are migration files:** add `supabase/migrations/NNN_description.sql` (next number, never edit one that has been run). The owner runs each file once in the Supabase SQL Editor; Claude has no database access and verifies through the public API only.
 - **Every new table must:** enable row level security, have explicit policies, and `grant` only what's needed to `authenticated` (the project has "automatically expose new tables" off). Signed-out visitors (`anon`) get no table access. Use `public.is_member()`, `is_moderator()` and `is_admin()` in policies.
-- **Sign-in on the site:** `account.html` (Google sign-in, status, display name, sign out) and `moderate.html` (approve/decline requests; admins set roles). Both load the pinned Supabase library (with an integrity hash) and `auth.js`. Other pages only check `localStorage` for the session key to relabel the nav's SIGN IN link as ACCOUNT; that is cosmetic. `auth.js` also saves the person's role as a hint (`amc-member-role`), which `script.js` uses to add a **Members area** row (Projects hub, Learning, Chat, Inbox with an unread count from the `amc-unread` hint, plus Moderation for moderators) under the header on every page for approved members. Also cosmetic: the member pages and the database still check the real role. `auth.js` and `script.js` share one global scope on those two pages, so top-level names must not collide.
+- **Sign-in on the site:** `account.html` (Google sign-in, status, display name, sign out) and `moderate.html` (approve/decline requests; admins set roles). Both load the pinned Supabase library (with an integrity hash) and `auth.js`. Other pages only check `localStorage` for the session key to relabel the nav's SIGN IN link as ACCOUNT; that is cosmetic. For approved members the account page is a **dashboard**: one card per area (inbox, my submissions, chat, directory, hub, learning, plus moderation for moderators), each filled in the background with a live count; a card whose count fails still works as a link. `auth.js` also saves the person's role as a hint (`amc-member-role`), which `script.js` uses to add a **Members area** row (Projects hub, Learning, Chat, Inbox with an unread count from the `amc-unread` hint, plus Moderation for moderators) under the header on every page for approved members. Also cosmetic: the member pages and the database still check the real role. `auth.js` and `script.js` share one global scope on those two pages, so top-level names must not collide.
 - **Projects hub (`hub.html`, `hub.js`):** members submit a project (title, category, description, optional https link, optional file up to 10 MB) → `pending` → a moderator publishes or rejects it (`review_project`) → published projects are visible to approved members, with comments and a **private message to the author** (`project_messages`, readable only by sender and recipient; the author reads and answers in `inbox.html`, and no email address is shown). Authors can edit their own items until they're published and resubmit rejected ones (`resubmit_project`). Only moderators can delete projects. Pending submissions also appear on `moderate.html`. Files are private; the page asks Supabase for a short-lived link to open one. Published projects are public (signed-out visitors use `PROJECT_PUBLIC_COLUMNS`; `me` is null in the read-only view). `projects.html` now just forwards to the hub; `appstore.html` stays as the icon launcher for the five apps, which are also listed in the hub. Items can carry a second link, `doc_url` ("Instructions").
 - **Learning Materials (`learn.html`) is the same pipeline, not a second one:** materials are `projects` rows with `kind = 'material'`, a `folder` (from `material_folders`, which moderators can add to) and a type (presentation, module, guide, video, other). `hub.js` serves both pages; the page picks the kind with `data-kind` on `#hub-app`, and everything kind-specific lives in `HUB_KINDS`. Add a third kind there rather than copying the code. Uploads are capped at 25 MB.
 - **Member profiles (`directory.html`, `profile.html`, `profiles.js`):** approved members fill in program, training level, focus areas, bio, an optional contact address and link from the account page (`#profile`); other approved members see them in the directory. Members-only. `contact_email` is an address the member chose to show; the sign-in email stays private. The 11 hand-made `member/*.html` pages stay until those people have accounts and profiles of their own.
@@ -39,6 +39,7 @@ Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds,
 - **Secrets:** only `ANTHROPIC_API_KEY`, stored as a GitHub Actions secret by the owner. Without it, the blog workflow skips quietly. Both workflows also need the setting *Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"*.
 - **Testing without the API:** `python scripts/blog_agent/agent.py --fixture sample.json --date YYYY-MM-DD` (see the script's docstring). Never commit test posts.
 - **Post files are data, not HTML:** `script.js` renders posts with `textContent` only. Keep it that way, because post text comes from an AI draft.
+- **Home page (`index.html`):** a hero, three panels and a tile grid. "Latest briefing" reads `blog/index.json`; "New in the hub" asks Supabase for the newest published projects with a plain `fetch` and the publishable key (`initHome` in `script.js`; the home page does not load the Supabase library). Both keep their plain HTML text if the request fails. **"Next meeting" is plain HTML: update it together with `schedule.html`.**
 - **Preview locally:** serve the folder (e.g. `python -m http.server`) and open `http://localhost:8000`. Don't just double-click files; that hides path bugs.
 
 ## Non-negotiable rules
@@ -75,28 +76,39 @@ Use the CSS variables; don't hard-code new colors.
 |---|---|---|
 | `--bg-inner` | `#000000` | Page background |
 | `--bg` | `#020802` | Terminal frame background (radial gradient `#051505` → `--bg` → `#000`) |
-| `--text` | `#00ff66` | All body text, default for everything |
+| `--text` | `#00ff66` | **Bright:** headings, links, buttons, names, key numbers. Not for paragraphs |
+| `--body` | `#c8f5d6` | **Body:** anything people read (paragraphs, descriptions, form text). The default text color |
+| `--muted` | `#7dbf94` | **Muted:** secondary detail (notes, dates, captions). Use this instead of `opacity` on text |
 | `--accent` | `#00cc55` | Borders, rules, highlights |
 | `--error` | `#ff5555` | Errors only |
+| `--line`, `--line-strong` | green at 25% / 45% | Card and panel borders |
+| `--panel` | `rgba(0,0,0,0.72)` | Card and panel fill |
+| `--glow` | soft green `box-shadow` | Hover glow on cards |
 
 Secondary accents, each with **one job only**:
-- Cyan `#00e5ff`: link hover, "Instructions" buttons
-- Yellow `#ffe600`: "Launch" / primary-action buttons
-- Pink `#ff4da6`: "< Back" links and the Join submit button
+- Cyan `#00e5ff` (`--cyan`): link hover, "Instructions" buttons, the NEW tag in the directory
+- Yellow `#ffe600` (`--yellow`): "Launch" / primary-action buttons (JOIN, `.btn--primary`) and "something is waiting for you" (unread inbox, dashboard alerts)
+- Pink `#ff4da6` (`--pink`): "< Back" links and the Join submit button
 - Department tags: IM `#00ff66`, Med/Peds `#00ffd5`, EM `#ffb347`
 
-No other hues. No white backgrounds, no light mode, no gradients beyond the subtle dark radial ones.
+No other hues. No white backgrounds, no light mode, no gradients beyond the subtle dark radial ones, the faint page grid and the scanline overlay (both defined once on `body`).
 
 ### Typography
-- One font everywhere: `"Courier New", monospace`. No web fonts, no sans-serif.
+- Two monospace stacks, no web fonts, no sans-serif: `--font-display` (Courier New) for headings, the hero and big numbers; `--font-body` (the device's own sturdier monospace: Cascadia Mono / Consolas / SF Mono / Menlo / Roboto Mono) for everything people read. Form controls inherit the body font.
+- Three text levels (bright / body / muted, see Colors). Bright is for what the eye should land on; if everything is bright, nothing is. Nav links are body-colored until hovered or current.
 - Headings and labels are UPPERCASE with letter-spacing `0.08em`; the site headline uses `0.1em`.
 - Body text `0.95rem` at line-height `1.4`; notes and secondary text `0.8–0.85rem` at ~0.85 opacity.
 - Inputs and buttons are at least `16px` on phones (prevents iOS zoom).
 
 ### Terminal-style elements (use these, don't invent new ones)
-- **Frame:** all content inside `.terminal-frame`: max-width `900px`, `2px solid var(--accent)` border, green glow `box-shadow: 0 0 25px rgba(0,255,102,0.4)`.
-- **Header:** `:: AI MEDICINE COLLECTIVE ::` centered, followed by the shared `.nav` and a `.horizontal-rule`. On phones (≤600px) `script.js` collapses the nav behind a `> MENU [+]` toggle, so **every page must load `script.js`**.
-- **Rules:** sections separated by `2px dashed var(--accent)` (`.horizontal-rule`) or `1px dashed` (`.section-divider`).
+- **Frame:** all content inside `.terminal-frame`: max-width `1000px`, `1px solid var(--accent)` border, green glow, and bright corner brackets (its `::before`/`::after`). The page behind it has a faint green grid and CRT scanlines.
+- **Status strip:** the first `<div class="horizontal-rule">` inside the frame is styled as a status strip (`AMC://COLLECTIVE … [ SYSTEM ONLINE ]`). Keep that div as the frame's first child on every page.
+- **Header:** `:: AI MEDICINE COLLECTIVE ::` centered and **linking to the home page** (there is no HOME item), followed by the shared `.nav` and a `.horizontal-rule`. The nav is six links (ABOUT, MEMBERS, MEETINGS, PROJECTS, RESOURCES, BLOG) plus two buttons: JOIN (yellow, `data-signed-out-only`, hidden once signed in) and SIGN IN / ACCOUNT. Don't add more top-level items; the App Store is reached from the home page and the Projects hub, member pages from the Members area row. The home page is the one exception: it has no nav, because its Explore grid does that job; its hero carries the JOIN and SIGN IN / ACCOUNT buttons. `script.js` marks the current page (`aria-current="page"`) and, on phones (≤600px), collapses the nav behind a `> MENU [+]` toggle, so **every page must load `script.js`**.
+- **Page title:** `.section-title` draws a bright block before the title and a line after it. Keep its content plain text.
+- **Rules:** sections separated by `1px dashed var(--accent)` (`.horizontal-rule`, `.section-divider`).
+- **Link buttons:** `.btn` (green) and `.btn--primary` (yellow) for links that should look like buttons.
+- **Loading and empty states:** member pages show `loadingBlock()` while they load (not a bare line of text) and `emptyState(title, text, linkText, href)` when a list is empty, with a next step where there is one. Both live in `auth.js`.
+- **Focus:** keyboard focus always shows a green outline (`:focus-visible`). Animations are switched off for people who ask for reduced motion.
 - **Voice:** captions and notes written as code comments (`// Current roster`); links and prompts prefixed with `>` (`> PASSWORD:`, `> ABOUT`); back links are `< Back`.
 - **Footer:** `> echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"` + blinking `█` cursor, on every page.
 - **Glow, not shadow:** hover and focus states add a green `text-shadow` / `box-shadow` glow (e.g. `0 0 8px rgba(0,255,102,0.5)`). No drop shadows, no blur.
@@ -106,7 +118,7 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 - **Accordions:** use native `<details>/<summary>` styled like `.resource-group`.
 
 ### Spacing and layout
-- Page padding `16px`; frame padding `24px 20px 16px` (`16px 12px 12px` on phones ≤480px).
+- Page padding `32px 16px` (`12px 10px` on phones); frame padding `20px 28px 18px` (`14px 12px 12px` on phones ≤480px).
 - Gaps on a small, consistent scale: `6, 8, 10, 12, 14, 16, 18, 24, 32px`. Cards pad `8–12px`; panels pad `24px` (`16px` on phones).
 - Mobile-first breakpoints already in use: `480px`, `600px`, `720px`, `900px`. Every page must work down to 320px wide with no sideways scrolling or clipped text. In flex/grid layouts that stack on phones, give text columns `min-width: 0` rather than a fixed minimum width.
 
@@ -121,7 +133,7 @@ Work these phases in sequence. Each phase is its own set of branches and PRs. Do
 
 1. **Design refresh + realistic About-page avatar.** Polish the terminal look within the rules above; clean up duplicated CSS; fix known broken links and filenames. Replace the About page's video-only intro with a realistic avatar of the club that fits the terminal frame.
 2. **Backend setup.** Add real authentication (replacing the client-side password gate), a database, and roles: member, moderator, admin. All secrets in environment variables (Rule 2). *Done:* Google sign-in, the `profiles` table with roles, the account page and the moderation page; the old shared-password screen is removed and the home page is public.
-3. **Merged Members / Join page.** One page combining the roster and sign-up. Joining creates an account request that moderators approve; approved members manage their own profile. *Done:* `members.html` has the public roster plus a `#join` section that sends people to `account.html`; after Google sign-in they fill in "About you" (`join_details` table, migration 002), which moderators see on `moderate.html`. A new request also emails the organizers through Formspree. `join.html` just forwards to `#join`. Members now manage their own profile (members-only directory, migration 008).
+3. **Merged Members / Join page.** One page combining the roster and sign-up. Joining creates an account request that moderators approve; approved members manage their own profile. *Done:* `members.html` has the public roster and `join.html` is the request-membership page (split out again on 2026-10-04), which sends people to `account.html`; after Google sign-in they fill in "About you" (`join_details` table, migration 002), which moderators see on `moderate.html`. A new request also emails the organizers through Formspree. Members now manage their own profile (members-only directory, migration 008). The directory shows focus areas and a NEW tag for the first two weeks.
 4. **Projects hub.** Members submit projects → moderator review → published. Includes comments on projects and a contact-relay so visitors can message a project's creator without exposing their email. *Built:* submission → moderator review → published, comments, contact by revealing the author's email to members, moderator-only delete. *Added later:* private messages to authors with an inbox (in place of showing emails), and authors editing unpublished items. Still to do: email notifications for new inbox messages (needs an email-sending service and a domain), and (Decided 2026-10-04: published projects are public and the Collective's tools were moved into the hub.)
 5. **Learning Materials.** Folder-organized library that reuses the Projects submission → moderation → publish pipeline (don't build a second one). *Built:* `learn.html` with folders, on the shared projects pipeline (migration 004). The public `resources.html` is unchanged apart from a pointer to it.
 6. **Topic-based chat.** Member chat organized by topic/channel, with moderator tools and the no-PHI notice (Rule 3). *Built:* `chat.html` with moderator-managed topics and live messages (migration 005).
