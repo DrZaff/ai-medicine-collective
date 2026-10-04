@@ -1,4 +1,4 @@
-# Every Friday, assembles the week's published blog posts into an email-ready
+# Every Friday afternoon (after Friday's post can be reviewed), assembles the week's published blog posts into an email-ready
 # newsletter (HTML + plain text) and opens a PR for review. No AI call and no
 # secrets needed. Sending to the listserv is not automated yet.
 #
@@ -9,7 +9,7 @@ name: Weekly newsletter draft
 
 on:
   schedule:
-    - cron: "0 14 * * 5" # Fridays, 10 AM EDT / 9 AM EST
+    - cron: "0 21 * * 5" # Fridays, 5 PM EDT / 4 PM EST
   workflow_dispatch:
 
 permissions:
