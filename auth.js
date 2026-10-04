@@ -28,6 +28,30 @@ function rememberRole(role) {
   window.dispatchEvent(new Event("amc-role-changed"));
 }
 
+// Number of unread inbox messages, saved the same way so the Members area
+// row can show "INBOX (2)" on any page. script.js reads MEMBER_UNREAD_HINT_KEY.
+const UNREAD_HINT_STORAGE_KEY = "amc-unread";
+
+function rememberUnread(count) {
+  try {
+    if (count > 0) localStorage.setItem(UNREAD_HINT_STORAGE_KEY, String(count));
+    else localStorage.removeItem(UNREAD_HINT_STORAGE_KEY);
+  } catch {
+    // localStorage unavailable: the count just won't show
+  }
+  window.dispatchEvent(new Event("amc-role-changed"));
+}
+
+// Looked up in the background after the profile loads; never blocks the page.
+async function refreshUnread(userId) {
+  const { count, error } = await db
+    .from("project_messages")
+    .select("id", { count: "exact", head: true })
+    .eq("recipient_id", userId)
+    .is("read_at", null);
+  if (!error) rememberUnread(count || 0);
+}
+
 const CONTACT_EMAIL = "zaffutbn@ucmail.uc.edu";
 const ROLE_LABELS = {
   pending: "PENDING",
@@ -107,17 +131,22 @@ async function getSessionAndProfile() {
   const { data: { session } } = await db.auth.getSession();
   if (!session) {
     rememberRole(null);
+    rememberUnread(0);
     return { session: null, profile: null };
   }
 
   const { data: profile, error } = await db
     .from("profiles")
-    .select("id, email, full_name, avatar_url, role, created_at")
+    .select("id, full_name, avatar_url, role, created_at")
     .eq("id", session.user.id)
     .maybeSingle();
 
   if (error) throw error;
+  // The profiles table doesn't hand out email addresses (migration 006);
+  // a person's own email comes from their sign-in session.
+  if (profile) profile.email = session.user.email;
   rememberRole(profile ? profile.role : null);
+  if (profile && APPROVED_ROLES.includes(profile.role)) refreshUnread(profile.id).catch(() => {});
 
   // details: the row, null if not filled in yet, or undefined if it couldn't
   // be read (then the form is simply not offered).
@@ -221,7 +250,11 @@ function initAccountPage() {
         const chatLinkNode = el("a", "account-mod-link", "> OPEN CHAT");
         chatLinkNode.href = "chat.html";
         chat.append(chatLinkNode);
-        panel.append(hub, learn, chat);
+        const inbox = el("p");
+        const inboxLinkNode = el("a", "account-mod-link", "> OPEN INBOX");
+        inboxLinkNode.href = "inbox.html";
+        inbox.append(inboxLinkNode);
+        panel.append(hub, learn, chat, inbox);
         if (profile.role === "moderator" || profile.role === "admin") {
           const mod = el("p");
           const link = el("a", "account-mod-link", "> OPEN MODERATION");
@@ -241,6 +274,7 @@ function initAccountPage() {
       button("SIGN OUT", "account-signout", async () => {
         await db.auth.signOut();
         rememberRole(null);
+        rememberUnread(0);
         renderSignedOut();
       })
     );
@@ -545,7 +579,7 @@ function initModerationPage() {
   async function load(message) {
     const { data: people, error } = await db
       .from("profiles")
-      .select("id, email, full_name, avatar_url, role, created_at")
+      .select("id, full_name, avatar_url, role, created_at")
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -553,6 +587,12 @@ function initModerationPage() {
       gate("> COULD NOT LOAD MEMBERS. Please refresh the page.");
       return;
     }
+
+    // Email addresses are available to moderators only, through a database
+    // function that checks the caller's role. Without it, names still show.
+    const emails = await db.rpc("member_emails");
+    const emailById = new Map((emails.data || []).map((row) => [row.id, row.email]));
+    people.forEach((person) => { person.email = emailById.get(person.id) || "(email hidden)"; });
 
     // "About you" details, readable by moderators. If this fails, the lists
     // still show, just without the details.

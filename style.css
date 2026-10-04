@@ -181,6 +181,14 @@ body {
   text-decoration: none;
 }
 
+/* Unread inbox messages: solid yellow outline so it stands out */
+.members-bar a.members-bar-unread,
+.members-bar a.members-bar-unread:visited {
+  border-style: solid;
+  border-color: #ffe600;
+  color: #ffe600;
+}
+
 .members-bar a:hover,
 .members-bar a[aria-current="page"] {
   color: var(--text);
@@ -741,6 +749,44 @@ button:hover {
 
 .chat-tab--new {
   border-style: dashed;
+}
+
+.chat-tab--archived {
+  opacity: 0.6;
+  border-style: dotted;
+}
+
+.chat-archive {
+  margin: 0 8px 8px 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.chat-archive[hidden],
+.chat-composer[hidden] {
+  display: none;
+}
+
+/* Inbox: each conversation reuses the chat message look inside a fold-out */
+.inbox-log {
+  min-height: 0;
+  max-height: 40vh;
+  margin-top: 8px;
+}
+
+.inbox-new {
+  margin-left: 10px;
+  border-color: #ffe600;
+  color: #ffe600;
+}
+
+.hub-contact-form {
+  margin-top: 0;
+}
+
+.hub-edit {
+  margin: 12px 0 0;
 }
 
 .chat-topic-title {
