@@ -775,6 +775,39 @@ button:hover {
   box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
 }
 
+.signin-or {
+  margin: 10px 0 6px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.signin-email-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.signin-email-form[hidden] {
+  display: none;
+}
+
+.signin-email-form .join-label {
+  min-width: 0;
+}
+
+.signin-email-form .join-input {
+  flex: 1 1 200px;
+}
+
+.signin-email-form .hub-tab {
+  background: transparent;
+}
+
+.signin-code {
+  letter-spacing: 0.2em;
+}
+
 .signin-btn:disabled {
   opacity: 0.5;
   cursor: wait;
