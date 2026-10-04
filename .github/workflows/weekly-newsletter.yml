@@ -50,7 +50,7 @@ jobs:
           git commit -m "Newsletter draft for week ending $DATE"
           git push -u origin "$branch"
           {
-            echo "Weekly newsletter built from **$COUNT** published blog post(s)."
+            echo "Weekly digest built from **$COUNT** published blog post(s), plus any projects published in the hub this week."
             echo
             echo "- Email-ready HTML: \`newsletter/$DATE.html\` (open the Netlify deploy preview to see it)"
             echo "- Plain-text version: \`newsletter/$DATE.txt\`"

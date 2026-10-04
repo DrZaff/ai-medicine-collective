@@ -1,8 +1,11 @@
-"""Assemble the weekly newsletter from the past week's published blog posts.
+"""Assemble the weekly digest: the past week's published blog posts, plus
+projects newly published in the hub.
 
 Writes newsletter/YYYY-MM-DD.html (email-ready, inline styles) and
 newsletter/YYYY-MM-DD.txt (plain-text version). No AI call: it only
-reformats posts that were already reviewed and merged. The weekly workflow
+reformats posts that were already reviewed and merged, and lists projects a
+moderator already published (read from the site's public API, the same
+request the home page makes; if that fails the section is left out). The weekly workflow
 (.github/workflows/weekly-newsletter.yml) opens a pull request with the result.
 
 Usage:
@@ -17,6 +20,9 @@ import html
 import json
 import os
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -24,6 +30,11 @@ ROOT = Path(__file__).resolve().parents[2]
 POSTS_DIR = ROOT / "blog" / "posts"
 OUT_DIR = ROOT / "newsletter"
 SITE_URL = "https://ai-medicine-collective.netlify.app"
+
+# Public by design (see CLAUDE.md): the same address and publishable key the
+# site's own pages use. They can only read what signed-out visitors can.
+API_URL = "https://ahwnarhmuzxgjindreuz.supabase.co/rest/v1"
+API_KEY = "sb_publishable_3C4xXn0j3GiunX-t6cd0HQ_ze_yTErT"
 
 # Terminal palette from CLAUDE.md, inlined because email clients drop <style>
 BG, PANEL, TEXT, ACCENT, DIM = "#000000", "#020802", "#00ff66", "#00cc55", "#7fd9a3"
@@ -51,10 +62,36 @@ def week_posts(end: dt.date, days: int) -> list[dict]:
     return posts
 
 
-def render_html(posts: list[dict], end: dt.date, days: int) -> str:
+def new_projects(end: dt.date, days: int) -> list[dict]:
+    """Projects published in the hub during the window. Empty on any failure."""
+    since = (end - dt.timedelta(days=days - 1)).isoformat()
+    query = urllib.parse.urlencode({
+        "select": "id,title,category,description,created_at",
+        "kind": "eq.project",
+        "status": "eq.published",
+        "created_at": f"gte.{since}",
+        "order": "created_at.desc",
+        "limit": "20",
+    })
+    request = urllib.request.Request(f"{API_URL}/projects?{query}", headers={"apikey": API_KEY})
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            rows = json.load(response)
+    except (urllib.error.URLError, TimeoutError, ValueError) as err:
+        print(f"Could not read new projects ({err}); leaving that section out.")
+        return []
+    return [row for row in rows if isinstance(row, dict) and row.get("title")]
+
+
+def short(text: str, limit: int = 160) -> str:
+    text = " ".join(str(text or "").split())
+    return text if len(text) <= limit else text[:limit].rstrip() + "…"
+
+
+def render_html(posts: list[dict], end: dt.date, days: int, projects: list[dict]) -> str:
     start = end - dt.timedelta(days=days - 1)
     e = html.escape
-    title = f"AI Medicine Collective weekly briefing, week ending {end.isoformat()}"
+    title = f"AI Medicine Collective weekly digest, week ending {end.isoformat()}"
     parts = [
         "<!DOCTYPE html>",
         '<html lang="en"><head><meta charset="UTF-8">',
@@ -69,7 +106,7 @@ def render_html(posts: list[dict], end: dt.date, days: int) -> str:
         f'<p style="margin:0;text-align:center;font-size:20px;letter-spacing:2px;">'
         f':: AI MEDICINE COLLECTIVE ::</p>',
         f'<p style="margin:6px 0 18px;text-align:center;font-size:13px;color:{DIM};">'
-        f'Weekly briefing &middot; {e(start.strftime("%b %d"))} &ndash; {e(end.strftime("%b %d, %Y"))}</p>',
+        f'Weekly digest &middot; {e(start.strftime("%b %d"))} &ndash; {e(end.strftime("%b %d, %Y"))}</p>',
         f'<hr style="border:0;border-top:2px dashed {ACCENT};margin:0 0 18px;">',
     ]
     for post in posts:
@@ -87,6 +124,27 @@ def render_html(posts: list[dict], end: dt.date, days: int) -> str:
                 f'<span style="color:{DIM};">&mdash; {e(item["source"])}</span></p>'
                 f'<p style="margin:0 0 12px;font-size:13px;line-height:1.5;">{e(item["summary"])}</p>'
             )
+    if projects:
+        parts.append(
+            f'<hr style="border:0;border-top:2px dashed {ACCENT};margin:18px 0 12px;">'
+            f'<p style="margin:0 0 10px;font-size:13px;letter-spacing:2px;color:{DIM};">// NEW IN THE HUB</p>'
+        )
+        for project in projects:
+            url = f"{SITE_URL}/hub.html?project={urllib.parse.quote(str(project['id']))}"
+            parts.append(
+                f'<p style="margin:0 0 2px;font-size:14px;font-weight:bold;">'
+                f'&gt; <a href="{e(url)}" style="color:{TEXT};text-decoration:none;">{e(project["title"])}</a> '
+                f'<span style="color:{DIM};font-weight:normal;">&mdash; {e(project.get("category") or "")}</span></p>'
+                f'<p style="margin:0 0 12px;font-size:13px;line-height:1.5;">{e(short(project.get("description")))}</p>'
+            )
+    parts.append(
+        f'<hr style="border:0;border-top:2px dashed {ACCENT};margin:18px 0 12px;">'
+        f'<p style="margin:0 0 6px;font-size:13px;letter-spacing:2px;color:{DIM};">// THIS WEEK ON THE SITE</p>'
+        f'<p style="margin:0 0 12px;font-size:13px;line-height:1.6;">'
+        f'&gt; <a href="{SITE_URL}/tools.html" style="color:{TEXT};">Open the tools</a> on your phone and add them to your home screen.<br>'
+        f'&gt; Wish a tool existed? <a href="{SITE_URL}/requests.html" style="color:{TEXT};">Post it or vote</a> (members).<br>'
+        f'&gt; Not a member yet? <a href="{SITE_URL}/join.html" style="color:{TEXT};">Request membership</a>.</p>'
+    )
     parts += [
         f'<hr style="border:0;border-top:2px dashed {ACCENT};margin:18px 0 12px;">',
         f'<p style="margin:0;font-size:12px;color:{DIM};">'
@@ -100,18 +158,29 @@ def render_html(posts: list[dict], end: dt.date, days: int) -> str:
     return "\n".join(parts) + "\n"
 
 
-def render_text(posts: list[dict], end: dt.date, days: int) -> str:
+def render_text(posts: list[dict], end: dt.date, days: int, projects: list[dict]) -> str:
     start = end - dt.timedelta(days=days - 1)
     lines = [
         ":: AI MEDICINE COLLECTIVE ::",
-        f"Weekly briefing, {start.strftime('%b %d')} - {end.strftime('%b %d, %Y')}",
+        f"Weekly digest, {start.strftime('%b %d')} - {end.strftime('%b %d, %Y')}",
         "",
     ]
     for post in posts:
         lines += [f"> {post['headline']} ({post['date']})", ""]
         for item in post["items"]:
             lines += [f"* {item['title']} ({item['source']})", f"  {item['url']}", f"  {item['summary']}", ""]
+    if projects:
+        lines += ["// NEW IN THE HUB", ""]
+        for project in projects:
+            lines += [f"> {project['title']} ({project.get('category') or ''})",
+                      f"  {SITE_URL}/hub.html?project={project['id']}",
+                      f"  {short(project.get('description'))}", ""]
     lines += [
+        "// THIS WEEK ON THE SITE",
+        f"> Open the tools on your phone: {SITE_URL}/tools.html",
+        f"> Wish a tool existed? Post it or vote (members): {SITE_URL}/requests.html",
+        f"> Not a member yet? {SITE_URL}/join.html",
+        "",
         f"All briefings: {SITE_URL}/blog.html",
         "Summaries are AI-drafted and reviewed by the Collective before publishing; "
         "always check the original source.",
@@ -136,16 +205,17 @@ def main() -> int:
     end = args.date or today_eastern()
     set_output("date", end.isoformat())
     posts = week_posts(end, args.days)
-    if not posts:
-        print("No published posts this week; no newsletter.")
+    projects = new_projects(end, args.days)
+    if not posts and not projects:
+        print("No published posts or new projects this week; no newsletter.")
         set_output("created", "false")
         return 0
 
     OUT_DIR.mkdir(exist_ok=True)
     stem = OUT_DIR / end.isoformat()
-    stem.with_suffix(".html").write_text(render_html(posts, end, args.days), encoding="utf-8")
-    stem.with_suffix(".txt").write_text(render_text(posts, end, args.days), encoding="utf-8")
-    print(f"Wrote {stem.name}.html and .txt from {len(posts)} post(s).")
+    stem.with_suffix(".html").write_text(render_html(posts, end, args.days, projects), encoding="utf-8")
+    stem.with_suffix(".txt").write_text(render_text(posts, end, args.days, projects), encoding="utf-8")
+    print(f"Wrote {stem.name}.html and .txt from {len(posts)} post(s) and {len(projects)} new project(s).")
     set_output("created", "true")
     set_output("post_count", str(len(posts)))
     return 0

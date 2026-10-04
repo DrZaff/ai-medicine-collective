@@ -243,7 +243,7 @@ function initHubPage() {
     if (message) nodes.push(el("p", "account-status hub-status", message));
 
     if (isMaterial) {
-      nodes.push(...(await folderNodes(projects)));
+      nodes.push(...(await pathNodes(projects)), ...(await folderNodes(projects)));
     } else if (!projects.length) {
       nodes.push(emptyState("// No projects published yet", "Be the first to share one.",
         me ? kind.submitLabel : "> SIGN IN TO SUBMIT", me ? `${kind.page}?view=submit` : "account.html"));
@@ -308,6 +308,106 @@ function initHubPage() {
     search.addEventListener("input", apply);
     apply();
     return [search, filter, shown, list, none];
+  }
+
+  /* ---- core path (materials only): a short ordered list picked by moderators ---- */
+
+  // Resolves to null when the path isn't available (before migration 009)
+  async function loadPath() {
+    const [items, done] = await Promise.all([
+      db.from("learning_path_items").select("project_id, position").order("position", { ascending: true }),
+      db.from("learning_progress").select("project_id").eq("user_id", me.id),
+    ]);
+    if (items.error || done.error) return null;
+    return { items: items.data, done: new Set(done.data.map((row) => row.project_id)) };
+  }
+
+  // "MARK DONE" / "DONE" toggle for one material
+  function doneButton(projectId, isDone, after) {
+    const btn = button(isDone ? "✓ DONE" : "MARK DONE", "hub-tab path-done", async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      const { error } = isDone
+        ? await db.from("learning_progress").delete().eq("user_id", me.id).eq("project_id", projectId)
+        : await db.from("learning_progress").insert({ user_id: me.id, project_id: projectId });
+      if (error) {
+        console.error(error);
+        btn.disabled = false;
+        return;
+      }
+      after();
+    });
+    btn.setAttribute("aria-pressed", String(isDone));
+    return btn;
+  }
+
+  async function pathNodes(projects) {
+    const path = await loadPath();
+    if (!path) return [];
+    const steps = path.items.map((item) => projects.find((p) => p.id === item.project_id)).filter(Boolean);
+
+    const section = el("section", "path");
+    section.append(el("h3", "subsection-title", "// Core path: AI for clinicians"));
+    if (!steps.length) {
+      if (!isModerator()) return [];
+      section.append(el("p", "note",
+        "// No steps yet. Open a published material and choose ADD TO CORE PATH. Aim for five or six, in the order a beginner should take them."));
+      return [section];
+    }
+
+    const finished = steps.filter((p) => path.done.has(p.id)).length;
+    const summary = el("p", "roster-stats", finished === steps.length
+      ? `> COMPLETE: all ${steps.length} steps done. It shows on your profile.`
+      : `> ${finished} of ${steps.length} steps done`);
+    summary.setAttribute("role", "status");
+    const bar = el("div", "path-bar");
+    bar.setAttribute("aria-hidden", "true");
+    const fillBar = el("span");
+    fillBar.style.width = `${Math.round((finished / steps.length) * 100)}%`;
+    bar.append(fillBar);
+
+    const list = el("ol", "path-list");
+    for (const project of steps) {
+      const li = el("li", path.done.has(project.id) ? "is-done" : null);
+      const text = el("span", "path-step");
+      text.append(
+        hubLink(project.title, `${kind.page}?project=${encodeURIComponent(project.id)}`),
+        el("span", "hub-card-meta", `// ${project.category} · ${authorName(project)}`)
+      );
+      li.append(text, doneButton(project.id, path.done.has(project.id), () => renderList()));
+      list.append(li);
+    }
+    section.append(summary, bar, list, el("p", "note",
+      "// Start here. Moderators pick these steps from the library below, so anything a member contributes can be chosen."));
+    return [section];
+  }
+
+  // On one material's page: mark it done, and (moderators) add or remove it
+  async function pathControls(project) {
+    const wrap = el("div", "hub-contact path-controls");
+    const path = await loadPath();
+    if (!path) return wrap;
+    const inPath = path.items.some((item) => item.project_id === project.id);
+    const again = () => renderProject(project.id);
+
+    if (inPath) {
+      wrap.append(el("span", "note", "// A step in the core path."), doneButton(project.id, path.done.has(project.id), again));
+    }
+    if (isModerator()) {
+      wrap.append(inPath
+        ? button("Remove from core path", "hub-tab", async () => {
+            await db.from("learning_path_items").delete().eq("project_id", project.id);
+            again();
+          })
+        : button("+ Add to core path", "hub-tab", async () => {
+            const position = Math.max(0, ...path.items.map((item) => item.position)) + 10;
+            const { error } = await db.from("learning_path_items")
+              .insert({ project_id: project.id, position, added_by: me.id });
+            if (error) console.error(error);
+            again();
+          }));
+    }
+    return wrap;
   }
 
   // Materials: one fold-out section per folder
@@ -422,6 +522,18 @@ function initHubPage() {
       el("span", "note", `// submitted ${formatDate(project.created_at)}`));
     byline.append(avatar(project.author || {}), who);
     article.append(byline, el("p", "hub-description", project.description), projectLinks(project, status));
+
+    if (isMaterial && me && project.status === "published") article.append(await pathControls(project));
+
+    // Published work is citable: one line to paste into a CV
+    if (project.status === "published") {
+      const cite = el("details", "account-details hub-cite");
+      cite.append(el("summary", "account-details-summary", "// Cite this (for a CV)"));
+      const text = citationFor(project, project.author && project.author.full_name);
+      cite.append(el("p", "hub-cite-text", text), copyButton("COPY CITATION", () => text));
+      if (isMaterial) cite.append(el("p", "note", "// The link opens for members only."));
+      article.append(cite);
+    }
 
     // Contact the author: a private message to their inbox on this site.
     // No email address is shown to either side.

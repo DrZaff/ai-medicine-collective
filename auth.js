@@ -127,6 +127,33 @@ function avatar(profile) {
   return el("span", "member-avatar", initials);
 }
 
+// The site's public address, for links that get copied out of the site
+// (citations). Deploy previews and localhost would otherwise leak into CVs.
+const SITE_ORIGIN = "https://ai-medicine-collective.netlify.app";
+
+// One line a member can paste into a CV. `item` needs id, kind, title, created_at.
+function citationFor(item, author) {
+  const isMaterial = item.kind === "material";
+  const year = new Date(item.created_at).getFullYear();
+  return `${author || "AI Medicine Collective"}. ${item.title}. AI Medicine Collective ` +
+    `${isMaterial ? "Learning Materials" : "Projects Hub"}; ${year}. ` +
+    `${SITE_ORIGIN}/${isMaterial ? "learn" : "hub"}.html?project=${item.id}`;
+}
+
+// A button that copies text (copyText lives in script.js, loaded on every page)
+function copyButton(label, getText) {
+  const btn = button(label, "hub-tab copy-btn", async () => {
+    try {
+      await copyText(getText());
+      btn.textContent = "COPIED";
+    } catch {
+      btn.textContent = "COPY FAILED";
+    }
+    setTimeout(() => { btn.textContent = label; }, 1500);
+  });
+  return btn;
+}
+
 // Placeholder shown while a page loads. It takes up roughly the room the
 // content will, so the page doesn't jump when the content arrives.
 function loadingBlock(label) {
@@ -265,6 +292,7 @@ function initAccountPage() {
         const firstName = (profile.full_name || "").trim().split(/\s+/)[0];
         panel.append(
           el("p", "account-status", firstName ? `> WELCOME BACK, ${firstName.toUpperCase()}` : "> WELCOME BACK"),
+          gettingStarted(profile),
           dashboard(profile)
         );
       }
@@ -289,6 +317,77 @@ function initAccountPage() {
       const target = document.getElementById("profile");
       if (target) target.scrollIntoView();
     }
+  }
+
+  // "Getting started": four small first steps. Shown until they're all done
+  // or the member hides it (remembered on this device only).
+  function gettingStarted(profile) {
+    const HIDE_KEY = "amc-onboarding-hidden";
+    const TOOL_USED_KEY = "amc-tool-used"; // set by the Tools page (script.js)
+    const read = (key) => {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    };
+
+    const wrap = el("section", "onboard");
+    wrap.hidden = true;
+    if (read(HIDE_KEY)) return wrap;
+
+    const has = async (query) => {
+      const { count: n, error } = await query;
+      return !error && n > 0;
+    };
+    const steps = [
+      ["Fill in your profile", "#profile", async () => {
+        const { data } = await db.from("profiles").select("bio, focus_areas").eq("id", profile.id).maybeSingle();
+        return !!data && !!(data.bio || data.focus_areas);
+      }],
+      ["Try a tool", "tools.html", async () => !!read(TOOL_USED_KEY)],
+      ["Say hello in chat", "chat.html", () => has(
+        db.from("chat_messages").select("id", { count: "exact", head: true }).eq("author_id", profile.id))],
+      ["Vote on a tool request, or post your own", "requests.html", async () =>
+        (await has(db.from("tool_request_votes").select("request_id", { count: "exact", head: true }).eq("user_id", profile.id)))
+        || (await has(db.from("tool_requests").select("id", { count: "exact", head: true }).eq("author_id", profile.id)))],
+    ];
+
+    (async () => {
+      const done = await Promise.all(steps.map(([, , check]) => check().catch(() => false)));
+      const finished = done.filter(Boolean).length;
+      if (finished === steps.length) return; // nothing left to do: stay hidden
+
+      const list = el("ul", "onboard-list");
+      steps.forEach(([label, href], i) => {
+        const li = el("li", done[i] ? "is-done" : null);
+        const link = el("a", null, label);
+        link.href = href;
+        if (href === "#profile") {
+          link.addEventListener("click", () => {
+            const target = document.getElementById("profile");
+            if (target) target.open = true;
+          });
+        }
+        li.append(el("span", "onboard-box", done[i] ? "[x]" : "[ ]"), link);
+        list.append(li);
+      });
+
+      wrap.append(
+        el("h3", "subsection-title", `// Getting started (${finished} of ${steps.length})`),
+        list,
+        button("Hide this", "hub-tab onboard-hide", () => {
+          try {
+            localStorage.setItem(HIDE_KEY, "1");
+          } catch {
+            // it will simply come back next time
+          }
+          wrap.hidden = true;
+        })
+      );
+      wrap.hidden = false;
+    })();
+    return wrap;
   }
 
   // Member home: one card per area, each filled in the background with a
@@ -321,6 +420,7 @@ function initAccountPage() {
     const mine = card("// My submissions", "hub.html?view=mine", "projects and materials");
     const chat = card("// Chat", "chat.html", "latest message");
     const people = card("// Directory", "directory.html", "members");
+    const requests = card("// Requests", "requests.html", "open tool requests");
     const hub = card("// Projects hub", "hub.html", "published projects");
     const learn = card("// Learning", "learn.html", "published materials");
     const mod = isMod ? card("// Moderation", "moderate.html", "waiting for review") : null;
@@ -398,6 +498,21 @@ function initAccountPage() {
     fill(learn, async () => {
       const n = await published("material");
       learn.value.textContent = n === null ? "—" : String(n);
+      // Core path progress, once there is a path (migration 009)
+      const [steps, done] = await Promise.all([
+        db.from("learning_path_items").select("project_id"),
+        db.from("learning_progress").select("project_id").eq("user_id", profile.id),
+      ]);
+      if (steps.error || done.error || !steps.data.length) return;
+      const finished = new Set(done.data.map((row) => row.project_id));
+      const n2 = steps.data.filter((step) => finished.has(step.project_id)).length;
+      learn.note.textContent = n2 === steps.data.length
+        ? "published materials · core path complete"
+        : `published materials · core path ${n2} of ${steps.data.length}`;
+    });
+    fill(requests, async () => {
+      const n = await count(db.from("tool_requests").select("id", { count: "exact", head: true }).eq("status", "open"));
+      requests.value.textContent = n === null ? "—" : String(n);
     });
 
     if (mod) {
