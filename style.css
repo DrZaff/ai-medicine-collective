@@ -2214,45 +2214,98 @@ a:active {
 /* The .join-row/.join-label/.join-input/.interest-chip/.join-submit styles
    are also used by the account page's forms (auth.js). */
 
-.join-section {
-  scroll-margin-top: 16px;
-}
-
-.join-layout {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 32px;
-  margin-top: 16px;
-}
-
-/* Shared neon panel look for both sides */
-.join-panel {
-  border: 1px solid var(--accent);
-  background: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.35);
-  padding: 24px;
-}
-
-.join-box {
-  width: 460px;
-  max-width: 100%;
-}
-
-.join-art-box {
-  width: 280px;
-  display: flex;
+/* Request-membership page: text on the left, the glowing staff on the right.
+   The picture's own background is black, like the panel, so it has no edge. */
+.join-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
   align-items: center;
-  justify-content: center;
+  gap: 8px 28px;
+  padding: 28px;
+  border: 1px solid var(--line-strong);
+  border-top: 2px solid var(--accent);
+  background: #000;
+  box-shadow: var(--glow);
+  overflow: hidden;
 }
 
-.join-art {
-  max-width: 100%;
-  height: auto;
+/* A soft green light behind the staff */
+.join-hero::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -60px;
+  width: 440px;
+  height: 440px;
+  transform: translateY(-50%);
+  background: radial-gradient(circle, rgba(0, 255, 102, 0.16) 0, transparent 65%);
+  pointer-events: none;
+}
+
+.join-emblem {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
   display: block;
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  /* Fade the picture's edges away so no rectangle shows */
+  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent 100%);
+  animation: emblemPulse 5s ease-in-out infinite;
 }
 
-/* Numbered steps and the call-to-action link in the join panel */
+@keyframes emblemPulse {
+  0%, 100% { filter: brightness(1.1); }
+  50% { filter: brightness(1.6); }
+}
+
+.join-content {
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.join-title {
+  margin: 0 0 12px;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(0, 255, 102, 0.7);
+}
+
+/* Phones: the staff becomes a banner above the text */
+@media (max-width: 720px) {
+  .join-hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .join-hero::before {
+    top: 0;
+    right: 50%;
+    width: 320px;
+    height: 320px;
+    transform: translateX(50%);
+  }
+
+  .join-emblem {
+    grid-column: 1;
+    grid-row: 1;
+    max-height: 240px;
+  }
+
+  .join-content {
+    grid-row: 2;
+  }
+}
+
 .join-steps {
   margin: 0 0 16px;
   padding-left: 22px;
@@ -2264,27 +2317,6 @@ a:active {
 
 .join-steps li {
   margin-bottom: 8px;
-}
-
-.join-cta,
-.join-cta:visited {
-  display: inline-block;
-  padding: 8px 22px;
-  border: 1px solid #ff4da6;
-  border-radius: 999px;
-  color: #ff4da6;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.join-cta:hover,
-.join-cta:focus-visible {
-  color: #ff4da6;
-  text-shadow: none;
-  background: rgba(255, 77, 166, 0.08);
-  box-shadow: 0 0 10px rgba(255, 77, 166, 0.4);
 }
 
 .join-row {
@@ -2411,32 +2443,7 @@ textarea.join-input {
   opacity: 0.85;
 }
 
-@media (max-width: 900px) {
-  .join-layout {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .join-box {
-    width: 100%;
-    max-width: 460px;
-  }
-
-  .join-art-box {
-    width: 100%;
-    max-width: 460px;
-  }
-
-  .join-art {
-    max-height: 260px;
-  }
-}
-
 @media (max-width: 480px) {
-  .join-panel {
-    padding: 16px;
-  }
-
   .join-submit {
     width: 100%;
     text-align: center;

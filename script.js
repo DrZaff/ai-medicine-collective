@@ -109,7 +109,6 @@ function initCurrentNav() {
 
   document.querySelectorAll(".nav a").forEach((link) => {
     const href = link.getAttribute("href") || "";
-    if (href.includes("#")) return; // JOIN points at a section, not a page
     if (href.split("/").pop().replace(/\.html$/, "") === here) link.setAttribute("aria-current", "page");
   });
 }
