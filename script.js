@@ -9,21 +9,79 @@
 // access to member data is enforced by the database.
 const AUTH_STORAGE_KEY = "sb-ahwnarhmuzxgjindreuz-auth-token";
 
-function initAccountLinks() {
-  let signedIn = false;
+// auth.js also remembers the person's role here after it loads their profile,
+// so other pages can show the Members area links without a database call.
+// Also cosmetic: someone who edits this value only sees links to pages that
+// will still refuse them.
+const MEMBER_ROLE_HINT_KEY = "amc-member-role";
+
+function readSignedInRole() {
   try {
-    signedIn = !!localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!localStorage.getItem(AUTH_STORAGE_KEY)) return null;
+    return localStorage.getItem(MEMBER_ROLE_HINT_KEY) || "";
   } catch {
-    // localStorage unavailable (private mode, blocked): leave links as SIGN IN
+    return null; // localStorage unavailable (private mode, blocked)
   }
-  if (!signedIn) return;
+}
+
+function initAccountLinks() {
+  const role = readSignedInRole();
 
   document.querySelectorAll("[data-account-link]").forEach((link) => {
-    link.textContent = link.dataset.accountLink;
+    if (!link.dataset.signedOutLabel) link.dataset.signedOutLabel = link.textContent;
+    link.textContent = role === null ? link.dataset.signedOutLabel : link.dataset.accountLink;
   });
+
+  renderMembersBar(role);
+}
+
+// A row of links to the members-only pages, under the header on every page.
+function renderMembersBar(role) {
+  document.querySelectorAll(".members-bar").forEach((bar) => bar.remove());
+  if (!["member", "moderator", "admin"].includes(role)) return;
+
+  const header = document.querySelector(".terminal-frame header");
+  const accountLink = document.querySelector("[data-account-link]");
+  if (!header || !accountLink) return;
+
+  // Pages in member/ link upward with "../"; reuse whatever prefix this page uses
+  const prefix = accountLink.getAttribute("href").replace(/account\.html$/, "");
+  const here = window.location.pathname.split("/").pop().replace(/\.html$/, "");
+
+  const items = [
+    ["hub", "PROJECTS HUB"],
+    ["learn", "LEARNING"],
+    ["chat", "CHAT"],
+  ];
+  if (role === "moderator" || role === "admin") items.push(["moderate", "MODERATION"]);
+
+  const bar = document.createElement("nav");
+  bar.className = "members-bar";
+  bar.setAttribute("aria-label", "Members area");
+
+  const label = document.createElement("span");
+  label.className = "members-bar-label";
+  label.textContent = "// MEMBERS:";
+  bar.append(label);
+
+  for (const [page, text] of items) {
+    const link = document.createElement("a");
+    link.href = `${prefix}${page}.html`;
+    link.textContent = text;
+    if (page === here) link.setAttribute("aria-current", "page");
+    bar.append(link);
+  }
+
+  // Sit just above the dashed rule that closes the header
+  const rules = header.querySelectorAll(".horizontal-rule");
+  const lastRule = rules[rules.length - 1];
+  if (lastRule) header.insertBefore(bar, lastRule);
+  else header.append(bar);
 }
 
 document.addEventListener("DOMContentLoaded", initAccountLinks);
+// auth.js fires this after it learns (or clears) the role on the current page
+window.addEventListener("amc-role-changed", initAccountLinks);
 
 /* ========= PROJECTS PAGE BEHAVIOR (category → detail toggle) ========= */
 

@@ -14,6 +14,20 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C4xXn0j3GiunX-t6cd0HQ_ze_yTErT
 // differ because both files load on this page and share one global scope.
 const SUPABASE_STORAGE_KEY = "sb-ahwnarhmuzxgjindreuz-auth-token";
 
+// script.js reads this (its MEMBER_ROLE_HINT_KEY) to show the Members area
+// links on pages that don't load the Supabase library. Keep the two identical.
+const ROLE_HINT_STORAGE_KEY = "amc-member-role";
+
+function rememberRole(role) {
+  try {
+    if (role) localStorage.setItem(ROLE_HINT_STORAGE_KEY, role);
+    else localStorage.removeItem(ROLE_HINT_STORAGE_KEY);
+  } catch {
+    // localStorage unavailable: the links just won't show
+  }
+  window.dispatchEvent(new Event("amc-role-changed"));
+}
+
 const CONTACT_EMAIL = "zaffutbn@ucmail.uc.edu";
 const ROLE_LABELS = {
   pending: "PENDING",
@@ -91,7 +105,10 @@ function avatar(profile) {
 
 async function getSessionAndProfile() {
   const { data: { session } } = await db.auth.getSession();
-  if (!session) return { session: null, profile: null };
+  if (!session) {
+    rememberRole(null);
+    return { session: null, profile: null };
+  }
 
   const { data: profile, error } = await db
     .from("profiles")
@@ -100,6 +117,7 @@ async function getSessionAndProfile() {
     .maybeSingle();
 
   if (error) throw error;
+  rememberRole(profile ? profile.role : null);
 
   // details: the row, null if not filled in yet, or undefined if it couldn't
   // be read (then the form is simply not offered).
@@ -222,6 +240,7 @@ function initAccountPage() {
     panel.append(
       button("SIGN OUT", "account-signout", async () => {
         await db.auth.signOut();
+        rememberRole(null);
         renderSignedOut();
       })
     );
