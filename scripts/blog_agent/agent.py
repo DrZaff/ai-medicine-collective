@@ -1,6 +1,6 @@
 """Daily blog agent for the AI Medicine Collective.
 
-Asks Claude (with web search) for the last ~48 hours of AI-in-medical-education
+Asks Claude (with web search) for the last ~72 hours of AI-in-medical-education
 news and research, keeps only items whose links came from the actual search
 results, and writes blog/posts/YYYY-MM-DD.json. The GitHub workflow
 (.github/workflows/daily-blog.yml) then opens a pull request; merging it is the
@@ -29,9 +29,15 @@ POSTS_DIR = ROOT / "blog" / "posts"
 
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"
-LOOKBACK_HOURS = 48
+LOOKBACK_HOURS = 72
 RECENT_DAYS_TO_AVOID = 14
 MAX_PAUSE_RESUMES = 5
+
+# Tool budgets. Fetched pages are the main cost (they count as input tokens),
+# so pages are capped; raise MAX_FETCH_TOKENS if summaries start missing detail.
+MAX_SEARCHES = 20
+MAX_FETCHES = 6
+MAX_FETCH_TOKENS = 6000
 
 # Approximate list prices, used only for the cost line in the PR description.
 # Check current pricing at https://www.anthropic.com/pricing before relying on it.
@@ -50,6 +56,12 @@ medicine without wading through hype.
 Each day you find and summarize the most useful recent items about AI in \
 medical education, plus a small number of notable AI-in-medicine research, \
 policy, or tool updates that matter to trainees and educators.
+
+Medical education comes first. Most items in a briefing should be about \
+teaching, learning, assessment, or training with AI (medical students, \
+residents, fellows, faculty development). General AI-in-medicine news is the \
+supporting act: include at most two such items, and only when they matter to \
+learners or educators.
 
 Editorial rules:
 - Use web search to find items published within the lookback window you are \
@@ -72,6 +84,12 @@ sentences; "why it matters" is 1 to 2 sentences aimed at learners and \
 educators.
 - The headline is a short, specific title for the whole day's briefing (no \
 clickbait). The intro is 1 to 2 sentences tying the day's items together.
+- Everything you write is published for readers. Never mention your search \
+process, tools, limits, what you could not find or check, or how many items \
+there are. If the day is thin, simply return fewer items with a normal intro.
+- You have a limited number of searches and page fetches. Use your searches \
+on medical-education topics first, and fetch a page only when the search \
+result does not give you enough to summarize it accurately.
 """
 
 POST_SCHEMA = {
@@ -106,8 +124,13 @@ POST_SCHEMA = {
 }
 
 TOOLS = [
-    {"type": "web_search_20260209", "name": "web_search", "max_uses": 12},
-    {"type": "web_fetch_20260209", "name": "web_fetch", "max_uses": 8},
+    {"type": "web_search_20260209", "name": "web_search", "max_uses": MAX_SEARCHES},
+    {
+        "type": "web_fetch_20260209",
+        "name": "web_fetch",
+        "max_uses": MAX_FETCHES,
+        "max_content_tokens": MAX_FETCH_TOKENS,
+    },
 ]
 
 
@@ -172,11 +195,14 @@ def build_user_prompt(date: dt.date, avoid: list[dict]) -> str:
         f"through {date.isoformat()}.\n\n"
         f"Already covered in the last {RECENT_DAYS_TO_AVOID} days (do not repeat):\n"
         f"{covered_text}\n\n"
-        "Search broadly (for example: AI in medical education, AI tutors or "
-        "simulation for medical students and residents, LLMs in clinical "
-        "training, AI assessment and feedback in GME, plus major AI-in-medicine "
-        "studies, guidelines, or regulatory news), then return the briefing in "
-        "the required JSON format."
+        "Search medical-education topics first (for example: AI in medical "
+        "education, AI tutors or simulation for medical students and residents, "
+        "LLMs in clinical training, AI assessment and feedback in GME, AI "
+        "curricula and policies at medical schools, and med-ed journals such as "
+        "Academic Medicine, Medical Education, Medical Teacher, BMC Medical "
+        "Education, and JMIR Medical Education). Only after that, look for "
+        "major AI-in-medicine studies, guidelines, or regulatory news. Then "
+        "return the briefing in the required JSON format."
     )
 
 
