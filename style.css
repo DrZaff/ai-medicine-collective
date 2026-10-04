@@ -688,6 +688,156 @@ button:hover {
 }
 
 
+/* === CHAT (chat.js) ========================================== */
+
+/* Topic buttons reuse .hub-tab; these are <button>s, so reset button looks */
+.chat-tab {
+  background: transparent;
+  text-transform: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chat-tab[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: rgba(0, 255, 102, 0.15);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+}
+
+.chat-tab--new {
+  border-style: dashed;
+}
+
+.chat-topic-title {
+  margin-top: 8px;
+}
+
+.chat-topic-note {
+  margin: 0 0 8px;
+}
+
+.chat-earlier {
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.chat-earlier[hidden] {
+  display: none;
+}
+
+/* The scrolling message window */
+.chat-log {
+  list-style: none;
+  margin: 0;
+  padding: 6px 12px;
+  min-height: 220px;
+  max-height: 55vh;
+  overflow-y: auto;
+  border: 1px solid var(--accent);
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.25);
+}
+
+.section .chat-log {
+  padding-left: 12px;
+}
+
+.chat-log:focus-visible {
+  outline: none;
+  box-shadow: 0 0 14px rgba(0, 255, 102, 0.5);
+}
+
+.chat-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(0, 255, 102, 0.18);
+}
+
+.chat-message:last-child {
+  border-bottom: none;
+}
+
+.chat-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.chat-author {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.chat-message--own .chat-author {
+  color: var(--accent);
+}
+
+.chat-time {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+/* Keep the writer's line breaks; never run long words past the frame */
+.chat-body {
+  margin-top: 2px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat-delete {
+  padding: 0 6px;
+  border-color: transparent;
+  color: var(--error);
+  font-size: 1rem;
+  line-height: 1.2;
+  opacity: 0.5;
+}
+
+.chat-delete:hover,
+.chat-delete:focus-visible {
+  opacity: 1;
+  border-color: var(--error);
+  background: rgba(255, 85, 85, 0.12);
+}
+
+.chat-composer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chat-composer .join-label {
+  width: 100%;
+  min-width: 0;
+}
+
+.chat-composer .join-input {
+  resize: vertical;
+}
+
+.chat-composer .join-submit {
+  margin-top: 0;
+}
+
+.chat-status:empty {
+  display: none;
+}
+
+
 /* === LANDING PAGE ============================================ */
 
 .landing-links {
