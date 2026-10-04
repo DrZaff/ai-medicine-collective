@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tools – AI Medicine Collective</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="One-tap launcher for the AI Medicine Collective's clinical tools." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="images/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="terminal-frame">
+
+    <div class="horizontal-rule"></div>
+
+    <header>
+      <h1 class="headline"><a href="index.html">:: AI MEDICINE COLLECTIVE ::</a></h1>
+
+      <nav class="nav" aria-label="Main">
+        <a href="about.html">ABOUT</a>
+        <a href="members.html">MEMBERS</a>
+        <a href="schedule.html">MEETINGS</a>
+        <a href="tools.html">TOOLS</a>
+        <a href="hub.html">PROJECTS</a>
+        <a href="resources.html">RESOURCES</a>
+        <a href="blog.html">BLOG</a>
+        <a href="join.html" class="nav-cta" data-signed-out-only>JOIN</a>
+        <a href="account.html" class="nav-account" data-account-link="ACCOUNT">SIGN IN</a>
+      </nav>
+
+      <div class="horizontal-rule"></div>
+    </header>
+
+    <main class="section">
+      <h2 class="section-title">TOOLS</h2>
+
+      <p class="note">
+        // Tap a tool to open it. On a phone, add this page to your home
+        screen (Share or menu &gt; Add to Home Screen) for one-tap access.
+      </p>
+
+      <div class="tools-actions">
+        <a class="btn btn--primary" href="hub.html?view=submit">+ Add your tool</a>
+        <a class="btn" href="requests.html">&gt; Request a tool</a>
+      </div>
+      <p class="note">
+        // Built something useful? Members can add it in about a minute: a
+        name, what it does, and a link. A moderator checks it, then it
+        appears here and in the <a href="hub.html">Projects hub</a>.
+      </p>
+
+      <!-- script.js (initTools) replaces this with every published tool.
+           These five apps show if that request fails or scripts are off. -->
+      <div id="tools-app" class="app-store-page">
+        <div class="app-grid">
+
+          <!-- Acid-Base Calculator -->
+          <div class="app-card">
+            <a
+              class="app-icon-launch"
+              href="https://acid-base-calculator.netlify.app/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Open Acid-Base Calculator app"
+            >
+              <img
+                src="images/applogos/ABG_logo_512.png"
+                alt="Acid-Base Calculator icon"
+                class="app-icon-img"
+              />
+            </a>
+            <div class="app-name">Acid-Base Calculator</div>
+            <a
+              class="app-desktop-link"
+              href="https://acid-base-calculator.netlify.app/?desktop=1"
+              target="_blank"
+              rel="noopener"
+            >
+              use on computer
+            </a>
+          </div>
+
+          <!-- HEART Score Calculator -->
+          <div class="app-card">
+            <a
+              class="app-icon-launch"
+              href="https://heart-score-calculator.netlify.app/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Open HEART Score Calculator app"
+            >
+              <img
+                src="images/applogos/HS_logo_512.png"
+                alt="HEART Score Calculator icon"
+                class="app-icon-img"
+              />
+            </a>
+            <div class="app-name">HEART Score Calculator</div>
+            <a
+              class="app-desktop-link"
+              href="https://heart-score-calculator.netlify.app/?desktop=1"
+              target="_blank"
+              rel="noopener"
+            >
+              use on computer
+            </a>
+          </div>
+
+          <!-- QT Interval Corrector -->
+          <div class="app-card">
+            <a
+              class="app-icon-launch"
+              href="https://qtc-calc.netlify.app/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Open QT Interval Corrector app"
+            >
+              <img
+                src="images/applogos/QTc_logo_512.png"
+                alt="QT Interval Corrector icon"
+                class="app-icon-img"
+              />
+            </a>
+            <div class="app-name">QT Interval Corrector</div>
+            <a
+              class="app-desktop-link"
+              href="https://qtc-calc.netlify.app/?desktop=1"
+              target="_blank"
+              rel="noopener"
+            >
+              use on computer
+            </a>
+          </div>
+
+          <!-- Thyroid Workup Assistant -->
+          <div class="app-card">
+            <a
+              class="app-icon-launch"
+              href="https://thyroid-cascader.netlify.app/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Open Thyroid Workup Assistant app"
+            >
+              <img
+                src="images/applogos/TC_logo_512.png"
+                alt="Thyroid Workup Assistant icon"
+                class="app-icon-img"
+              />
+            </a>
+            <div class="app-name">Thyroid Workup Assistant</div>
+            <a
+              class="app-desktop-link"
+              href="https://thyroid-cascader.netlify.app/?desktop=1"
+              target="_blank"
+              rel="noopener"
+            >
+              use on computer
+            </a>
+          </div>
+
+          <!-- VA Night Float Algorithm -->
+          <div class="app-card">
+            <a
+              class="app-icon-launch"
+              href="https://va-night-algorithm.netlify.app/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Open VA Night Float Algorithm app"
+            >
+              <img
+                src="images/applogos/NF_logo_512.png"
+                alt="VA Night Float Algorithm icon"
+                class="app-icon-img"
+              />
+            </a>
+            <div class="app-name">VA Night Float Algorithm</div>
+            <a
+              class="app-desktop-link"
+              href="https://va-night-algorithm.netlify.app/?desktop=1"
+              target="_blank"
+              rel="noopener"
+            >
+              use on computer
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      <p><a href="index.html" class="back-link">&lt; Back</a></p>
+    </main>
+
+    <div class="horizontal-rule bottom-rule"></div>
+
+    <footer class="footer">
+      &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+      <span class="cursor">█</span>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+
+

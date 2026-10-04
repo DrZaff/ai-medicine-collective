@@ -167,6 +167,18 @@ function initProfilePage() {
       if (subtitle) who.append(el("span", "profile-role", subtitle));
       head.append(avatar(person), who);
       if (person.role !== "member") head.append(roleTag(person.role));
+
+      // Finished every step of the core learning path (migration 009)?
+      const [pathSteps, pathDone] = await Promise.all([
+        db.from("learning_path_items").select("project_id"),
+        db.from("learning_progress").select("project_id").eq("user_id", person.id),
+      ]);
+      if (!pathSteps.error && !pathDone.error && pathSteps.data.length) {
+        const finished = new Set(pathDone.data.map((row) => row.project_id));
+        if (pathSteps.data.every((step) => finished.has(step.project_id))) {
+          head.append(el("span", "member-tag member-tag--path", "CORE PATH COMPLETE"));
+        }
+      }
       panel.append(head);
 
       const fields = el("dl", "profile-fields");
@@ -212,7 +224,7 @@ function initProfilePage() {
       const nodes = [panel];
       const { data: items } = await db
         .from("projects")
-        .select("id, kind, title, category, folder")
+        .select("id, kind, title, category, folder, created_at")
         .eq("author_id", person.id)
         .eq("status", "published")
         .order("created_at", { ascending: false });
@@ -228,6 +240,10 @@ function initProfilePage() {
           list.append(li);
         }
         section.append(list);
+        if (isMe) {
+          section.append(copyButton("COPY ALL FOR MY CV",
+            () => items.map((item) => citationFor(item, person.full_name)).join("\n")));
+        }
         nodes.push(section);
       }
 
