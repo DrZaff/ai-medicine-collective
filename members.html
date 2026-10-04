@@ -209,89 +209,28 @@
 
         <p>
           Anyone interested in AI in medicine can ask to join: students,
-          residents, faculty, and staff. A moderator reviews every request and
-          will reply by email.
-        </p>
-
-        <p class="note">
-          // Two steps: fill in this form so we know who you are, then
-          <a href="account.html">sign in with Google</a> to create your
-          account. Already a member? <a href="account.html">Sign in</a>.
+          residents, faculty, and staff. A moderator reviews every request.
         </p>
 
         <div class="join-layout">
 
-          <form
-            id="join-form"
-            class="join-form join-panel join-box"
-            action="https://formspree.io/f/mqaonqpr"
-            method="POST"
-          >
-            <input type="hidden" name="source" value="AI Medicine Collective – Members page" />
-            <input type="hidden" name="_subject" value="New membership request – AI Medicine Collective" />
+          <div class="join-panel join-box">
+            <ol class="join-steps">
+              <li>Sign in with your Google account.</li>
+              <li>Tell us your role, program and interests. It takes about a minute.</li>
+              <li>A moderator reviews your request. You can check your status on your account page any time.</li>
+            </ol>
 
-            <!-- Spam trap: hidden from people, bots fill it in -->
-            <div class="join-trap" aria-hidden="true">
-              <label for="join-gotcha">Leave this empty</label>
-              <input id="join-gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
-            </div>
-
-            <div class="join-row">
-              <label for="join-name" class="join-label">Name</label>
-              <input id="join-name" name="name" type="text" class="join-input"
-                placeholder="Ada Lovelace" autocomplete="name" required />
-            </div>
-
-            <div class="join-row">
-              <label for="join-email" class="join-label">Email</label>
-              <input id="join-email" name="email" type="email" class="join-input"
-                placeholder="you@example.com" autocomplete="email" required />
-            </div>
-
-            <div class="join-row">
-              <label for="join-role" class="join-label">Role</label>
-              <select id="join-role" name="role" class="join-input" required>
-                <option value="" disabled selected>Select one</option>
-                <option>Medical student</option>
-                <option>Resident / Fellow</option>
-                <option>Attending / Faculty</option>
-                <option>Other healthcare professional</option>
-                <option>Other</option>
-              </select>
-            </div>
-
-            <div class="join-row">
-              <label for="join-program" class="join-label">Program</label>
-              <input id="join-program" name="program" type="text" class="join-input"
-                placeholder="e.g. UC Internal Medicine" autocomplete="organization" />
-            </div>
-
-            <fieldset class="join-interests">
-              <legend class="join-label">Interests</legend>
-              <label class="interest-chip"><input type="checkbox" name="interests" value="Medical education" /> Med ed</label>
-              <label class="interest-chip"><input type="checkbox" name="interests" value="Patient care" /> Patient care</label>
-              <label class="interest-chip"><input type="checkbox" name="interests" value="Research" /> Research</label>
-              <label class="interest-chip"><input type="checkbox" name="interests" value="Guidelines" /> Guidelines</label>
-              <label class="interest-chip"><input type="checkbox" name="interests" value="Lifestyle" /> Lifestyle</label>
-              <label class="interest-chip"><input type="checkbox" name="interests" value="Learning AI skills" /> Learning AI</label>
-            </fieldset>
-
-            <div class="join-row join-row--stacked">
-              <label for="join-message" class="join-label">Message</label>
-              <textarea id="join-message" name="message" class="join-input" rows="3"
-                placeholder="What would you like to build or learn? (optional)"></textarea>
-            </div>
-
-            <button type="submit" class="join-submit">&gt; Submit request</button>
-
-            <p id="join-status" class="join-status" role="status" aria-live="polite"></p>
+            <p>
+              <a href="account.html" class="join-cta">&gt; Request membership</a>
+            </p>
 
             <p class="join-hint">
-              // Please don't include any patient information.<br />
+              // Already a member? <a href="account.html">Sign in</a>.<br />
               // Questions? Email <span class="highlight">zaffutbn@ucmail.uc.edu</span>.<br />
               // How we handle your information: <a href="privacy.html">privacy policy</a>.
             </p>
-          </form>
+          </div>
 
           <div class="join-panel join-art-box">
             <img src="images/join-art.jpg" alt="Green circuit-style caduceus" class="join-art" />

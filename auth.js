@@ -24,6 +24,28 @@ const ROLE_LABELS = {
 };
 const APPROVED_ROLES = ["member", "moderator", "admin"];
 
+// "About you" details (table join_details). These lists must match the
+// CHECK constraints in supabase/migrations/002_join_details.sql.
+const TRAINING_ROLES = [
+  "Medical student",
+  "Resident / Fellow",
+  "Attending / Faculty",
+  "Other healthcare professional",
+  "Other",
+];
+const INTERESTS = [
+  ["Medical education", "Med ed"],
+  ["Patient care", "Patient care"],
+  ["Research", "Research"],
+  ["Guidelines", "Guidelines"],
+  ["Lifestyle", "Lifestyle"],
+  ["Learning AI skills", "Learning AI"],
+];
+
+// New requests also email the organizers through the same Formspree form the
+// old join page used, so nobody has to keep checking the moderation page.
+const REQUEST_NOTIFY_URL = "https://formspree.io/f/mqaonqpr";
+
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: { storageKey: SUPABASE_STORAGE_KEY, flowType: "pkce" },
 });
@@ -78,7 +100,19 @@ async function getSessionAndProfile() {
     .maybeSingle();
 
   if (error) throw error;
-  return { session, profile };
+
+  // details: the row, null if not filled in yet, or undefined if it couldn't
+  // be read (then the form is simply not offered).
+  let details;
+  if (profile) {
+    const result = await db
+      .from("join_details")
+      .select("training_role, program, interests, message")
+      .eq("user_id", session.user.id)
+      .maybeSingle();
+    details = result.error ? undefined : result.data;
+  }
+  return { session, profile, details };
 }
 
 function signInWithGoogle() {
@@ -119,7 +153,7 @@ function initAccountPage() {
     show(panel);
   }
 
-  function renderSignedIn(session, profile) {
+  function renderSignedIn(session, profile, details) {
     const panel = el("div", "account-panel");
 
     if (!profile) {
@@ -137,17 +171,16 @@ function initAccountPage() {
       head.append(avatar(profile), who, roleTag(profile.role));
       panel.append(head);
 
-      if (profile.role === "pending") {
+      if (profile.role === "pending" && details === null) {
+        panel.append(
+          el("p", "account-status", "> ONE MORE STEP"),
+          el("p", null, "You're signed in. Tell us a little about yourself below so a moderator can review your request.")
+        );
+      } else if (profile.role === "pending") {
         panel.append(
           el("p", "account-status", "> ACCESS PENDING"),
           el("p", null, "Your request is with our moderators. Member features unlock once you're approved; check back here to see your status.")
         );
-        const tip = el("p", "note");
-        tip.append("// Help us review faster: tell us about yourself on the ");
-        const link = el("a", null, "membership request form");
-        link.href = "members.html#join";
-        tip.append(link, ".");
-        panel.append(tip);
       } else if (profile.role === "rejected") {
         panel.append(
           el("p", "account-status is-error", "> REQUEST DECLINED"),
@@ -167,7 +200,10 @@ function initAccountPage() {
         }
       }
 
-      if (profile.role !== "rejected") panel.append(nameForm(profile));
+      if (profile.role !== "rejected") {
+        if (details !== undefined) panel.append(detailsForm(profile, details));
+        panel.append(nameForm(profile));
+      }
     }
 
     panel.append(
@@ -177,6 +213,130 @@ function initAccountPage() {
       })
     );
     show(panel);
+  }
+
+  // "About you": role, program, interests, message. Folded away once filled in.
+  function detailsForm(profile, details) {
+    const isNew = details === null;
+    const wrap = el("details", "account-details");
+    wrap.open = isNew;
+    wrap.append(el("summary", "account-details-summary",
+      isNew ? "// About you" : "// About you (edit)"));
+
+    const form = el("form", "account-details-form");
+    const field = (labelText, control, stacked) => {
+      const row = el("div", stacked ? "join-row join-row--stacked" : "join-row");
+      const label = el("label", "join-label", labelText);
+      label.htmlFor = control.id;
+      row.append(label, control);
+      return row;
+    };
+
+    const role = el("select", "join-input");
+    role.id = "details-role";
+    role.required = true;
+    const blank = el("option", null, "Select one");
+    blank.value = "";
+    blank.disabled = true;
+    blank.selected = isNew;
+    role.append(blank);
+    for (const value of TRAINING_ROLES) {
+      const option = el("option", null, value);
+      option.selected = !isNew && details.training_role === value;
+      role.append(option);
+    }
+
+    const program = el("input", "join-input");
+    program.id = "details-program";
+    program.type = "text";
+    program.maxLength = 120;
+    program.placeholder = "e.g. UC Internal Medicine";
+    program.value = (details && details.program) || "";
+
+    const interests = el("fieldset", "join-interests");
+    interests.append(el("legend", "join-label", "Interests"));
+    const boxes = INTERESTS.map(([value, label]) => {
+      const chip = el("label", "interest-chip");
+      const box = el("input");
+      box.type = "checkbox";
+      box.value = value;
+      box.checked = !!details && (details.interests || []).includes(value);
+      chip.append(box, ` ${label}`);
+      interests.append(chip);
+      return box;
+    });
+
+    const message = el("textarea", "join-input");
+    message.id = "details-message";
+    message.rows = 3;
+    message.maxLength = 1000;
+    message.placeholder = "What would you like to build or learn? (optional)";
+    message.value = (details && details.message) || "";
+
+    const isRequest = isNew && profile.role === "pending";
+    const save = el("button", "join-submit", isRequest ? "> Send request" : "> Save");
+    save.type = "submit";
+    const status = el("p", "join-status");
+    status.setAttribute("role", "status");
+
+    form.append(
+      field("Role", role),
+      field("Program", program),
+      interests,
+      field("Message", message, true),
+      save,
+      status,
+      el("p", "join-hint", "// Visible only to you and our moderators. Please don't include any patient information.")
+    );
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const row = {
+        training_role: role.value,
+        program: program.value.trim() || null,
+        interests: boxes.filter((box) => box.checked).map((box) => box.value),
+        message: message.value.trim() || null,
+      };
+
+      save.disabled = true;
+      status.textContent = "> SAVING...";
+      status.classList.remove("is-error");
+
+      const { error } = isNew
+        ? await db.from("join_details").insert({ user_id: profile.id, ...row })
+        : await db.from("join_details").update(row).eq("user_id", profile.id);
+
+      if (error) {
+        console.error(error);
+        save.disabled = false;
+        status.textContent = "> COULD NOT SAVE. Please try again.";
+        status.classList.add("is-error");
+        return;
+      }
+
+      if (isRequest) notifyOrganizers(profile, row);
+      await refresh();
+    });
+
+    wrap.append(form);
+    return wrap;
+  }
+
+  // Best-effort email to the organizers about a new request. The request is
+  // already saved; a failure here is not shown to the person.
+  function notifyOrganizers(profile, row) {
+    const data = new FormData();
+    data.append("_subject", "New membership request – AI Medicine Collective");
+    data.append("source", "AI Medicine Collective – account page");
+    data.append("name", profile.full_name || "");
+    data.append("email", profile.email);
+    data.append("role", row.training_role);
+    data.append("program", row.program || "");
+    data.append("interests", row.interests.join(", "));
+    data.append("message", row.message || "");
+    data.append("review", new URL("moderate.html", window.location.href).href);
+    fetch(REQUEST_NOTIFY_URL, { method: "POST", body: data, headers: { Accept: "application/json" } })
+      .catch(() => {});
   }
 
   function nameForm(profile) {
@@ -214,8 +374,8 @@ function initAccountPage() {
 
   async function refresh() {
     try {
-      const { session, profile } = await getSessionAndProfile();
-      if (session) renderSignedIn(session, profile);
+      const { session, profile, details } = await getSessionAndProfile();
+      if (session) renderSignedIn(session, profile, details);
       else renderSignedOut();
     } catch (err) {
       console.error(err);
@@ -248,6 +408,7 @@ function initModerationPage() {
 
   const show = (...nodes) => app.replaceChildren(...nodes);
   let me = null;
+  let detailsById = new Map();
 
   function gate(text, linkText, href) {
     const p = el("p", "account-status is-error", text);
@@ -282,6 +443,17 @@ function initModerationPage() {
       el("span", "account-email", person.email),
       el("span", "note", `// signed up ${formatDate(person.created_at)}`)
     );
+    const info = detailsById.get(person.id);
+    if (info) {
+      const facts = [info.training_role, info.program].filter(Boolean).join(" · ");
+      who.append(el("span", "mod-detail", facts));
+      if (info.interests && info.interests.length) {
+        who.append(el("span", "mod-detail", `Interests: ${info.interests.join(", ")}`));
+      }
+      if (info.message) who.append(el("span", "mod-detail mod-message", `"${info.message}"`));
+    } else if (person.role === "pending") {
+      who.append(el("span", "note", "// hasn't filled in their details yet"));
+    }
     const actions = el("div", "mod-actions");
     row.append(avatar(person), who, roleTag(person.role), actions);
 
@@ -349,6 +521,13 @@ function initModerationPage() {
       gate("> COULD NOT LOAD MEMBERS. Please refresh the page.");
       return;
     }
+
+    // "About you" details, readable by moderators. If this fails, the lists
+    // still show, just without the details.
+    const details = await db
+      .from("join_details")
+      .select("user_id, training_role, program, interests, message");
+    detailsById = new Map((details.data || []).map((row) => [row.user_id, row]));
 
     const status = el("p", "account-status mod-status", message || "");
     status.setAttribute("role", "status");
