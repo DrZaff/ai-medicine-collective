@@ -998,10 +998,6 @@ button:hover {
   opacity: 0.85;
 }
 
-.project-type {
-  cursor: pointer;
-}
-
 .project-detail-card {
   position: relative;
 }

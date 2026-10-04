@@ -239,7 +239,7 @@ function initAccountPage() {
           el("p", null, "You're an approved member. Everything below is open to you.")
         );
         const hub = el("p");
-        const hubLinkNode = el("a", "account-mod-link", "> OPEN PROJECTS HUB");
+        const hubLinkNode = el("a", "account-mod-link", "> OPEN PROJECTS HUB (submit and discuss)");
         hubLinkNode.href = "hub.html";
         hub.append(hubLinkNode);
         const learn = el("p");

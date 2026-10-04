@@ -56,8 +56,8 @@ function renderMembersBar(role) {
     // no count shown
   }
 
+  // (The Projects hub is public and already in the main menu as PROJECTS.)
   const items = [
-    ["hub", "PROJECTS HUB"],
     ["learn", "LEARNING"],
     ["chat", "CHAT"],
     ["inbox", unread > 0 ? `INBOX (${unread})` : "INBOX"],
@@ -92,87 +92,6 @@ function renderMembersBar(role) {
 document.addEventListener("DOMContentLoaded", initAccountLinks);
 // auth.js fires this after it learns (or clears) the role on the current page
 window.addEventListener("amc-role-changed", initAccountLinks);
-
-/* ========= PROJECTS PAGE BEHAVIOR (category → detail toggle) ========= */
-
-function initProjectsPage() {
-  const typesContainer = document.getElementById("project-types");
-  const detailsContainer = document.getElementById("project-details");
-  const typeLabel = document.getElementById("projects-current-type-label");
-  const typeLinks = document.querySelectorAll(".project-type");
-  const backLink = document.querySelector(".back-link");
-
-  if (!typesContainer || !detailsContainer || !typeLabel) return; // not on projects page
-
-  function labelForType(type) {
-    switch (type) {
-      case "clinical":
-        return "// Clinical tools";
-      case "education":
-        return "// Education";
-      case "lifestyle":
-        return "// Lifestyle";
-      case "productivity":
-        return "// Productivity";
-      case "misc":
-        return "// Miscellaneous";
-      default:
-        return "// Projects";
-    }
-  }
-
-  function showTypesGrid() {
-    typesContainer.classList.remove("hidden");
-    detailsContainer.classList.add("hidden");
-    typeLabel.classList.add("hidden");
-  }
-
-  function showDetailsForType(type) {
-    typesContainer.classList.add("hidden");
-    detailsContainer.classList.remove("hidden");
-
-    typeLabel.textContent = labelForType(type);
-    typeLabel.classList.remove("hidden");
-
-    const cards = detailsContainer.querySelectorAll(".project-detail-card");
-    cards.forEach((card) => {
-      if (card.dataset.type === type) {
-        card.classList.remove("hidden");
-      } else {
-        card.classList.add("hidden");
-      }
-    });
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  // Default state: grid only
-  showTypesGrid();
-
-  // Clicking a type shows its details
-  typeLinks.forEach((link) => {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      const type = link.dataset.type;
-      if (!type) return;
-      showDetailsForType(type);
-    });
-  });
-
-  // Global "< Back" link: if details are visible, go back to grid
-  if (backLink) {
-    backLink.addEventListener("click", (e) => {
-      if (!typesContainer.classList.contains("hidden")) {
-        return; // already in grid mode → let normal link behavior occur
-      }
-      e.preventDefault();
-      showTypesGrid();
-    });
-  }
-}
-
-// Initialize projects behavior once DOM is ready
-document.addEventListener("DOMContentLoaded", initProjectsPage);
 
 /* ========= ALL PAGES: collapsible menu on phones ========= */
 

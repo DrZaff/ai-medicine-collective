@@ -60,7 +60,13 @@ const PROJECT_FILE_ACCEPT = ".pdf,.png,.jpg,.jpeg,.txt,.md,.docx,.pptx,.xlsx";
 const PROJECT_STATUS_LABELS = { pending: "IN REVIEW", published: "PUBLISHED", rejected: "NOT APPROVED" };
 
 const PROJECT_COLUMNS =
-  "id, kind, folder, title, category, description, link_url, file_path, file_name, status, review_note, created_at, " +
+  "id, kind, folder, title, category, description, link_url, doc_url, file_path, file_name, status, review_note, created_at, " +
+  "author:profiles!projects_author_id_fkey(id, full_name, avatar_url)";
+
+// Published projects are public (migration 007). Signed-out visitors are
+// granted only these columns, so asking for more would be refused.
+const PROJECT_PUBLIC_COLUMNS =
+  "id, kind, folder, title, category, description, link_url, doc_url, file_path, file_name, status, created_at, " +
   "author:profiles!projects_author_id_fkey(id, full_name, avatar_url)";
 
 /* ========= shared pieces ========= */
@@ -117,6 +123,13 @@ function projectLinks(project, statusNode) {
     launch.rel = "noopener noreferrer";
     actions.append(launch);
   }
+  const docHref = project.doc_url && httpsUrl(project.doc_url);
+  if (docHref) {
+    const doc = hubLink("Instructions", docHref, "project-doc-link");
+    doc.target = "_blank";
+    doc.rel = "noopener noreferrer";
+    actions.append(doc);
+  }
   if (project.file_path) {
     const file = hubLink(`File: ${project.file_name || "download"}`, "#", "project-doc-link");
     file.addEventListener("click", (e) => {
@@ -161,8 +174,11 @@ function initHubPage() {
 
   const show = (...nodes) => app.replaceChildren(...nodes);
   const params = new URLSearchParams(window.location.search);
+  // `me` stays null for visitors who aren't approved members. On the
+  // Projects hub they get a read-only view of published projects.
   let me = null;
-  const isModerator = () => me.role === "moderator" || me.role === "admin";
+  const isModerator = () => !!me && (me.role === "moderator" || me.role === "admin");
+  const columns = () => (me ? PROJECT_COLUMNS : PROJECT_PUBLIC_COLUMNS);
 
   function fail(text) {
     show(el("p", "account-status is-error", text));
@@ -170,11 +186,16 @@ function initHubPage() {
 
   function toolbar(current) {
     const bar = el("div", "hub-toolbar");
-    const items = [
-      ["all", kind.allLabel, kind.page],
-      ["mine", "MY SUBMISSIONS", `${kind.page}?view=mine`],
-      ["submit", kind.submitLabel, `${kind.page}?view=submit`],
-    ];
+    const items = me
+      ? [
+          ["all", kind.allLabel, kind.page],
+          ["mine", "MY SUBMISSIONS", `${kind.page}?view=mine`],
+          ["submit", kind.submitLabel, `${kind.page}?view=submit`],
+        ]
+      : [
+          ["all", kind.allLabel, kind.page],
+          ["submit", "> SIGN IN TO SUBMIT OR COMMENT", "account.html"],
+        ];
     for (const [key, label, href] of items) {
       const link = hubLink(label, href, key === "submit" ? "hub-tab hub-tab--submit" : "hub-tab");
       if (key === current) link.setAttribute("aria-current", "page");
@@ -212,7 +233,7 @@ function initHubPage() {
   async function renderList(message) {
     const { data: projects, error } = await db
       .from("projects")
-      .select(PROJECT_COLUMNS)
+      .select(columns())
       .eq("kind", kindKey)
       .eq("status", "published")
       .order("created_at", { ascending: false });
@@ -331,7 +352,7 @@ function initHubPage() {
 
   async function renderProject(id) {
     const { data: project, error } = await db
-      .from("projects").select(PROJECT_COLUMNS).eq("id", id).maybeSingle();
+      .from("projects").select(columns()).eq("id", id).maybeSingle();
     if (error) return fail(`> COULD NOT LOAD THIS ${kind.noun.toUpperCase()}. Please refresh the page.`);
     if (!project) {
       show(toolbar(null), el("p", "account-status is-error", "> NOT FOUND"),
@@ -368,7 +389,12 @@ function initHubPage() {
 
     // Contact the author: a private message to their inbox on this site.
     // No email address is shown to either side.
-    if (project.author && project.author.id === me.id) {
+    if (!me) {
+      const invite = el("div", "hub-contact");
+      invite.append(el("span", "note", "// Members can comment and message the author. "),
+        hubLink("Sign in or request membership", "account.html"), el("span", "note", "."));
+      article.append(invite);
+    } else if (project.author && project.author.id === me.id) {
       const own = el("div", "hub-contact");
       own.append(el("span", "note", "// This is yours. Messages from members arrive in your "),
         hubLink("inbox", "inbox.html"), el("span", "note", "."));
@@ -378,7 +404,7 @@ function initHubPage() {
     }
 
     // Authors can fix an item that isn't published yet
-    if (project.author && project.author.id === me.id && project.status !== "published") {
+    if (me && project.author && project.author.id === me.id && project.status !== "published") {
       const edit = el("p", "hub-edit");
       edit.append(hubLink(project.status === "rejected" ? "> EDIT AND RESUBMIT" : "> EDIT",
         `${kind.page}?view=edit&project=${encodeURIComponent(project.id)}`, "account-mod-link"));
@@ -412,7 +438,7 @@ function initHubPage() {
 
     article.append(status);
     const nodes = [toolbar(null), article];
-    if (project.status === "published") nodes.push(await commentsSection(project));
+    if (me && project.status === "published") nodes.push(await commentsSection(project));
     show(...nodes);
   }
 
@@ -750,19 +776,19 @@ function initHubPage() {
     show(el("p", "account-status", "> CHECKING ACCESS..."));
     try {
       const { session, profile } = await getSessionAndProfile();
-      if (!session) {
+      const approved = !!profile && ["member", "moderator", "admin"].includes(profile.role);
+
+      if (approved) {
+        me = profile;
+      } else if (isMaterial || ["submit", "mine", "edit"].includes(params.get("view"))) {
+        // Learning Materials, and submitting or managing your own items, need membership
         show(el("p", "account-status", "> MEMBERS ONLY"),
-          el("p", null, kind.intro),
-          hubLink("> SIGN IN OR REQUEST MEMBERSHIP", "account.html", "account-mod-link"));
+          el("p", null, !session ? kind.intro
+            : `Your membership isn't active yet. This opens once a moderator approves your request.`),
+          hubLink(!session ? "> SIGN IN OR REQUEST MEMBERSHIP" : "> CHECK YOUR STATUS", "account.html", "account-mod-link"));
         return;
       }
-      if (!profile || !["member", "moderator", "admin"].includes(profile.role)) {
-        show(el("p", "account-status", "> MEMBERS ONLY"),
-          el("p", null, `Your membership isn't active yet. ${kind.name} opens once a moderator approves your request.`),
-          hubLink("> CHECK YOUR STATUS", "account.html", "account-mod-link"));
-        return;
-      }
-      me = profile;
+      // Otherwise: a visitor browsing published projects, read-only (me stays null)
 
       if (params.get("view") === "edit" && params.get("project")) await renderEdit(params.get("project"));
       else if (params.get("project")) await renderProject(params.get("project"));
