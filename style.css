@@ -386,6 +386,36 @@ button:hover {
   opacity: 0.85;
 }
 
+/* "About you" details on the account page */
+.account-details {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--accent);
+}
+
+.account-details-summary {
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.account-details-form {
+  margin-top: 12px;
+}
+
+/* Request details shown to moderators */
+.mod-detail {
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.mod-message {
+  opacity: 0.85;
+  font-style: italic;
+}
+
 /* Moderation lists */
 .mod-status {
   margin: 8px 0 0;
@@ -1065,7 +1095,9 @@ a:active {
 }
 
 
-/* === MEMBERS PAGE: JOIN REQUEST ============================== */
+/* === JOIN SECTION + SHARED FORM FIELDS ======================= */
+/* The .join-row/.join-label/.join-input/.interest-chip/.join-submit styles
+   are also used by the account page's forms (auth.js). */
 
 .join-section {
   scroll-margin-top: 16px;
@@ -1103,6 +1135,41 @@ a:active {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+/* Numbered steps and the call-to-action link in the join panel */
+.join-steps {
+  margin: 0 0 16px;
+  padding-left: 22px;
+}
+
+.section .join-steps {
+  padding-left: 22px;
+}
+
+.join-steps li {
+  margin-bottom: 8px;
+}
+
+.join-cta,
+.join-cta:visited {
+  display: inline-block;
+  padding: 8px 22px;
+  border: 1px solid #ff4da6;
+  border-radius: 999px;
+  color: #ff4da6;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.join-cta:hover,
+.join-cta:focus-visible {
+  color: #ff4da6;
+  text-shadow: none;
+  background: rgba(255, 77, 166, 0.08);
+  box-shadow: 0 0 10px rgba(255, 77, 166, 0.4);
 }
 
 .join-row {
@@ -1223,31 +1290,10 @@ textarea.join-input {
   color: var(--error);
 }
 
-/* Shown in place of the form after a successful request */
-.join-success {
-  border: 1px solid var(--accent);
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.35);
-  background: rgba(0, 0, 0, 0.6);
-  padding: 24px;
-}
-
-.join-success p {
-  margin: 0 0 8px;
-}
-
 .join-hint {
   margin-top: 12px;
   font-size: 0.8rem;
   opacity: 0.85;
-}
-
-/* Spam trap: off-screen for people, still in the form for bots */
-.join-trap {
-  position: absolute;
-  left: -10000px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
 }
 
 @media (max-width: 900px) {
