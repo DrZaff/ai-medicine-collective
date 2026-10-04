@@ -76,7 +76,9 @@ Use the CSS variables; don't hard-code new colors.
 |---|---|---|
 | `--bg-inner` | `#000000` | Page background |
 | `--bg` | `#020802` | Terminal frame background (radial gradient `#051505` → `--bg` → `#000`) |
-| `--text` | `#00ff66` | All body text, default for everything |
+| `--text` | `#00ff66` | **Bright:** headings, links, buttons, names, key numbers. Not for paragraphs |
+| `--body` | `#c8f5d6` | **Body:** anything people read (paragraphs, descriptions, form text). The default text color |
+| `--muted` | `#7dbf94` | **Muted:** secondary detail (notes, dates, captions). Use this instead of `opacity` on text |
 | `--accent` | `#00cc55` | Borders, rules, highlights |
 | `--error` | `#ff5555` | Errors only |
 | `--line`, `--line-strong` | green at 25% / 45% | Card and panel borders |
@@ -92,7 +94,8 @@ Secondary accents, each with **one job only**:
 No other hues. No white backgrounds, no light mode, no gradients beyond the subtle dark radial ones, the faint page grid and the scanline overlay (both defined once on `body`).
 
 ### Typography
-- One font everywhere: `"Courier New", monospace`. No web fonts, no sans-serif.
+- Two monospace stacks, no web fonts, no sans-serif: `--font-display` (Courier New) for headings, the hero and big numbers; `--font-body` (the device's own sturdier monospace: Cascadia Mono / Consolas / SF Mono / Menlo / Roboto Mono) for everything people read. Form controls inherit the body font.
+- Three text levels (bright / body / muted, see Colors). Bright is for what the eye should land on; if everything is bright, nothing is. Nav links are body-colored until hovered or current.
 - Headings and labels are UPPERCASE with letter-spacing `0.08em`; the site headline uses `0.1em`.
 - Body text `0.95rem` at line-height `1.4`; notes and secondary text `0.8–0.85rem` at ~0.85 opacity.
 - Inputs and buttons are at least `16px` on phones (prevents iOS zoom).

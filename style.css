@@ -16,6 +16,17 @@
   --accent: #00cc55;
   --error: #ff5555;
 
+  /* Text hierarchy: bright for what matters (headings, links, numbers,
+     names), body for reading, muted for secondary detail. */
+  --body: #c8f5d6;
+  --muted: #7dbf94;
+
+  /* Courier for display text (the terminal look); a sturdier monospace
+     already on the reader's device for everything they have to read. */
+  --font-display: "Courier New", Courier, monospace;
+  --font-body: ui-monospace, "Cascadia Mono", "Cascadia Code", Consolas, "SF Mono", Menlo,
+    "Roboto Mono", "DejaVu Sans Mono", "Liberation Mono", monospace;
+
   /* One job each (see CLAUDE.md) */
   --cyan: #00e5ff;    /* link hover, "Instructions" */
   --yellow: #ffe600;  /* primary actions */
@@ -59,8 +70,8 @@ body {
     linear-gradient(90deg, rgba(0, 255, 102, 0.035) 1px, transparent 1px);
   background-size: auto, 32px 32px, 32px 32px;
   background-attachment: fixed;
-  color: var(--text);
-  font-family: "Courier New", monospace;
+  color: var(--body);
+  font-family: var(--font-body);
   animation: crtFade 0.4s ease-out;
 }
 
@@ -146,7 +157,7 @@ body::after {
   font-size: 0.68rem;
   letter-spacing: 0.14em;
   white-space: nowrap;
-  opacity: 0.75;
+  color: var(--muted);
 }
 
 .terminal-frame > .horizontal-rule:first-child::before {
@@ -180,6 +191,33 @@ body::after {
 .headline a:hover {
   color: #b6ffd0;
   text-shadow: 0 0 8px rgba(0, 255, 102, 1), 0 0 30px rgba(0, 255, 102, 0.7);
+}
+
+/* Headings are display text: Courier, bright */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  color: var(--text);
+}
+
+/* Things the eye should land on inside running text */
+strong,
+b,
+dt,
+summary,
+legend,
+.account-status,
+.account-name,
+.project-title,
+.roster-name,
+.chat-author,
+.ms-title,
+.home-list-title,
+.loading-label,
+.empty-state-title {
+  color: var(--text);
 }
 
 .hidden {
@@ -242,7 +280,7 @@ textarea:focus-visible {
 .nav a,
 .nav a:visited {
   text-decoration: none;
-  color: var(--text);
+  color: var(--body);
   padding: 5px 12px;
   border: 1px solid transparent;
   border-bottom: 2px solid transparent;
@@ -260,6 +298,7 @@ textarea:focus-visible {
 
 /* The page you are on (set by script.js) */
 .nav a[aria-current="page"] {
+  color: var(--text);
   border-bottom-color: var(--text);
   text-shadow: 0 0 8px rgba(0, 255, 102, 0.9);
   background-color: rgba(0, 255, 102, 0.08);
@@ -361,7 +400,7 @@ textarea:focus-visible {
 }
 
 .members-bar-label {
-  opacity: 0.75;
+  color: var(--muted);
 }
 
 .members-bar a,
@@ -442,12 +481,12 @@ textarea:focus-visible {
 }
 
 .highlight {
-  color: var(--accent);
+  color: var(--text);
 }
 
 .note {
   font-size: 0.85rem;
-  opacity: 0.85;
+  color: var(--muted);
 }
 
 /* Long-form text pages (privacy policy) */
@@ -520,7 +559,7 @@ button:hover {
   margin-top: 8px;
   font-size: 0.8rem;
   letter-spacing: 0.04em;
-  opacity: 0.85;
+  color: var(--muted);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -595,7 +634,7 @@ button:hover {
   margin: 0 auto;
   max-width: 46ch;
   font-size: 0.9rem;
-  opacity: 0.85;
+  color: var(--muted);
 }
 
 .empty-state .btn {
@@ -666,6 +705,8 @@ button:hover {
   font-weight: bold;
   line-height: 1.2;
   text-shadow: 0 0 10px rgba(0, 255, 102, 0.6);
+  font-family: var(--font-display);
+  color: var(--text);
 }
 
 .dash-value--small {
@@ -676,7 +717,7 @@ button:hover {
 .dash-note {
   font-size: 0.75rem;
   line-height: 1.35;
-  opacity: 0.8;
+  color: var(--muted);
   overflow-wrap: anywhere;
 }
 
@@ -772,7 +813,7 @@ button:hover {
 
 .account-email {
   font-size: 0.8rem;
-  opacity: 0.85;
+  color: var(--muted);
   overflow-wrap: anywhere;
 }
 
@@ -1027,7 +1068,7 @@ button:hover {
   display: block;
   margin-top: 6px;
   font-size: 0.75rem;
-  opacity: 0.75;
+  color: var(--muted);
 }
 
 .status-pending {
@@ -1174,7 +1215,7 @@ button:hover {
   margin-top: 2px;
   font-size: 0.72rem;
   line-height: 1.35;
-  opacity: 0.75;
+  color: var(--muted);
   overflow-wrap: anywhere;
 }
 
@@ -1335,7 +1376,7 @@ button:hover {
 
 .chat-time {
   font-size: 0.7rem;
-  opacity: 0.7;
+  color: var(--muted);
 }
 
 /* Keep the writer's line breaks; never run long words past the frame */
@@ -1401,7 +1442,7 @@ button:hover {
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.8;
+  color: var(--muted);
 }
 
 .hero-title {
@@ -1460,6 +1501,8 @@ button:hover {
   font-size: clamp(1.5rem, 5vw, 2.2rem);
   font-weight: bold;
   text-shadow: 0 0 10px rgba(0, 255, 102, 0.6);
+  font-family: var(--font-display);
+  color: var(--text);
 }
 
 .hero-stat dd {
@@ -1467,7 +1510,7 @@ button:hover {
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  opacity: 0.8;
+  color: var(--muted);
 }
 
 .home-panels {
@@ -1520,7 +1563,7 @@ button:hover {
 .home-panel-text {
   margin-top: 8px;
   font-size: 0.82rem;
-  opacity: 0.85;
+  color: var(--body);
 }
 
 .home-list {
@@ -1547,7 +1590,7 @@ button:hover {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.7;
+  color: var(--muted);
 }
 
 .home-panel-link {
@@ -1597,7 +1640,7 @@ button:hover {
 .tile-text {
   font-size: 0.8rem;
   line-height: 1.4;
-  opacity: 0.8;
+  color: var(--body);
 }
 
 .tile-tag {
@@ -1677,7 +1720,7 @@ button:hover {
   display: block;
   font-size: 0.8rem;
   margin-top: 2px;
-  opacity: 0.85;
+  color: var(--body);
 }
 
 .project-detail-card {
@@ -1849,7 +1892,7 @@ button:hover {
 
 .roster-meta {
   font-size: 0.8rem;
-  opacity: 0.9;
+  color: var(--body);
 }
 
 .roster-tags {
@@ -1864,7 +1907,7 @@ button:hover {
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.75;
+  color: var(--muted);
 }
 
 .roster-go {
@@ -1999,7 +2042,7 @@ button:hover {
   align-items: center;
   gap: 10px;
   font-size: 0.85rem;
-  font-family: "Courier New", monospace;
+  font-family: inherit;
 }
 
 .profile-email-address {
@@ -2156,7 +2199,7 @@ button:hover {
   border: 1px solid var(--accent);
   background: rgba(0, 0, 0, 0.9);
   color: var(--accent);
-  font-family: "Courier New", monospace;
+  font-family: inherit;
   font-size: 0.85rem;
   padding: 2px 8px;
   cursor: pointer;
@@ -2167,10 +2210,16 @@ button:hover {
 }
 
 
+.join-input::placeholder {
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+
 /* === LINKS (keep after NAV and LANDING PAGE) ================= */
 
 a {
-  color: #00ff80;
+  color: var(--text);
   text-decoration: none;
   font-weight: 600;
 }
@@ -2181,7 +2230,7 @@ a:hover {
 }
 
 a:visited {
-  color: #00ff80;
+  color: var(--text);
 }
 
 a:active {
@@ -2344,10 +2393,10 @@ a:active {
   flex: 1;
   min-width: 180px;
   background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--text);
+  border: 1px solid var(--line-strong);
+  color: var(--body);
   padding: 6px 8px;
-  font-family: "Courier New", monospace;
+  font-family: inherit;
   font-size: 0.9rem;
 }
 
@@ -2440,7 +2489,7 @@ textarea.join-input {
 .join-hint {
   margin-top: 12px;
   font-size: 0.8rem;
-  opacity: 0.85;
+  color: var(--muted);
 }
 
 @media (max-width: 480px) {
@@ -2541,7 +2590,7 @@ textarea.join-input {
 .blog-source {
   margin: 4px 0 6px;
   font-size: 0.8rem;
-  opacity: 0.75;
+  color: var(--muted);
 }
 
 .section .blog-summary,
@@ -2553,7 +2602,7 @@ textarea.join-input {
 .blog-why {
   border-left: 2px solid var(--accent);
   padding-left: 10px;
-  opacity: 0.9;
+  color: var(--body);
 }
 
 .blog-archive {
@@ -2577,7 +2626,7 @@ textarea.join-input {
 .blog-archive-date {
   display: inline-block;
   min-width: 100px;
-  opacity: 0.75;
+  color: var(--muted);
 }
 
 .blog-archive-list a[aria-current="page"] {
@@ -2628,7 +2677,7 @@ textarea.join-input {
 
 /* Date badge: same width for every row */
 .ms-date {
-  font-family: "Courier New", monospace;
+  font-family: inherit;
   font-size: 0.8rem;
   padding: 4px 10px;
   border-radius: 6px;
@@ -2904,7 +2953,7 @@ textarea.join-input {
 .guide-video::cue {
   color: #00ff66;
   background: rgba(0, 0, 0, 0.8);
-  font-family: "Courier New", monospace;
+  font-family: inherit;
 }
 
 .guide-controls {
