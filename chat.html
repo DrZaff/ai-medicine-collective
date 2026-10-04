@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat – AI Medicine Collective</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="terminal-frame">
+
+    <div class="horizontal-rule"></div>
+
+    <header>
+      <h1 class="headline">:: AI MEDICINE COLLECTIVE ::</h1>
+
+      <nav class="nav">
+        <a href="index.html">HOME</a>
+        <a href="about.html">ABOUT</a>
+        <a href="members.html">MEMBERS</a>
+        <a href="schedule.html">MEETING SCHEDULE</a>
+        <a href="projects.html">PROJECTS</a>
+        <a href="appstore.html">APP STORE</a>
+        <a href="resources.html">RESOURCES</a>
+        <a href="blog.html">BLOG</a>
+        <a href="members.html#join">JOIN</a>
+        <a href="account.html" data-account-link="ACCOUNT">SIGN IN</a>
+      </nav>
+
+      <div class="horizontal-rule"></div>
+    </header>
+
+    <main class="section">
+      <h2 class="section-title">CHAT</h2>
+
+      <p class="note">// Ask anything, by topic. New messages appear as they're posted.</p>
+
+      <!-- Filled by chat.js -->
+      <div id="chat-app" class="account-app">
+        <p class="account-status">&gt; LOADING...</p>
+      </div>
+
+      <noscript>
+        <p>&gt; Chat needs JavaScript.</p>
+      </noscript>
+
+      <p><a href="index.html" class="back-link">&lt; Back</a></p>
+    </main>
+
+    <div class="horizontal-rule bottom-rule"></div>
+
+    <footer class="footer">
+      &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+      <span class="cursor">█</span>
+    </footer>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"
+    integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok"
+    crossorigin="anonymous"></script>
+  <script src="auth.js"></script>
+  <script src="chat.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
