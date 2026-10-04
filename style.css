@@ -731,6 +731,33 @@ button:hover {
 }
 
 
+/* === MEMBER DIRECTORY & PROFILES (profiles.js) =============== */
+
+.directory-search {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  margin: 4px 0 14px;
+}
+
+.member-profile {
+  max-width: 640px;
+}
+
+.member-profile .profile-name {
+  margin: 0;
+}
+
+/* Keep the member's line breaks; never run long words past the frame */
+.member-profile-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.member-profile-items {
+  margin-top: 8px;
+}
+
 /* === CHAT (chat.js) ========================================== */
 
 /* Topic buttons reuse .hub-tab; these are <button>s, so reset button looks */

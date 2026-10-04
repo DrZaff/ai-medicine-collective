@@ -382,7 +382,11 @@ function initHubPage() {
 
     const byline = el("div", "account-head hub-byline");
     const who = el("div", "account-who");
-    who.append(el("span", "account-name", authorName(project)),
+    // Members can open the author's profile; visitors just see the name
+    who.append(
+      me && project.author
+        ? hubLink(authorName(project), `profile.html?id=${encodeURIComponent(project.author.id)}`, "account-name")
+        : el("span", "account-name", authorName(project)),
       el("span", "note", `// submitted ${formatDate(project.created_at)}`));
     byline.append(avatar(project.author || {}), who);
     article.append(byline, el("p", "hub-description", project.description), projectLinks(project, status));

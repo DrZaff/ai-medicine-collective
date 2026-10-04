@@ -200,7 +200,7 @@ function initAccountPage() {
     show(panel);
   }
 
-  function renderSignedIn(session, profile, details) {
+  async function renderSignedIn(session, profile, details) {
     const panel = el("div", "account-panel");
 
     if (!profile) {
@@ -254,7 +254,11 @@ function initAccountPage() {
         const inboxLinkNode = el("a", "account-mod-link", "> OPEN INBOX");
         inboxLinkNode.href = "inbox.html";
         inbox.append(inboxLinkNode);
-        panel.append(hub, learn, chat, inbox);
+        const directory = el("p");
+        const directoryLinkNode = el("a", "account-mod-link", "> OPEN MEMBER DIRECTORY");
+        directoryLinkNode.href = "directory.html";
+        directory.append(directoryLinkNode);
+        panel.append(hub, learn, chat, directory, inbox);
         if (profile.role === "moderator" || profile.role === "admin") {
           const mod = el("p");
           const link = el("a", "account-mod-link", "> OPEN MODERATION");
@@ -266,7 +270,7 @@ function initAccountPage() {
 
       if (profile.role !== "rejected") {
         if (details !== undefined) panel.append(detailsForm(profile, details));
-        panel.append(nameForm(profile));
+        panel.append(await profileForm(profile, details));
       }
     }
 
@@ -279,6 +283,11 @@ function initAccountPage() {
       })
     );
     show(panel);
+    // Arriving from "EDIT MY PROFILE": the form didn't exist when the page loaded
+    if (window.location.hash === "#profile") {
+      const target = document.getElementById("profile");
+      if (target) target.scrollIntoView();
+    }
   }
 
   // "About you": role, program, interests, message. Folded away once filled in.
@@ -405,43 +414,125 @@ function initAccountPage() {
       .catch(() => {});
   }
 
-  function nameForm(profile) {
-    const form = el("form", "account-name-form");
-    const label = el("label", "join-label", "Display name");
-    label.htmlFor = "account-name-input";
-    const input = el("input", "join-input");
-    input.id = "account-name-input";
-    input.type = "text";
-    input.maxLength = 80;
-    input.required = true;
-    input.value = profile.full_name || "";
-    const save = el("button", null, "SAVE");
+  // "Your profile": what other members see in the directory. The extra
+  // fields come from migration 008; if they can't be read yet, only the
+  // display name is offered.
+  async function profileForm(profile, details) {
+    const { data: extra, error: extraError } = await db
+      .from("profiles")
+      .select("program, training_level, focus_areas, bio, contact_email, link_url")
+      .eq("id", profile.id)
+      .maybeSingle();
+    const full = !extraError && !!extra;
+    const current = extra || {};
+    const empty = full && !current.bio && !current.focus_areas;
+
+    const wrap = el("details", "account-details");
+    wrap.id = "profile";
+    wrap.open = empty || window.location.hash === "#profile";
+    wrap.append(el("summary", "account-details-summary", "// Your profile (visible to members)"));
+
+    const form = el("form", "account-details-form");
+    const field = (labelText, control, stacked) => {
+      const row = el("div", stacked ? "join-row join-row--stacked" : "join-row");
+      const label = el("label", "join-label", labelText);
+      label.htmlFor = control.id;
+      row.append(label, control);
+      return row;
+    };
+    const textInput = (id, value, max, placeholder, type) => {
+      const input = el("input", "join-input");
+      input.id = id;
+      input.type = type || "text";
+      input.maxLength = max;
+      input.value = value || "";
+      if (placeholder) input.placeholder = placeholder;
+      return input;
+    };
+
+    const name = textInput("account-name-input", profile.full_name, 80);
+    name.required = true;
+    form.append(field("Name", name));
+
+    let program, level, focus, bio, contact, link;
+    if (full) {
+      program = textInput("profile-program", current.program || (details && details.program), 120, "e.g. UC Internal Medicine");
+      level = textInput("profile-level", current.training_level, 40, "e.g. PGY-2, MS3, Faculty");
+      focus = textInput("profile-focus", current.focus_areas, 300, "e.g. clinical workflows, medical education");
+      bio = el("textarea", "join-input");
+      bio.id = "profile-bio";
+      bio.rows = 4;
+      bio.maxLength = 1000;
+      bio.value = current.bio || "";
+      bio.placeholder = "A few lines about you and what you're building or learning.";
+      contact = textInput("profile-contact", current.contact_email, 120, "optional: an email to show other members", "email");
+      link = textInput("profile-link", current.link_url, 300, "optional: https://…", "url");
+      link.pattern = "https://.+";
+      form.append(
+        field("Program", program),
+        field("Level", level),
+        field("Focus", focus),
+        field("About", bio, true),
+        field("Contact", contact),
+        field("Link", link)
+      );
+    }
+
+    const save = el("button", "join-submit", "> Save profile");
     save.type = "submit";
-    const status = el("span", "account-form-status");
+    const status = el("p", "join-status");
     status.setAttribute("role", "status");
-    form.append(label, input, save, status);
+    form.append(save, status);
+    if (full) {
+      form.append(el("p", "join-hint",
+        "// Shown to approved members in the directory. Your sign-in email stays private unless you add a contact address here. No patient information."));
+    }
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const name = input.value.trim();
-      if (!name) return;
-      save.disabled = true;
-      const { error } = await db.from("profiles").update({ full_name: name }).eq("id", profile.id);
-      save.disabled = false;
-      status.textContent = error ? "> COULD NOT SAVE" : "> SAVED";
-      status.classList.toggle("is-error", !!error);
-      if (!error) {
-        const shown = document.querySelector(".account-name");
-        if (shown) shown.textContent = name;
+      const changes = { full_name: name.value.trim() };
+      if (!changes.full_name) return;
+      if (full) {
+        Object.assign(changes, {
+          program: program.value.trim() || null,
+          training_level: level.value.trim() || null,
+          focus_areas: focus.value.trim() || null,
+          bio: bio.value.trim() || null,
+          contact_email: contact.value.trim() || null,
+          link_url: link.value.trim() || null,
+        });
       }
+      save.disabled = true;
+      status.classList.remove("is-error");
+      status.textContent = "> SAVING...";
+      const { error } = await db.from("profiles").update(changes).eq("id", profile.id);
+      save.disabled = false;
+      if (error) {
+        console.error(error);
+        status.textContent = "> COULD NOT SAVE. Check the contact email and link, then try again.";
+        status.classList.add("is-error");
+        return;
+      }
+      status.textContent = "> SAVED";
+      const shown = document.querySelector(".account-name");
+      if (shown) shown.textContent = changes.full_name;
     });
-    return form;
+
+    wrap.append(form);
+    if (full && APPROVED_ROLES.includes(profile.role)) {
+      const view = el("p");
+      const viewLink = el("a", "account-mod-link", "> VIEW MY PROFILE");
+      viewLink.href = `profile.html?id=${encodeURIComponent(profile.id)}`;
+      view.append(viewLink);
+      wrap.append(view);
+    }
+    return wrap;
   }
 
   async function refresh() {
     try {
       const { session, profile, details } = await getSessionAndProfile();
-      if (session) renderSignedIn(session, profile, details);
+      if (session) await renderSignedIn(session, profile, details);
       else renderSignedOut();
     } catch (err) {
       console.error(err);

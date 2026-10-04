@@ -60,6 +60,7 @@ function renderMembersBar(role) {
   const items = [
     ["learn", "LEARNING"],
     ["chat", "CHAT"],
+    ["directory", "DIRECTORY"],
     ["inbox", unread > 0 ? `INBOX (${unread})` : "INBOX"],
   ];
   if (role === "moderator" || role === "admin") items.push(["moderate", "MODERATION"]);
