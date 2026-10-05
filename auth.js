@@ -336,7 +336,13 @@ function initAccountPage() {
       if (token.length < 6) return say("> ENTER THE CODE FROM THE EMAIL (digits only).", true);
       verify.disabled = true;
       say("> CHECKING...");
-      const { error } = await db.auth.verifyOtp({ email: address, token, type: "email" });
+      // "email" covers both first-time and returning sign-ins; the two older
+      // names are tried as a fallback in case the server expects them.
+      let error;
+      for (const type of ["email", "signup", "magiclink"]) {
+        ({ error } = await db.auth.verifyOtp({ email: address, token, type }));
+        if (!error) break;
+      }
       verify.disabled = false;
       if (error) {
         console.error(error);
@@ -878,10 +884,17 @@ function initAccountPage() {
     }
   }
 
-  // Google sends people back with ?error=... if they cancel or something fails
+  // Google, or an emailed sign-in link, sends people back with error details
+  // (in the address after "?" or after "#") if they cancel or something fails
   const params = new URLSearchParams(window.location.search);
-  if (params.get("error")) {
-    renderSignedOut("> SIGN-IN WAS CANCELLED OR FAILED. Please try again.");
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  if (params.get("error") || hashParams.get("error")) {
+    const code = params.get("error_code") || hashParams.get("error_code");
+    // Emailed links work once. Some mail systems open links to scan them,
+    // which uses the link up before the person clicks it.
+    renderSignedOut(code === "otp_expired"
+      ? "> THAT LINK HAS EXPIRED OR WAS ALREADY USED. Ask for a code below and type it in instead."
+      : "> SIGN-IN WAS CANCELLED OR FAILED. Please try again.");
     history.replaceState(null, "", window.location.pathname);
     return;
   }
