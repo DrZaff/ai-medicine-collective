@@ -336,7 +336,13 @@ function initAccountPage() {
       if (token.length < 6) return say("> ENTER THE CODE FROM THE EMAIL (digits only).", true);
       verify.disabled = true;
       say("> CHECKING...");
-      const { error } = await db.auth.verifyOtp({ email: address, token, type: "email" });
+      // "email" covers both first-time and returning sign-ins; the two older
+      // names are tried as a fallback in case the server expects them.
+      let error;
+      for (const type of ["email", "signup", "magiclink"]) {
+        ({ error } = await db.auth.verifyOtp({ email: address, token, type }));
+        if (!error) break;
+      }
       verify.disabled = false;
       if (error) {
         console.error(error);
