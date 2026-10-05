@@ -235,23 +235,119 @@ function initAccountPage() {
     const panel = el("div", "account-panel");
     if (message) panel.append(el("p", "account-status is-error", message));
     panel.append(
-      el("p", null, "Members sign in with their Google account. No new password to remember."),
+      el("p", null, "Sign in with your Google account, or with a code we email you. No password to remember."),
       button("> SIGN IN WITH GOOGLE", "signin-btn", async (e) => {
         e.currentTarget.disabled = true;
         const { error } = await signInWithGoogle();
         if (error) renderSignedOut("> SIGN-IN FAILED. Please try again.");
-      })
+      }),
+      el("p", "signin-or", "// or"),
+      emailSignIn()
     );
     const note = el("p", "note");
     note.append(
       "// First time here? Signing in sends a membership request to our moderators. " +
-      "We receive only your name, email and profile picture from Google. See the "
+      "With Google we receive only your name, email and profile picture; with a code, only your email. See the "
     );
     const link = el("a", null, "privacy policy");
     link.href = "privacy.html";
     note.append(link, ".");
     panel.append(note);
     show(panel);
+  }
+
+  // Sign in without Google: we email a one-time code, the person types it in.
+  // (The email also carries a link, which works when it's opened in the same
+  // browser that asked for it.) Sent by Supabase through the Collective's
+  // own mail domain.
+  function emailSignIn() {
+    const wrap = el("div", "signin-email");
+    const status = el("p", "join-status");
+    status.setAttribute("role", "status");
+    const say = (text, isError) => {
+      status.textContent = text;
+      status.classList.toggle("is-error", !!isError);
+    };
+
+    const askForm = el("form", "signin-email-form");
+    const email = el("input", "join-input");
+    email.id = "signin-email";
+    email.type = "email";
+    email.required = true;
+    email.maxLength = 254;
+    email.autocomplete = "email";
+    email.placeholder = "you@example.com";
+    const emailLabel = el("label", "join-label", "Email");
+    emailLabel.htmlFor = email.id;
+    const send = el("button", "join-submit", "> Email me a code");
+    send.type = "submit";
+    askForm.append(emailLabel, email, send);
+
+    const codeForm = el("form", "signin-email-form");
+    codeForm.hidden = true;
+    const code = el("input", "join-input signin-code");
+    code.id = "signin-code";
+    code.type = "text";
+    code.inputMode = "numeric";
+    code.autocomplete = "one-time-code";
+    code.required = true;
+    code.maxLength = 16; // room for spaces when pasted
+    code.placeholder = "code from the email";
+    const codeLabel = el("label", "join-label", "Code");
+    codeLabel.htmlFor = code.id;
+    const verify = el("button", "join-submit", "> Sign in");
+    verify.type = "submit";
+    const restart = button("Use a different email", "hub-tab", () => {
+      codeForm.hidden = true;
+      askForm.hidden = false;
+      say("");
+      email.focus();
+    });
+    codeForm.append(codeLabel, code, verify, restart);
+
+    let address = "";
+    askForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      address = email.value.trim();
+      if (!address) return;
+      send.disabled = true;
+      say("> SENDING...");
+      const { error } = await db.auth.signInWithOtp({
+        email: address,
+        options: { emailRedirectTo: new URL("account.html", window.location.href).href },
+      });
+      send.disabled = false;
+      if (error) {
+        console.error(error);
+        say(error.status === 429
+          ? "> TOO MANY TRIES. Please wait a minute and try again."
+          : "> COULD NOT SEND THE CODE. Check the address, or use Google sign-in.", true);
+        return;
+      }
+      askForm.hidden = true;
+      codeForm.hidden = false;
+      say(`> CODE SENT to ${address}. It can take a minute; check spam too.`);
+      code.focus();
+    });
+
+    codeForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const token = code.value.replace(/\D/g, "");
+      if (token.length < 6) return say("> ENTER THE CODE FROM THE EMAIL (digits only).", true);
+      verify.disabled = true;
+      say("> CHECKING...");
+      const { error } = await db.auth.verifyOtp({ email: address, token, type: "email" });
+      verify.disabled = false;
+      if (error) {
+        console.error(error);
+        say("> THAT CODE DIDN'T WORK. It may have expired; ask for a new one.", true);
+        return;
+      }
+      await refresh();
+    });
+
+    wrap.append(askForm, codeForm, status);
+    return wrap;
   }
 
   async function renderSignedIn(session, profile, details) {
@@ -671,7 +767,7 @@ function initAccountPage() {
 
     const wrap = el("details", "account-details");
     wrap.id = "profile";
-    wrap.open = empty || window.location.hash === "#profile";
+    wrap.open = empty || !profile.full_name || window.location.hash === "#profile";
     wrap.append(el("summary", "account-details-summary", "// Your profile (visible to members)"));
 
     const form = el("form", "account-details-form");
