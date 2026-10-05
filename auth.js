@@ -878,10 +878,17 @@ function initAccountPage() {
     }
   }
 
-  // Google sends people back with ?error=... if they cancel or something fails
+  // Google, or an emailed sign-in link, sends people back with error details
+  // (in the address after "?" or after "#") if they cancel or something fails
   const params = new URLSearchParams(window.location.search);
-  if (params.get("error")) {
-    renderSignedOut("> SIGN-IN WAS CANCELLED OR FAILED. Please try again.");
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  if (params.get("error") || hashParams.get("error")) {
+    const code = params.get("error_code") || hashParams.get("error_code");
+    // Emailed links work once. Some mail systems open links to scan them,
+    // which uses the link up before the person clicks it.
+    renderSignedOut(code === "otp_expired"
+      ? "> THAT LINK HAS EXPIRED OR WAS ALREADY USED. Ask for a code below and type it in instead."
+      : "> SIGN-IN WAS CANCELLED OR FAILED. Please try again.");
     history.replaceState(null, "", window.location.pathname);
     return;
   }
