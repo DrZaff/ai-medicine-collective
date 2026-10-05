@@ -775,6 +775,11 @@ button:hover {
   box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
 }
 
+.profile-alerts {
+  display: inline-block;
+  margin: 4px 0 12px;
+}
+
 .signin-or {
   margin: 10px 0 6px;
   color: var(--muted);

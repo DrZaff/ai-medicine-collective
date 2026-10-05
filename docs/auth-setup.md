@@ -173,7 +173,7 @@ can create an account another way.
 - [ ] Client ID and secret saved in Supabase, Google provider turned **on**
 - [ ] Site URL and the 3 redirect URLs added in Supabase
 - [ ] Project URL and publishable/anon key handed to the developer
-- [ ] Email provider turned **off** (Google only)
+- [ ] Email provider turned **on** (added 2026-10-05 for sign-in by emailed code; see "Email" below)
 - [ ] Migration files run in the SQL Editor, in order
 - [ ] First admin set (after signing in once)
 
@@ -186,3 +186,26 @@ can create an account another way.
   Redirect URLs in Supabase (Part 3b).
 - **Only some people can sign in:** the Google app is probably still in
   "Testing". Publish it (Part 2, step 7).
+
+## Email (added October 2026)
+
+The site sends email through Resend from `mail.aimedicinecollective.com`
+(domain registered at Porkbun; four DNS records there, shown on Resend's
+Domains page).
+
+- **Sign-in codes:** Supabase > Authentication > Emails > SMTP Settings uses
+  Resend (host `smtp.resend.com`, port `465`, username `resend`, password = a
+  Resend key with sending access). The "Magic link or OTP" and "Confirm sign
+  up" templates show `{{ .Token }}` and deliberately contain **no link**:
+  mail scanners open links, which uses up the one-time code.
+- **Emails the database sends itself** (inbox alerts, migration 011): a second
+  Resend key stored in Supabase Vault under the exact name `resend_api_key`.
+  Create the key in Resend (sending access, limited to the mail domain), then
+  add it in the Supabase dashboard's Vault page, or run this once in the SQL
+  Editor with your key in place of the placeholder (do not save the query):
+  `select vault.create_secret('PASTE-KEY-HERE', 'resend_api_key');`
+- **If alerts don't arrive:** in the SQL Editor run
+  `select id, status_code, error_msg, created from net._http_response order by created desc limit 5;`
+  A `200` means Resend accepted it; anything else says why not.
+- Keys never go in the repo or in chat. To replace one, delete it in Resend,
+  create a new one, and update it where it is stored.

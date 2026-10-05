@@ -822,6 +822,20 @@ function initAccountPage() {
       );
     }
 
+    // Email alerts for private messages (migration 011). Asked for on its
+    // own so the rest of the form still works before that column exists.
+    let alerts = null;
+    const { data: prefs, error: prefsError } = await db
+      .from("profiles").select("email_alerts").eq("id", profile.id).maybeSingle();
+    if (!prefsError && prefs && typeof prefs.email_alerts === "boolean") {
+      const chip = el("label", "interest-chip profile-alerts");
+      alerts = el("input");
+      alerts.type = "checkbox";
+      alerts.checked = prefs.email_alerts;
+      chip.append(alerts, " Email me when I get a private message");
+      form.append(chip);
+    }
+
     const save = el("button", "join-submit", "> Save profile");
     save.type = "submit";
     const status = el("p", "join-status");
@@ -846,6 +860,7 @@ function initAccountPage() {
           link_url: link.value.trim() || null,
         });
       }
+      if (alerts) changes.email_alerts = alerts.checked;
       save.disabled = true;
       status.classList.remove("is-error");
       status.textContent = "> SAVING...";
