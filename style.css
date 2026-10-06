@@ -775,6 +775,32 @@ button:hover {
   box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
 }
 
+.digest-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 8px 0;
+}
+
+.digest-row .join-label {
+  min-width: 0;
+}
+
+.digest-row .join-input {
+  flex: 0 1 180px;
+  min-width: 150px;
+}
+
+.digest-row button.hub-tab {
+  background: transparent;
+}
+
+.digest-history li {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 .profile-alerts {
   display: inline-block;
   margin: 4px 0 12px;

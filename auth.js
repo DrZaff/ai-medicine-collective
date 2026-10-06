@@ -692,6 +692,18 @@ function initAccountPage() {
     message.placeholder = "What would you like to build or learn? (optional)";
     message.value = (details && details.message) || "";
 
+    // Offered once, when the person first fills this in; afterwards the
+    // switch lives under "Your profile". The digest goes to approved members.
+    let digestBox = null;
+    let digestChip = null;
+    if (isNew) {
+      digestChip = el("label", "interest-chip profile-alerts");
+      digestBox = el("input");
+      digestBox.type = "checkbox";
+      digestBox.checked = true;
+      digestChip.append(digestBox, " Email me the weekly digest once I'm a member (briefings and new projects)");
+    }
+
     const isRequest = isNew && profile.role === "pending";
     const save = el("button", "join-submit", isRequest ? "> Send request" : "> Save");
     save.type = "submit";
@@ -703,6 +715,7 @@ function initAccountPage() {
       field("Program", program),
       interests,
       field("Message", message, true),
+      ...(digestChip ? [digestChip] : []),
       save,
       status,
       el("p", "join-hint", "// Visible only to you and our moderators. Please don't include any patient information.")
@@ -733,6 +746,10 @@ function initAccountPage() {
         return;
       }
 
+      // Best effort: before migration 013 the column isn't there, and that's fine
+      if (digestBox) {
+        await db.from("profiles").update({ email_digest: digestBox.checked }).eq("id", profile.id);
+      }
       if (isRequest) notifyOrganizers(profile, row);
       await refresh();
     });
@@ -857,6 +874,19 @@ function initAccountPage() {
       form.append(chip);
     }
 
+    // Weekly digest by email (migration 013); same pattern as the alerts box
+    let digest = null;
+    const { data: digestPref, error: digestError } = await db
+      .from("profiles").select("email_digest").eq("id", profile.id).maybeSingle();
+    if (!digestError && digestPref && typeof digestPref.email_digest === "boolean") {
+      const chip = el("label", "interest-chip profile-alerts");
+      digest = el("input");
+      digest.type = "checkbox";
+      digest.checked = digestPref.email_digest;
+      chip.append(digest, " Email me the weekly digest");
+      form.append(chip);
+    }
+
     const save = el("button", "join-submit", "> Save profile");
     save.type = "submit";
     const status = el("p", "join-status");
@@ -882,6 +912,7 @@ function initAccountPage() {
         });
       }
       if (alerts) changes.email_alerts = alerts.checked;
+      if (digest) changes.email_digest = digest.checked;
       if (institution) changes.institution = institution.value.trim() || null;
       if (listing) changes.directory_listing = listing.checked;
       save.disabled = true;
@@ -1111,5 +1142,106 @@ function initModerationPage() {
   })();
 }
 
+/* ========= MODERATION PAGE: send the weekly digest (admins) ========= */
+
+// The digest is written by the Friday workflow and reviewed as a pull
+// request. Once that is merged, an admin sends it from here: this page reads
+// the published file and hands it to send_digest() (migration 013), which
+// emails approved members who haven't opted out. One send per week.
+function initDigestSender() {
+  const app = document.getElementById("moderate-digest");
+  if (!app) return;
+
+  // The most recent Friday (the day the digest is dated), as YYYY-MM-DD
+  const lastFriday = () => {
+    const day = new Date();
+    day.setDate(day.getDate() - ((day.getDay() + 2) % 7));
+    return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`;
+  };
+
+  (async () => {
+    const { profile } = await getSessionAndProfile();
+    if (!profile || profile.role !== "admin") return;
+
+    const { data: sent, error: sentError } = await db
+      .from("digest_sends").select("issue_date, sent_at, recipients")
+      .order("issue_date", { ascending: false }).limit(5);
+    if (sentError) return; // before migration 013: no panel
+
+    const section = el("section", "mod-section digest-panel");
+    section.append(el("h3", "subsection-title", "// Weekly digest"),
+      el("p", "note", "// Merge that week's \"Newsletter draft\" pull request first. Then send yourself a test, check it, and send it to members. Each week can be sent once."));
+
+    const date = el("input", "join-input");
+    date.id = "digest-date";
+    date.type = "date";
+    date.value = lastFriday();
+    const label = el("label", "join-label", "Week ending");
+    label.htmlFor = date.id;
+    const preview = el("a", "hub-tab", "Preview");
+    preview.target = "_blank";
+    preview.rel = "noopener";
+    const setPreview = () => { preview.href = `newsletter/${encodeURIComponent(date.value)}.html`; };
+    setPreview();
+    date.addEventListener("change", setPreview);
+
+    const status = el("p", "account-status hub-status");
+    status.setAttribute("role", "status");
+    const say = (text, isError) => {
+      status.textContent = text;
+      status.classList.toggle("is-error", !!isError);
+    };
+
+    async function send(testOnly) {
+      const issue = date.value;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(issue)) return say("> PICK A DATE FIRST.", true);
+      if (!testOnly && !window.confirm(`Email the ${issue} digest to all members who receive it? This can't be undone.`)) return;
+
+      say("> LOADING THE DIGEST...");
+      let html, plain;
+      try {
+        const [page, text] = await Promise.all([fetch(`newsletter/${issue}.html`), fetch(`newsletter/${issue}.txt`)]);
+        if (!page.ok || !text.ok) throw new Error("missing");
+        [html, plain] = await Promise.all([page.text(), text.text()]);
+      } catch {
+        return say(`> NO DIGEST FOUND FOR ${issue}. Merge that week's "Newsletter draft" pull request first.`, true);
+      }
+
+      say("> SENDING...");
+      const { data, error } = await db.rpc("send_digest", {
+        issue,
+        subject: `AI Medicine Collective weekly digest: week ending ${issue}`,
+        html,
+        plain,
+        test_only: testOnly,
+      });
+      if (error) {
+        console.error(error);
+        return say(`> NOT SENT: ${error.message}`, true);
+      }
+      say(testOnly
+        ? `> TEST SENT to ${profile.email}. Check your inbox (and spam).`
+        : `> SENT to ${data} member${data === 1 ? "" : "s"}.`);
+      if (!testOnly) history.append(el("li", null, `${issue} · ${data} members · just now`));
+    }
+
+    const row = el("div", "digest-row");
+    row.append(label, date, preview,
+      button("Send test to me", "hub-tab", () => send(true)),
+      button("> Send to members", "hub-tab hub-tab--submit", () => send(false)));
+
+    const history = el("ul", "dash-list digest-history");
+    for (const entry of sent) {
+      history.append(el("li", null, `${entry.issue_date} · ${entry.recipients} members · sent ${formatDate(entry.sent_at)}`));
+    }
+
+    section.append(row, status);
+    if (sent.length) section.append(el("p", "note", "// Already sent:"));
+    section.append(history);
+    app.replaceChildren(section);
+  })().catch((err) => console.error(err));
+}
+
+document.addEventListener("DOMContentLoaded", initDigestSender);
 document.addEventListener("DOMContentLoaded", initAccountPage);
 document.addEventListener("DOMContentLoaded", initModerationPage);
