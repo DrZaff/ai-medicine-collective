@@ -69,7 +69,15 @@ function initDirectoryPage() {
         .in("role", ["member", "moderator", "admin"]);
       (places || []).forEach((row) => { if (row.institution) institutionOf.set(row.id, row.institution); });
 
-      const total = `${people.length} member${people.length === 1 ? "" : "s"}`;
+      // Members who switched off "Show me in the member list" (migration 014).
+      // You still see yourself, marked as hidden from others.
+      const hidden = new Set();
+      const { data: choices } = await db.from("profiles").select("id, directory_listing")
+        .in("role", ["member", "moderator", "admin"]);
+      (choices || []).forEach((row) => { if (row.directory_listing === false) hidden.add(row.id); });
+      const listedPeople = people.filter((person) => !hidden.has(person.id) || person.id === me.id);
+
+      const total = `${listedPeople.length} member${listedPeople.length === 1 ? "" : "s"}`;
       const count = el("p", "roster-stats", `> ${total}`);
       count.setAttribute("role", "status");
       const newSince = Date.now() - MEMBER_NEW_DAYS * 24 * 60 * 60 * 1000;
@@ -80,7 +88,7 @@ function initDirectoryPage() {
       search.setAttribute("aria-label", "Search members by name, program or focus area");
 
       const grid = el("div", "roster-grid");
-      const cards = people.map((person) => {
+      const cards = listedPeople.map((person) => {
         const card = el("a", "roster-card");
         card.href = `profile.html?id=${encodeURIComponent(person.id)}`;
         const text = el("span", "roster-text");
@@ -99,7 +107,7 @@ function initDirectoryPage() {
           const tags = el("span", "roster-tags");
           if (person.role !== "member") tags.append(roleTag(person.role));
           if (isNew) tags.append(el("span", "member-tag member-tag--new", "NEW"));
-          if (person.id === me.id) tags.append(el("span", "roster-role", "You"));
+          if (person.id === me.id) tags.append(el("span", "roster-role", hidden.has(me.id) ? "You (hidden from others)" : "You"));
           text.append(tags);
         }
         const go = el("span", "roster-go", ">");
