@@ -62,7 +62,22 @@ function initDirectoryPage() {
         return;
       }
 
-      const total = `${people.length} member${people.length === 1 ? "" : "s"}`;
+      // Institutions (migration 012), asked for separately so the directory
+      // still loads before that column exists
+      const institutionOf = new Map();
+      const { data: places } = await db.from("profiles").select("id, institution")
+        .in("role", ["member", "moderator", "admin"]);
+      (places || []).forEach((row) => { if (row.institution) institutionOf.set(row.id, row.institution); });
+
+      // Members who switched off "Show me in the member list" (migration 014).
+      // You still see yourself, marked as hidden from others.
+      const hidden = new Set();
+      const { data: choices } = await db.from("profiles").select("id, directory_listing")
+        .in("role", ["member", "moderator", "admin"]);
+      (choices || []).forEach((row) => { if (row.directory_listing === false) hidden.add(row.id); });
+      const listedPeople = people.filter((person) => !hidden.has(person.id) || person.id === me.id);
+
+      const total = `${listedPeople.length} member${listedPeople.length === 1 ? "" : "s"}`;
       const count = el("p", "roster-stats", `> ${total}`);
       count.setAttribute("role", "status");
       const newSince = Date.now() - MEMBER_NEW_DAYS * 24 * 60 * 60 * 1000;
@@ -73,13 +88,15 @@ function initDirectoryPage() {
       search.setAttribute("aria-label", "Search members by name, program or focus area");
 
       const grid = el("div", "roster-grid");
-      const cards = people.map((person) => {
+      const cards = listedPeople.map((person) => {
         const card = el("a", "roster-card");
         card.href = `profile.html?id=${encodeURIComponent(person.id)}`;
         const text = el("span", "roster-text");
         text.append(el("span", "roster-name", person.full_name || "Member"));
         const subtitle = memberSubtitle(person);
         if (subtitle) text.append(el("span", "roster-meta", subtitle));
+        const institution = institutionOf.get(person.id) || "";
+        if (institution) text.append(el("span", "roster-meta", institution));
         // What they work on, so the directory helps you find collaborators
         if (person.focus_areas) {
           const focus = person.focus_areas.length > 70 ? `${person.focus_areas.slice(0, 70).trimEnd()}…` : person.focus_areas;
@@ -90,31 +107,55 @@ function initDirectoryPage() {
           const tags = el("span", "roster-tags");
           if (person.role !== "member") tags.append(roleTag(person.role));
           if (isNew) tags.append(el("span", "member-tag member-tag--new", "NEW"));
-          if (person.id === me.id) tags.append(el("span", "roster-role", "You"));
+          if (person.id === me.id) tags.append(el("span", "roster-role", hidden.has(me.id) ? "You (hidden from others)" : "You"));
           text.append(tags);
         }
         const go = el("span", "roster-go", ">");
         go.setAttribute("aria-hidden", "true");
         card.append(avatar(person), text, go);
-        card.dataset.search = `${person.full_name || ""} ${person.program || ""} ${person.training_level || ""} ${person.focus_areas || ""}`.toLowerCase();
+        card.dataset.search = `${person.full_name || ""} ${person.program || ""} ${person.training_level || ""} ${person.focus_areas || ""} ${institution}`.toLowerCase();
+        card.dataset.institution = institution;
         grid.append(card);
         return card;
       });
 
       const none = el("p", "note", "// No members match that.");
       none.hidden = true;
-      search.addEventListener("input", () => {
+      let place = "All";
+      const apply = () => {
         const term = search.value.trim().toLowerCase();
         let shown = 0;
         cards.forEach((card) => {
-          card.hidden = !!term && !card.dataset.search.includes(term);
+          card.hidden = (!!term && !card.dataset.search.includes(term))
+            || (place !== "All" && card.dataset.institution !== place);
           if (!card.hidden) shown++;
         });
         count.textContent = shown === cards.length ? `> ${total}` : `> ${shown} of ${total}`;
         none.hidden = shown > 0;
-      });
+      };
+      search.addEventListener("input", apply);
 
-      app.replaceChildren(count, search, grid, none);
+      // Institution filter, when there is more than one to choose from
+      const filter = el("div", "filter-bar");
+      filter.setAttribute("role", "group");
+      filter.setAttribute("aria-label", "Filter members by institution");
+      const institutions = [...new Set(institutionOf.values())].sort((a, b) => a.localeCompare(b));
+      if (institutions.length > 1) {
+        const buttons = ["All", ...institutions].map((name) => {
+          const btn = button(name.toUpperCase(), "filter-btn", () => {
+            place = name;
+            buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+            apply();
+          });
+          btn.setAttribute("aria-pressed", String(name === "All"));
+          filter.append(btn);
+          return btn;
+        });
+      } else {
+        filter.hidden = true;
+      }
+
+      app.replaceChildren(count, search, filter, grid, none);
     } catch (err) {
       console.error(err);
       app.replaceChildren(el("p", "account-status is-error", "> COULD NOT LOAD THE DIRECTORY. Please refresh the page."));
@@ -184,6 +225,8 @@ function initProfilePage() {
       const fields = el("dl", "profile-fields");
       const addField = (label, node) => { fields.append(el("dt", null, label), node); };
 
+      const { data: where } = await db.from("profiles").select("institution").eq("id", person.id).maybeSingle();
+      if (where && where.institution) addField("Institution", el("dd", "member-profile-text", where.institution));
       if (person.focus_areas) addField("Focus areas", el("dd", "member-profile-text", person.focus_areas));
       if (person.bio) addField("About", el("dd", "member-profile-text", person.bio));
       if (person.contact_email) {

@@ -822,6 +822,27 @@ function initAccountPage() {
       );
     }
 
+    // Institution (migration 012) and the member-list switch (014). Each is
+    // asked for on its own so the form still works before those columns exist.
+    let institution = null;
+    let listing = null;
+    const { data: place, error: placeError } = await db
+      .from("profiles").select("institution").eq("id", profile.id).maybeSingle();
+    if (!placeError && place) {
+      institution = textInput("profile-institution", place.institution, 120, "e.g. University of Cincinnati");
+      form.append(field("Institution", institution));
+    }
+    const { data: listed, error: listedError } = await db
+      .from("profiles").select("directory_listing").eq("id", profile.id).maybeSingle();
+    if (!listedError && listed && typeof listed.directory_listing === "boolean") {
+      const chip = el("label", "interest-chip profile-alerts");
+      listing = el("input");
+      listing.type = "checkbox";
+      listing.checked = listed.directory_listing;
+      chip.append(listing, " Show me in the member list (members only)");
+      form.append(chip);
+    }
+
     // Email alerts for private messages (migration 011). Asked for on its
     // own so the rest of the form still works before that column exists.
     let alerts = null;
@@ -861,6 +882,8 @@ function initAccountPage() {
         });
       }
       if (alerts) changes.email_alerts = alerts.checked;
+      if (institution) changes.institution = institution.value.trim() || null;
+      if (listing) changes.directory_listing = listing.checked;
       save.disabled = true;
       status.classList.remove("is-error");
       status.textContent = "> SAVING...";
