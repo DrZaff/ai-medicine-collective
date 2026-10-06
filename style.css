@@ -1247,6 +1247,13 @@ button:hover {
   margin: 4px 0 14px;
 }
 
+/* Listed members who aren't links (signed-out visitors) don't react to hover */
+div.roster-card:hover {
+  border-color: var(--line);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.08);
+  transform: none;
+}
+
 /* What a member works on, under their name in the directory */
 .roster-focus {
   display: block;

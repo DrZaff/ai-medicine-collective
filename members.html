@@ -33,25 +33,25 @@
       <h2 class="section-title">MEMBERS</h2>
 
       <p class="note">
-        // The core team behind the AI Medicine Collective: residents at the
+        // The admin team runs the AI Medicine Collective: residents at the
         University of Cincinnati building practical AI tools for medicine.
+        Members who choose to be listed appear below them.
       </p>
 
       <p class="roster-stats">
-        &gt; 11 core members &middot; 3 programs &middot;
+        &gt; 7 admins &middot;
         <a href="join.html">request to join &gt;</a>
       </p>
 
-      <!-- ========== CORE TEAM ========== -->
+      <!-- ========== ADMIN TEAM (hand-made pages in member/) ========== -->
       <section class="roster" aria-labelledby="core-team-heading">
-        <h3 id="core-team-heading" class="subsection-title">// Core team</h3>
+        <h3 id="core-team-heading" class="subsection-title">// Admin team</h3>
 
         <!-- Program filter buttons are added by script.js (data-program on each card) -->
         <div class="filter-bar" data-filter-for="roster-grid" hidden></div>
 
         <p class="note roster-hint">
-          Select a member to open their profile. Signed-in members can browse
-          everyone in the <a href="directory.html">member directory</a>.
+          Select an admin to open their page.
         </p>
 
         <div id="roster-grid" class="roster-grid">
@@ -122,19 +122,6 @@
             <span class="roster-go" aria-hidden="true">&gt;</span>
           </a>
 
-          <a class="roster-card" href="member/sam.html" data-program="medpeds">
-            <span class="member-avatar" aria-hidden="true">SS</span>
-            <span class="roster-text">
-              <span class="roster-name">Samantha Schoenl</span>
-              <span class="roster-meta">Med/Peds &middot; PGY-3</span>
-              <span class="roster-tags">
-                <span class="member-tag tag-medpeds">MED/PEDS</span>
-                <span class="roster-role">Team member</span>
-              </span>
-            </span>
-            <span class="roster-go" aria-hidden="true">&gt;</span>
-          </a>
-
           <a class="roster-card" href="member/hannah.html" data-program="im">
             <span class="member-avatar" aria-hidden="true">HD</span>
             <span class="roster-text">
@@ -142,7 +129,7 @@
               <span class="roster-meta">Internal Medicine &middot; PGY-3</span>
               <span class="roster-tags">
                 <span class="member-tag tag-im">IM</span>
-                <span class="roster-role">Team member</span>
+                <span class="roster-role">Admin</span>
               </span>
             </span>
             <span class="roster-go" aria-hidden="true">&gt;</span>
@@ -155,51 +142,31 @@
               <span class="roster-meta">Internal Medicine &middot; PGY-2</span>
               <span class="roster-tags">
                 <span class="member-tag tag-im">IM</span>
-                <span class="roster-role">Team member</span>
+                <span class="roster-role">Admin</span>
               </span>
             </span>
             <span class="roster-go" aria-hidden="true">&gt;</span>
           </a>
 
-          <a class="roster-card" href="member/cameron.html" data-program="em">
-            <span class="member-avatar" aria-hidden="true">CP</span>
-            <span class="roster-text">
-              <span class="roster-name">Cameron Pawlik</span>
-              <span class="roster-meta">Emergency Medicine &middot; PGY-2</span>
-              <span class="roster-tags">
-                <span class="member-tag tag-em">EM</span>
-                <span class="roster-role">Team member</span>
-              </span>
-            </span>
-            <span class="roster-go" aria-hidden="true">&gt;</span>
-          </a>
+        </div>
+      </section>
 
-          <a class="roster-card" href="member/bushra.html" data-program="em">
-            <span class="member-avatar" aria-hidden="true">BA</span>
-            <span class="roster-text">
-              <span class="roster-name">Bushra Amin</span>
-              <span class="roster-meta">Emergency Medicine &middot; PGY-2</span>
-              <span class="roster-tags">
-                <span class="member-tag tag-em">EM</span>
-                <span class="roster-role">Team member</span>
-              </span>
-            </span>
-            <span class="roster-go" aria-hidden="true">&gt;</span>
-          </a>
+      <div class="section-divider"></div>
 
-          <a class="roster-card" href="member/alex.html" data-program="im">
-            <span class="member-avatar" aria-hidden="true">AA</span>
-            <span class="roster-text">
-              <span class="roster-name">Alex Arora</span>
-              <span class="roster-meta">Internal Medicine &middot; PGY-1</span>
-              <span class="roster-tags">
-                <span class="member-tag tag-im">IM</span>
-                <span class="roster-role">Team member</span>
-              </span>
-            </span>
-            <span class="roster-go" aria-hidden="true">&gt;</span>
-          </a>
+      <!-- ========== MEMBERS (filled by script.js, initPublicMembers) ==========
+           Only members who ticked "List me on the public Members page". -->
+      <section class="roster" aria-labelledby="members-heading">
+        <h3 id="members-heading" class="subsection-title">// Members</h3>
 
+        <p class="note roster-hint">
+          Being listed here is each member's choice. Members: tick the box
+          under "Your profile" on your <a href="account.html#profile">account page</a>.
+          Signed-in members can browse everyone in the
+          <a href="directory.html">member directory</a>.
+        </p>
+
+        <div id="public-members">
+          <noscript><p class="note">// The member list needs JavaScript.</p></noscript>
         </div>
       </section>
 

@@ -822,6 +822,23 @@ function initAccountPage() {
       );
     }
 
+    // Institution and the public-listing choice (migration 012). Asked for
+    // on their own so the form still works before those columns exist.
+    let institution = null;
+    let listing = null;
+    const { data: listed, error: listedError } = await db
+      .from("profiles").select("institution, public_listing").eq("id", profile.id).maybeSingle();
+    if (!listedError && listed && typeof listed.public_listing === "boolean") {
+      institution = textInput("profile-institution", listed.institution, 120, "e.g. University of Cincinnati");
+      form.append(field("Institution", institution));
+      const chip = el("label", "interest-chip profile-alerts");
+      listing = el("input");
+      listing.type = "checkbox";
+      listing.checked = listed.public_listing;
+      chip.append(listing, " List me on the public Members page (name, picture, institution, program, level)");
+      form.append(chip);
+    }
+
     // Email alerts for private messages (migration 011). Asked for on its
     // own so the rest of the form still works before that column exists.
     let alerts = null;
@@ -861,6 +878,10 @@ function initAccountPage() {
         });
       }
       if (alerts) changes.email_alerts = alerts.checked;
+      if (listing) {
+        changes.institution = institution.value.trim() || null;
+        changes.public_listing = listing.checked;
+      }
       save.disabled = true;
       status.classList.remove("is-error");
       status.textContent = "> SAVING...";
