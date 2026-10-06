@@ -152,6 +152,9 @@ def render_html(posts: list[dict], end: dt.date, days: int, projects: list[dict]
         f'{SITE_URL.replace("https://", "")}/blog</a>. '
         f'Summaries are AI-drafted and reviewed by the Collective before publishing; '
         f'always check the original source.</p>',
+        f'<p style="margin:10px 0 0;font-size:12px;color:{DIM};">'
+        f'Members receive this digest by email. To stop it, untick "Email me the weekly digest" '
+        f'under Your profile on your <a href="{SITE_URL}/account.html#profile" style="color:{TEXT};">account page</a>.</p>',
         '</td></tr></table></div>',
         '</body></html>',
     ]
@@ -184,6 +187,9 @@ def render_text(posts: list[dict], end: dt.date, days: int, projects: list[dict]
         f"All briefings: {SITE_URL}/blog.html",
         "Summaries are AI-drafted and reviewed by the Collective before publishing; "
         "always check the original source.",
+        "",
+        "Members receive this digest by email. To stop it, untick \"Email me the weekly digest\" "
+        f"under Your profile on your account page: {SITE_URL}/account.html#profile",
     ]
     return "\n".join(lines) + "\n"
 
