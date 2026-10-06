@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-05",
+  "headline": "AI picks nightly teaching cases for radiology residents, and a student-built study app gains users",
+  "intro": "This briefing looks at two ways AI is entering training. In one, a residency program uses AI to fill gaps in residents' case exposure. In the other, a student-built AI study app is drawing a large following among medical students.",
+  "items": [
+    {
+      "title": "AI Tool Finds and Fixes Training Gaps for Radiology Residents",
+      "source": "NYU Langone News (press release on a study in Academic Radiology)",
+      "url": "https://nyulangone.org/news/ai-tool-finds-and-fixes-training-gaps-radiology-residents",
+      "published": "2026-09-30",
+      "category": "education",
+      "summary": "NYU Langone faculty listed the conditions residents should see in their first three years across five imaging subspecialties, with a target number of encounters for each. They then had ChatGPT-4o read the summary sections of each resident's daily reports and pick three to five teaching cases every night, favoring conditions the resident had rarely seen; residents reviewed these at their workstations and discussed them with supervisors. The press release says the AI found exposure gaps and suggested the right case types with more than 90 percent accuracy, and that residents saw a wider range of pathology without losing time on real clinical cases.",
+      "why_it_matters": "Case logs show how many cases a trainee has seen, not how varied they were. This proof of concept shows how programs could use AI to tailor case exposure to each resident. This summary is based on the institution's press release; read the Academic Radiology paper for the full methods and limitations."
+    },
+    {
+      "title": "UCLA alumnus turns medical school frustrations into AI study app 'Neural Consult'",
+      "source": "Daily Bruin",
+      "url": "https://dailybruin.com/2026/10/03/ucla-alumnus-turns-medical-school-frustrations-into-ai-study-app-neural-consult",
+      "published": "2026-10-03",
+      "category": "tool",
+      "summary": "This student-newspaper profile covers Neural Consult, an AI study tool for medical and other patient-facing students, co-created by a medical student at the Keck School of Medicine of USC. The article puts its user count at about 100,000 (over in one place, nearly in another) and says it grew out of the founder's struggle to combine patient-interaction skills with practical knowledge while studying. It is a feature story, not an evaluation, and it reports no data on learning outcomes or accuracy.",
+      "why_it_matters": "Students are adopting AI study tools faster than schools can evaluate them. Educators should know what learners are using and help them check whether these tools are accurate and actually help them learn."
+    }
+  ],
+  "tags": [
+    "ai study tools",
+    "graduate medical education",
+    "large language models",
+    "medical students",
+    "precision education",
+    "radiology residency"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
