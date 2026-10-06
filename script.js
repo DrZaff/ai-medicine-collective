@@ -50,8 +50,9 @@ function renderMembersBar(role) {
   const accountLink = document.querySelector("[data-account-link]");
   if (!header || !accountLink) return;
 
-  // Pages in member/ link upward with "../"; reuse whatever prefix this page uses
-  const prefix = accountLink.getAttribute("href").replace(/account\.html$/, "");
+  // Pages in member/ link upward with "../"; reuse whatever prefix this page
+  // uses. The live site rewrites "account.html" to "/account", so accept both.
+  const prefix = accountLink.getAttribute("href").replace(/account(\.html)?$/, "");
   const here = window.location.pathname.split("/").pop().replace(/\.html$/, "");
 
   let unread = 0;
