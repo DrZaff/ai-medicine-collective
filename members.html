@@ -35,7 +35,7 @@
       <p class="note">
         // The admin team runs the AI Medicine Collective: residents at the
         University of Cincinnati building practical AI tools for medicine.
-        Members who choose to be listed appear below them.
+        Signed-in members can see the full member list below them.
       </p>
 
       <p class="roster-stats">
@@ -153,19 +153,17 @@
 
       <div class="section-divider"></div>
 
-      <!-- ========== MEMBERS (filled by script.js, initPublicMembers) ==========
-           Only members who ticked "List me on the public Members page". -->
+      <!-- ========== MEMBERS (filled by profiles.js; members only) ==========
+           Every approved member, unless they chose to hide themselves.
+           Signed-out visitors see a sign-in prompt instead. -->
       <section class="roster" aria-labelledby="members-heading">
         <h3 id="members-heading" class="subsection-title">// Members</h3>
 
         <p class="note roster-hint">
-          Being listed here is each member's choice. Members: tick the box
-          under "Your profile" on your <a href="account.html#profile">account page</a>.
-          Signed-in members can browse everyone in the
-          <a href="directory.html">member directory</a>.
+          Everyone in the Collective, visible to members only.
         </p>
 
-        <div id="public-members">
+        <div id="directory-app" class="account-app" aria-live="polite">
           <noscript><p class="note">// The member list needs JavaScript.</p></noscript>
         </div>
       </section>
@@ -182,6 +180,11 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"
+    integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok"
+    crossorigin="anonymous"></script>
+  <script src="auth.js"></script>
+  <script src="profiles.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

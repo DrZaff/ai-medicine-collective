@@ -692,6 +692,18 @@ function initAccountPage() {
     message.placeholder = "What would you like to build or learn? (optional)";
     message.value = (details && details.message) || "";
 
+    // Offered once, when the person first fills this in; afterwards the
+    // switch lives under "Your profile". The digest goes to approved members.
+    let digestBox = null;
+    let digestChip = null;
+    if (isNew) {
+      digestChip = el("label", "interest-chip profile-alerts");
+      digestBox = el("input");
+      digestBox.type = "checkbox";
+      digestBox.checked = true;
+      digestChip.append(digestBox, " Email me the weekly digest once I'm a member (briefings and new projects)");
+    }
+
     const isRequest = isNew && profile.role === "pending";
     const save = el("button", "join-submit", isRequest ? "> Send request" : "> Save");
     save.type = "submit";
@@ -703,6 +715,7 @@ function initAccountPage() {
       field("Program", program),
       interests,
       field("Message", message, true),
+      ...(digestChip ? [digestChip] : []),
       save,
       status,
       el("p", "join-hint", "// Visible only to you and our moderators. Please don't include any patient information.")
@@ -733,6 +746,10 @@ function initAccountPage() {
         return;
       }
 
+      // Best effort: before migration 013 the column isn't there, and that's fine
+      if (digestBox) {
+        await db.from("profiles").update({ email_digest: digestBox.checked }).eq("id", profile.id);
+      }
       if (isRequest) notifyOrganizers(profile, row);
       await refresh();
     });
@@ -822,20 +839,24 @@ function initAccountPage() {
       );
     }
 
-    // Institution and the public-listing choice (migration 012). Asked for
-    // on their own so the form still works before those columns exist.
+    // Institution (migration 012) and the member-list switch (014). Each is
+    // asked for on its own so the form still works before those columns exist.
     let institution = null;
     let listing = null;
-    const { data: listed, error: listedError } = await db
-      .from("profiles").select("institution, public_listing").eq("id", profile.id).maybeSingle();
-    if (!listedError && listed && typeof listed.public_listing === "boolean") {
-      institution = textInput("profile-institution", listed.institution, 120, "e.g. University of Cincinnati");
+    const { data: place, error: placeError } = await db
+      .from("profiles").select("institution").eq("id", profile.id).maybeSingle();
+    if (!placeError && place) {
+      institution = textInput("profile-institution", place.institution, 120, "e.g. University of Cincinnati");
       form.append(field("Institution", institution));
+    }
+    const { data: listed, error: listedError } = await db
+      .from("profiles").select("directory_listing").eq("id", profile.id).maybeSingle();
+    if (!listedError && listed && typeof listed.directory_listing === "boolean") {
       const chip = el("label", "interest-chip profile-alerts");
       listing = el("input");
       listing.type = "checkbox";
-      listing.checked = listed.public_listing;
-      chip.append(listing, " List me on the public Members page (name, picture, institution, program, level)");
+      listing.checked = listed.directory_listing;
+      chip.append(listing, " Show me in the member list (members only)");
       form.append(chip);
     }
 
@@ -892,10 +913,8 @@ function initAccountPage() {
       }
       if (alerts) changes.email_alerts = alerts.checked;
       if (digest) changes.email_digest = digest.checked;
-      if (listing) {
-        changes.institution = institution.value.trim() || null;
-        changes.public_listing = listing.checked;
-      }
+      if (institution) changes.institution = institution.value.trim() || null;
+      if (listing) changes.directory_listing = listing.checked;
       save.disabled = true;
       status.classList.remove("is-error");
       status.textContent = "> SAVING...";
