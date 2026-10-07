@@ -38,6 +38,17 @@ function initAccountLinks() {
     link.hidden = role !== null;
   });
 
+  // Status strip, top right of the frame: signed in or not, and as what
+  const strip = document.querySelector(".terminal-frame > .horizontal-rule:first-child");
+  if (strip) {
+    const labels = { member: "MEMBER", moderator: "MODERATOR", admin: "ADMIN", pending: "PENDING" };
+    strip.dataset.status = role === null
+      ? "[ SIGNED OUT ]"
+      : labels[role] ? `[ SIGNED IN · ${labels[role]} ]` : "[ SIGNED IN ]";
+    if (role === null) delete strip.dataset.signedIn;
+    else strip.dataset.signedIn = "";
+  }
+
   renderMembersBar(role);
 }
 
