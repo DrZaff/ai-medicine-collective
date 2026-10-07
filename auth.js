@@ -129,7 +129,7 @@ function avatar(profile) {
 
 // The site's public address, for links that get copied out of the site
 // (citations). Deploy previews and localhost would otherwise leak into CVs.
-const SITE_ORIGIN = "https://ai-medicine-collective.netlify.app";
+const SITE_ORIGIN = "https://www.aimedicinecollective.com";
 
 // One line a member can paste into a CV. `item` needs id, kind, title, created_at.
 function citationFor(item, author) {

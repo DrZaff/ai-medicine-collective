@@ -209,3 +209,12 @@ Domains page).
   A `200` means Resend accepted it; anything else says why not.
 - Keys never go in the repo or in chat. To replace one, delete it in Resend,
   create a new one, and update it where it is stored.
+
+## Site address (changed October 2026)
+
+The site now lives at `https://www.aimedicinecollective.com`. In Supabase >
+Authentication > URL Configuration, the **Site URL** is that address, and the
+**Redirect URLs** list includes `https://www.aimedicinecollective.com/**` and
+`https://aimedicinecollective.com/**` alongside the netlify entries above
+(keep those: the old address and deploy previews still use them). Without
+these entries, signing in from the new address sends people back to the old one.
