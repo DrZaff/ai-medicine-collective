@@ -79,9 +79,9 @@ language sql
 stable
 set search_path = ''
 as $$
-  select (d + t) at time zone 'America/New_York'
-    from generate_series(target::timestamp, target::timestamp + interval '6 days', interval '1 day') d
-   cross join generate_series(interval '16 hours', interval '18 hours 30 minutes', interval '30 minutes') t
+  select (day_start + interval '16 hours' + half_hour * interval '30 minutes') at time zone 'America/New_York'
+    from generate_series(target::timestamp, target::timestamp + interval '6 days', interval '1 day') as day_start
+   cross join generate_series(0, 5) as half_hour
    order by 1;
 $$;
 
