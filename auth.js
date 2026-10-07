@@ -1449,7 +1449,7 @@ function initDigestSender() {
     const firstName = (profile.full_name || "").trim().split(/\s+/)[0] || "";
     const section = el("section", "mod-section digest-panel");
     section.append(el("h3", "subsection-title", "// Weekly digest"),
-      el("p", "note", "// Merge that week's \"Newsletter draft\" pull request first. Load it here, add a note in your own words, preview, send yourself a test, then send it to members. Each week can be sent once."));
+      el("p", "note", "// Each Friday's digest is published to the site automatically; nobody is emailed until you send it here. Load it, add a note in your own words, preview and edit, send yourself a test, then send it to members. Each week can be sent once."));
 
     const status = el("p", "account-status hub-status");
     status.setAttribute("role", "status");
@@ -1586,7 +1586,7 @@ function initDigestSender() {
         if (!page.ok || !text.ok) throw new Error("missing");
         [html, plain] = await Promise.all([page.text(), text.text()]);
       } catch {
-        return say(`> NO DIGEST FOUND FOR ${issue}. Merge that week's "Newsletter draft" pull request first.`, true);
+        return say(`> NO DIGEST FOUND FOR ${issue}. The Friday job may not have run yet.`, true);
       }
       let suggested = `AI Medicine Collective: week ending ${issue}`;
       try {
@@ -1631,6 +1631,15 @@ function initDigestSender() {
 
     const top = el("div", "digest-row");
     top.append(dateLabel, date, button("Load", "hub-tab", loadIssue));
+
+    // Start on the newest published issue (the Friday job can run late, so
+    // its date isn't always a Friday)
+    fetch("newsletter/latest.json", { cache: "no-cache" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((latest) => {
+        if (latest && /^\d{4}-\d{2}-\d{2}$/.test(latest.date)) date.value = latest.date;
+      })
+      .catch(() => {});
 
     const actions = el("div", "digest-row");
     actions.append(

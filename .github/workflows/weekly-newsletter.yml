@@ -1,11 +1,15 @@
-# Every Friday afternoon (after Friday's post can be reviewed), assembles the week's published blog posts into an email-ready
-# newsletter (HTML + plain text) and opens a PR for review. No AI call and no
-# secrets needed. Sending to the listserv is not automated yet.
+# Every Friday afternoon, assembles the weekly digest (HTML, plain text and a
+# suggested subject line) from the week's published blog posts and new hub
+# projects, and publishes the files to the site by committing them to main.
+# No AI call and no secrets needed.
 #
-# Needs: Settings > Actions > General > Workflow permissions >
-#        "Allow GitHub Actions to create and approve pull requests"
+# Publishing the files emails nobody. An admin still sends the digest from
+# the Moderation page (load the week, add a note, preview and edit, test,
+# send), and that preview is the review step. The owner chose this on
+# 2026-10-07 in place of a pull request each Friday; it is the one automated
+# exception to "never commit directly to main" (see CLAUDE.md).
 
-name: Weekly newsletter draft
+name: Weekly digest
 
 on:
   schedule:
@@ -14,7 +18,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   assemble:
@@ -31,34 +34,20 @@ jobs:
         id: build
         run: python scripts/blog_agent/newsletter.py
 
-      - name: Open pull request
+      - name: Publish to the site
         if: steps.build.outputs.created == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
           DATE: ${{ steps.build.outputs.date }}
-          COUNT: ${{ steps.build.outputs.post_count }}
         run: |
-          branch="newsletter/$DATE"
-          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
-            echo "::notice::A newsletter branch for $DATE already exists; not opening another."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git switch -c "$branch"
-          git add "newsletter/$DATE.html" "newsletter/$DATE.txt" "newsletter/$DATE.json"
-          git commit -m "Newsletter draft for week ending $DATE"
-          git push -u origin "$branch"
-          {
-            echo "Weekly digest built from **$COUNT** published blog post(s), plus any projects published in the hub this week."
-            echo
-            echo "- Email-ready HTML: \`newsletter/$DATE.html\` (open the Netlify deploy preview to see it)"
-            echo "- Plain-text version: \`newsletter/$DATE.txt\`"
-            echo
-            echo "- Suggested subject line: \`newsletter/$DATE.json\`"
-            echo
-            echo "After merging, an admin sends it from the Moderation page: load the week, add a note, preview, test, send."
-          } > "$RUNNER_TEMP/body.md"
-          gh pr create --base main --head "$branch" \
-            --title "Newsletter draft: week ending $DATE" \
-            --body-file "$RUNNER_TEMP/body.md"
+          git add "newsletter/$DATE.html" "newsletter/$DATE.txt" "newsletter/$DATE.json" newsletter/latest.json
+          if git diff --cached --quiet; then
+            echo "::notice::The digest for $DATE is already published and unchanged."
+            exit 0
+          fi
+          git commit -m "Weekly digest for week ending $DATE"
+          # A blog post may have been merged while this ran
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo "::notice::Published newsletter/$DATE.html. Send it from the Moderation page."
