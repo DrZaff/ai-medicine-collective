@@ -422,7 +422,7 @@ function initAccountPage() {
           ? "> TOO MANY TRIES. Please wait a minute and try again."
           : "> COULD NOT SEND THE CODE. Check the address, or use Google sign-in.", true);
       }
-      showCodeForm(`> CODE SENT to ${address}. Type it here; then set a new password under "Password" on your account page.`);
+      showCodeForm(`> CODE SENT to ${address}. It can take a minute, and may land in junk or spam. Type it here; then set a new password under "Password" on your account page.`);
     }
 
     passForm.addEventListener("submit", async (e) => {
@@ -475,7 +475,7 @@ function initAccountPage() {
       if (data.session) return refresh(); // confirmation switched off: already signed in
       // Same message whether or not the address already had an account, so
       // this form can't be used to find out who is a member.
-      showCodeForm(`> CHECK ${address} for a code and type it here to finish. No email? You may already have an account: start over and sign in, or use "Forgot password".`);
+      showCodeForm(`> CHECK ${address} for a code and type it here to finish. Look in junk or spam too. Still nothing? You may already have an account: start over and sign in, or use "Forgot password".`);
     });
 
     codeForm.addEventListener("submit", async (e) => {
