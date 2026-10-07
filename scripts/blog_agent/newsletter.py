@@ -12,7 +12,8 @@ text) and .json (the suggested subject line). No AI call: it only rearranges
 posts that were already reviewed and merged, and reads published projects
 from the site's public API (the same request the home page makes; if that
 fails, those parts are left out). The weekly workflow
-(.github/workflows/weekly-newsletter.yml) opens a pull request with the result.
+(.github/workflows/weekly-newsletter.yml) publishes the result to the site; an
+admin then sends it from the Moderation page.
 
 The files carry three markers that the Moderation page fills in at the moment
 an admin presses send (see initDigestSender in auth.js): a personal note,
@@ -361,6 +362,8 @@ def main() -> int:
     stem.with_suffix(".json").write_text(
         json.dumps({"date": end.isoformat(), "subject": digest["subject"]}, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8")
+    # The Moderation page reads this to offer the newest issue
+    (OUT_DIR / "latest.json").write_text(json.dumps({"date": end.isoformat()}) + chr(10), encoding="utf-8")
     print(f"Wrote {stem.name}.html, .txt and .json from {len(digest['week'])} post(s). Subject: {digest['subject']}")
     set_output("created", "true")
     set_output("post_count", str(len(digest["week"])))
