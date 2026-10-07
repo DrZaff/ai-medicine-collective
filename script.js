@@ -521,12 +521,13 @@ function initBlog() {
         head.append(el("span", "blog-item-title", item.title));
       }
 
-      li.append(
-        head,
-        el("p", "blog-source", `${item.source} · ${item.published}`),
-        el("p", "blog-summary", item.summary),
-        el("p", "blog-why", `> Why it matters: ${item.why_it_matters}`)
-      );
+      // Takeaway first; the fuller summary folds away so the feed can be skimmed
+      const why = el("p", "blog-why");
+      why.append(el("span", "blog-why-label", "Why it matters"), item.why_it_matters);
+      const more = el("details", "blog-more");
+      more.append(el("summary", null, "Read the summary"), el("p", "blog-summary", item.summary));
+
+      li.append(head, el("p", "blog-source", `${item.source} · ${item.published}`), why, more);
       list.append(li);
     }
     article.append(list);

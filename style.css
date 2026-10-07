@@ -18,14 +18,17 @@
 
   /* Text hierarchy: bright for what matters (headings, links, numbers,
      names), body for reading, muted for secondary detail. */
-  --body: #c8f5d6;
-  --muted: #7dbf94;
+  --body: #e9f1eb;
+  --muted: #9db8a6;
 
   /* Courier for display text (the terminal look); a sturdier monospace
      already on the reader's device for everything they have to read. */
   --font-display: "Courier New", Courier, monospace;
   --font-body: ui-monospace, "Cascadia Mono", "Cascadia Code", Consolas, "SF Mono", Menlo,
     "Roboto Mono", "DejaVu Sans Mono", "Liberation Mono", monospace;
+  /* Anything longer than a line or two is set in the device's plain text
+     font: far easier to read than monospace, especially on a phone. */
+  --font-read: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   /* One job each (see CLAUDE.md) */
   --cyan: #00e5ff;    /* link hover, "Instructions" */
@@ -86,9 +89,15 @@ body::after {
     to bottom,
     transparent 0,
     transparent 2px,
-    rgba(0, 0, 0, 0.16) 2px,
-    rgba(0, 0, 0, 0.16) 3px
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 3px
   );
+}
+
+@media (max-width: 600px) {
+  body::after {
+    display: none;
+  }
 }
 
 @keyframes crtFade {
@@ -395,7 +404,7 @@ textarea:focus-visible {
   padding: 8px 10px;
   border: 1px solid var(--line);
   background: rgba(0, 255, 102, 0.04);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   letter-spacing: 0.1em;
 }
 
@@ -466,8 +475,31 @@ textarea:focus-visible {
 .section p,
 .section ul,
 .section li {
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Reading text (see --font-read). Labels, notes in the "//" voice, buttons
+   and headings stay monospace; paragraphs people actually read do not. */
+.section p:not([class]),
+.section li:not([class]),
+.section dd:not([class]),
+.hero-text,
+.home-panel-body p:not([class]),
+.home-panel-text,
+.tile-text,
+.project-desc,
+.hub-description,
+.request-details,
+.chat-body,
+.member-profile-text,
+.empty-state-text,
+.blog-intro,
+.blog-summary,
+.blog-why,
+.join-steps li {
+  font-family: var(--font-read);
+  letter-spacing: 0;
 }
 
 .section ul {
@@ -485,7 +517,7 @@ textarea:focus-visible {
 }
 
 .note {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--muted);
 }
 
@@ -633,7 +665,7 @@ button:hover {
 .empty-state-text {
   margin: 0 auto;
   max-width: 46ch;
-  font-size: 0.9rem;
+  font-size: 0.98rem;
   color: var(--muted);
 }
 
@@ -694,7 +726,7 @@ button:hover {
 }
 
 .dash-title {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
@@ -715,7 +747,7 @@ button:hover {
 }
 
 .dash-note {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   line-height: 1.35;
   color: var(--muted);
   overflow-wrap: anywhere;
@@ -1131,7 +1163,7 @@ button:hover {
 .hub-card-meta {
   display: block;
   margin-top: 6px;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   color: var(--muted);
 }
 
@@ -1284,7 +1316,7 @@ div.roster-card:hover {
 .roster-focus {
   display: block;
   margin-top: 2px;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   line-height: 1.35;
   color: var(--muted);
   overflow-wrap: anywhere;
@@ -1398,7 +1430,7 @@ div.roster-card:hover {
 }
 
 .tool-name {
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   line-height: 1.3;
   overflow-wrap: anywhere;
 }
@@ -1409,7 +1441,7 @@ div.roster-card:hover {
   justify-content: center;
   gap: 2px 10px;
   margin-top: auto;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
 }
 
 .tool-links a,
@@ -1478,8 +1510,8 @@ div.roster-card:hover {
 
 .request-details {
   margin: 6px 0 0;
-  font-size: 0.88rem;
-  line-height: 1.45;
+  font-size: 0.98rem;
+  line-height: 1.55;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -1802,7 +1834,7 @@ button.onboard-hide {
 
 .chat-author {
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
 }
 
 .chat-message--own .chat-author {
@@ -1817,8 +1849,8 @@ button.onboard-hide {
 /* Keep the writer's line breaks; never run long words past the frame */
 .chat-body {
   margin-top: 2px;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 1rem;
+  line-height: 1.5;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -1874,7 +1906,7 @@ button.onboard-hide {
 
 .hero-kicker {
   margin: 0 0 10px;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
@@ -1897,8 +1929,8 @@ button.onboard-hide {
 .hero-text {
   max-width: 60ch;
   margin: 18px auto 0;
-  font-size: 1rem;
-  line-height: 1.55;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 .hero-actions {
@@ -1942,7 +1974,7 @@ button.onboard-hide {
 
 .hero-stat dd {
   margin: 4px 0 0;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
@@ -1973,7 +2005,7 @@ button.onboard-hide {
 
 .home-panel-title {
   margin: 0 0 10px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
@@ -1981,8 +2013,8 @@ button.onboard-hide {
 
 .home-panel-body {
   flex: 1;
-  font-size: 0.9rem;
-  line-height: 1.45;
+  font-size: 1rem;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
@@ -1992,12 +2024,13 @@ button.onboard-hide {
 
 .home-headline {
   display: block;
+  margin-bottom: 8px;
   line-height: 1.35;
 }
 
 .home-panel-text {
   margin-top: 8px;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: var(--body);
 }
 
@@ -2022,7 +2055,7 @@ button.onboard-hide {
 .home-list-meta {
   display: block;
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
@@ -2030,7 +2063,7 @@ button.onboard-hide {
 
 .home-panel-link {
   margin-top: 12px;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   letter-spacing: 0.1em;
 }
 
@@ -2073,8 +2106,8 @@ button.onboard-hide {
 }
 
 .tile-text {
-  font-size: 0.8rem;
-  line-height: 1.4;
+  font-size: 0.92rem;
+  line-height: 1.45;
   color: var(--body);
 }
 
@@ -2083,7 +2116,7 @@ button.onboard-hide {
   padding: 1px 6px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: normal;
   letter-spacing: 0.08em;
   vertical-align: middle;
@@ -2113,8 +2146,8 @@ button.onboard-hide {
   }
 
   .hero-stat dd {
-    font-size: 0.62rem;
-    letter-spacing: 0.04em;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
   }
 }
 
@@ -2153,7 +2186,7 @@ button.onboard-hide {
 
 .project-desc {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   margin-top: 2px;
   color: var(--body);
 }
@@ -2365,7 +2398,7 @@ button.onboard-hide {
 .member-tag {
   display: inline-block;
   padding: 1px 6px;
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border-radius: 10px;
@@ -2923,7 +2956,7 @@ textarea.join-input {
 
 .join-hint {
   margin-top: 12px;
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   color: var(--muted);
 }
 
@@ -2943,7 +2976,7 @@ textarea.join-input {
 /* === BLOG ==================================================== */
 
 .blog-status {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .blog-post {
@@ -2952,96 +2985,136 @@ textarea.join-input {
 
 .blog-date {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   letter-spacing: 0.08em;
   color: var(--accent);
 }
 
 .blog-headline {
-  margin: 4px 0 8px;
-  font-size: 1.15rem;
-  letter-spacing: 0.04em;
+  margin: 6px 0 12px;
+  font-size: clamp(1.3rem, 4.5vw, 1.7rem);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+}
+
+.section .blog-intro {
+  max-width: 68ch;
+  font-size: 1.08rem;
+  line-height: 1.6;
 }
 
 .blog-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 8px 0 0;
+  margin: 14px 0 0;
 }
 
 .blog-tag {
-  padding: 1px 8px;
-  border: 1px solid rgba(0, 255, 102, 0.4);
+  padding: 2px 10px;
+  border: 1px solid var(--line-strong);
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  opacity: 0.85;
+  color: var(--muted);
 }
 
 .blog-items {
   list-style: none;
-  margin: 16px 0 0;
+  margin: 20px 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .section .blog-items {
   padding-left: 0;
 }
 
+/* One story: category, headline, source, the takeaway, then the detail */
 .blog-item {
-  padding: 12px 14px;
-  border: 1px solid rgba(0, 255, 102, 0.25);
-  background: rgba(0, 0, 0, 0.75);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.08);
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  background: var(--panel);
 }
 
 .blog-item-head {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
 }
 
 .blog-cat {
-  padding: 1px 8px;
+  padding: 2px 10px;
   border: 1px solid var(--accent);
   border-radius: 999px;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--text);
 }
 
 .blog-item-title {
-  font-size: 1rem;
-  font-weight: bold;
+  font-family: var(--font-read);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.3;
   overflow-wrap: anywhere;
 }
 
-.blog-source {
-  margin: 4px 0 6px;
-  font-size: 0.8rem;
+.section .blog-source {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
   color: var(--muted);
 }
 
-.section .blog-summary,
+/* The takeaway is what a skimming reader should leave with */
 .section .blog-why {
-  margin: 6px 0 0;
-  font-size: 0.9rem;
-}
-
-.blog-why {
-  border-left: 2px solid var(--accent);
-  padding-left: 10px;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--yellow);
+  background: rgba(255, 230, 0, 0.05);
+  font-size: 1.02rem;
+  line-height: 1.55;
   color: var(--body);
 }
 
+.blog-why-label {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+/* The longer summary folds away so the page can be skimmed */
+.blog-more {
+  margin-top: 12px;
+}
+
+.blog-more summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.section .blog-summary {
+  max-width: 68ch;
+  margin: 10px 0 0;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
 .blog-archive {
-  margin-top: 22px;
+  margin-top: 26px;
 }
 
 .blog-archive-list {
@@ -3055,18 +3128,24 @@ textarea.join-input {
 }
 
 .blog-archive-list li {
-  margin: 4px 0;
+  margin: 8px 0;
 }
 
 .blog-archive-date {
-  display: inline-block;
-  min-width: 100px;
+  display: block;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 
 .blog-archive-list a[aria-current="page"] {
   color: var(--accent);
   text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .blog-item {
+    padding: 14px;
+  }
 }
 
 

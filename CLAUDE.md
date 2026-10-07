@@ -84,8 +84,8 @@ Use the CSS variables; don't hard-code new colors.
 | `--bg-inner` | `#000000` | Page background |
 | `--bg` | `#020802` | Terminal frame background (radial gradient `#051505` → `--bg` → `#000`) |
 | `--text` | `#00ff66` | **Bright:** headings, links, buttons, names, key numbers. Not for paragraphs |
-| `--body` | `#c8f5d6` | **Body:** anything people read (paragraphs, descriptions, form text). The default text color |
-| `--muted` | `#7dbf94` | **Muted:** secondary detail (notes, dates, captions). Use this instead of `opacity` on text |
+| `--body` | `#e9f1eb` | **Body:** anything people read (paragraphs, descriptions, form text). Near-white on purpose: green body text was reported as hard to read. The default text color |
+| `--muted` | `#9db8a6` | **Muted:** secondary detail (notes, dates, captions). Use this instead of `opacity` on text |
 | `--accent` | `#00cc55` | Borders, rules, highlights |
 | `--error` | `#ff5555` | Errors only |
 | `--line`, `--line-strong` | green at 25% / 45% | Card and panel borders |
@@ -98,13 +98,14 @@ Secondary accents, each with **one job only**:
 - Pink `#ff4da6` (`--pink`): "< Back" links and the Join submit button
 - Department tags: IM `#00ff66`, Med/Peds `#00ffd5`, EM `#ffb347`
 
-No other hues. No white backgrounds, no light mode, no gradients beyond the subtle dark radial ones, the faint page grid and the scanline overlay (both defined once on `body`).
+No other hues. No white backgrounds, no light mode, no gradients beyond the subtle dark radial ones, the faint page grid and the scanline overlay (both defined once on `body`; the scanlines are switched off on phones, where they cost the most legibility).
 
 ### Typography
-- Two monospace stacks, no web fonts, no sans-serif: `--font-display` (Courier New) for headings, the hero and big numbers; `--font-body` (the device's own sturdier monospace: Cascadia Mono / Consolas / SF Mono / Menlo / Roboto Mono) for everything people read. Form controls inherit the body font.
+- Three stacks, no web fonts. **Reading text is not monospace** (changed 2026-10-07 after members said the small green monospace text was hard to digest, especially on phones): `--font-read` (the device's plain system font) for anything longer than a line or two — paragraphs, descriptions, blog summaries, chat messages. Give a new reading element a class from the `--font-read` rule in `style.css`, or no class at all inside `.section`. The terminal voice stays monospace: `--font-display` (Courier New) for headings, the hero and big numbers; `--font-body` (the device's own sturdier monospace: Cascadia Mono / Consolas / SF Mono / Menlo / Roboto Mono) for everything people read. Form controls inherit the body font.
 - Three text levels (bright / body / muted, see Colors). Bright is for what the eye should land on; if everything is bright, nothing is. Nav links are body-colored until hovered or current.
 - Headings and labels are UPPERCASE with letter-spacing `0.08em`; the site headline uses `0.1em`.
-- Body text `0.95rem` at line-height `1.4`; notes and secondary text `0.8–0.85rem` at ~0.85 opacity.
+- Reading text is at least `1rem` (16px) at line-height `1.5–1.65`; notes and labels no smaller than about `0.78rem`. Don't go below that to make something fit: shorten the text instead.
+- **Blog feed:** each story shows its category, headline, source and the "Why it matters" takeaway; the longer summary is folded behind "Read the summary" so the page can be skimmed.
 - Inputs and buttons are at least `16px` on phones (prevents iOS zoom).
 
 ### Terminal-style elements (use these, don't invent new ones)
