@@ -133,6 +133,7 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 ### Code conventions
 - Shared styles go in `style.css` under the matching `/* === SECTION === */` block; edit an existing rule rather than appending a second copy of the same selector at the bottom. Avoid page-level `<style>` blocks. Respect the ordering notes in `style.css` (e.g. the LINKS block must stay below NAV and LANDING PAGE).
 - Every page uses the same header, nav, and footer markup. When the nav changes, update it on **every** page, including `member/*.html`.
+- Every page's `<head>` carries the tab icon and link-preview tags (`og:title`, `og:description`, `og:image` pointing at `images/share-card.png` by its full web address, `twitter:card`). Copy them when adding a page, and set `og:title` to the page's title. Group chats and social sites read these to show a title, description and picture for a shared link.
 - Images need meaningful `alt` text. Compress large images (aim < 500 KB) and use thumbnails for previews.
 
 ## Roadmap (in order)
