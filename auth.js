@@ -52,6 +52,14 @@ async function refreshUnread(userId) {
   if (!error) rememberUnread(count || 0);
 }
 
+// Bot check on the email sign-in forms (Cloudflare Turnstile). This is the
+// public "site key"; the matching secret key lives only in Supabase
+// (Authentication > Attack Protection). While this is empty there is no
+// check and nothing is loaded from Cloudflare.
+const TURNSTILE_SITE_KEY = "0x4AAAAAAFQNTJzs-R2ztzr7";
+const TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=amcTurnstileReady";
+window.amcTurnstileReady = () => window.dispatchEvent(new Event("amc-turnstile-ready"));
+
 const CONTACT_EMAIL = "zaffutbn@ucmail.uc.edu";
 const ROLE_LABELS = {
   pending: "PENDING",
@@ -235,7 +243,7 @@ function initAccountPage() {
     const panel = el("div", "account-panel");
     if (message) panel.append(el("p", "account-status is-error", message));
     panel.append(
-      el("p", null, "Sign in with your Google account, or with a code we email you. No password to remember."),
+      el("p", null, "Sign in with your Google account, or with your email and a password."),
       button("> SIGN IN WITH GOOGLE", "signin-btn", async (e) => {
         e.currentTarget.disabled = true;
         const { error } = await signInWithGoogle();
@@ -247,7 +255,7 @@ function initAccountPage() {
     const note = el("p", "note");
     note.append(
       "// First time here? Signing in sends a membership request to our moderators. " +
-      "With Google we receive only your name, email and profile picture; with a code, only your email. See the "
+      "With Google we receive only your name, email and profile picture; with a password, only your email. See the "
     );
     const link = el("a", null, "privacy policy");
     link.href = "privacy.html";
@@ -256,10 +264,12 @@ function initAccountPage() {
     show(panel);
   }
 
-  // Sign in without Google: we email a one-time code, the person types it in.
-  // (The email also carries a link, which works when it's opened in the same
-  // browser that asked for it.) Sent by Supabase through the Collective's
-  // own mail domain.
+  // Sign in without Google: email and password. The person's email is their
+  // username. New accounts confirm the address with a one-time code we email;
+  // the same kind of code is the way back in after a forgotten password
+  // (no link in the email: mail scanners open links and use them up).
+  const PASSWORD_MIN = 10;
+
   function emailSignIn() {
     const wrap = el("div", "signin-email");
     const status = el("p", "join-status");
@@ -268,21 +278,94 @@ function initAccountPage() {
       status.textContent = text;
       status.classList.toggle("is-error", !!isError);
     };
+    const row = (labelText, input) => {
+      const label = el("label", "join-label", labelText);
+      label.htmlFor = input.id;
+      const line = el("div", "signin-row");
+      line.append(label, input);
+      return line;
+    };
 
-    const askForm = el("form", "signin-email-form");
+    let mode = "signin"; // or "create"
+    let address = "";
+
+    /* ---- bot check: each sign-in request carries a one-use pass ---- */
+    const captchaBox = el("div", "signin-captcha");
+    let captchaToken = null;
+    let captchaWidget = null;
+    function mountCaptcha() {
+      if (!TURNSTILE_SITE_KEY || !window.turnstile || captchaWidget !== null) return;
+      captchaWidget = window.turnstile.render(captchaBox, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: "dark",
+        callback: (token) => { captchaToken = token; },
+        "expired-callback": () => { captchaToken = null; },
+        "error-callback": () => { captchaToken = null; },
+      });
+    }
+    // A pass works once: ask for a fresh one after every attempt
+    function resetCaptcha() {
+      captchaToken = null;
+      if (captchaWidget !== null && window.turnstile) window.turnstile.reset(captchaWidget);
+    }
+    // False (with a message) while the check hasn't finished
+    function captchaReady() {
+      if (!TURNSTILE_SITE_KEY || captchaToken) return true;
+      say("> ONE MOMENT: the check below hasn't finished. Try again when it shows a tick.", true);
+      return false;
+    }
+    if (TURNSTILE_SITE_KEY) {
+      window.addEventListener("amc-turnstile-ready", mountCaptcha);
+      if (!document.querySelector("script[data-turnstile]")) {
+        const loader = document.createElement("script");
+        loader.src = TURNSTILE_SCRIPT;
+        loader.async = true;
+        loader.dataset.turnstile = "";
+        document.head.append(loader);
+      }
+      mountCaptcha(); // already loaded (the form was drawn again)
+    }
+
+    /* ---- email + password ---- */
+    const passForm = el("form", "signin-pass-form");
     const email = el("input", "join-input");
     email.id = "signin-email";
     email.type = "email";
     email.required = true;
     email.maxLength = 254;
-    email.autocomplete = "email";
+    email.autocomplete = "username";
     email.placeholder = "you@example.com";
-    const emailLabel = el("label", "join-label", "Email");
-    emailLabel.htmlFor = email.id;
-    const send = el("button", "join-submit", "> Email me a code");
-    send.type = "submit";
-    askForm.append(emailLabel, email, send);
+    const password = el("input", "join-input");
+    password.id = "signin-password";
+    password.type = "password";
+    password.required = true;
+    password.maxLength = 72;
+    password.autocomplete = "current-password";
+    const hint = el("p", "join-hint signin-hint");
+    const submit = el("button", "join-submit");
+    submit.type = "submit";
+    const swapMode = button("", "hub-tab", () => setMode(mode === "signin" ? "create" : "signin"));
+    const forgot = button("Forgot password? Email me a code", "hub-tab", () => sendCode());
+    const choices = el("div", "signin-choices");
+    choices.append(swapMode, forgot);
+    passForm.append(row("Email", email), row("Password", password), hint, captchaBox, submit, choices);
 
+    function setMode(next) {
+      mode = next;
+      const creating = mode === "create";
+      submit.textContent = creating ? "> Create account" : "> Sign in";
+      swapMode.textContent = creating ? "I already have an account" : "New here? Create an account";
+      password.autocomplete = creating ? "new-password" : "current-password";
+      password.minLength = creating ? PASSWORD_MIN : 0;
+      hint.textContent = creating
+        ? `// At least ${PASSWORD_MIN} characters. We'll email a code to confirm the address.`
+        : "";
+      hint.hidden = !creating;
+      forgot.hidden = creating;
+      say("");
+    }
+
+    /* ---- the emailed code ---- */
     const codeForm = el("form", "signin-email-form");
     codeForm.hidden = true;
     const code = el("input", "join-input signin-code");
@@ -295,39 +378,102 @@ function initAccountPage() {
     code.placeholder = "code from the email";
     const codeLabel = el("label", "join-label", "Code");
     codeLabel.htmlFor = code.id;
-    const verify = el("button", "join-submit", "> Sign in");
+    const verify = el("button", "join-submit", "> Continue");
     verify.type = "submit";
-    const restart = button("Use a different email", "hub-tab", () => {
+    const restart = button("Start over", "hub-tab", () => {
       codeForm.hidden = true;
-      askForm.hidden = false;
+      passForm.hidden = false;
       say("");
       email.focus();
     });
     codeForm.append(codeLabel, code, verify, restart);
 
-    let address = "";
-    askForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    const showCodeForm = (message) => {
+      passForm.hidden = true;
+      codeForm.hidden = false;
+      code.value = "";
+      say(message);
+      code.focus();
+    };
+
+    // "Forgot password": a code signs them in; they then set a new password
+    // on the account page.
+    async function sendCode() {
       address = email.value.trim();
-      if (!address) return;
-      send.disabled = true;
+      if (!address) {
+        say("> TYPE YOUR EMAIL FIRST, then ask for a code.", true);
+        email.focus();
+        return;
+      }
+      if (!captchaReady()) return;
+      forgot.disabled = true;
       say("> SENDING...");
       const { error } = await db.auth.signInWithOtp({
         email: address,
-        options: { emailRedirectTo: new URL("account.html", window.location.href).href },
+        options: { emailRedirectTo: new URL("account.html", window.location.href).href, captchaToken },
       });
-      send.disabled = false;
+      forgot.disabled = false;
+      resetCaptcha();
       if (error) {
         console.error(error);
-        say(error.status === 429
+        return say(error.status === 429
           ? "> TOO MANY TRIES. Please wait a minute and try again."
           : "> COULD NOT SEND THE CODE. Check the address, or use Google sign-in.", true);
-        return;
       }
-      askForm.hidden = true;
-      codeForm.hidden = false;
-      say(`> CODE SENT to ${address}. It can take a minute; check spam too.`);
-      code.focus();
+      showCodeForm(`> CODE SENT to ${address}. Type it here; then set a new password under "Password" on your account page.`);
+    }
+
+    passForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      address = email.value.trim();
+      if (!address || !password.value) return;
+      if (!captchaReady()) return;
+      submit.disabled = true;
+
+      if (mode === "signin") {
+        say("> SIGNING IN...");
+        const { error } = await db.auth.signInWithPassword({
+          email: address,
+          password: password.value,
+          options: { captchaToken },
+        });
+        submit.disabled = false;
+        resetCaptcha();
+        if (error) {
+          console.error(error);
+          return say(/not confirmed/i.test(error.message || "")
+            ? "> THAT EMAIL ISN'T CONFIRMED YET. Use \"Forgot password? Email me a code\" to finish."
+            : error.status === 429
+              ? "> TOO MANY TRIES. Please wait a minute and try again."
+              : "> WRONG EMAIL OR PASSWORD. If you joined with Google or a code, use that, or ask for a code below.", true);
+        }
+        password.value = "";
+        return refresh();
+      }
+
+      if (password.value.length < PASSWORD_MIN) {
+        submit.disabled = false;
+        return say(`> PASSWORD TOO SHORT. Use at least ${PASSWORD_MIN} characters.`, true);
+      }
+      say("> CREATING YOUR ACCOUNT...");
+      const { data, error } = await db.auth.signUp({
+        email: address,
+        password: password.value,
+        options: { emailRedirectTo: new URL("account.html", window.location.href).href, captchaToken },
+      });
+      submit.disabled = false;
+      resetCaptcha();
+      password.value = "";
+      if (error) {
+        console.error(error);
+        return say(error.status === 429
+          ? "> TOO MANY TRIES. Please wait a minute and try again."
+          : `> COULD NOT CREATE THE ACCOUNT. ${error.message || "Please try again."}`, true);
+      }
+      if (data.session) return refresh(); // confirmation switched off: already signed in
+      // Same message whether or not the address already had an account, so
+      // this form can't be used to find out who is a member.
+      showCodeForm(`> CHECK ${address} for a code and type it here to finish. No email? You may already have an account: start over and sign in, or use "Forgot password".`);
     });
 
     codeForm.addEventListener("submit", async (e) => {
@@ -336,8 +482,7 @@ function initAccountPage() {
       if (token.length < 6) return say("> ENTER THE CODE FROM THE EMAIL (digits only).", true);
       verify.disabled = true;
       say("> CHECKING...");
-      // "email" covers both first-time and returning sign-ins; the two older
-      // names are tried as a fallback in case the server expects them.
+      // The server names the code by how it was sent; try each in turn
       let error;
       for (const type of ["email", "signup", "magiclink"]) {
         ({ error } = await db.auth.verifyOtp({ email: address, token, type }));
@@ -346,13 +491,61 @@ function initAccountPage() {
       verify.disabled = false;
       if (error) {
         console.error(error);
-        say("> THAT CODE DIDN'T WORK. It may have expired; ask for a new one.", true);
-        return;
+        return say("> THAT CODE DIDN'T WORK. It may have expired; start over and ask for a new one.", true);
       }
       await refresh();
     });
 
-    wrap.append(askForm, codeForm, status);
+    setMode("signin");
+    wrap.append(passForm, codeForm, status);
+    return wrap;
+  }
+
+  // Set or change the password, for anyone signed in (including people who
+  // joined with Google or a code and want a password as well).
+  function passwordForm() {
+    const wrap = el("details", "account-details");
+    wrap.id = "password";
+    wrap.append(el("summary", "account-details-summary", "// Password"));
+
+    const form = el("form", "account-details-form");
+    const input = el("input", "join-input");
+    input.id = "account-new-password";
+    input.type = "password";
+    input.required = true;
+    input.minLength = PASSWORD_MIN;
+    input.maxLength = 72;
+    input.autocomplete = "new-password";
+    const label = el("label", "join-label", "New");
+    label.htmlFor = input.id;
+    const line = el("div", "join-row");
+    line.append(label, input);
+    const save = el("button", "join-submit", "> Set password");
+    save.type = "submit";
+    const status = el("p", "join-status");
+    status.setAttribute("role", "status");
+    form.append(line, save, status, el("p", "join-hint",
+      `// At least ${PASSWORD_MIN} characters. After this you can sign in with your email and this password. Google sign-in keeps working too.`));
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (input.value.length < PASSWORD_MIN) return;
+      save.disabled = true;
+      status.classList.remove("is-error");
+      status.textContent = "> SAVING...";
+      const { error } = await db.auth.updateUser({ password: input.value });
+      save.disabled = false;
+      input.value = "";
+      if (error) {
+        console.error(error);
+        status.textContent = `> COULD NOT SET THE PASSWORD. ${error.message || "Please try again."}`;
+        status.classList.add("is-error");
+        return;
+      }
+      status.textContent = "> PASSWORD SET.";
+    });
+
+    wrap.append(form);
     return wrap;
   }
 
@@ -406,6 +599,7 @@ function initAccountPage() {
     }
 
     panel.append(
+      passwordForm(),
       button("SIGN OUT", "account-signout", async () => {
         await db.auth.signOut();
         rememberRole(null);

@@ -58,9 +58,11 @@
           and any message. Only you and our moderators can see these details.
         </li>
         <li>
-          <strong>Sign-in with an emailed code.</strong> If you choose this
-          instead of Google, we receive only the email address you type, and
-          send a one-time code to it. There is no password.
+          <strong>Sign-in with email and a password.</strong> If you choose this
+          instead of Google, we receive the email address you type, and we
+          email a one-time code to confirm it (and again if you forget your
+          password). Your password is stored by our sign-in provider,
+          Supabase, in scrambled form; we cannot see it.
         </li>
         <li>
           <strong>Sign-in with Google.</strong> When member sign-in is available
@@ -148,6 +150,7 @@
         <li><strong>Supabase</strong>: stores member accounts and member content.</li>
         <li><strong>Google</strong>: provides sign-in, if you choose it.</li>
         <li><strong>Resend</strong>: delivers the emails we send you, such as sign-in codes.</li>
+        <li><strong>Cloudflare</strong>: runs a short automated check on the email sign-in form to keep bots from guessing passwords. It is loaded only on the account page.</li>
         <li><strong>YouTube (Google)</strong>: plays the videos on the Resources page. Nothing is loaded from YouTube until you press play on a video.</li>
       </ul>
       <p>
