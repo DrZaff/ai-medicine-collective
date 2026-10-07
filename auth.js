@@ -298,6 +298,8 @@ function initAccountPage() {
       captchaWidget = window.turnstile.render(captchaBox, {
         sitekey: TURNSTILE_SITE_KEY,
         theme: "dark",
+        // The standard box is 300px wide, more than a narrow phone's form has
+        size: window.innerWidth < 400 ? "compact" : "normal",
         callback: (token) => { captchaToken = token; },
         "expired-callback": () => { captchaToken = null; },
         "error-callback": () => { captchaToken = null; },
