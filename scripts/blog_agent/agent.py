@@ -29,8 +29,9 @@ POSTS_DIR = ROOT / "blog" / "posts"
 
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"
-LOOKBACK_DAYS = 7
-RECENT_DAYS_TO_AVOID = 21  # must stay longer than LOOKBACK_DAYS
+LOOKBACK_DAYS = 7              # med-ed review
+VS_HUMAN_LOOKBACK_DAYS = 30    # "AI vs human" review: good comparison studies are rarer
+RECENT_DAYS_TO_AVOID = 45      # must stay longer than both lookback windows
 MAX_PAUSE_RESUMES = 5
 
 # Tool budgets. Fetched pages are the main cost (they count as input tokens),
@@ -48,28 +49,46 @@ PRICE_PER_WEB_SEARCH = 0.01
 
 CATEGORIES = ["education", "research", "news", "policy", "tool"]
 
+# Every briefing has two reviews, one per section.
+SECTIONS = ["med_ed", "ai_vs_human"]
+SECTION_LABELS = {"med_ed": "Med-ed review", "ai_vs_human": "AI vs human"}
+# Who came out ahead on the study's main measure (AI vs human reviews only).
+VERDICTS = ["ai_ahead", "humans_ahead", "comparable", "mixed", "not_applicable"]
+
 SYSTEM_PROMPT = """\
 You are the editor of the AI Medicine Collective's briefing, published three \
-times a week and read by \
-medical students, residents, and faculty who want to keep up with AI in \
-medicine without wading through hype.
+times a week and read by medical students, residents, and faculty who want to \
+keep up with AI in medicine without wading through hype.
 
-For each briefing you find and summarize the most useful recent items about AI in \
-medical education, plus a small number of notable AI-in-medicine research, \
-policy, or tool updates that matter to trainees and educators.
+Every briefing has exactly two reviews, one in each section:
 
-Medical education comes first. Most items in a briefing should be about \
-teaching, learning, assessment, or training with AI (medical students, \
-residents, fellows, faculty development). General AI-in-medicine news is the \
-supporting act: include at most two such items, and only when they matter to \
-learners or educators.
+1. MED-ED REVIEW (section "med_ed"). The single most useful recent item about \
+AI in medical education: teaching, learning, assessment, or training with AI \
+(medical students, residents, fellows, faculty development). Published within \
+the med-ed lookback window you are given. Set its verdict to "not_applicable".
+
+2. AI VS HUMAN (section "ai_vs_human"). One study that directly compares the \
+performance of an AI system with the performance of humans on a task in \
+medicine: clinicians, trainees, or students against an AI, or clinicians \
+working with an AI against clinicians working without it. It must be a real \
+study with a reported comparison: a peer-reviewed article, or a preprint \
+clearly labelled as one. Not a press release on its own, not vendor \
+marketing, not an opinion piece, not a study that only benchmarks AI against \
+other AI. Published within the AI-vs-human lookback window you are given. \
+Its summary must say, in this order: the task; which AI system; who the \
+humans were and how many; the main measure and each side's result, with \
+numbers exactly as the source reports them; and the most important \
+limitation (for example: retrospective, written vignettes rather than real \
+patients, a single centre, a small sample). Set its verdict from the study's \
+own main result: "ai_ahead", "humans_ahead", "comparable", or "mixed". Do not \
+call a winner the authors did not report, and do not generalise beyond the \
+task studied.
 
 Editorial rules:
-- Use web search to find items published within the lookback window you are \
-given. Prefer primary sources: journal articles, preprints from reputable \
-servers, official announcements from medical schools, societies, regulators, \
-and companies. Prefer reputable outlets over aggregators and press-release \
-mirrors.
+- Use web search to find items. Prefer primary sources: journal articles, \
+preprints from reputable servers, official announcements from medical \
+schools, societies, regulators, and companies. Prefer reputable outlets over \
+aggregators and press-release mirrors.
 - Every item must link to a URL you actually found with your search tools in \
 this conversation. Never construct, guess, or shorten a URL. If you cannot \
 confirm an item's source, leave it out.
@@ -78,19 +97,22 @@ conclusions. Say plainly when something is a preprint, a press release, or \
 an opinion piece.
 - Never include patient-identifiable information of any kind.
 - Skip items already covered recently (you are given that list).
-- Quality over quantity: 3 to 5 items is ideal. If fewer qualify, return \
-fewer. If nothing qualifies, return an empty items list.
-- Write in clear, plain language for busy clinicians. Each summary is 2 to 3 \
-sentences; "why it matters" is 1 to 2 sentences aimed at learners and \
-educators.
+- One item per section, never more. If nothing qualifies for a section, leave \
+that section out rather than stretching: a briefing with one good review is \
+better than one with a weak second. If nothing qualifies at all, return an \
+empty items list.
+- Write in clear, plain language for busy clinicians. The med-ed summary is 2 \
+to 3 sentences; the AI-vs-human summary is 3 to 5. "Why it matters" is 1 to 2 \
+sentences aimed at learners and educators.
 - The headline is a short, specific title for the whole briefing (no \
-clickbait). The intro is 1 to 2 sentences tying the items together.
+clickbait). The intro is 1 to 2 sentences tying the two reviews together.
 - Everything you write is published for readers. Never mention your search \
 process, tools, limits, what you could not find or check, or how many items \
-there are. If the week is thin, simply return fewer items with a normal intro.
-- You have a limited number of searches and page fetches. Use your searches \
-on medical-education topics first, and fetch a page only when the search \
-result does not give you enough to summarize it accurately.
+there are.
+- You have a limited number of searches and page fetches. Split your searches \
+roughly evenly between the two sections, and fetch a page only when the \
+search result does not give you enough to summarize it accurately. For the \
+AI-vs-human study, fetch the article page so the numbers are right.
 """
 
 POST_SCHEMA = {
@@ -108,12 +130,14 @@ POST_SCHEMA = {
                     "url": {"type": "string"},
                     "published": {"type": "string", "description": "YYYY-MM-DD"},
                     "category": {"type": "string", "enum": CATEGORIES},
+                    "section": {"type": "string", "enum": SECTIONS},
+                    "verdict": {"type": "string", "enum": VERDICTS},
                     "summary": {"type": "string"},
                     "why_it_matters": {"type": "string"},
                 },
                 "required": [
                     "title", "source", "url", "published",
-                    "category", "summary", "why_it_matters",
+                    "category", "section", "verdict", "summary", "why_it_matters",
                 ],
                 "additionalProperties": False,
             },
@@ -190,20 +214,30 @@ def build_user_prompt(date: dt.date, avoid: list[dict]) -> str:
         for post in avoid for item in post.get("items", [])
     ]
     covered_text = "\n".join(covered) if covered else "(none)"
+    vs_start = date - dt.timedelta(days=VS_HUMAN_LOOKBACK_DAYS)
     return (
         f"Today is {date.isoformat()}. Prepare this briefing.\n\n"
-        f"Lookback window: items published from {window_start.isoformat()} "
+        f"Med-ed lookback window: published from {window_start.isoformat()} "
+        f"through {date.isoformat()}.\n"
+        f"AI-vs-human lookback window: published from {vs_start.isoformat()} "
         f"through {date.isoformat()}.\n\n"
         f"Already covered in the last {RECENT_DAYS_TO_AVOID} days (do not repeat):\n"
         f"{covered_text}\n\n"
-        "Search medical-education topics first (for example: AI in medical "
+        "For the med-ed review, search topics such as: AI in medical "
         "education, AI tutors or simulation for medical students and residents, "
         "LLMs in clinical training, AI assessment and feedback in GME, AI "
         "curricula and policies at medical schools, and med-ed journals such as "
         "Academic Medicine, Medical Education, Medical Teacher, BMC Medical "
-        "Education, and JMIR Medical Education). Only after that, look for "
-        "major AI-in-medicine studies, guidelines, or regulatory news. Then "
-        "return the briefing in the required JSON format."
+        "Education, and JMIR Medical Education.\n\n"
+        "For the AI-vs-human review, search for studies such as: large "
+        "language model versus physicians on diagnosis or management, AI "
+        "versus radiologists, pathologists, dermatologists or ophthalmologists "
+        "on image reading, AI versus residents or students on examinations, "
+        "and randomised or crossover studies of clinicians with and without AI "
+        "assistance, in journals such as JAMA Network Open, NEJM AI, The "
+        "Lancet Digital Health, Nature Medicine, npj Digital Medicine, "
+        "Radiology and BMJ, or on medRxiv.\n\n"
+        "Then return the briefing in the required JSON format."
     )
 
 
@@ -286,7 +320,7 @@ def verify_items(result: dict, found_urls: set[str], avoid: list[dict]) -> tuple
     """Keep items whose URL appeared in the search results and wasn't covered
     recently. Returns (kept, reasons for dropped items)."""
     covered = {normalize_url(i["url"]) for p in avoid for i in p.get("items", [])}
-    kept, dropped, seen = [], [], set()
+    kept, dropped, seen, sections = [], [], set(), set()
 
     for item in result.get("items", []):
         url = item.get("url", "")
@@ -297,9 +331,17 @@ def verify_items(result: dict, found_urls: set[str], avoid: list[dict]) -> tuple
             dropped.append(f"{item.get('title', '?')}: link not found in search results ({url})")
         elif key in covered or key in seen:
             dropped.append(f"{item.get('title', '?')}: already covered")
+        elif item.get("section") not in SECTIONS:
+            dropped.append(f"{item.get('title', '?')}: no section")
+        elif item["section"] in sections:
+            dropped.append(f"{item.get('title', '?')}: a second item for the {item['section']} section")
         else:
             seen.add(key)
+            sections.add(item["section"])
+            if item["section"] != "ai_vs_human":
+                item["verdict"] = "not_applicable"
             kept.append(item)
+    kept.sort(key=lambda item: SECTIONS.index(item["section"]))
     return kept, dropped
 
 
@@ -316,7 +358,8 @@ def write_pr_body(path: Path, post: dict, dropped: list[str], usage: dict | None
     for n, item in enumerate(post["items"], 1):
         lines += [
             f"{n}. **{item['title']}** — {item['source']}, {item['published']} "
-            f"(`{item['category']}`)",
+            f"(`{SECTION_LABELS.get(item.get('section'), item['category'])}`"
+            + (f", verdict `{item['verdict']}`" if item.get("verdict") not in (None, "not_applicable") else "") + ")",
             f"   - {item['url']}",
             f"   - {item['summary']}",
             f"   - *Why it matters:* {item['why_it_matters']}",
