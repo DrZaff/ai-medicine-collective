@@ -52,6 +52,14 @@ async function refreshUnread(userId) {
   if (!error) rememberUnread(count || 0);
 }
 
+// Bot check on the email sign-in forms (Cloudflare Turnstile). This is the
+// public "site key"; the matching secret key lives only in Supabase
+// (Authentication > Attack Protection). While this is empty there is no
+// check and nothing is loaded from Cloudflare.
+const TURNSTILE_SITE_KEY = "";
+const TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=amcTurnstileReady";
+window.amcTurnstileReady = () => window.dispatchEvent(new Event("amc-turnstile-ready"));
+
 const CONTACT_EMAIL = "zaffutbn@ucmail.uc.edu";
 const ROLE_LABELS = {
   pending: "PENDING",
@@ -281,6 +289,43 @@ function initAccountPage() {
     let mode = "signin"; // or "create"
     let address = "";
 
+    /* ---- bot check: each sign-in request carries a one-use pass ---- */
+    const captchaBox = el("div", "signin-captcha");
+    let captchaToken = null;
+    let captchaWidget = null;
+    function mountCaptcha() {
+      if (!TURNSTILE_SITE_KEY || !window.turnstile || captchaWidget !== null) return;
+      captchaWidget = window.turnstile.render(captchaBox, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: "dark",
+        callback: (token) => { captchaToken = token; },
+        "expired-callback": () => { captchaToken = null; },
+        "error-callback": () => { captchaToken = null; },
+      });
+    }
+    // A pass works once: ask for a fresh one after every attempt
+    function resetCaptcha() {
+      captchaToken = null;
+      if (captchaWidget !== null && window.turnstile) window.turnstile.reset(captchaWidget);
+    }
+    // False (with a message) while the check hasn't finished
+    function captchaReady() {
+      if (!TURNSTILE_SITE_KEY || captchaToken) return true;
+      say("> ONE MOMENT: the check below hasn't finished. Try again when it shows a tick.", true);
+      return false;
+    }
+    if (TURNSTILE_SITE_KEY) {
+      window.addEventListener("amc-turnstile-ready", mountCaptcha);
+      if (!document.querySelector("script[data-turnstile]")) {
+        const loader = document.createElement("script");
+        loader.src = TURNSTILE_SCRIPT;
+        loader.async = true;
+        loader.dataset.turnstile = "";
+        document.head.append(loader);
+      }
+      mountCaptcha(); // already loaded (the form was drawn again)
+    }
+
     /* ---- email + password ---- */
     const passForm = el("form", "signin-pass-form");
     const email = el("input", "join-input");
@@ -303,7 +348,7 @@ function initAccountPage() {
     const forgot = button("Forgot password? Email me a code", "hub-tab", () => sendCode());
     const choices = el("div", "signin-choices");
     choices.append(swapMode, forgot);
-    passForm.append(row("Email", email), row("Password", password), hint, submit, choices);
+    passForm.append(row("Email", email), row("Password", password), hint, captchaBox, submit, choices);
 
     function setMode(next) {
       mode = next;
@@ -360,13 +405,15 @@ function initAccountPage() {
         email.focus();
         return;
       }
+      if (!captchaReady()) return;
       forgot.disabled = true;
       say("> SENDING...");
       const { error } = await db.auth.signInWithOtp({
         email: address,
-        options: { emailRedirectTo: new URL("account.html", window.location.href).href },
+        options: { emailRedirectTo: new URL("account.html", window.location.href).href, captchaToken },
       });
       forgot.disabled = false;
+      resetCaptcha();
       if (error) {
         console.error(error);
         return say(error.status === 429
@@ -380,12 +427,18 @@ function initAccountPage() {
       e.preventDefault();
       address = email.value.trim();
       if (!address || !password.value) return;
+      if (!captchaReady()) return;
       submit.disabled = true;
 
       if (mode === "signin") {
         say("> SIGNING IN...");
-        const { error } = await db.auth.signInWithPassword({ email: address, password: password.value });
+        const { error } = await db.auth.signInWithPassword({
+          email: address,
+          password: password.value,
+          options: { captchaToken },
+        });
         submit.disabled = false;
+        resetCaptcha();
         if (error) {
           console.error(error);
           return say(/not confirmed/i.test(error.message || "")
@@ -406,9 +459,10 @@ function initAccountPage() {
       const { data, error } = await db.auth.signUp({
         email: address,
         password: password.value,
-        options: { emailRedirectTo: new URL("account.html", window.location.href).href },
+        options: { emailRedirectTo: new URL("account.html", window.location.href).href, captchaToken },
       });
       submit.disabled = false;
+      resetCaptcha();
       password.value = "";
       if (error) {
         console.error(error);

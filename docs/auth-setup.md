@@ -228,3 +228,19 @@ the minimum password length to 10 to match the site, and leave "Confirm email"
 on. New password accounts are confirmed with the emailed code, and a forgotten
 password is handled by emailing a sign-in code, so the "Reset password" email
 template is never used.
+
+## Bot check (Cloudflare Turnstile)
+
+Stops scripts from guessing passwords. Two keys from a free Cloudflare
+account (Turnstile > Add widget; hostnames `aimedicinecollective.com` and
+`ai-medicine-collective.netlify.app`; mode Managed):
+
+- **Site key** (public): `TURNSTILE_SITE_KEY` in `auth.js`.
+- **Secret key**: Supabase > Authentication > Attack Protection > enable
+  CAPTCHA protection, provider Turnstile, paste the secret. Never in the
+  repo or in chat.
+
+Order matters: put the site key in the code and deploy it **before** turning
+protection on in Supabase. Protection on with no site key in the code would
+block every email sign-in (Google would still work). To switch the check off,
+turn protection off in Supabase first, then empty the site key.
