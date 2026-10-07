@@ -35,6 +35,7 @@ jobs:
         run: python scripts/blog_agent/newsletter.py
 
       - name: Publish to the site
+        id: publish
         if: steps.build.outputs.created == 'true'
         env:
           DATE: ${{ steps.build.outputs.date }}
@@ -51,3 +52,40 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
           echo "::notice::Published newsletter/$DATE.html. Send it from the Moderation page."
+          echo "published=true" >> "$GITHUB_OUTPUT"
+
+      - name: Email - the digest is ready to send
+        if: steps.publish.outputs.published == 'true'
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+          DATE: ${{ steps.build.outputs.date }}
+        run: |
+          subject=$(python -c "import json,sys; print(json.load(open(sys.argv[1], encoding='utf-8'))['subject'])" "newsletter/$DATE.json")
+          {
+            echo "This week's digest ($DATE) is published on the site and ready for you to send. Nobody has been emailed."
+            echo
+            echo "Suggested subject line: $subject"
+            echo
+            echo "WHAT TO DO"
+            echo "1. Open the Moderation page: https://www.aimedicinecollective.com/moderate.html"
+            echo "2. Scroll to \"Weekly digest\" and click Load."
+            echo "3. Write a short note in your own words."
+            echo "4. Click \"Preview and edit\" and change anything you like."
+            echo "5. Click \"Send test to me\" and check it in your inbox."
+            echo "6. Click \"Send to members\"."
+            echo
+            echo "Web copy: https://www.aimedicinecollective.com/newsletter/$DATE.html"
+            echo "To skip this week, do nothing."
+          } > "$RUNNER_TEMP/email.txt"
+          python scripts/blog_agent/notify.py --subject "Action needed: this week's digest is ready to send" --body-file "$RUNNER_TEMP/email.txt"
+
+      - name: Email - the run failed
+        if: failure()
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python scripts/blog_agent/notify.py --subject "Action needed: the weekly digest run failed" \
+            --body "This week's digest was not built. Tell Claude \"the digest run failed\", or open the run and press \"Re-run jobs\": $RUN_URL"
