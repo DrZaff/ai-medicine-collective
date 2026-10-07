@@ -218,3 +218,13 @@ Authentication > URL Configuration, the **Site URL** is that address, and the
 `https://aimedicinecollective.com/**` alongside the netlify entries above
 (keep those: the old address and deploy previews still use them). Without
 these entries, signing in from the new address sends people back to the old one.
+
+## Passwords (added October 2026)
+
+People can sign in with Google, or with their email and a password. This uses
+the Email provider that is already on; nothing else needs switching on.
+Recommended in Supabase > Authentication > Sign In / Providers > Email: set
+the minimum password length to 10 to match the site, and leave "Confirm email"
+on. New password accounts are confirmed with the emailed code, and a forgotten
+password is handled by emailing a sign-in code, so the "Reset password" email
+template is never used.

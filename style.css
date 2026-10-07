@@ -851,6 +851,58 @@ button:hover {
   font-size: 0.85rem;
 }
 
+.signin-pass-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 420px;
+}
+
+.signin-pass-form[hidden] {
+  display: none;
+}
+
+.signin-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  width: 100%;
+}
+
+.signin-row .join-label {
+  min-width: 84px;
+}
+
+.signin-row .join-input {
+  flex: 1 1 200px;
+}
+
+.signin-hint {
+  margin: 0;
+}
+
+.signin-hint[hidden] {
+  display: none;
+}
+
+.signin-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.signin-choices .hub-tab {
+  background: transparent;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.signin-choices .hub-tab[hidden] {
+  display: none;
+}
+
 .signin-email-form {
   display: flex;
   flex-wrap: wrap;
