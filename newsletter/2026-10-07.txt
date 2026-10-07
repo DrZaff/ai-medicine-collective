@@ -1,0 +1,38 @@
+:: AI MEDICINE COLLECTIVE ::
+Weekly digest, Oct 01 - Oct 07, 2026
+
+[[AMC:NOTE]]
+// THE ONE THING
+Machine Learning for Human-Autonomy Teaming in Surgical Skill Assessment: Scoping Review
+Surgical educators being pitched automated skill scoring should ask for external validation and evidence from real settings first, because most tools have only been tested on benchmark data. Residents should treat AI-generated skill scores as experimental, not as an established assessment.
+https://ai.jmir.org/2026/1/e94109
+
+// AI VS HUMAN
+No head-to-head study made the cut this week.
+
+// ALSO THIS WEEK
+> Artificial Intelligence as a Core Public Health Competency: Proposal and Perspectives in Education and Research (JMIR Medical Education)
+  https://mededu.jmir.org/2026/1/e92246
+> AI Tool Finds and Fixes Training Gaps for Radiology Residents (NYU Langone News (press release on a study in Academic Radiology))
+  https://nyulangone.org/news/ai-tool-finds-and-fixes-training-gaps-radiology-residents
+> UCLA alumnus turns medical school frustrations into AI study app 'Neural Consult' (Daily Bruin)
+  https://dailybruin.com/2026/10/03/ucla-alumnus-turns-medical-school-frustrations-into-ai-study-app-neural-consult
+> What and when: a Delphi study identifying AI competencies and learning objectives for medical students (Frontiers in Digital Health)
+  https://www.frontiersin.org/journals/digital-health/articles/10.3389/fdgth.2026.1918847/full
+
+// TOOL OF THE WEEK
+QT Interval Corrector
+Clinical micro-app that corrects the QT interval, built with ClinicalToolsDEV. Opens in the browser on phone or computer.
+https://www.aimedicinecollective.com/hub.html?project=86dfa07e-7e5c-4997-9858-a9212713c8bd
+
+// FROM THE COLLECTIVE
+Brandon Zaffuto added 16 tools, including Acid-Base Calculator and ANKIGen AI.
+[[AMC:COLLECTIVE]]
+
+// ONE ASK
+[[AMC:ASK]]Open one tool from the hub this week and tell its author what you think. https://www.aimedicinecollective.com/tools.html[[/AMC:ASK]]
+
+Every briefing: https://www.aimedicinecollective.com/blog.html
+Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.
+
+You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" under Your profile on your account page: https://www.aimedicinecollective.com/account.html#profile

@@ -1340,13 +1340,35 @@ function initModerationPage() {
 
 /* ========= MODERATION PAGE: send the weekly digest (admins) ========= */
 
-// The digest is written by the Friday workflow and reviewed as a pull
-// request. Once that is merged, an admin sends it from here: this page reads
-// the published file and hands it to send_digest() (migration 013), which
-// emails approved members who haven't opted out. One send per week.
+// The Friday workflow writes the digest and it is reviewed as a pull request.
+// Once that is merged, an admin sends it from here. This page reads the
+// published files, adds the parts only a signed-in member can know (a note
+// from the sender, the meeting, the most-wanted tool request, new members),
+// shows a preview, and hands the result to send_digest() (migrations 013 and
+// 017), which emails approved members who haven't opted out. One send per week.
+
+// Markers written by scripts/blog_agent/newsletter.py. Keep them identical.
+const DIGEST_MARKS = {
+  note: "<!--AMC:NOTE-->",
+  collective: "<!--AMC:COLLECTIVE-->",
+  ask: /<!--AMC:ASK-->[\s\S]*?<!--\/AMC:ASK-->/,
+  textNote: "[[AMC:NOTE]]",
+  textCollective: "[[AMC:COLLECTIVE]]",
+  textAsk: /\[\[AMC:ASK\]\][\s\S]*?\[\[\/AMC:ASK\]\]/,
+};
+// Inline styles matching the digest's own (email clients ignore stylesheets)
+const DIGEST_P = "margin:0 0 10px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:#e9f1eb;";
+const DIGEST_LINK = "color:#00ff66;text-decoration:none;font-weight:bold;";
+
 function initDigestSender() {
   const app = document.getElementById("moderate-digest");
   if (!app) return;
+
+  const escapeHtml = (text) => String(text).replace(/[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const site = (page) => `${SITE_ORIGIN}/${page}`;
+  const eastern = (iso, options) => new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", ...options });
+  const plainDate = (date, options) => new Date(`${date}T12:00:00Z`).toLocaleDateString("en-US", { timeZone: "UTC", ...options });
 
   // The most recent Friday (the day the digest is dated), as YYYY-MM-DD
   const lastFriday = () => {
@@ -1354,6 +1376,66 @@ function initDigestSender() {
     day.setDate(day.getDate() - ((day.getDay() + 2) % 7));
     return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`;
   };
+
+  // Members-only news, gathered with the admin's own access. Every part is
+  // optional: whatever can't be read is simply left out.
+  async function memberNews() {
+    const lines = []; // { text, linkText, href }
+    let ask = null;
+
+    try {
+      const { data: poll } = await db.rpc("meeting_poll");
+      const next = poll && poll.meetings && poll.meetings[0];
+      if (next) {
+        lines.push({
+          text: `Next meeting: ${eastern(next.starts_at, { weekday: "long", month: "long", day: "numeric" })} at `
+            + `${eastern(next.starts_at, { hour: "numeric", minute: "2-digit" })} Eastern${next.place ? `, ${next.place}` : ""}.`,
+          linkText: "Add it to your calendar", href: site("schedule.html"),
+        });
+      } else if (poll && poll.open) {
+        const month = plainDate(poll.month, { month: "long" });
+        lines.push({
+          text: `Voting is open for the ${month} meeting time, until ${plainDate(poll.closes_on, { weekday: "long", month: "long", day: "numeric" })}.`,
+          linkText: "Vote", href: site("schedule.html"),
+        });
+        ask = { text: `Tick the times you could make for the ${month} meeting. It takes a minute.`, linkText: "Vote now", href: site("schedule.html") };
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    try {
+      const [requests, votes] = await Promise.all([
+        db.from("tool_requests").select("id, title, status").eq("status", "open"),
+        db.from("tool_request_votes").select("request_id"),
+      ]);
+      if (!requests.error && !votes.error && requests.data.length) {
+        const counts = new Map();
+        votes.data.forEach((v) => counts.set(v.request_id, (counts.get(v.request_id) || 0) + 1));
+        const top = requests.data.slice().sort((x, y) => (counts.get(y.id) || 0) - (counts.get(x.id) || 0))[0];
+        const n = counts.get(top.id) || 0;
+        lines.push({
+          text: `Most-wanted tool: "${top.title}"${n ? ` (${n} vote${n === 1 ? "" : "s"})` : ""}. Nobody has claimed it yet.`,
+          linkText: "Vote or build it", href: site("requests.html"),
+        });
+        if (!ask) ask = { text: "Upvote the tool request you'd use most, or claim one and build it.", linkText: "Open requests", href: site("requests.html") };
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    try {
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const { count: joined, error } = await db.from("profiles").select("id", { count: "exact", head: true })
+        .in("role", APPROVED_ROLES).gte("approved_at", weekAgo);
+      if (!error && joined > 0) {
+        lines.push({ text: `${joined} new member${joined === 1 ? "" : "s"} joined this week. Welcome.`, linkText: "Say hello in chat", href: site("chat.html") });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    return { lines, ask };
+  }
 
   (async () => {
     const { profile } = await getSessionAndProfile();
@@ -1364,22 +1446,10 @@ function initDigestSender() {
       .order("issue_date", { ascending: false }).limit(5);
     if (sentError) return; // before migration 013: no panel
 
+    const firstName = (profile.full_name || "").trim().split(/\s+/)[0] || "";
     const section = el("section", "mod-section digest-panel");
     section.append(el("h3", "subsection-title", "// Weekly digest"),
-      el("p", "note", "// Merge that week's \"Newsletter draft\" pull request first. Then send yourself a test, check it, and send it to members. Each week can be sent once."));
-
-    const date = el("input", "join-input");
-    date.id = "digest-date";
-    date.type = "date";
-    date.value = lastFriday();
-    const label = el("label", "join-label", "Week ending");
-    label.htmlFor = date.id;
-    const preview = el("a", "hub-tab", "Preview");
-    preview.target = "_blank";
-    preview.rel = "noopener";
-    const setPreview = () => { preview.href = `newsletter/${encodeURIComponent(date.value)}.html`; };
-    setPreview();
-    date.addEventListener("change", setPreview);
+      el("p", "note", "// Merge that week's \"Newsletter draft\" pull request first. Load it here, add a note in your own words, preview, send yourself a test, then send it to members. Each week can be sent once."));
 
     const status = el("p", "account-status hub-status");
     status.setAttribute("role", "status");
@@ -1388,12 +1458,81 @@ function initDigestSender() {
       status.classList.toggle("is-error", !!isError);
     };
 
-    async function send(testOnly) {
+    const field = (labelText, control) => {
+      const label = el("label", "join-label", labelText);
+      label.htmlFor = control.id;
+      const row = el("div", "join-row join-row--stacked");
+      row.append(label, control);
+      return row;
+    };
+
+    const date = el("input", "join-input");
+    date.id = "digest-date";
+    date.type = "date";
+    date.value = lastFriday();
+    const dateLabel = el("label", "join-label", "Week ending");
+    dateLabel.htmlFor = date.id;
+
+    const subject = el("input", "join-input");
+    subject.id = "digest-subject";
+    subject.type = "text";
+    subject.maxLength = 200;
+    const replyTo = el("input", "join-input");
+    replyTo.id = "digest-reply";
+    replyTo.type = "email";
+    replyTo.maxLength = 254;
+    replyTo.value = profile.email || "";
+    replyTo.placeholder = "where replies should go";
+    const note = el("textarea", "join-input");
+    note.id = "digest-note";
+    note.rows = 4;
+    note.maxLength = 1200;
+    note.placeholder = "Two or three sentences in your own voice: what you noticed, built, or want people to try. Optional, but it's what people read first.";
+
+    const preview = el("iframe", "digest-preview");
+    preview.title = "Digest preview";
+    preview.setAttribute("sandbox", ""); // show it, run nothing
+    preview.hidden = true;
+
+    const compose = el("div", "digest-compose");
+    compose.hidden = true;
+
+    let loaded = null; // { issue, html, plain, news }
+
+    // The digest with the note, the members-only news and the ask filled in
+    function assemble() {
+      const paragraphs = note.value.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+      const noteHtml = paragraphs.length
+        ? `<div style="margin:16px 0 4px;padding:12px 14px;border-left:3px solid #00cc55;background:#07130a;">`
+          + paragraphs.map((p) => `<p style="${DIGEST_P}">${escapeHtml(p).replace(/\n/g, "<br>")}</p>`).join("")
+          + (firstName ? `<p style="${DIGEST_P}margin-bottom:0;color:#9db8a6;">${escapeHtml(firstName)}</p>` : "")
+          + "</div>"
+        : "";
+      const noteText = paragraphs.length ? `${paragraphs.join("\n\n")}${firstName ? `\n${firstName}` : ""}\n` : "";
+
+      const { lines, ask } = loaded.news;
+      const newsHtml = lines.map((line) =>
+        `<p style="${DIGEST_P}">${escapeHtml(line.text)} <a href="${escapeHtml(line.href)}" style="${DIGEST_LINK}">${escapeHtml(line.linkText)}</a></p>`).join("\n");
+      const newsText = lines.map((line) => `${line.text} ${line.href}`).join("\n");
+
+      let html = loaded.html.replace(DIGEST_MARKS.note, () => noteHtml).replace(DIGEST_MARKS.collective, () => newsHtml);
+      let plain = loaded.plain.replace(DIGEST_MARKS.textNote, () => noteText).replace(DIGEST_MARKS.textCollective, () => newsText);
+      if (ask) {
+        html = html.replace(DIGEST_MARKS.ask, () =>
+          `<p style="${DIGEST_P}">${escapeHtml(ask.text)} <a href="${escapeHtml(ask.href)}" style="${DIGEST_LINK}">${escapeHtml(ask.linkText)}</a></p>`);
+        plain = plain.replace(DIGEST_MARKS.textAsk, () => `${ask.text} ${ask.href}`);
+      }
+      // Whatever markers are left (the default ask) are just removed
+      plain = plain.replace(/\[\[\/?AMC:[A-Z]+\]\]/g, "");
+      return { html, plain };
+    }
+
+    async function loadIssue() {
       const issue = date.value;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(issue)) return say("> PICK A DATE FIRST.", true);
-      if (!testOnly && !window.confirm(`Email the ${issue} digest to all members who receive it? This can't be undone.`)) return;
-
       say("> LOADING THE DIGEST...");
+      compose.hidden = true;
+      preview.hidden = true;
       let html, plain;
       try {
         const [page, text] = await Promise.all([fetch(`newsletter/${issue}.html`), fetch(`newsletter/${issue}.txt`)]);
@@ -1402,36 +1541,65 @@ function initDigestSender() {
       } catch {
         return say(`> NO DIGEST FOUND FOR ${issue}. Merge that week's "Newsletter draft" pull request first.`, true);
       }
+      let suggested = `AI Medicine Collective: week ending ${issue}`;
+      try {
+        const meta = await (await fetch(`newsletter/${issue}.json`)).json();
+        if (meta && typeof meta.subject === "string" && meta.subject.trim()) suggested = meta.subject.trim();
+      } catch {
+        // older issues have no subject file
+      }
+      subject.value = suggested;
+      loaded = { issue, html, plain, news: await memberNews() };
+      compose.hidden = false;
+      say(`> LOADED ${issue}. ${loaded.news.lines.length} members-only line(s) will be added. Preview it before sending.`);
+    }
+
+    async function send(testOnly) {
+      if (!loaded) return say("> LOAD A DIGEST FIRST.", true);
+      const title = subject.value.trim();
+      if (title.length < 5) return say("> GIVE IT A SUBJECT LINE FIRST.", true);
+      if (!testOnly && !window.confirm(`Email the ${loaded.issue} digest to all members who receive it? This can't be undone.`)) return;
 
       say("> SENDING...");
-      const { data, error } = await db.rpc("send_digest", {
-        issue,
-        subject: `AI Medicine Collective weekly digest: week ending ${issue}`,
-        html,
-        plain,
-        test_only: testOnly,
-      });
+      const { html, plain } = assemble();
+      const args = { issue: loaded.issue, subject: title, html, plain, test_only: testOnly };
+      const reply = replyTo.value.trim();
+      let { data, error } = await db.rpc("send_digest", reply ? { ...args, reply_to: reply } : args);
+      // Before migration 017 the function has no reply address: send without it
+      if (error && reply && (error.code === "PGRST202" || /reply_to|Could not find the function/i.test(error.message || ""))) {
+        ({ data, error } = await db.rpc("send_digest", args));
+      }
       if (error) {
         console.error(error);
         return say(`> NOT SENT: ${error.message}`, true);
       }
       say(testOnly
-        ? `> TEST SENT to ${profile.email}. Check your inbox (and spam).`
+        ? `> TEST SENT to ${profile.email}. Check your inbox (and junk).`
         : `> SENT to ${data} member${data === 1 ? "" : "s"}.`);
-      if (!testOnly) history.append(el("li", null, `${issue} · ${data} members · just now`));
+      if (!testOnly) history.append(el("li", null, `${loaded.issue} · ${data} members · just now`));
     }
 
-    const row = el("div", "digest-row");
-    row.append(label, date, preview,
+    const top = el("div", "digest-row");
+    top.append(dateLabel, date, button("Load", "hub-tab", loadIssue));
+
+    const actions = el("div", "digest-row");
+    actions.append(
+      button("Preview", "hub-tab", () => {
+        if (!loaded) return;
+        preview.srcdoc = assemble().html;
+        preview.hidden = false;
+      }),
       button("Send test to me", "hub-tab", () => send(true)),
-      button("> Send to members", "hub-tab hub-tab--submit", () => send(false)));
+      button("> Send to members", "hub-tab hub-tab--submit", () => send(false))
+    );
+    compose.append(field("Subject line", subject), field("A note from you", note), field("Replies go to", replyTo), actions, preview);
 
     const history = el("ul", "dash-list digest-history");
     for (const entry of sent) {
       history.append(el("li", null, `${entry.issue_date} · ${entry.recipients} members · sent ${formatDate(entry.sent_at)}`));
     }
 
-    section.append(row, status);
+    section.append(top, status, compose);
     if (sent.length) section.append(el("p", "note", "// Already sent:"));
     section.append(history);
     app.replaceChildren(section);

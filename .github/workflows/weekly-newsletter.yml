@@ -46,7 +46,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add "newsletter/$DATE.html" "newsletter/$DATE.txt"
+          git add "newsletter/$DATE.html" "newsletter/$DATE.txt" "newsletter/$DATE.json"
           git commit -m "Newsletter draft for week ending $DATE"
           git push -u origin "$branch"
           {
@@ -55,7 +55,9 @@ jobs:
             echo "- Email-ready HTML: \`newsletter/$DATE.html\` (open the Netlify deploy preview to see it)"
             echo "- Plain-text version: \`newsletter/$DATE.txt\`"
             echo
-            echo "Merging keeps a web copy at \`/newsletter/$DATE.html\`. Sending it to the listserv is still manual."
+            echo "- Suggested subject line: \`newsletter/$DATE.json\`"
+            echo
+            echo "After merging, an admin sends it from the Moderation page: load the week, add a note, preview, test, send."
           } > "$RUNNER_TEMP/body.md"
           gh pr create --base main --head "$branch" \
             --title "Newsletter draft: week ending $DATE" \

@@ -835,6 +835,28 @@ button:hover {
   background: transparent;
 }
 
+.digest-compose {
+  margin-top: 10px;
+}
+
+.digest-compose[hidden] {
+  display: none;
+}
+
+/* The assembled email, shown before it is sent */
+.digest-preview {
+  display: block;
+  width: 100%;
+  height: 640px;
+  margin-top: 12px;
+  border: 1px solid var(--line-strong);
+  background: #000;
+}
+
+.digest-preview[hidden] {
+  display: none;
+}
+
 .digest-history li {
   font-size: 0.85rem;
   color: var(--muted);
