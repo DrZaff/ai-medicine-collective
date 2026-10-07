@@ -110,14 +110,14 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 
 ### Terminal-style elements (use these, don't invent new ones)
 - **Frame:** all content inside `.terminal-frame`: max-width `1000px`, `1px solid var(--accent)` border, green glow, and bright corner brackets (its `::before`/`::after`). The page behind it has a faint green grid and CRT scanlines.
-- **Status strip:** the first `<div class="horizontal-rule">` inside the frame is styled as a status strip (`AMC://COLLECTIVE … [ SYSTEM ONLINE ]`). Keep that div as the frame's first child on every page.
+- **Status strip:** the first `<div class="horizontal-rule">` inside the frame is styled as a status strip: `AMC://COLLECTIVE` on the left and the sign-in status on the right (`[ SIGNED OUT ]`, `[ SIGNED IN · MEMBER ]` and so on, set by `script.js` from the same cosmetic hints as the menu). Keep that div as the frame's first child on every page.
 - **Header:** `:: AI MEDICINE COLLECTIVE ::` centered and **linking to the home page** (there is no HOME item), followed by the shared `.nav` and a `.horizontal-rule`. The nav is seven links (ABOUT, MEMBERS, MEETINGS, TOOLS, PROJECTS, RESOURCES, BLOG) plus two buttons: JOIN (yellow, `data-signed-out-only`, hidden once signed in) and SIGN IN / ACCOUNT. Don't add more top-level items; member pages are reached from the Members area row. The home page is the one exception: it has no nav, because its Explore grid does that job; its hero carries the JOIN and SIGN IN / ACCOUNT buttons. `script.js` marks the current page (`aria-current="page"`) and, on phones (≤600px), collapses the nav behind a `> MENU [+]` toggle, so **every page must load `script.js`**.
 - **Page title:** `.section-title` draws a bright block before the title and a line after it. Keep its content plain text.
 - **Rules:** sections separated by `1px dashed var(--accent)` (`.horizontal-rule`, `.section-divider`).
 - **Link buttons:** `.btn` (green) and `.btn--primary` (yellow) for links that should look like buttons.
 - **Loading and empty states:** member pages show `loadingBlock()` while they load (not a bare line of text) and `emptyState(title, text, linkText, href)` when a list is empty, with a next step where there is one. Both live in `auth.js`.
 - **Focus:** keyboard focus always shows a green outline (`:focus-visible`). Animations are switched off for people who ask for reduced motion.
-- **Voice:** captions and notes written as code comments (`// Current roster`); links and prompts prefixed with `>` (`> PASSWORD:`, `> ABOUT`); back links are `< Back`.
+- **Voice:** captions and notes written as code comments (`// Current roster`); links and prompts prefixed with `>` (`> PASSWORD:`, `> ABOUT`); the link at the bottom of each page is `< HOME` (pink); the hand-made admin pages use `< Back` to return to the Members page.
 - **Footer:** `> echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"` + blinking `█` cursor, on every page.
 - **Glow, not shadow:** hover and focus states add a green `text-shadow` / `box-shadow` glow (e.g. `0 0 8px rgba(0,255,102,0.5)`). No drop shadows, no blur.
 - **Boxes and cards:** near-black fill `rgba(0,0,0,0.7–0.85)`, `1px` green border at ~25–40% opacity, brightening to `--accent` on hover. Square corners (`0–4px`); pills (`999px`) only for buttons and tags.

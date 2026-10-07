@@ -173,8 +173,19 @@ body::after {
   content: "AMC://COLLECTIVE";
 }
 
+/* Right side: whether you're signed in. script.js fills data-status from
+   the same hints it uses for the menu; without it, visitors are signed out. */
 .terminal-frame > .horizontal-rule:first-child::after {
-  content: "[ SYSTEM ONLINE ]";
+  content: "[ SIGNED OUT ]";
+}
+
+.terminal-frame > .horizontal-rule:first-child[data-status]::after {
+  content: attr(data-status);
+}
+
+.terminal-frame > .horizontal-rule:first-child[data-signed-in]::after {
+  color: var(--text);
+  text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
 }
 
 .bottom-rule {
@@ -257,10 +268,6 @@ textarea:focus-visible {
   .terminal-frame > .horizontal-rule:first-child {
     font-size: 0.6rem;
     letter-spacing: 0.06em;
-  }
-
-  .terminal-frame > .horizontal-rule:first-child::after {
-    content: "[ ONLINE ]";
   }
 }
 
