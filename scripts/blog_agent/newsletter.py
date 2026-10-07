@@ -29,7 +29,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 ROOT = Path(__file__).resolve().parents[2]
 POSTS_DIR = ROOT / "blog" / "posts"
 OUT_DIR = ROOT / "newsletter"
-SITE_URL = "https://ai-medicine-collective.netlify.app"
+SITE_URL = "https://www.aimedicinecollective.com"
 
 # Public by design (see CLAUDE.md): the same address and publishable key the
 # site's own pages use. They can only read what signed-out visitors can.
