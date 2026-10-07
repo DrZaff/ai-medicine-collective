@@ -3363,6 +3363,115 @@ textarea.join-input {
 }
 
 
+/* === MEETING POLL (meetings.js) ============================== */
+
+.meeting-confirmed {
+  margin-bottom: 18px;
+  border-color: var(--yellow);
+  box-shadow: 0 0 12px rgba(255, 230, 0, 0.2);
+}
+
+.meeting-when {
+  margin: 8px 0 4px;
+  font-family: var(--font-read);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.meeting-where {
+  margin: 0 0 6px;
+  font-family: var(--font-read);
+  overflow-wrap: anywhere;
+}
+
+button.meeting-undo {
+  margin-top: 12px;
+  background: transparent;
+  border-color: rgba(255, 85, 85, 0.5);
+  color: var(--error);
+}
+
+.meeting-poll {
+  margin-top: 6px;
+}
+
+/* One day: its name, then six half-hour chips that wrap on a phone */
+.poll-day {
+  display: grid;
+  grid-template-columns: minmax(0, 190px) minmax(0, 1fr);
+  gap: 6px 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px dashed var(--line);
+}
+
+.poll-day-name {
+  font-weight: bold;
+  color: var(--text);
+}
+
+.poll-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.poll-slot {
+  min-width: 104px;
+  padding: 8px 10px;
+  border-color: var(--line-strong);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.poll-slot.is-top {
+  border-color: var(--text);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.45);
+}
+
+/* A time you ticked */
+.poll-slot[aria-pressed="true"] {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: rgba(255, 230, 0, 0.12);
+}
+
+.poll-slot:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.meeting-admin {
+  margin-top: 18px;
+  padding: 2px 14px 12px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+}
+
+.meeting-admin .dash-list button.hub-tab {
+  margin-left: auto;
+  background: transparent;
+}
+
+#meeting-archive[hidden] {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .poll-day {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .poll-slot {
+    flex: 1 1 104px;
+  }
+}
+
+
 /* === MEETING SCHEDULE ======================================== */
 
 .ms-section {

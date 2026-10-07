@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Meeting Schedule – AI Medicine Collective</title>
+  <title>Meetings – AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="images/icon-192.png" />
   <meta property="og:site_name" content="AI Medicine Collective" />
@@ -37,11 +37,39 @@
     </header>
 
     <main class="section">
-      <h2 class="section-title">MEETING SCHEDULE</h2>
+      <h2 class="section-title">MEETINGS</h2>
 
-      <!-- Past meetings -->
-      <section class="ms-section">
-        <p>// Past meetings</p>
+      <p class="note">
+        // The Collective meets in the first week of every month. Members vote
+        on the time and get a calendar invite.
+      </p>
+
+      <!-- Filled by meetings.js (members only): the confirmed meeting and the poll -->
+      <div id="meetings-app" class="account-app" aria-live="polite">
+        <p class="account-status">&gt; LOADING...</p>
+      </div>
+
+      <noscript>
+        <p>&gt; Meetings need JavaScript. Members sign in on the <a href="account.html">account page</a>.</p>
+      </noscript>
+
+      <!-- Shown by meetings.js to approved members. The list is in this file
+           and the minutes are ordinary files, so this keeps them out of a
+           casual visitor's way; it does not make them secret. Add a past
+           meeting by copying an <li>. -->
+      <section id="meeting-archive" class="ms-section" hidden>
+        <h3 class="subsection-title">// Also planned</h3>
+        <ul class="ms-list">
+          <li class="ms-row">
+            <span class="ms-link">
+              <span class="ms-date">TBD</span>
+              <span class="ms-title">Guest speaker: Dr Laurah Turner</span>
+            </span>
+            <span class="ms-cta">COMING SOON</span>
+          </li>
+        </ul>
+
+        <h3 class="subsection-title">// Past meetings</h3>
         <p>Click a past meeting to open its minutes file.</p>
 
         <ul class="ms-list">
@@ -51,30 +79,6 @@
               <span class="ms-title">AI Club Formation</span>
             </a>
             <a href="minutes/2025-11-04-ai-club-formation-minutes.pdf" class="ms-cta ms-cta--minutes" target="_blank">MINUTES</a>
-          </li>
-        </ul>
-      </section>
-
-      <!-- Upcoming meetings -->
-      <section class="ms-section">
-        <p>// Upcoming meetings</p>
-        <p>Dates and sign-up links will be posted here once scheduled.</p>
-
-        <ul class="ms-list">
-          <li class="ms-row">
-            <span class="ms-link">
-              <span class="ms-date">TBD</span>
-              <span class="ms-title">Next monthly meeting</span>
-            </span>
-            <span class="ms-cta">COMING SOON</span>
-          </li>
-
-          <li class="ms-row">
-            <span class="ms-link">
-              <span class="ms-date">TBD</span>
-              <span class="ms-title">Guest speaker: Dr Laurah Turner</span>
-            </span>
-            <span class="ms-cta">COMING SOON</span>
           </li>
         </ul>
       </section>
@@ -91,6 +95,11 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"
+    integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok"
+    crossorigin="anonymous"></script>
+  <script src="auth.js"></script>
+  <script src="meetings.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
