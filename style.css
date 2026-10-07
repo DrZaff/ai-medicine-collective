@@ -3185,7 +3185,6 @@ textarea.join-input {
 }
 
 .section .blog-intro {
-  max-width: 68ch;
   font-size: 1.08rem;
   line-height: 1.6;
 }
@@ -3321,7 +3320,6 @@ textarea.join-input {
 }
 
 .section .blog-summary {
-  max-width: 68ch;
   margin: 10px 0 0;
   font-size: 1rem;
   line-height: 1.65;
