@@ -1491,13 +1491,57 @@ function initDigestSender() {
 
     const preview = el("iframe", "digest-preview");
     preview.title = "Digest preview";
-    preview.setAttribute("sandbox", ""); // show it, run nothing
+    // Scripts never run in here; "allow-same-origin" only lets this page turn
+    // the email's text editable and read the result back.
+    preview.setAttribute("sandbox", "allow-same-origin");
     preview.hidden = true;
+    const previewHint = el("p", "note", "// Click any text in the preview to change it. What you see here is exactly what gets sent.");
+    previewHint.hidden = true;
 
     const compose = el("div", "digest-compose");
     compose.hidden = true;
 
     let loaded = null; // { issue, html, plain, news }
+    // The preview is the working copy once it has been opened:
+    let previewOpen = false;  // showing the current issue
+    let previewEdited = false; // someone typed in it
+    let noteChanged = false;   // the note box changed after the preview was built
+
+    function showPreview() {
+      preview.addEventListener("load", () => {
+        const doc = preview.contentDocument;
+        if (!doc || !doc.body) return;
+        doc.body.contentEditable = "true";
+        doc.addEventListener("input", () => { previewEdited = true; });
+      }, { once: true });
+      preview.srcdoc = assemble().html;
+      preview.hidden = false;
+      previewHint.hidden = false;
+      previewOpen = true;
+      previewEdited = false;
+      noteChanged = false;
+    }
+
+    // The edited preview as an email: the page itself, and a plain-text
+    // version read off it (links written out, since plain text has none).
+    function fromPreview() {
+      const doc = preview.contentDocument;
+      doc.body.removeAttribute("contenteditable");
+      const html = `<!DOCTYPE html>\n${doc.documentElement.outerHTML}\n`;
+      const copy = doc.body.cloneNode(true);
+      copy.querySelectorAll("a[href]").forEach((link) => {
+        const href = link.getAttribute("href");
+        if (href && !link.textContent.includes(href.replace(/^https?:\/\//, ""))) link.append(` (${href})`);
+      });
+      copy.querySelectorAll('[style*="display:none"]').forEach((hidden) => hidden.remove());
+      // Off-screen but laid out, so line breaks between blocks survive
+      copy.style.cssText = "position:absolute;left:-9999px;top:0;width:600px;";
+      doc.documentElement.append(copy);
+      const plain = `${copy.innerText.replace(/\n{3,}/g, "\n\n").trim()}\n`;
+      copy.remove();
+      doc.body.contentEditable = "true";
+      return { html, plain };
+    }
 
     // The digest with the note, the members-only news and the ask filled in
     function assemble() {
@@ -1533,6 +1577,9 @@ function initDigestSender() {
       say("> LOADING THE DIGEST...");
       compose.hidden = true;
       preview.hidden = true;
+      previewHint.hidden = true;
+      previewOpen = false;
+      previewEdited = false;
       let html, plain;
       try {
         const [page, text] = await Promise.all([fetch(`newsletter/${issue}.html`), fetch(`newsletter/${issue}.txt`)]);
@@ -1560,8 +1607,11 @@ function initDigestSender() {
       if (title.length < 5) return say("> GIVE IT A SUBJECT LINE FIRST.", true);
       if (!testOnly && !window.confirm(`Email the ${loaded.issue} digest to all members who receive it? This can't be undone.`)) return;
 
+      if (previewEdited && noteChanged) {
+        return say("> YOU CHANGED THE NOTE AFTER EDITING THE PREVIEW. Click Preview to rebuild it (your edits in the preview will be replaced), then send.", true);
+      }
       say("> SENDING...");
-      const { html, plain } = assemble();
+      const { html, plain } = previewOpen && previewEdited ? fromPreview() : assemble();
       const args = { issue: loaded.issue, subject: title, html, plain, test_only: testOnly };
       const reply = replyTo.value.trim();
       let { data, error } = await db.rpc("send_digest", reply ? { ...args, reply_to: reply } : args);
@@ -1584,15 +1634,20 @@ function initDigestSender() {
 
     const actions = el("div", "digest-row");
     actions.append(
-      button("Preview", "hub-tab", () => {
+      button("Preview and edit", "hub-tab", () => {
         if (!loaded) return;
-        preview.srcdoc = assemble().html;
-        preview.hidden = false;
+        if (previewEdited && !window.confirm("Rebuild the preview? The changes you typed into it will be replaced.")) return;
+        showPreview();
       }),
       button("Send test to me", "hub-tab", () => send(true)),
       button("> Send to members", "hub-tab hub-tab--submit", () => send(false))
     );
-    compose.append(field("Subject line", subject), field("A note from you", note), field("Replies go to", replyTo), actions, preview);
+    note.addEventListener("input", () => {
+      if (!previewOpen) return;
+      if (previewEdited) noteChanged = true; // can't merge the two: ask before sending
+      else showPreview();                    // nothing typed in the preview yet: just keep it current
+    });
+    compose.append(field("Subject line", subject), field("A note from you", note), field("Replies go to", replyTo), actions, previewHint, preview);
 
     const history = el("ul", "dash-list digest-history");
     for (const entry of sent) {
