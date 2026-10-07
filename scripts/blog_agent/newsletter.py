@@ -37,6 +37,7 @@ API_URL = "https://ahwnarhmuzxgjindreuz.supabase.co/rest/v1"
 API_KEY = "sb_publishable_3C4xXn0j3GiunX-t6cd0HQ_ze_yTErT"
 
 # Terminal palette from CLAUDE.md, inlined because email clients drop <style>
+SECTION_LABELS = {"med_ed": "Med-ed review", "ai_vs_human": "AI vs human"}
 BG, PANEL, TEXT, ACCENT, DIM = "#000000", "#020802", "#00ff66", "#00cc55", "#7fd9a3"
 FONT = "'Courier New', Courier, monospace"
 
@@ -118,6 +119,11 @@ def render_html(posts: list[dict], end: dt.date, days: int, projects: list[dict]
             f'<p style="margin:0 0 10px;font-size:12px;color:{DIM};">// {e(post["date"])}</p>'
         )
         for item in post["items"]:
+            label = SECTION_LABELS.get(item.get("section"))
+            if label:
+                parts.append(
+                    f'<p style="margin:10px 0 2px;font-size:11px;letter-spacing:2px;color:{DIM};">'
+                    f'{e(label.upper())}</p>')
             parts.append(
                 f'<p style="margin:0 0 4px;font-size:14px;">'
                 f'<a href="{e(item["url"])}" style="color:#00e5ff;">{e(item["title"])}</a> '
@@ -171,7 +177,9 @@ def render_text(posts: list[dict], end: dt.date, days: int, projects: list[dict]
     for post in posts:
         lines += [f"> {post['headline']} ({post['date']})", ""]
         for item in post["items"]:
-            lines += [f"* {item['title']} ({item['source']})", f"  {item['url']}", f"  {item['summary']}", ""]
+            label = SECTION_LABELS.get(item.get("section"))
+            lines += [f"* {(label + ': ') if label else ''}{item['title']} ({item['source']})",
+                      f"  {item['url']}", f"  {item['summary']}", ""]
     if projects:
         lines += ["// NEW IN THE HUB", ""]
         for project in projects:

@@ -3065,6 +3065,33 @@ textarea.join-input {
   color: var(--text);
 }
 
+.blog-item-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* The "AI vs human" review: cyan edge, and who came out ahead */
+.blog-item--versus {
+  border-left-color: var(--cyan);
+}
+
+.blog-item--versus .blog-cat {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.blog-item--versus .blog-verdict {
+  border-color: var(--line-strong);
+  color: var(--body);
+}
+
+.blog-item--versus .blog-verdict--ai_ahead,
+.blog-item--versus .blog-verdict--humans_ahead {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
 .blog-item-title {
   font-family: var(--font-read);
   font-size: 1.2rem;

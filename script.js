@@ -518,8 +518,20 @@ function initBlog() {
     const list = el("ol", "blog-items");
     for (const item of post.items || []) {
       const li = el("li", "blog-item");
+      // Newer posts have two reviews, each labelled by section; older ones
+      // carry only a category.
+      const SECTION_NAMES = { med_ed: "Med-ed review", ai_vs_human: "AI vs human" };
+      const VERDICT_NAMES = {
+        ai_ahead: "AI ahead", humans_ahead: "Humans ahead", comparable: "Comparable", mixed: "Mixed results",
+      };
       const head = el("div", "blog-item-head");
-      head.append(el("span", "blog-cat", item.category));
+      const labels = el("div", "blog-item-labels");
+      labels.append(el("span", "blog-cat", SECTION_NAMES[item.section] || item.category));
+      if (VERDICT_NAMES[item.verdict]) {
+        labels.append(el("span", `blog-cat blog-verdict blog-verdict--${item.verdict}`, VERDICT_NAMES[item.verdict]));
+      }
+      head.append(labels);
+      if (item.section === "ai_vs_human") li.classList.add("blog-item--versus");
 
       const href = safeHref(item.url);
       if (href) {
