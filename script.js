@@ -73,9 +73,8 @@ function renderMembersBar(role) {
     // no count shown
   }
 
-  // (The Projects hub is public and already in the main menu as PROJECTS.)
+  // (Projects and Learning are already in the main menu.)
   const items = [
-    ["learn", "LEARNING"],
     ["chat", "CHAT"],
     ["requests", "REQUESTS"],
     ["directory", "DIRECTORY"],
@@ -120,6 +119,7 @@ function initCurrentNav() {
   if (/\/member\/[^/]*$/.test(path)) here = "members"; // the hand-made profile pages
   if (here === "appstore") here = "tools";
   if (here === "projects") here = "hub";
+  if (here === "resources") here = "learn";
 
   document.querySelectorAll(".nav a").forEach((link) => {
     const href = link.getAttribute("href") || "";
@@ -665,7 +665,7 @@ function initCopyEmailButton() {
 
 document.addEventListener("DOMContentLoaded", initCopyEmailButton);
 
-/* ========= RESOURCES PAGE: videos ========= */
+/* ========= LEARNING PAGE: videos ========= */
 
 // Nothing is loaded from YouTube until someone presses "Play here"; then the
 // button's card gets the player (YouTube's no-cookie address). Without
@@ -695,11 +695,11 @@ function initVideoCards() {
 
 document.addEventListener("DOMContentLoaded", initVideoCards);
 
-/* ========= RESOURCES PAGE: flyer lightbox ========= */
+/* ========= ABOUT PAGE: flyer lightbox ========= */
 
 function initFlyerLightbox() {
   const thumbs = document.querySelectorAll(".resource-thumb img");
-  if (!thumbs.length) return; // not on resources page
+  if (!thumbs.length) return; // no flyers on this page
 
   // Create overlay once
   const overlay = document.createElement("div");

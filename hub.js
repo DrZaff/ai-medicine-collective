@@ -37,14 +37,14 @@ const HUB_KINDS = {
   },
   material: {
     page: "learn.html",
-    name: "Learning Materials",
+    name: "Learning",
     noun: "material",
     plural: "materials",
     allLabel: "ALL MATERIALS",
     submitLabel: "> ADD A MATERIAL",
     categoryLabel: "Type",
     categories: ["Presentation", "Module", "Guide", "Video", "Other"],
-    intro: "Learning Materials is the members' library of presentations, modules and guides for building AI skills.",
+    intro: "Learning is for members: a core path, the Collective's own presentations and guides, and a picked library of videos, courses and references. It's free to join.",
     titleHint: "e.g. Prompting basics for clinicians",
     descriptionHint: "What will people learn, who is it for, and how long does it take?",
     linkHint: "https://… (slides, video, course page; optional)",
@@ -925,6 +925,10 @@ function initHubPage() {
     try {
       const { session, profile } = await getSessionAndProfile();
       const approved = !!profile && ["member", "moderator", "admin"].includes(profile.role);
+
+      // The outside library on learn.html (static, hidden until now)
+      const library = document.getElementById("learning-library");
+      if (library) library.hidden = !approved || !!params.get("project") || !!params.get("view");
 
       if (approved) {
         me = profile;

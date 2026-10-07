@@ -2672,6 +2672,14 @@ button.onboard-hide {
 }
 
 /* Flyer thumbnails */
+.learning-library {
+  margin-top: 26px;
+}
+
+.learning-library[hidden] {
+  display: none;
+}
+
 /* A video: title and note, a play button, and the player once asked for */
 .video-card {
   display: grid;
