@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-07",
+  "headline": "AI for Surgical Skill Assessment Is Still Early, and a Proposal to Make AI Literacy a Core Competency",
+  "intro": "This briefing covers two items on how AI fits into training. A new review finds that most AI tools for scoring surgical skill are still proof-of-concept, and a viewpoint argues that AI literacy should be taught as a core competency.",
+  "items": [
+    {
+      "title": "Machine Learning for Human-Autonomy Teaming in Surgical Skill Assessment: Scoping Review",
+      "source": "JMIR AI",
+      "url": "https://ai.jmir.org/2026/1/e94109",
+      "published": "2026-10-02",
+      "category": "education",
+      "summary": "This peer-reviewed scoping review looked at 92 studies from 2019 to 2025 that used machine learning to assess surgical skill from motion (kinematic) data, video, or biosignals. Most models reported strong results on benchmark datasets, but 77.2% of studies were still at the proof-of-concept stage, only 2 reached a higher readiness level, 91.3% of models could not adapt to the individual user, and 38% had no external validation. The authors conclude that these tools are a solid base for objective skill assessment but are not yet ready to give trainees adaptive, real-time guidance.",
+      "why_it_matters": "Surgical educators being pitched automated skill scoring should ask for external validation and evidence from real settings first, because most tools have only been tested on benchmark data. Residents should treat AI-generated skill scores as experimental, not as an established assessment."
+    },
+    {
+      "title": "Artificial Intelligence as a Core Public Health Competency: Proposal and Perspectives in Education and Research",
+      "source": "JMIR Medical Education",
+      "url": "https://mededu.jmir.org/2026/1/e92246",
+      "published": "2026-09-30",
+      "category": "education",
+      "summary": "In this viewpoint (an opinion piece, not a study), the authors propose making AI literacy a core public health competency. They define it in terms of knowledge, skills, and attitudes, and scale it to different professional roles. They describe ways AI can support learners, teachers, and organizations, such as personalized learning, dynamic scenarios, immersive simulations, and help with preparing course content, and they stress that AI should enhance human capabilities rather than replace them.",
+      "why_it_matters": "Curriculum designers in medicine and public health can borrow its knowledge-skills-attitudes structure, scaled by professional role, to set AI learning objectives. It also frames AI teaching as a responsibility shared across institutions, not just a technology problem."
+    }
+  ],
+  "tags": [
+    "ai literacy",
+    "competencies",
+    "curriculum",
+    "machine learning",
+    "medical education",
+    "public health education",
+    "skill assessment",
+    "surgical training"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
