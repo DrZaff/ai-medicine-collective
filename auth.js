@@ -56,7 +56,7 @@ async function refreshUnread(userId) {
 // public "site key"; the matching secret key lives only in Supabase
 // (Authentication > Attack Protection). While this is empty there is no
 // check and nothing is loaded from Cloudflare.
-const TURNSTILE_SITE_KEY = "";
+const TURNSTILE_SITE_KEY = "0x4AAAAAAFQNTJzs-R2ztzr7";
 const TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=amcTurnstileReady";
 window.amcTurnstileReady = () => window.dispatchEvent(new Event("amc-turnstile-ready"));
 

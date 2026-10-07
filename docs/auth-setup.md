@@ -235,7 +235,7 @@ Stops scripts from guessing passwords. Two keys from a free Cloudflare
 account (Turnstile > Add widget; hostnames `aimedicinecollective.com` and
 `ai-medicine-collective.netlify.app`; mode Managed):
 
-- **Site key** (public): `TURNSTILE_SITE_KEY` in `auth.js`.
+- **Site key** (public): `TURNSTILE_SITE_KEY` in `auth.js` (set 2026-10-07).
 - **Secret key**: Supabase > Authentication > Attack Protection > enable
   CAPTCHA protection, provider Turnstile, paste the secret. Never in the
   repo or in chat.
