@@ -665,6 +665,36 @@ function initCopyEmailButton() {
 
 document.addEventListener("DOMContentLoaded", initCopyEmailButton);
 
+/* ========= RESOURCES PAGE: videos ========= */
+
+// Nothing is loaded from YouTube until someone presses "Play here"; then the
+// button's card gets the player (YouTube's no-cookie address). Without
+// JavaScript the "Open on YouTube" link still works.
+function initVideoCards() {
+  document.addEventListener("click", (e) => {
+    const button = e.target.closest(".video-play");
+    if (!button) return;
+    const card = button.closest(".video-card");
+    const id = card && card.dataset.video;
+    if (!id || !/^[A-Za-z0-9_-]{6,20}$/.test(id) || card.querySelector("iframe")) return;
+
+    const frame = document.createElement("iframe");
+    frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+    frame.title = (card.querySelector(".video-title") || {}).textContent || "Video";
+    frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    frame.allowFullscreen = true;
+    frame.referrerPolicy = "strict-origin-when-cross-origin";
+    const holder = document.createElement("div");
+    holder.className = "video-frame";
+    holder.append(frame);
+    card.append(holder);
+    button.remove();
+    frame.focus();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initVideoCards);
+
 /* ========= RESOURCES PAGE: flyer lightbox ========= */
 
 function initFlyerLightbox() {

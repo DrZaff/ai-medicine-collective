@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Resources – AI Medicine Collective</title>
+  <meta name="description" content="Videos, courses and references for clinicians learning AI, picked by the AI Medicine Collective." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -32,28 +33,252 @@
     <main class="section">
       <h2 class="section-title">RESOURCES</h2>
 
-      <p>// Central stash for AI Med Collective learning material & club assets.</p>
-
       <p class="note">
-        // Members: presentations, modules and guides live in
-        <a href="learn.html">Learning Materials</a>, organized by folder.
+        // Videos, courses and references for learning AI, picked by the
+        Collective. Most of it is free; some courses and tools charge.
+        Videos load from YouTube only when you press play.
       </p>
 
-      <!-- === RESOURCES ACCORDION =================================== -->
+      <p class="note">
+        // Members: presentations, modules and guides made by the Collective
+        live in <a href="learn.html">Learning Materials</a>.
+      </p>
+
+      <!-- === RESOURCES ACCORDION ===================================
+           To add a video: copy a <div class="video-card"> and change
+           data-video (the part after "v=" in the YouTube address), the two
+           links' video id, the title, channel and note.
+           To add a link: copy an <li> inside a <ul class="link-list">. -->
       <section class="resource-accordion">
 
-        <!-- LEARNING AI (collapsed by default) -->
-        <details class="resource-group">
-          <summary class="resource-summary">// Learning AI</summary>
+        <details class="resource-group" open>
+          <summary class="resource-summary">// Start here: how AI works</summary>
           <div class="resource-body">
-            <p class="note">
-              Videos and other resources to guide learning.
-            </p>
-            <ul class="list-hash">
-              <li>In process!</li>
-              <li>In process!</li>
-              <!-- Add more learning resources as needed -->
+            <p class="note">No background needed. Pick one and watch it before anything else.</p>
+            <div class="video-card" data-video="LPZh9BOjkQs">
+              <div class="video-text">
+                <span class="video-title">Large Language Models explained briefly</span>
+                <span class="video-meta">3Blue1Brown &middot; YouTube</span>
+                <p>A short visual explanation of what a large language model is and how it produces text. The best first watch.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=LPZh9BOjkQs" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+            <div class="video-card" data-video="2IK3DFHRFfw">
+              <div class="video-text">
+                <span class="video-title">Generative AI in a Nutshell</span>
+                <span class="video-meta">Henrik Kniberg &middot; YouTube</span>
+                <p>A hand-drawn overview of generative AI: what it is, what it can do, and how to work with it.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=2IK3DFHRFfw" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+            <div class="video-card" data-video="G2fqAlgmoPo">
+              <div class="video-text">
+                <span class="video-title">Introduction to Generative AI</span>
+                <span class="video-meta">Google Cloud Tech &middot; YouTube</span>
+                <p>An introductory lesson on generative AI and how it differs from earlier machine learning.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=G2fqAlgmoPo" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+            <div class="video-card" data-video="zjkBMFhNj_g">
+              <div class="video-text">
+                <span class="video-title">Intro to Large Language Models (1hr talk)</span>
+                <span class="video-meta">Andrej Karpathy &middot; YouTube</span>
+                <p>A general-audience talk on how large language models work, where they are heading, and their security problems.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=zjkBMFhNj_g" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="resource-group">
+          <summary class="resource-summary">// Go deeper: what&#x27;s under the hood</summary>
+          <div class="resource-body">
+            <p class="note">For when you want to understand the machinery. More mathematical, still visual.</p>
+            <div class="video-card" data-video="aircAruvnKk">
+              <div class="video-text">
+                <span class="video-title">But what is a neural network?</span>
+                <span class="video-meta">3Blue1Brown &middot; YouTube</span>
+                <p>The first chapter of a visual series on deep learning: what a neural network is, built up from scratch.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=aircAruvnKk" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+            <div class="video-card" data-video="wjZofJX0v4M">
+              <div class="video-text">
+                <span class="video-title">Transformers, the tech behind LLMs</span>
+                <span class="video-meta">3Blue1Brown &middot; YouTube</span>
+                <p>How the transformer, the design behind today&#x27;s language models, processes text.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=wjZofJX0v4M" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+            <div class="video-card" data-video="eMlx5fFNoYc">
+              <div class="video-text">
+                <span class="video-title">Attention in transformers, step-by-step</span>
+                <span class="video-meta">3Blue1Brown &middot; YouTube</span>
+                <p>A step-by-step look at attention, the mechanism at the centre of a transformer.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=eMlx5fFNoYc" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+            <div class="video-card" data-video="7xTGNNLPyMI">
+              <div class="video-text">
+                <span class="video-title">Deep Dive into LLMs like ChatGPT</span>
+                <span class="video-meta">Andrej Karpathy &middot; YouTube</span>
+                <p>A long, thorough walk through how models like ChatGPT are built and how to think about what they do.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=7xTGNNLPyMI" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="resource-group">
+          <summary class="resource-summary">// Using AI well: prompting and everyday practice</summary>
+          <div class="resource-body">
+            <p class="note">Practical skill. Never paste patient information into an AI tool that isn&#x27;t approved for it.</p>
+            <div class="video-card" data-video="EWvNQjAaOHw">
+              <div class="video-text">
+                <span class="video-title">How I use LLMs</span>
+                <span class="video-meta">Andrej Karpathy &middot; YouTube</span>
+                <p>A practical tour of using AI assistants day to day, with worked examples.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=EWvNQjAaOHw" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+            <div class="video-card" data-video="jkrNMKz9pWU">
+              <div class="video-text">
+                <span class="video-title">A Hackers&#x27; Guide to Language Models</span>
+                <span class="video-meta">Jeremy Howard &middot; YouTube</span>
+                <p>A hands-on, code-first guide to what language models can and can&#x27;t do. Best if you like to tinker.</p>
+              </div>
+              <div class="video-actions">
+                <button type="button" class="video-play">&#9654; Play here</button>
+                <a href="https://www.youtube.com/watch?v=jkrNMKz9pWU" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+              </div>
+            </div>
+            <ul class="link-list">
+              <li>
+                <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener noreferrer">Prompt engineering overview</a>
+                <span class="link-source">Anthropic</span>
+                <p>A structured guide to writing clear, effective prompts.</p>
+              </li>
+              <li>
+                <a href="https://github.com/anthropics/prompt-eng-interactive-tutorial" target="_blank" rel="noopener noreferrer">Interactive prompt engineering tutorial</a>
+                <span class="link-source">Anthropic, on GitHub</span>
+                <p>A step-by-step course with exercises you work through yourself.</p>
+              </li>
+              <li>
+                <a href="https://platform.openai.com/docs/guides/prompt-engineering" target="_blank" rel="noopener noreferrer">Prompt engineering guide</a>
+                <span class="link-source">OpenAI</span>
+                <p>OpenAI&#x27;s own guide to getting better results from its models.</p>
+              </li>
             </ul>
+          </div>
+        </details>
+
+        <details class="resource-group">
+          <summary class="resource-summary">// Courses</summary>
+          <div class="resource-body">
+            <p class="note">Longer, structured learning. Check each provider&#x27;s page for current cost and time.</p>
+            <ul class="link-list">
+              <li>
+                <a href="https://www.ama-assn.org/education/changemeded-initiative/ai-medical-education" target="_blank" rel="noopener noreferrer">Artificial Intelligence in Health Care Series</a>
+                <span class="link-source">American Medical Association (ChangeMedEd) with the University of Michigan</span>
+                <p>A seven-part module series introducing AI and machine learning concepts in health care. Written for medical students and suitable for residents and faculty. Offered at no cost on the AMA Ed Hub.</p>
+              </li>
+              <li>
+                <a href="https://www.coursera.org/specializations/ai-healthcare" target="_blank" rel="noopener noreferrer">AI in Healthcare Specialization</a>
+                <span class="link-source">Stanford University, on Coursera</span>
+                <p>A multi-course series for clinicians and engineers on how AI is built on health data and how to judge whether it is safe to use.</p>
+              </li>
+              <li>
+                <a href="https://www.coursera.org/specializations/ai-for-medicine" target="_blank" rel="noopener noreferrer">AI for Medicine Specialization</a>
+                <span class="link-source">DeepLearning.AI, on Coursera</span>
+                <p>A more technical, hands-on series on machine learning for diagnosis, prognosis and treatment. Assumes some programming.</p>
+              </li>
+              <li>
+                <a href="https://www.coursera.org/learn/ai-for-everyone" target="_blank" rel="noopener noreferrer">AI For Everyone</a>
+                <span class="link-source">DeepLearning.AI, on Coursera</span>
+                <p>A non-technical course on what AI can and cannot do. A good choice for people who lead or teach.</p>
+              </li>
+              <li>
+                <a href="https://www.elementsofai.com/" target="_blank" rel="noopener noreferrer">Elements of AI</a>
+                <span class="link-source">University of Helsinki and MinnaLearn</span>
+                <p>A free online course on the basics of AI for people with no technical background.</p>
+              </li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="resource-group">
+          <summary class="resource-summary">// Guidance, policy and evidence</summary>
+          <div class="resource-body">
+            <p class="note">What the major bodies say, and where the research is published.</p>
+            <ul class="link-list">
+              <li>
+                <a href="https://www.aamc.org/about-us/mission-areas/medical-education/principles-ai-use" target="_blank" rel="noopener noreferrer">Principles for the Responsible Use of Artificial Intelligence in and for Medical Education</a>
+                <span class="link-source">AAMC</span>
+                <p>The Association of American Medical Colleges&#x27; principles for schools and programs bringing AI into teaching.</p>
+              </li>
+              <li>
+                <a href="https://www.who.int/publications/i/item/9789240084759" target="_blank" rel="noopener noreferrer">Ethics and governance of artificial intelligence for health: guidance on large multi-modal models</a>
+                <span class="link-source">World Health Organization</span>
+                <p>WHO guidance on the risks and governance of large multi-modal models in health care.</p>
+              </li>
+              <li>
+                <a href="https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices" target="_blank" rel="noopener noreferrer">List of Artificial Intelligence-Enabled Medical Devices</a>
+                <span class="link-source">U.S. Food and Drug Administration</span>
+                <p>The FDA&#x27;s running list of AI-enabled devices it has authorized. Useful for checking whether a product is cleared.</p>
+              </li>
+              <li>
+                <a href="https://ai.nejm.org/" target="_blank" rel="noopener noreferrer">NEJM AI</a>
+                <span class="link-source">NEJM Group</span>
+                <p>A journal of AI in clinical medicine, from the publisher of the New England Journal of Medicine.</p>
+              </li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="resource-group">
+          <summary class="resource-summary">// Build your own</summary>
+          <div class="resource-body">
+            <p class="note">The Collective&#x27;s own route from idea to working tool.</p>
+            <ul class="link-list">
+              <li>
+                <a href="https://chatgpt.com/g/g-69327e70b56881919d9d47197683eca7-clinicaltoolsdev" target="_blank" rel="noopener noreferrer">ClinicalToolsDEV</a>
+                <span class="link-source">AI Medicine Collective (custom GPT; needs a paid ChatGPT subscription)</span>
+                <p>A guided assistant that walks you step by step through building a clinical tool app, with no prior coding experience.</p>
+              </li>
+            </ul>
+            <p>
+              See what members have already built in <a href="tools.html">Tools</a>
+              and the <a href="hub.html">Projects hub</a>. Members can add their
+              own, and find presentations and guides in
+              <a href="learn.html">Learning Materials</a>.
+            </p>
           </div>
         </details>
 
@@ -86,20 +311,6 @@
 
               <!-- Add more flyers by copying a <figure> and updating src + data-full -->
             </div>
-          </div>
-        </details>
-
-        <!-- MISCELLANEOUS -->
-        <details class="resource-group">
-          <summary class="resource-summary">// Miscellaneous</summary>
-          <div class="resource-body">
-            <p class="note">
-              Odds & ends that don’t fit elsewhere: templates, examples, and experimental assets.
-            </p>
-            <ul class="list-hash">
-              <li>In process!</li>
-              <!-- Add more misc resources here -->
-            </ul>
           </div>
         </details>
 
