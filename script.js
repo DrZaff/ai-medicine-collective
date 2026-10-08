@@ -429,6 +429,26 @@ function initHome() {
 
 document.addEventListener("DOMContentLoaded", initHome);
 
+// Elements marked data-reveal rise into view as the page is scrolled
+// (light design only: the styling lives in modern.css). Without this
+// script, or for people who ask for reduced motion, they are simply visible.
+function initReveal() {
+  const marked = document.querySelectorAll("[data-reveal]");
+  if (!marked.length || !("IntersectionObserver" in window)) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.body.classList.add("reveal-ready");
+  const watcher = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add("is-in");
+      watcher.unobserve(entry.target);
+    }
+  }, { rootMargin: "0px 0px -8% 0px" });
+  marked.forEach((item) => watcher.observe(item));
+}
+
+document.addEventListener("DOMContentLoaded", initReveal);
+
 /* ========= TOOLS PAGE: launcher ========= */
 
 // Icons for the Collective's own apps, by web address. Everything else gets

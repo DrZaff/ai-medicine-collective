@@ -305,6 +305,11 @@ textarea:focus-visible {
   display: inline;
 }
 
+/* Things only the light design shows */
+html:not(.modern) .m-only {
+  display: none;
+}
+
 /* The Dark mode / Light mode button, added to every header by script.js */
 .theme-toggle {
   display: block;
@@ -2072,6 +2077,11 @@ button.onboard-hide {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   text-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.75), 0 0 40px rgb(var(--glow-rgb) / 0.35);
+}
+
+/* the light design sets this phrase in italics */
+.hero-em {
+  font-style: normal;
 }
 
 /* Out of the flow, so the blinking cursor doesn't pull the title off-center */
