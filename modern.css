@@ -250,17 +250,16 @@
   color: var(--ink);
 }
 
-/* the mark beside the name: a pulse line on a green tile */
+/* the mark beside the name: the AMC logo */
 .modern .headline a::before {
   content: "";
   flex: 0 0 auto;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 15h5l2.5-7 4.5 13 2.5-6H24'/%3E%3C/svg%3E") center / 28px 28px no-repeat,
-    var(--grad);
-  box-shadow: 0 2px 8px rgb(11 107 79 / 0.3);
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  /* zoomed in so the letters stay readable at this size */
+  background: #000 url("images/icon-192.png") center / 165% no-repeat;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 0.25);
 }
 
 .modern .headline a:hover {
@@ -1673,10 +1672,9 @@
   }
 
   .modern .headline a::before {
-    width: 24px;
-    height: 24px;
-    border-radius: 7px;
-    background-size: 24px 24px, auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
   }
 }
 
