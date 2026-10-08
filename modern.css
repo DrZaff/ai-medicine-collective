@@ -30,6 +30,16 @@
   --shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 4px 16px rgb(15 23 42 / 0.06);
   --shadow-lift: 0 2px 4px rgb(15 23 42 / 0.06), 0 12px 28px rgb(15 23 42 / 0.10);
 
+  /* Character: a bright mint and a green-to-teal sweep for the few things
+     the eye should land on, a deep "night" green for the dark bands, and a
+     monospace for small labels (the terminal showing through). */
+  --spark: #10b981;
+  --spark-soft: #6ee7b7;
+  --night: #05261f;
+  --grad: linear-gradient(135deg, #0b6b4f 0%, #0d8a7a 100%);
+  --grad-bright: linear-gradient(90deg, #10b981 0%, #06b6d4 100%);
+  --font-label: ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Menlo, "Roboto Mono", monospace;
+
   /* The tokens style.css is written against */
   --bg: var(--card);
   --bg-inner: var(--page);
@@ -84,7 +94,12 @@
 
 .modern body {
   padding: 0;
-  background: var(--page);
+  /* a soft green and blue wash behind the top of every page */
+  background:
+    radial-gradient(900px 420px at 10% -120px, rgb(16 185 129 / 0.13), transparent 65%),
+    radial-gradient(820px 400px at 96% -80px, rgb(6 182 212 / 0.10), transparent 65%),
+    var(--page);
+  background-repeat: no-repeat;
   color: var(--body);
   font-size: 16px;
   line-height: 1.6;
@@ -105,7 +120,7 @@
 .modern .terminal-frame {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 0 24px 32px;
+  padding: 0 24px;
   border: 0;
   background: none;
   box-shadow: none;
@@ -172,9 +187,13 @@
   margin-bottom: 28px;
   padding: 14px 0;
   background: var(--card);
-  box-shadow: 0 0 0 100vmax var(--card);
-  clip-path: inset(0 -100vmax);
-  border-bottom: 1px solid var(--line);
+  /* the second shadow is the hairline under the bar */
+  box-shadow: 0 0 0 100vmax var(--card), 0 1px 0 100vmax var(--line);
+  clip-path: inset(0 -100vmax -1px);
+  /* a thin strip of colour along the very top of the window (painted
+     outwards with border-image, which never causes sideways scrolling) */
+  border-top: 3px solid var(--spark);
+  border-image: var(--grad-bright) 1 / 3px 0 0 / 0 100vmax;
 }
 
 .modern header > .horizontal-rule {
@@ -194,7 +213,23 @@
 
 .modern .headline a,
 .modern .headline a:visited {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: var(--ink);
+}
+
+/* the mark beside the name: a pulse line on a green tile */
+.modern .headline a::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 15h5l2.5-7 4.5 13 2.5-6H24'/%3E%3C/svg%3E") center / 28px 28px no-repeat,
+    var(--grad);
+  box-shadow: 0 2px 8px rgb(11 107 79 / 0.3);
 }
 
 .modern .headline a:hover {
@@ -244,7 +279,8 @@
   padding: 8px 16px;
   border: 0;
   border-radius: 999px;
-  background: var(--brand);
+  background: var(--grad);
+  box-shadow: 0 4px 14px rgb(11 107 79 / 0.22);
   color: #fff;
   font-weight: 600;
 }
@@ -431,9 +467,19 @@
   text-transform: uppercase;
 }
 
-.modern .section-title::before,
-.modern .section-title::after {
+.modern .section-title::before {
   display: none;
+}
+
+/* a short bright bar under each page title */
+.modern .section-title::after {
+  display: block;
+  width: 56px;
+  height: 4px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--grad-bright);
 }
 
 .modern .subsection-title {
@@ -493,18 +539,26 @@
   color: var(--ink);
 }
 
+/* The footer is a dark band across the whole window, in the label font */
 .modern .footer {
   justify-content: center;
-  margin-top: 16px;
-  padding-top: 8px;
-  color: var(--muted);
+  margin-top: 56px;
+  padding: 26px 0;
+  background: var(--night);
+  box-shadow: 0 0 0 100vmax var(--night);
+  /* open at the bottom too, so a short page ends in the band, not a gap */
+  clip-path: inset(0 -100vmax -100vmax);
+  color: var(--spark-soft);
+  font-family: var(--font-label);
   font-size: 0;
   opacity: 1;
 }
 
 .modern .footer::after {
   content: "AI Medicine Collective \00b7  Building intelligent healthcare together";
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-align: center;
 }
 
 .modern .footer .cursor,
@@ -513,7 +567,7 @@
 }
 
 .modern .bottom-rule {
-  margin-top: 48px;
+  display: none;
 }
 
 
@@ -593,9 +647,10 @@
 .modern .video-play,
 .modern .ms-cta--signup {
   padding: 9px 18px;
-  border: 1px solid var(--brand);
+  border: 1px solid transparent;
   border-radius: 999px;
-  background: var(--brand);
+  background: var(--grad) border-box;
+  box-shadow: 0 4px 14px rgb(11 107 79 / 0.22);
   color: #fff;
   font-size: 0.85rem;
   font-weight: 700;
@@ -701,7 +756,7 @@
 .modern a.roster-card:hover,
 .modern a.project-item:hover,
 .modern .tool-card:hover {
-  border-color: var(--line-strong);
+  border-color: rgb(16 185 129 / 0.55);
   box-shadow: var(--shadow-lift);
   transform: translateY(-2px);
   text-decoration: none;
@@ -734,44 +789,116 @@
 
 /* === HOME PAGE =============================================== */
 
+/* The hero is a dark green stage: the one place the light theme goes dark */
 .modern .hero {
-  padding: 40px 0 8px;
+  position: relative;
+  margin-top: 4px;
+  padding: 64px 40px 40px;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(520px 300px at 18% 0%, rgb(16 185 129 / 0.35), transparent 70%),
+    radial-gradient(480px 320px at 90% 100%, rgb(6 182 212 / 0.28), transparent 70%),
+    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px) 0 0 / 100% 32px,
+    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px) 0 0 / 32px 100%,
+    linear-gradient(140deg, #04201a 0%, #06342a 55%, #073a44 100%);
+  box-shadow: 0 24px 48px -20px rgb(4 32 26 / 0.55);
+  color: #fff;
 }
 
 .modern .hero-kicker {
-  color: var(--brand);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 6px 14px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.06);
+  color: var(--spark-soft);
+  font-family: var(--font-label);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
 }
 
 .modern .hero-title {
-  font-size: clamp(2.3rem, 7vw, 4rem);
+  color: transparent;
+  background: linear-gradient(100deg, #fff 35%, var(--spark-soft) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-size: clamp(2.3rem, 7vw, 4.2rem);
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -0.03em;
   text-transform: none;
 }
 
+/* the terminal's blinking cursor survives here, in mint */
+.modern .hero-title .cursor {
+  display: inline;
+  color: var(--spark);
+  -webkit-text-fill-color: var(--spark);
+}
+
 .modern .hero-text {
-  color: #475569;
+  color: rgb(226 240 235 / 0.9);
   font-size: 1.15rem;
 }
 
-.modern .hero-actions .btn {
+.modern .hero-actions {
+  margin-top: 28px;
+}
+
+.modern .hero-actions .btn,
+.modern .hero-actions .btn:visited {
   padding: 11px 22px;
+  border-color: rgb(255 255 255 / 0.25);
+  background: rgb(255 255 255 / 0.07);
+  color: #fff;
   font-size: 0.9rem;
 }
 
-.modern .hero-stats {
+.modern .hero-actions .btn:hover {
+  border-color: rgb(255 255 255 / 0.55);
+  background: rgb(255 255 255 / 0.16);
+  color: #fff;
+}
+
+.modern .hero-actions .btn--primary,
+.modern .hero-actions .btn--primary:visited {
+  border-color: transparent;
+  background: var(--spark-soft);
+  box-shadow: 0 6px 22px rgb(16 185 129 / 0.4);
+  color: #04201a;
+}
+
+.modern .hero-actions .btn--primary:hover {
+  border-color: transparent;
+  background: #fff;
+  color: #04201a;
+}
+
+.modern .hero .hero-stats {
   overflow: hidden;
+  margin-top: 40px;
+  border-color: rgb(255 255 255 / 0.14);
+  background: rgb(255 255 255 / 0.06);
+  box-shadow: none;
+}
+
+.modern .hero-stat {
+  padding: 18px 12px;
 }
 
 .modern .hero-stat + .hero-stat {
-  border-left: 1px solid var(--line);
+  border-left: 1px solid rgb(255 255 255 / 0.14);
 }
 
-.modern .hero-stat dt,
+.modern .hero-stat dt {
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 .modern .dash-value {
   color: var(--brand);
   font-weight: 800;
@@ -779,17 +906,59 @@
 }
 
 .modern .hero-stat dd {
-  color: var(--muted);
+  color: var(--spark-soft);
+  font-family: var(--font-label);
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
+}
+
+/* the home page arrives in three soft steps */
+@keyframes modernRise {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+.modern .hero,
+.modern .home-panels,
+.modern .home-explore {
+  animation: modernRise 0.5s ease-out both;
+}
+
+.modern .home-panels {
+  animation-delay: 0.08s;
+}
+
+.modern .home-explore {
+  animation-delay: 0.16s;
 }
 
 .modern .home-panel {
-  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  padding: 22px 20px 20px;
   border-top: 1px solid var(--line);
 }
 
-.modern .home-panel-title,
+/* a bright edge along the top of each panel */
+.modern .home-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--grad-bright);
+}
+
+.modern .home-panel-title {
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
 .modern .dash-title {
   color: var(--muted);
   font-size: 0.75rem;
@@ -822,7 +991,27 @@
 }
 
 .modern .tile {
-  padding: 16px;
+  padding: 18px;
+}
+
+.modern .tile:hover .tile-title {
+  color: var(--brand);
+}
+
+/* an arrow slides in when a tile is pointed at */
+.modern .tile-title::after {
+  content: "\2192";
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--spark);
+  opacity: 0;
+  translate: -6px 0;
+  transition: 0.18s ease-out;
+}
+
+.modern .tile:hover .tile-title::after {
+  opacity: 1;
+  translate: 0 0;
 }
 
 .modern .tile-title {
@@ -1405,7 +1594,7 @@
 .modern .join-submit,
 .modern .signin-btn,
 .modern .video-play {
-  background: var(--brand) !important;
+  background: var(--grad) border-box !important;
   color: #fff !important;
 }
 
@@ -1424,7 +1613,7 @@
 /* "[ ]" and "[x]" become a circle and a tick */
 .modern .onboard-box {
   display: inline-block;
-  width: 1.4em;
+  width: 24px;
   font-size: 0;
 }
 
@@ -1436,4 +1625,26 @@
 .modern .onboard-list li.is-done .onboard-box::before {
   content: "\2713";
   color: var(--brand);
+}
+
+@media (max-width: 600px) {
+  .modern .hero {
+    padding: 40px 18px 22px;
+    border-radius: 18px;
+  }
+
+  .modern .hero .hero-stats {
+    margin-top: 28px;
+  }
+
+  .modern .headline a {
+    gap: 8px;
+  }
+
+  .modern .headline a::before {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background-size: 24px 24px, auto;
+  }
 }

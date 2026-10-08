@@ -78,7 +78,7 @@ Web servers treat `Sam.html` and `sam.html` as different files. Use **lowercase-
 
 The site has two looks built from the same pages (added 2026-10-08):
 
-- **Modern** (the default): a clean, light design — white cards on a pale grey page, dark-green brand colour, the device's system font, sentence-case headings, solid buttons, soft shadows. This is what every visitor sees first.
+- **Modern** (the default): a clean, light design — white cards on a pale grey page, dark-green brand colour, the device's system font, sentence-case headings, solid buttons, soft shadows. This is what every visitor sees first. Its character comes from a few deliberate touches, defined as tokens at the top of `modern.css` and used sparingly: a mint-to-cyan sweep (`--grad-bright`: the strip above the header, the bar under page titles, the top edge of home panels), a green gradient on primary buttons (`--grad`), a dark-green "night" stage for the home hero and the footer band (`--night`), and a monospace label font (`--font-label`) for small eyebrow labels — the terminal showing through. Don't add more accent colours; reuse these.
 - **Terminal**: the original green-on-black "hacker" design described in the next section. The **Dark mode** button at the top of every page switches to it behind a Matrix-style curtain of falling digits; **[ LIGHT MODE ]** switches back with a short fade. The choice is remembered on that device (`localStorage["amc-theme"]`).
 
 **Every UI change, from now on, must be built and checked in both themes.** Screenshot or inspect the page once in each before opening the PR, and say in the PR that both were checked.
