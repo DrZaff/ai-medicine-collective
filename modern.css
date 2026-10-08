@@ -1,0 +1,1439 @@
+/* =============================================================
+   AI MEDICINE COLLECTIVE — the modern (light) look
+
+   The site has two themes. style.css holds the layout and the original
+   terminal look. This file restyles the same pages when <html> has
+   class "modern", which is the default; the Dark mode button swaps it
+   for class "terminal" and none of this applies.
+
+   Every rule here starts with ".modern". Most of the change is the
+   token block: style.css takes its colours, fonts and shadows from
+   those tokens, so redefining them carries most components across.
+   The rest undoes terminal mannerisms (capitals, monospace, glows,
+   dashed rules) and gives buttons, cards and forms their modern shape.
+
+   When you add or change something in style.css, check it in both
+   themes and add what it needs here (see CLAUDE.md).
+   ============================================================= */
+
+
+/* === TOKENS ================================================== */
+
+.modern {
+  --brand: #0b6b4f;          /* deep green: a nod to the terminal */
+  --brand-strong: #084c39;
+  --brand-soft: #e8f4ef;
+  --ink: #0f172a;            /* headings */
+  --page: #f5f7fa;
+  --card: #ffffff;
+  --radius: 12px;
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 4px 16px rgb(15 23 42 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(15 23 42 / 0.06), 0 12px 28px rgb(15 23 42 / 0.10);
+
+  /* The tokens style.css is written against */
+  --bg: var(--card);
+  --bg-inner: var(--page);
+  --base: var(--card);
+  --text: var(--brand);       /* "bright": links, names, key numbers */
+  --body: #1f2937;
+  --muted: #64748b;
+  --accent: #94a3b8;          /* rules and quiet labels */
+  --error: #dc2626;
+  --cyan: #0369a1;
+  --yellow: #b45309;          /* "something is waiting" */
+  --pink: #475569;
+  --amber: #b45309;
+  --teal: #0f766e;
+  --line: #e5e9f0;
+  --line-strong: #cbd5e1;
+  --panel: var(--card);
+  --glow: var(--shadow-lift);
+
+  --rule-style: solid;
+  --surface-rgb: 255 255 255;
+  --green-rgb: 15 23 42;      /* translucent fills become soft slate tints */
+  --glow-rgb: 148 163 184;    /* glows become faint grey halos */
+  --yellow-rgb: 180 83 9;
+  --cyan-rgb: 3 105 161;
+  --pink-rgb: 71 85 105;
+  --error-rgb: 220 38 38;
+  --amber-rgb: 180 83 9;
+  --teal-rgb: 15 118 110;
+
+  --font-display: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body: var(--font-display);
+  --font-read: var(--font-display);
+
+  color-scheme: light;
+  scrollbar-color: var(--line-strong) var(--page);
+}
+
+
+/* === BASE ==================================================== */
+
+/* Terminal marks ("// ", "> ", ":: ") are hidden; see script.js */
+.modern .t-only {
+  display: none;
+}
+
+.modern *,
+.modern *::before,
+.modern *::after {
+  text-shadow: none !important;
+}
+
+.modern body {
+  padding: 0;
+  background: var(--page);
+  color: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  animation: none;
+}
+
+/* no scanlines */
+.modern body::after {
+  display: none;
+}
+
+.modern ::selection {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* The frame becomes a plain centred column */
+.modern .terminal-frame {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.modern .terminal-frame::before,
+.modern .terminal-frame::after {
+  display: none;
+}
+
+/* the status strip belongs to the terminal */
+.modern .terminal-frame > .horizontal-rule:first-child {
+  display: none;
+}
+
+.modern .horizontal-rule,
+.modern .section-divider {
+  border-top: 1px solid var(--line);
+  opacity: 1;
+}
+
+.modern h1,
+.modern h2,
+.modern h3,
+.modern h4 {
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.modern strong,
+.modern b,
+.modern dt,
+.modern legend,
+.modern .account-name,
+.modern .project-title,
+.modern .roster-name,
+.modern .chat-author,
+.modern .ms-title,
+.modern .home-list-title,
+.modern .loading-label,
+.modern .empty-state-title {
+  color: var(--ink);
+}
+
+.modern a:focus-visible,
+.modern button:focus-visible,
+.modern summary:focus-visible,
+.modern input:focus-visible,
+.modern select:focus-visible,
+.modern textarea:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+
+/* === HEADER & NAV ============================================ */
+
+/* A white bar across the whole window; its contents stay in the column */
+.modern .terminal-frame > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 20px;
+  margin-bottom: 28px;
+  padding: 14px 0;
+  background: var(--card);
+  box-shadow: 0 0 0 100vmax var(--card);
+  clip-path: inset(0 -100vmax);
+  border-bottom: 1px solid var(--line);
+}
+
+.modern header > .horizontal-rule {
+  display: none;
+}
+
+.modern .headline {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.modern .headline a,
+.modern .headline a:visited {
+  color: var(--ink);
+}
+
+.modern .headline a:hover {
+  color: var(--brand);
+}
+
+.modern .nav {
+  grid-column: 2;
+  grid-row: 1;
+  justify-content: flex-end;
+  gap: 2px;
+  margin: 0;
+}
+
+.modern .nav a,
+.modern .nav a:visited {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: lowercase;
+}
+
+/* the menu text is written in capitals; show it as "About", "Sign in" */
+.modern .nav a::first-letter {
+  text-transform: uppercase;
+}
+
+.modern .nav a:hover {
+  color: var(--ink);
+  background: #eef2f6;
+}
+
+.modern .nav a[aria-current="page"] {
+  color: var(--brand);
+  background: var(--brand-soft);
+  font-weight: 600;
+}
+
+.modern .nav a.nav-cta,
+.modern .nav a.nav-cta:visited {
+  margin-left: 8px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+}
+
+.modern .nav a.nav-cta:hover {
+  background: var(--brand-strong);
+  color: #fff;
+  box-shadow: none;
+}
+
+.modern .nav a.nav-account,
+.modern .nav a.nav-account:visited {
+  margin-left: 6px;
+  padding: 7px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+}
+
+.modern .nav a.nav-account:hover,
+.modern .nav a.nav-account[aria-current="page"] {
+  border-color: var(--brand);
+  box-shadow: none;
+}
+
+.modern .theme-toggle {
+  grid-column: 3;
+  grid-row: 1;
+  margin: 0;
+  padding: 7px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.modern .theme-toggle:hover {
+  background: #000;
+  color: #7dffb0;
+  border-color: #000;
+}
+
+.modern .members-bar {
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--brand-soft);
+  font-size: 0.82rem;
+  letter-spacing: 0;
+}
+
+.modern .members-bar-label {
+  color: var(--brand);
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.modern .members-bar a,
+.modern .members-bar a:visited {
+  padding: 4px 12px;
+  border: 0;
+  background: var(--card);
+  color: var(--body);
+  font-weight: 500;
+  text-transform: lowercase;
+  display: inline-block;
+}
+
+.modern .members-bar a::first-letter {
+  text-transform: uppercase;
+}
+
+.modern .members-bar a:hover,
+.modern .members-bar a[aria-current="page"] {
+  background: var(--brand);
+  color: #fff;
+}
+
+.modern .members-bar a.members-bar-unread,
+.modern .members-bar a.members-bar-unread:visited {
+  background: #fef3c7;
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .modern .terminal-frame > header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .modern .nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-start;
+  }
+
+  .modern .theme-toggle {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .modern .terminal-frame {
+    padding: 0 16px 24px;
+  }
+
+  .modern .terminal-frame > header {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px 10px;
+  }
+
+  .modern .headline {
+    font-size: 0.88rem;
+    letter-spacing: 0.02em;
+    white-space: normal;
+  }
+
+  .modern .theme-toggle {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+
+  /* the phone menu button, added by script.js */
+  .modern .nav-toggle {
+    grid-column: 3;
+    grid-row: 1;
+    width: auto;
+    margin: 0;
+    padding: 6px 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+    font-size: 0.72rem;
+    letter-spacing: 0;
+    gap: 6px;
+  }
+
+  .modern .nav-toggle[aria-expanded="true"] {
+    box-shadow: none;
+    border-color: var(--brand);
+  }
+
+  .modern .nav-toggle-icon {
+    font-family: ui-monospace, Consolas, monospace;
+  }
+
+  .modern .nav--collapsible.is-open {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .modern .nav--collapsible.is-open a {
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+}
+
+
+/* === PAGE TITLES & TEXT ====================================== */
+
+.modern .section {
+  margin-top: 0;
+}
+
+.modern .section-title {
+  display: block;
+  margin: 0 0 12px;
+  font-size: clamp(1.7rem, 4vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: lowercase;
+}
+
+.modern .section-title::first-letter {
+  text-transform: uppercase;
+}
+
+.modern .section-title::before,
+.modern .section-title::after {
+  display: none;
+}
+
+.modern .subsection-title {
+  margin: 28px 0 12px;
+  color: var(--ink);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.modern .note,
+.modern .join-hint {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.modern .section p,
+.modern .section ul,
+.modern .section li {
+  line-height: 1.65;
+}
+
+.modern a {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.modern a:visited {
+  color: var(--brand);
+}
+
+.modern a:hover {
+  color: var(--brand-strong);
+  text-decoration: underline;
+}
+
+.modern .back-link,
+.modern .back-link:visited {
+  margin-top: 28px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* "HOME" is written in capitals */
+.modern .back-link {
+  text-transform: lowercase;
+}
+
+.modern .back-link::first-letter {
+  text-transform: uppercase;
+}
+
+.modern .back-link:hover {
+  color: var(--ink);
+}
+
+.modern .footer {
+  justify-content: center;
+  margin-top: 16px;
+  padding-top: 8px;
+  color: var(--muted);
+  font-size: 0;
+  opacity: 1;
+}
+
+.modern .footer::after {
+  content: "AI Medicine Collective \00b7  Building intelligent healthcare together";
+  font-size: 0.85rem;
+}
+
+.modern .footer .cursor,
+.modern .cursor {
+  display: none;
+}
+
+.modern .bottom-rule {
+  margin-top: 48px;
+}
+
+
+/* === BUTTONS, TABS, TAGS ===================================== */
+
+.modern button {
+  padding: 8px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.modern button:hover {
+  background: #f1f5f9;
+  box-shadow: none;
+}
+
+.modern button:disabled {
+  opacity: 0.55;
+}
+
+.modern .btn,
+.modern .btn:visited,
+.modern .hub-tab,
+.modern .hub-tab:visited,
+.modern .filter-btn,
+.modern .project-doc-link,
+.modern .project-doc-link:visited,
+.modern .ms-cta,
+.modern .ms-cta:visited {
+  padding: 8px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: none;
+}
+
+.modern .btn:hover,
+.modern .hub-tab:hover,
+.modern .filter-btn:hover,
+.modern .project-doc-link:hover,
+.modern .ms-cta:hover {
+  background: #f1f5f9;
+  color: var(--ink);
+  border-color: var(--accent);
+  box-shadow: none;
+  text-decoration: none;
+}
+
+/* the chosen tab or filter */
+.modern .hub-tab[aria-current="page"],
+.modern .filter-btn[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* primary actions: solid brand green */
+.modern .btn--primary,
+.modern .btn--primary:visited,
+.modern .signin-btn,
+.modern .join-submit,
+.modern .hub-tab--submit,
+.modern .hub-tab--submit:visited,
+.modern button.hub-tab--submit,
+.modern .project-launch-btn,
+.modern .project-launch-btn:visited,
+.modern .video-play,
+.modern .ms-cta--signup {
+  padding: 9px 18px;
+  border: 1px solid var(--brand);
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: none;
+}
+
+.modern .btn--primary:hover,
+.modern .signin-btn:hover,
+.modern .join-submit:hover,
+.modern .hub-tab--submit:hover,
+.modern .hub-tab--submit[aria-current="page"],
+.modern .project-launch-btn:hover,
+.modern .video-play:hover,
+.modern .ms-cta--signup:hover {
+  border-color: var(--brand-strong);
+  background: var(--brand-strong);
+  color: #fff;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.modern .member-tag,
+.modern .tile-tag,
+.modern .blog-tag,
+.modern .blog-cat {
+  padding: 2px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: #eef2f6;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.modern .role-admin,
+.modern .role-moderator,
+.modern .status-published,
+.modern .tag-im {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.modern .role-pending,
+.modern .status-pending,
+.modern .request-claimed,
+.modern .tag-em {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.modern .role-rejected,
+.modern .status-rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.modern .member-tag--new,
+.modern .request-done,
+.modern .tag-medpeds {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.modern .member-tag--path {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+
+/* === CARDS & PANELS ========================================== */
+
+.modern .account-panel,
+.modern .hub-detail,
+.modern .home-panel,
+.modern .tile,
+.modern .dash-card,
+.modern .roster-card,
+.modern .project-item,
+.modern .tool-card,
+.modern .request-card,
+.modern .blog-item,
+.modern .path,
+.modern .onboard,
+.modern .meeting-admin,
+.modern .join-hero,
+.modern .empty-state,
+.modern .resource-group,
+.modern .hero-stats,
+.modern .profile-card,
+.modern .mod-row,
+.modern .app-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .tile:hover,
+.modern .dash-card:hover,
+.modern .home-panel:hover,
+.modern a.roster-card:hover,
+.modern a.project-item:hover,
+.modern .tool-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.modern div.roster-card:hover {
+  border-color: var(--line);
+  box-shadow: var(--shadow);
+  transform: none;
+}
+
+.modern .loading-bar {
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #eef2f6 0, #e2e8f0 50%, #eef2f6 100%);
+  background-size: 200% 100%;
+}
+
+.modern .empty-state {
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.modern .empty-state-title,
+.modern .loading-label,
+.modern .account-status {
+  letter-spacing: 0.02em;
+}
+
+
+/* === HOME PAGE =============================================== */
+
+.modern .hero {
+  padding: 40px 0 8px;
+}
+
+.modern .hero-kicker {
+  color: var(--brand);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.modern .hero-title {
+  font-size: clamp(2.3rem, 7vw, 4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: none;
+}
+
+.modern .hero-text {
+  color: #475569;
+  font-size: 1.15rem;
+}
+
+.modern .hero-actions .btn {
+  padding: 11px 22px;
+  font-size: 0.9rem;
+}
+
+.modern .hero-stats {
+  overflow: hidden;
+}
+
+.modern .hero-stat + .hero-stat {
+  border-left: 1px solid var(--line);
+}
+
+.modern .hero-stat dt,
+.modern .dash-value {
+  color: var(--brand);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.modern .hero-stat dd {
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.modern .home-panel {
+  padding: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.modern .home-panel-title,
+.modern .dash-title {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.modern .home-list li + li {
+  border-top: 1px solid var(--line);
+}
+
+.modern .home-list-meta {
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+
+.modern .home-panel-link {
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  text-transform: lowercase;
+  display: inline-block;
+}
+
+.modern .home-panel-link::first-letter {
+  text-transform: uppercase;
+}
+
+.modern .home-panel-link::after {
+  content: "\00a0\2192";
+}
+
+.modern .tile {
+  padding: 16px;
+}
+
+.modern .tile-title {
+  color: var(--ink);
+  font-size: 1rem;
+  letter-spacing: 0;
+  text-transform: lowercase;
+}
+
+.modern .tile-title::first-letter {
+  text-transform: uppercase;
+}
+
+.modern .tile-tag {
+  text-transform: uppercase;
+}
+
+.modern .tile-text {
+  color: var(--muted);
+}
+
+
+/* === ACCOUNT, DASHBOARD, FORMS =============================== */
+
+.modern .account-panel {
+  padding: 28px;
+}
+
+.modern .account-status {
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+
+.modern .account-status.is-error,
+.modern .join-status.is-error {
+  color: var(--error);
+}
+
+.modern .account-avatar,
+.modern .member-avatar {
+  border: 0;
+  filter: none;
+}
+
+.modern .member-avatar {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 700;
+  opacity: 1;
+}
+
+.modern .dash-card {
+  border-top: 1px solid var(--line);
+  padding: 16px;
+}
+
+.modern .dash-card--alert,
+.modern .dash-card--alert:visited {
+  border-color: #fcd34d;
+  background: #fffbeb;
+}
+
+.modern .dash-card--alert .dash-value {
+  color: var(--yellow);
+}
+
+.modern .dash-list li,
+.modern .path-list li,
+.modern .poll-day,
+.modern .video-card,
+.modern .link-list li {
+  border-top: 1px solid var(--line);
+}
+
+.modern .account-details {
+  border-top: 1px solid var(--line);
+}
+
+.modern .account-details-summary,
+.modern .resource-summary {
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.modern .join-label {
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.modern .join-input {
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.modern .join-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgb(11 107 79 / 0.15);
+  outline: none;
+}
+
+.modern .join-input::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+.modern .interest-chip {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--body);
+}
+
+.modern .account-signout {
+  opacity: 1;
+  color: var(--muted);
+}
+
+.modern .onboard {
+  border-color: #fcd34d;
+  background: #fffbeb;
+}
+
+.modern .onboard .subsection-title,
+.modern .onboard-box {
+  color: #92400e;
+}
+
+.modern .signin-or {
+  color: var(--muted);
+}
+
+.modern .signin-choices .hub-tab {
+  border: 0;
+  background: none;
+  padding: 4px 0;
+  margin-right: 16px;
+  color: var(--brand);
+}
+
+.modern .signin-choices .hub-tab:hover {
+  background: none;
+  text-decoration: underline;
+}
+
+
+/* === PROJECTS HUB, TOOLS, REQUESTS, LEARNING ================= */
+
+.modern .project-item {
+  padding: 16px;
+}
+
+.modern .project-title {
+  font-size: 1.05rem;
+  letter-spacing: 0;
+}
+
+.modern .project-desc {
+  color: #475569;
+}
+
+.modern .hub-card-meta {
+  color: var(--muted);
+}
+
+.modern .hub-detail {
+  padding: 28px;
+}
+
+.modern .hub-title {
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.modern .hub-cite-text {
+  border-left: 3px solid var(--brand);
+  border-radius: 0 8px 8px 0;
+  background: #f8fafc;
+}
+
+.modern .tool-icon {
+  border: 1px solid var(--line);
+}
+
+.modern .tool-icon--text {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.modern .tool-launch,
+.modern .tool-launch:visited {
+  color: var(--ink);
+}
+
+.modern .request-vote {
+  border-radius: 10px;
+  color: var(--ink);
+}
+
+.modern .request-vote[aria-pressed="true"],
+.modern .path-done[aria-pressed="true"] {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+  box-shadow: none;
+}
+
+.modern .request-delete,
+.modern button.meeting-undo {
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.modern .path {
+  padding: 8px 20px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.modern .path-bar {
+  height: 8px;
+  border: 0;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.modern .path-bar span {
+  background: var(--brand);
+  box-shadow: none;
+}
+
+.modern .resource-group {
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.modern .resource-summary {
+  padding: 14px 18px;
+  border-bottom: 0;
+}
+
+.modern .resource-body {
+  border-top: 1px solid var(--line);
+}
+
+.modern .video-title {
+  color: var(--ink);
+}
+
+.modern .video-frame {
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+/* === BLOG ==================================================== */
+
+.modern .blog-date {
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.modern .blog-headline {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.modern .blog-item {
+  padding: 22px 24px;
+  border-left: 4px solid var(--brand);
+}
+
+.modern .blog-item--versus {
+  border-left-color: var(--cyan);
+}
+
+.modern .blog-item-title,
+.modern a.blog-item-title,
+.modern a.blog-item-title:visited {
+  color: var(--ink);
+}
+
+.modern a.blog-item-title:hover {
+  color: var(--brand);
+}
+
+.modern .blog-item--versus .blog-cat {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.modern .blog-item--versus .blog-verdict--ai_ahead,
+.modern .blog-item--versus .blog-verdict--humans_ahead {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.modern .section .blog-why {
+  border-left: 3px solid #f59e0b;
+  border-radius: 0 8px 8px 0;
+  background: #fffbeb;
+  color: var(--body);
+}
+
+.modern .blog-why-label {
+  color: #92400e;
+}
+
+.modern .blog-more summary {
+  color: var(--brand);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+
+/* === MEETINGS ================================================ */
+
+.modern .meeting-confirmed {
+  border-color: #fcd34d;
+  background: #fffbeb;
+  box-shadow: var(--shadow);
+}
+
+.modern .meeting-when {
+  color: var(--ink);
+}
+
+.modern .poll-day-name {
+  color: var(--ink);
+}
+
+.modern .poll-slot {
+  border-radius: 999px;
+  color: var(--body);
+  font-weight: 500;
+}
+
+.modern .poll-slot.is-top {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgb(11 107 79 / 0.15);
+}
+
+.modern .poll-slot[aria-pressed="true"] {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.modern .ms-row {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.modern .ms-date {
+  border: 0;
+  border-radius: 8px;
+  background: #eef2f6;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+
+/* === CHAT ==================================================== */
+
+.modern .chat-log {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.modern .chat-message {
+  border-color: var(--line);
+}
+
+.modern .chat-time {
+  color: var(--muted);
+}
+
+.modern .chat-topic-title {
+  color: var(--ink);
+}
+
+
+/* === JOIN PAGE =============================================== */
+
+/* the green staff is drawn on black: give it a dark stage to stand on */
+.modern .join-hero {
+  background: var(--card);
+}
+
+.modern .join-hero::before {
+  display: none;
+}
+
+.modern .join-emblem {
+  padding: 16px;
+  border-radius: 16px;
+  background: #050b06;
+  mix-blend-mode: normal;
+  -webkit-mask-image: none;
+  mask-image: none;
+  animation: none;
+}
+
+.modern .join-title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.modern .join-steps li::marker {
+  color: var(--brand);
+  font-weight: 700;
+}
+
+
+/* === ABOUT PAGE GUIDE, LIGHTBOX ============================== */
+
+/* the video stays on its dark screen in both looks */
+.modern .guide {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .guide-status {
+  color: var(--muted);
+}
+
+.modern .guide-screen {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.modern .lightbox-overlay {
+  background: rgb(15 23 42 / 0.85);
+}
+
+.modern .resource-thumb img {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+
+/* === ACCORDIONS ============================================== */
+
+/* a chevron in place of the terminal's ">" */
+.modern .resource-summary::before {
+  content: "\203A";
+  display: inline-block;
+  width: 1em;
+  color: var(--muted);
+  font-weight: 700;
+  transition: transform 0.15s ease-out;
+}
+
+.modern details[open] > .resource-summary::before {
+  transform: rotate(90deg);
+}
+
+
+/* === HAND-MADE ADMIN PAGES =================================== */
+
+.modern .profile-photo-frame {
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  box-shadow: var(--shadow-lift);
+  overflow: hidden;
+}
+
+.modern .profile-photo-frame img {
+  border: 0;
+  border-radius: 16px;
+  filter: none;
+}
+
+.modern .profile-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.modern .profile-role {
+  color: var(--muted);
+}
+
+.modern .profile-fields dt {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.modern .profile-fields dd {
+  color: var(--body);
+}
+
+.modern .profile-email-address {
+  color: var(--ink);
+}
+
+.modern .copy-email-btn.copied {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+
+/* === ABOUT PAGE GUIDE (more) ================================= */
+
+.modern .guide {
+  padding: 16px;
+}
+
+.modern .guide-status {
+  margin-bottom: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.modern .guide-screen {
+  border: 0;
+  background: #000;
+}
+
+.modern .guide-scanlines {
+  display: none;
+}
+
+.modern .guide-btn--play {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.modern .guide-btn--play:hover {
+  background: var(--brand-strong);
+}
+
+.modern .guide-transcript {
+  box-shadow: none;
+}
+
+
+/* === BLOG (more) ============================================= */
+
+.modern .blog-archive-date {
+  color: var(--muted);
+}
+
+.modern .blog-archive-list a[aria-current="page"] {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+
+/* === LATE FIXES ============================================== */
+
+/* style.css makes some buttons transparent in their own corners of the
+   site; primary actions stay solid everywhere */
+.modern .hub-tab--submit,
+.modern button.hub-tab--submit,
+.modern .join-submit,
+.modern .signin-btn,
+.modern .video-play {
+  background: var(--brand) !important;
+  color: #fff !important;
+}
+
+.modern .hub-tab--submit:hover,
+.modern .join-submit:hover,
+.modern .signin-btn:hover,
+.modern .video-play:hover {
+  background: var(--brand-strong) !important;
+}
+
+.modern .account-mod-link,
+.modern .chat-project-link {
+  letter-spacing: 0;
+}
+
+/* "[ ]" and "[x]" become a circle and a tick */
+.modern .onboard-box {
+  display: inline-block;
+  width: 1.4em;
+  font-size: 0;
+}
+
+.modern .onboard-box::before {
+  content: "\25CB";
+  font-size: 1.05rem;
+}
+
+.modern .onboard-list li.is-done .onboard-box::before {
+  content: "\2713";
+  color: var(--brand);
+}

@@ -74,9 +74,26 @@ Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds,
 ### 4. Filenames are case-sensitive
 Web servers treat `Sam.html` and `sam.html` as different files. Use **lowercase-kebab-case** for all new files and folders (`member/sam-schoenl.html`, `images/app-logos/qtc-logo-512.png`), and make links match exactly. Use relative paths (`minutes/file.pdf`), not root paths (`/minutes/file.pdf`).
 
-## Design system: "minimalist hacker terminal"
+## Two themes: every change updates both
 
-Every page must look like it belongs on a green-phosphor terminal. Follow these rules for all new and changed UI. If the design refresh (Roadmap phase 1) changes a rule, update this section in the same PR.
+The site has two looks built from the same pages (added 2026-10-08):
+
+- **Modern** (the default): a clean, light design — white cards on a pale grey page, dark-green brand colour, the device's system font, sentence-case headings, solid buttons, soft shadows. This is what every visitor sees first.
+- **Terminal**: the original green-on-black "hacker" design described in the next section. The **Dark mode** button at the top of every page switches to it behind a Matrix-style curtain of falling digits; **[ LIGHT MODE ]** switches back with a short fade. The choice is remembered on that device (`localStorage["amc-theme"]`).
+
+**Every UI change, from now on, must be built and checked in both themes.** Screenshot or inspect the page once in each before opening the PR, and say in the PR that both were checked.
+
+How it is wired:
+- `<html class="modern">` on every page. A one-line script in the `<head>`, straight after the stylesheets, swaps the class to `terminal` if that was the saved choice, so the page never flashes the wrong look. `script.js` adds the button (`initThemeToggle`) and the curtain (`matrixCurtain`).
+- `style.css` holds the layout **and** the terminal look. `modern.css` loads after it and restyles things; **every rule in it starts with `.modern`**, so it can never change the terminal look. A new component gets its rules in `style.css` first, then whatever it needs in the matching section of `modern.css`.
+- **Colours are tokens in both files.** `style.css` defines them in `:root` (including the `--…-rgb` channel tokens for translucent colours, written `rgb(var(--green-rgb) / 0.25)`, and `--rule-style` for dashed/solid lines); `modern.css` redefines the same names under `.modern`. Never write a literal colour, `rgba(0, 255, 102, …)` or `dashed` in a component rule: it would leak one theme into the other.
+- **Terminal marks in text** (`// ` before captions, `> ` before prompts, `< ` before back links, `:: ` around the site name) stay in the HTML and scripts as they always were. `script.js` (`initTerminalMarks`) wraps each one in `<span class="t-only">`, which the modern theme hides. Text people wrote themselves (chat, comments, descriptions, blog posts) is listed in `RAW_TEXT` and never touched; add a new user-text class to that list.
+- CSS escapes in `content:` (e.g. `"\203A"`) must be written with the Write/Edit tools, not through a shell heredoc, which mangles the backslash.
+- New pages copy the `<html class="modern">` tag, both stylesheet links and the one-line script from an existing page.
+
+## Design system (terminal theme): "minimalist hacker terminal"
+
+In the terminal theme, every page must look like it belongs on a green-phosphor terminal. Follow these rules for all new and changed UI, then give the same change its modern styling in `modern.css` (see above). If a change alters a rule, update this section in the same PR.
 
 ### Colors
 Use the CSS variables; don't hard-code new colors.
@@ -100,7 +117,7 @@ Secondary accents, each with **one job only**:
 - Pink `#ff4da6` (`--pink`): "< Back" links and the Join submit button
 - Department tags: IM `#00ff66`, Med/Peds `#00ffd5`, EM `#ffb347`
 
-No other hues. No white backgrounds, no light mode, no gradients beyond the subtle dark radial ones, the faint page grid and the scanline overlay (both defined once on `body`; the scanlines are switched off on phones, where they cost the most legibility).
+No other hues in the terminal theme. No white backgrounds (the light look lives only in `modern.css`), no gradients beyond the subtle dark radial ones, the faint page grid and the scanline overlay (both defined once on `body`; the scanlines are switched off on phones, where they cost the most legibility).
 
 ### Typography
 - Three stacks, no web fonts. **Reading text is not monospace** (changed 2026-10-07 after members said the small green monospace text was hard to digest, especially on phones): `--font-read` (the device's plain system font) for anything longer than a line or two — paragraphs, descriptions, blog summaries, chat messages. Give a new reading element a class from the `--font-read` rule in `style.css`, or no class at all inside `.section`. The terminal voice stays monospace: `--font-display` (Courier New) for headings, the hero and big numbers; `--font-body` (the device's own sturdier monospace: Cascadia Mono / Consolas / SF Mono / Menlo / Roboto Mono) for everything people read. Form controls inherit the body font.
@@ -133,7 +150,7 @@ No other hues. No white backgrounds, no light mode, no gradients beyond the subt
 - Mobile-first breakpoints already in use: `480px`, `600px`, `720px`, `900px`. Every page must work down to 320px wide with no sideways scrolling or clipped text. In flex/grid layouts that stack on phones, give text columns `min-width: 0` rather than a fixed minimum width.
 
 ### Code conventions
-- Shared styles go in `style.css` under the matching `/* === SECTION === */` block; edit an existing rule rather than appending a second copy of the same selector at the bottom. Avoid page-level `<style>` blocks. Respect the ordering notes in `style.css` (e.g. the LINKS block must stay below NAV and LANDING PAGE).
+- Shared styles go in `style.css` (and the modern version in `modern.css`) under the matching `/* === SECTION === */` block; edit an existing rule rather than appending a second copy of the same selector at the bottom. Avoid page-level `<style>` blocks. Respect the ordering notes in `style.css` (e.g. the LINKS block must stay below NAV and LANDING PAGE).
 - Every page uses the same header, nav, and footer markup. When the nav changes, update it on **every** page, including `member/*.html`.
 - Every page's `<head>` carries the tab icon and link-preview tags (`og:title`, `og:description`, `og:image` pointing at `images/share-card.png` by its full web address, `twitter:card`). Copy them when adding a page, and set `og:title` to the page's title. Group chats and social sites read these to show a title, description and picture for a shared link.
 - Images need meaningful `alt` text. Compress large images (aim < 500 KB) and use thumbnails for previews.
