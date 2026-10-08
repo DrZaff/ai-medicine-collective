@@ -244,3 +244,29 @@ Order matters: put the site key in the code and deploy it **before** turning
 protection on in Supabase. Protection on with no site key in the code would
 block every email sign-in (Google would still work). To switch the check off,
 turn protection off in Supabase first, then empty the site key.
+
+## Action emails and the dependable schedule (October 2026)
+
+**Emails when a person is needed.** The blog and digest workflows email the
+organizers (draft ready, digest ready to send, run failed). Two GitHub secrets
+(repository > Settings > Secrets and variables > Actions):
+
+- `RESEND_API_KEY`: a Resend key with sending access, limited to the mail domain.
+- `NOTIFY_EMAIL`: who to tell. Several addresses separated by commas.
+
+**Starting the jobs on time.** GitHub's scheduler is unreliable, so the
+database starts the workflows (migration 018, `pg_cron`). It needs a GitHub
+fine-grained personal access token: repository access "Only select
+repositories" > `ai-medicine-collective`; permission "Actions: Read and
+write"; nothing else. Store it once in the Supabase SQL Editor (do not save
+the query):
+`select vault.create_secret('PASTE-TOKEN-HERE', 'github_actions_token');`
+
+The token expires on the date chosen when it was made. When it does, the
+database's starts stop silently and GitHub's own late schedule takes over.
+To renew: make a new token, then run
+`select vault.update_secret((select id from vault.secrets where name = 'github_actions_token'), 'PASTE-NEW-TOKEN-HERE');`
+
+To see what the timetable did: `select * from cron.job_run_details order by start_time desc limit 5;`
+and `select id, status_code, error_msg, created from net._http_response order by created desc limit 5;`
+(GitHub answers `204` when it accepts a start).
