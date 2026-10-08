@@ -297,7 +297,8 @@ function initAccountPage() {
       if (!TURNSTILE_SITE_KEY || !window.turnstile || captchaWidget !== null) return;
       captchaWidget = window.turnstile.render(captchaBox, {
         sitekey: TURNSTILE_SITE_KEY,
-        theme: "dark",
+        // match the look the person is using (siteTheme lives in script.js)
+        theme: typeof siteTheme === "function" && siteTheme() === "modern" ? "light" : "dark",
         // The standard box is 300px wide, more than a narrow phone's form has
         size: window.innerWidth < 400 ? "compact" : "normal",
         callback: (token) => { captchaToken = token; },

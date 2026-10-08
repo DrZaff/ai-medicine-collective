@@ -1,6 +1,187 @@
 // === AI Medicine Collective - shared page behavior ===
 // (Sign-in, account and moderation code lives in auth.js.)
 
+/* ========= ALL PAGES: two looks, one site ========= */
+
+// The site has two themes. "modern" (clean, light) is what everyone sees
+// first; "terminal" is the original green-on-black design, switched on with
+// the Dark mode button. The choice is remembered on this device. A one-line
+// script in each page's <head> applies it before the page is drawn; this
+// code adds the button and the transition. style.css is the terminal look
+// and the shared layout; modern.css restyles it when <html> has class "modern".
+const THEME_STORAGE_KEY = "amc-theme";
+
+function siteTheme() {
+  return document.documentElement.classList.contains("terminal") ? "terminal" : "modern";
+}
+
+function setSiteTheme(theme) {
+  document.documentElement.className = theme === "terminal" ? "terminal" : "modern";
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    // not remembered; the page still switches
+  }
+  document.querySelectorAll(".theme-toggle").forEach((btn) => {
+    btn.textContent = theme === "terminal" ? "[ LIGHT MODE ]" : "Dark mode";
+    btn.setAttribute("aria-pressed", String(theme === "terminal"));
+  });
+}
+
+// A curtain of falling digits covers the page, the theme changes behind it,
+// and the curtain fades away.
+function matrixCurtain(onCovered) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !document.createElement("canvas").getContext) {
+    onCovered();
+    return;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.className = "matrix-curtain";
+  canvas.setAttribute("aria-hidden", "true");
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  document.body.append(canvas);
+  const ctx = canvas.getContext("2d");
+  ctx.scale(ratio, ratio);
+
+  const cell = width < 600 ? 14 : 18;
+  const tail = 16; // glowing digits behind each column's leading edge
+  ctx.font = `bold ${cell}px "Courier New", monospace`;
+  ctx.textBaseline = "top";
+  // Speeds scale with the window, so the curtain takes about the same time
+  // (a little over a second) on a phone and on a tall monitor
+  const columns = Array.from({ length: Math.ceil(width / cell) }, () => ({
+    y: -Math.random() * height * 0.35,            // staggered start: a ragged curtain edge
+    speed: (height * (1 + Math.random() * 0.8)) / 30,
+  }));
+  const digit = () => String(Math.floor(Math.random() * 10));
+
+  let covered = false;
+  let last = 0;
+  function frame(now) {
+    if (now - last < 28) return requestAnimationFrame(frame); // about 35 frames a second
+    last = now;
+    let lowest = Infinity;
+    columns.forEach((column, i) => {
+      const x = i * cell;
+      column.y += column.speed;
+      lowest = Math.min(lowest, column.y);
+      // solid black above the tail, then the digits fading up from the leading edge
+      ctx.fillStyle = "#000";
+      ctx.fillRect(x, 0, cell, Math.max(0, column.y + cell));
+      for (let k = 0; k < tail; k++) {
+        const y = column.y - k * cell;
+        if (y < -cell || y > height) continue;
+        ctx.fillStyle = k === 0 ? "#d7ffe6" : `rgba(0, 255, 102, ${(1 - k / tail).toFixed(2)})`;
+        ctx.fillText(digit(), x + 2, y);
+      }
+    });
+    if (lowest - tail * cell > height) {
+      // the whole screen is black: change the theme behind it, then lift
+      if (!covered) {
+        covered = true;
+        onCovered();
+        canvas.classList.add("is-lifting");
+        setTimeout(() => canvas.remove(), 650);
+      }
+      return;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function initThemeToggle() {
+  const header = document.querySelector(".terminal-frame header");
+  if (!header) return;
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "theme-toggle";
+  btn.title = "Switch between the light design and the original terminal design";
+  let busy = false;
+  btn.addEventListener("click", () => {
+    if (busy) return;
+    if (siteTheme() === "modern") {
+      busy = true;
+      matrixCurtain(() => {
+        setSiteTheme("terminal");
+        busy = false;
+      });
+    } else {
+      // back to light: a short fade is enough
+      document.documentElement.classList.add("theme-fading");
+      setTimeout(() => {
+        setSiteTheme("modern");
+        document.documentElement.classList.remove("theme-fading");
+      }, 180);
+    }
+  });
+  header.prepend(btn);
+  setSiteTheme(siteTheme());
+}
+
+document.addEventListener("DOMContentLoaded", initThemeToggle);
+
+// The terminal voice puts "// " before captions, "> " before prompts and
+// "< " before back links, and wraps the site name in "::". Those marks are
+// part of the text all over the pages and scripts. This wraps each one in a
+// <span class="t-only">, which the modern theme hides, so the same text
+// reads naturally in both looks. It also catches text added later.
+// Text that people wrote themselves (chat, comments, descriptions, blog
+// posts) is never touched.
+const TERMINAL_MARK = /^(\s*)(\/\/ |> |< )/;
+const RAW_TEXT = ".t-only, .chat-body, .hub-description, .hub-comment-body, .request-details, .member-profile-text, " +
+  ".blog-headline, .blog-intro, .blog-item-title, .blog-summary, .blog-why, .blog-archive-list a, .inbox-thread, " +
+  "textarea, script, style, code, pre, [contenteditable], [contenteditable] *";
+
+function markTerminalText(textNode) {
+  const parent = textNode.parentElement;
+  if (!parent || parent.closest(RAW_TEXT)) return;
+  const match = TERMINAL_MARK.exec(textNode.data);
+  if (!match) return;
+  const mark = document.createElement("span");
+  mark.className = "t-only";
+  mark.textContent = match[2];
+  textNode.data = textNode.data.slice(match[0].length);
+  parent.insertBefore(mark, textNode);
+}
+
+function markTerminalTextIn(node) {
+  if (node.nodeType === Node.TEXT_NODE) return markTerminalText(node);
+  if (node.nodeType !== Node.ELEMENT_NODE) return;
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+  const found = [];
+  while (walker.nextNode()) found.push(walker.currentNode);
+  found.forEach(markTerminalText);
+}
+
+function initTerminalMarks() {
+  // ":: AI MEDICINE COLLECTIVE ::" -> the name on its own in the modern look
+  document.querySelectorAll(".headline a").forEach((link) => {
+    const name = /^::\s*(.*?)\s*::$/.exec(link.textContent.trim());
+    if (!name) return;
+    const before = document.createElement("span");
+    before.className = "t-only";
+    before.textContent = ":: ";
+    const after = before.cloneNode();
+    after.textContent = " ::";
+    link.replaceChildren(before, name[1], after);
+  });
+
+  markTerminalTextIn(document.body);
+  new MutationObserver((changes) => {
+    for (const change of changes) {
+      if (change.type === "characterData") markTerminalText(change.target);
+      else change.addedNodes.forEach(markTerminalTextIn);
+    }
+  }).observe(document.body, { childList: true, subtree: true, characterData: true });
+}
+
+document.addEventListener("DOMContentLoaded", initTerminalMarks);
+
 /* ========= ALL PAGES: SIGN IN / ACCOUNT link ========= */
 
 // Supabase keeps the signed-in session in localStorage under this key (set in

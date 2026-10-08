@@ -36,10 +36,26 @@
   --pink: #ff4da6;    /* "< Back" */
 
   /* Shared surfaces */
-  --line: rgba(0, 255, 102, 0.25);
-  --line-strong: rgba(0, 255, 102, 0.45);
-  --panel: rgba(0, 0, 0, 0.72);
-  --glow: 0 0 14px rgba(0, 255, 102, 0.28);
+  --line: rgb(var(--green-rgb) / 0.25);
+  --line-strong: rgb(var(--green-rgb) / 0.45);
+  --panel: rgb(var(--surface-rgb) / 0.72);
+  --glow: 0 0 14px rgb(var(--glow-rgb) / 0.28);
+
+  /* Raw colour channels, so translucent fills and glows can follow the theme
+     (modern.css redefines every token in this block). */
+  --rule-style: dashed;      /* dividers and quiet borders */
+  --base: #000;              /* the deepest surface: panel fills, text on bright */
+  --surface-rgb: 0 0 0;
+  --green-rgb: 0 255 102;
+  --glow-rgb: 0 255 102;     /* the same green, where it is a glow or shadow */
+  --yellow-rgb: 255 230 0;
+  --cyan-rgb: 0 229 255;
+  --pink-rgb: 255 77 166;
+  --error-rgb: 255 85 85;
+  --amber: #ffb347;          /* pending / waiting, and the EM tag */
+  --amber-rgb: 255 179 71;
+  --teal: #00ffd5;           /* the Med/Peds tag */
+  --teal-rgb: 0 255 213;
 }
 
 
@@ -50,12 +66,12 @@
 }
 
 html {
-  scrollbar-color: var(--accent) #000;
+  scrollbar-color: var(--accent) var(--base);
 }
 
 ::selection {
   background: var(--text);
-  color: #000;
+  color: var(--base);
 }
 
 body {
@@ -68,9 +84,9 @@ body {
   background-color: var(--bg-inner);
   /* A faint grid behind the terminal, lit from the top */
   background-image:
-    radial-gradient(ellipse at 50% -10%, rgba(0, 255, 102, 0.10), transparent 60%),
-    linear-gradient(rgba(0, 255, 102, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 102, 0.035) 1px, transparent 1px);
+    radial-gradient(ellipse at 50% -10%, rgb(var(--green-rgb) / 0.10), transparent 60%),
+    linear-gradient(rgb(var(--green-rgb) / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--green-rgb) / 0.035) 1px, transparent 1px);
   background-size: auto, 32px 32px, 32px 32px;
   background-attachment: fixed;
   color: var(--body);
@@ -89,8 +105,8 @@ body::after {
     to bottom,
     transparent 0,
     transparent 2px,
-    rgba(0, 0, 0, 0.08) 2px,
-    rgba(0, 0, 0, 0.08) 3px
+    rgb(var(--surface-rgb) / 0.08) 2px,
+    rgb(var(--surface-rgb) / 0.08) 3px
   );
 }
 
@@ -113,13 +129,13 @@ body::after {
   position: relative;
   width: 100%;
   max-width: 1000px;
-  background: radial-gradient(circle at top, #061a06 0, var(--bg) 45%, #000 100%);
+  background: radial-gradient(circle at top, #061a06 0, var(--bg) 45%, var(--base) 100%);
   border: 1px solid var(--accent);
   padding: 20px 28px 18px;
   box-shadow:
-    0 0 0 1px rgba(0, 255, 102, 0.12),
-    0 0 40px rgba(0, 255, 102, 0.22),
-    inset 0 0 60px rgba(0, 255, 102, 0.04);
+    0 0 0 1px rgb(var(--glow-rgb) / 0.12),
+    0 0 40px rgb(var(--glow-rgb) / 0.22),
+    inset 0 0 60px rgb(var(--glow-rgb) / 0.04);
 }
 
 /* Bright corner brackets on the frame */
@@ -131,7 +147,7 @@ body::after {
   height: 22px;
   border: 2px solid var(--text);
   pointer-events: none;
-  filter: drop-shadow(0 0 4px rgba(0, 255, 102, 0.8));
+  filter: drop-shadow(0 0 4px rgb(var(--glow-rgb) / 0.8));
 }
 
 .terminal-frame::before {
@@ -149,7 +165,7 @@ body::after {
 }
 
 .horizontal-rule {
-  border-top: 1px dashed var(--accent);
+  border-top: 1px var(--rule-style) var(--accent);
   margin: 4px 0 12px;
   opacity: 0.8;
 }
@@ -185,7 +201,7 @@ body::after {
 
 .terminal-frame > .horizontal-rule:first-child[data-signed-in]::after {
   color: var(--text);
-  text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
+  text-shadow: 0 0 6px rgb(var(--glow-rgb) / 0.6);
 }
 
 .bottom-rule {
@@ -198,7 +214,7 @@ body::after {
   letter-spacing: 0.14em;
   margin: 4px 0 12px;
   text-transform: uppercase;
-  text-shadow: 0 0 6px rgba(0, 255, 102, 0.9), 0 0 22px rgba(0, 255, 102, 0.45);
+  text-shadow: 0 0 6px rgb(var(--glow-rgb) / 0.9), 0 0 22px rgb(var(--glow-rgb) / 0.45);
 }
 
 /* The site name links home on every page */
@@ -210,7 +226,7 @@ body::after {
 
 .headline a:hover {
   color: #b6ffd0;
-  text-shadow: 0 0 8px rgba(0, 255, 102, 1), 0 0 30px rgba(0, 255, 102, 0.7);
+  text-shadow: 0 0 8px rgb(var(--glow-rgb) / 1), 0 0 30px rgb(var(--glow-rgb) / 0.7);
 }
 
 /* Headings are display text: Courier, bright */
@@ -282,6 +298,52 @@ textarea:focus-visible {
 }
 
 
+/* === THEME SWITCH (both looks) =============================== */
+
+/* Marks of the terminal voice ("// ", "> ", ":: "); modern.css hides them */
+.t-only {
+  display: inline;
+}
+
+/* The Dark mode / Light mode button, added to every header by script.js */
+.theme-toggle {
+  display: block;
+  margin: 0 auto 6px;
+  padding: 2px 10px;
+  border-color: var(--line-strong);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+/* The curtain of digits that brings in the terminal look */
+.matrix-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.6s ease-out;
+}
+
+.matrix-curtain.is-lifting {
+  opacity: 0;
+}
+
+/* Leaving the terminal look: a quick dip */
+html.theme-fading body {
+  opacity: 0;
+  transition: opacity 0.18s ease-out;
+}
+
+
 /* === NAV ===================================================== */
 
 .nav {
@@ -308,16 +370,16 @@ textarea:focus-visible {
 .nav a:hover {
   color: var(--text);
   border-bottom-color: var(--accent);
-  background-color: rgba(0, 255, 102, 0.06);
-  text-shadow: 0 0 6px rgba(0, 255, 102, 0.9);
+  background-color: rgb(var(--green-rgb) / 0.06);
+  text-shadow: 0 0 6px rgb(var(--glow-rgb) / 0.9);
 }
 
 /* The page you are on (set by script.js) */
 .nav a[aria-current="page"] {
   color: var(--text);
   border-bottom-color: var(--text);
-  text-shadow: 0 0 8px rgba(0, 255, 102, 0.9);
-  background-color: rgba(0, 255, 102, 0.08);
+  text-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.9);
+  background-color: rgb(var(--green-rgb) / 0.08);
 }
 
 /* JOIN and SIGN IN / ACCOUNT sit apart as buttons */
@@ -339,15 +401,15 @@ textarea:focus-visible {
 
 .nav a.nav-cta:hover {
   color: var(--yellow);
-  background-color: rgba(255, 230, 0, 0.12);
-  box-shadow: 0 0 10px rgba(255, 230, 0, 0.5);
+  background-color: rgb(var(--yellow-rgb) / 0.12);
+  box-shadow: 0 0 10px rgb(var(--yellow-rgb) / 0.5);
   text-shadow: none;
 }
 
 .nav a.nav-account:hover,
 .nav a.nav-account[aria-current="page"] {
   border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+  box-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.4);
 }
 
 .nav a[hidden] {
@@ -373,7 +435,7 @@ textarea:focus-visible {
   }
 
   .nav-toggle[aria-expanded="true"] {
-    box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+    box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.4);
   }
 
   .nav--collapsible {
@@ -410,7 +472,7 @@ textarea:focus-visible {
   margin: 2px 0 12px;
   padding: 8px 10px;
   border: 1px solid var(--line);
-  background: rgba(0, 255, 102, 0.04);
+  background: rgb(var(--green-rgb) / 0.04);
   font-size: 0.8rem;
   letter-spacing: 0.1em;
 }
@@ -422,7 +484,7 @@ textarea:focus-visible {
 .members-bar a,
 .members-bar a:visited {
   padding: 2px 10px;
-  border: 1px dashed var(--line-strong);
+  border: 1px var(--rule-style) var(--line-strong);
   border-radius: 999px;
   color: var(--text);
   text-decoration: none;
@@ -442,7 +504,7 @@ textarea:focus-visible {
   text-shadow: none;
   border-style: solid;
   border-color: var(--accent);
-  background-color: rgba(0, 255, 102, 0.12);
+  background-color: rgb(var(--green-rgb) / 0.12);
 }
 
 
@@ -461,7 +523,7 @@ textarea:focus-visible {
   font-size: 1.3rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  text-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
+  text-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.5);
 }
 
 .section-title::before {
@@ -470,7 +532,7 @@ textarea:focus-visible {
   width: 8px;
   height: 1.1em;
   background: var(--text);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.8);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.8);
 }
 
 .section-title::after {
@@ -515,7 +577,7 @@ textarea:focus-visible {
 
 .section-divider {
   margin: 18px 0;
-  border-top: 1px dashed var(--accent);
+  border-top: 1px var(--rule-style) var(--accent);
   opacity: 0.7;
 }
 
@@ -555,7 +617,7 @@ button {
 }
 
 button:hover {
-  background-color: rgba(0, 255, 102, 0.1);
+  background-color: rgb(var(--green-rgb) / 0.1);
 }
 
 /* Link styled as a button (home page, empty states) */
@@ -575,8 +637,8 @@ button:hover {
 .btn:hover {
   color: var(--text);
   text-shadow: none;
-  background-color: rgba(0, 255, 102, 0.12);
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.45);
+  background-color: rgb(var(--green-rgb) / 0.12);
+  box-shadow: 0 0 12px rgb(var(--glow-rgb) / 0.45);
 }
 
 .btn--primary,
@@ -587,8 +649,8 @@ button:hover {
 
 .btn--primary:hover {
   color: var(--yellow);
-  background-color: rgba(255, 230, 0, 0.12);
-  box-shadow: 0 0 14px rgba(255, 230, 0, 0.55);
+  background-color: rgb(var(--yellow-rgb) / 0.12);
+  box-shadow: 0 0 14px rgb(var(--yellow-rgb) / 0.55);
 }
 
 
@@ -641,7 +703,7 @@ button:hover {
   height: 54px;
   margin-top: 10px;
   border: 1px solid var(--line);
-  background: linear-gradient(90deg, rgba(0, 255, 102, 0.03) 0, rgba(0, 255, 102, 0.12) 50%, rgba(0, 255, 102, 0.03) 100%);
+  background: linear-gradient(90deg, rgb(var(--green-rgb) / 0.03) 0, rgb(var(--green-rgb) / 0.12) 50%, rgb(var(--green-rgb) / 0.03) 100%);
   background-size: 200% 100%;
   animation: loadingSweep 1.4s linear infinite;
 }
@@ -657,7 +719,7 @@ button:hover {
 /* "Nothing here yet", with a next step */
 .empty-state {
   padding: 22px 18px;
-  border: 1px dashed var(--line-strong);
+  border: 1px var(--rule-style) var(--line-strong);
   background: var(--panel);
   text-align: center;
 }
@@ -690,8 +752,8 @@ button:hover {
 .account-panel {
   max-width: 560px;
   border: 1px solid var(--accent);
-  background: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.35);
+  background: rgb(var(--surface-rgb) / 0.6);
+  box-shadow: 0 0 12px rgb(var(--glow-rgb) / 0.35);
   padding: 24px;
 }
 
@@ -743,7 +805,7 @@ button:hover {
   font-size: 1.9rem;
   font-weight: bold;
   line-height: 1.2;
-  text-shadow: 0 0 10px rgba(0, 255, 102, 0.6);
+  text-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.6);
   font-family: var(--font-display);
   color: var(--text);
 }
@@ -768,7 +830,7 @@ button:hover {
 
 .dash-card--alert .dash-value {
   color: var(--yellow);
-  text-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
+  text-shadow: 0 0 10px rgb(var(--yellow-rgb) / 0.6);
 }
 
 .dash-list {
@@ -783,7 +845,7 @@ button:hover {
   align-items: center;
   gap: 8px;
   padding: 6px 0;
-  border-top: 1px dashed var(--line);
+  border-top: 1px var(--rule-style) var(--line);
 }
 
 .account-status {
@@ -802,16 +864,16 @@ button:hover {
   margin: 6px 0 4px;
   padding: 8px 22px;
   border-radius: 999px;
-  border-color: #ffe600;
-  color: #ffe600;
+  border-color: var(--yellow);
+  color: var(--yellow);
   font-weight: 700;
   letter-spacing: 0.08em;
 }
 
 .signin-btn:hover,
 .signin-btn:focus-visible {
-  background-color: rgba(255, 230, 0, 0.15);
-  box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
+  background-color: rgb(var(--yellow-rgb) / 0.15);
+  box-shadow: 0 0 10px rgb(var(--yellow-rgb) / 0.6);
 }
 
 .digest-row {
@@ -850,7 +912,7 @@ button:hover {
   height: 640px;
   margin-top: 12px;
   border: 1px solid var(--line-strong);
-  background: #000;
+  background: var(--base);
 }
 
 .digest-preview[hidden] {
@@ -1011,9 +1073,9 @@ button:hover {
 }
 
 .role-pending {
-  border-color: #ffb347;
-  color: #ffb347;
-  background: rgba(255, 179, 71, 0.1);
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgb(var(--amber-rgb) / 0.1);
 }
 
 .role-rejected {
@@ -1023,9 +1085,9 @@ button:hover {
 
 .role-moderator,
 .role-admin {
-  border-color: #00ffd5;
-  color: #00ffd5;
-  background: rgba(0, 255, 213, 0.08);
+  border-color: var(--teal);
+  color: var(--teal);
+  background: rgb(var(--teal-rgb) / 0.08);
 }
 
 .account-mod-link {
@@ -1040,7 +1102,7 @@ button:hover {
   gap: 10px;
   margin: 16px 0 4px;
   padding-top: 12px;
-  border-top: 1px dashed var(--accent);
+  border-top: 1px var(--rule-style) var(--accent);
 }
 
 .account-form-status {
@@ -1056,7 +1118,7 @@ button:hover {
 .account-details {
   margin: 16px 0 0;
   padding-top: 12px;
-  border-top: 1px dashed var(--accent);
+  border-top: 1px var(--rule-style) var(--accent);
 }
 
 .account-details-summary {
@@ -1107,8 +1169,8 @@ button:hover {
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid rgba(0, 255, 102, 0.25);
-  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgb(var(--green-rgb) / 0.25);
+  background: rgb(var(--surface-rgb) / 0.7);
 }
 
 .mod-actions {
@@ -1119,12 +1181,12 @@ button:hover {
 }
 
 .mod-approve {
-  border-color: #ffe600;
-  color: #ffe600;
+  border-color: var(--yellow);
+  color: var(--yellow);
 }
 
 .mod-approve:hover {
-  background-color: rgba(255, 230, 0, 0.15);
+  background-color: rgb(var(--yellow-rgb) / 0.15);
 }
 
 .mod-decline {
@@ -1133,7 +1195,7 @@ button:hover {
 }
 
 .mod-decline:hover {
-  background-color: rgba(255, 85, 85, 0.12);
+  background-color: rgb(var(--error-rgb) / 0.12);
 }
 
 .mod-role-select {
@@ -1160,7 +1222,7 @@ button:hover {
 .hub-tab,
 .hub-tab:visited {
   padding: 4px 14px;
-  border: 1px solid rgba(0, 255, 102, 0.4);
+  border: 1px solid rgb(var(--green-rgb) / 0.4);
   border-radius: 999px;
   color: var(--text);
   font-size: 0.75rem;
@@ -1172,23 +1234,23 @@ button:hover {
   color: var(--text);
   text-shadow: none;
   border-color: var(--accent);
-  background: rgba(0, 255, 102, 0.15);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+  background: rgb(var(--green-rgb) / 0.15);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.4);
 }
 
 /* Primary action = neon yellow */
 .hub-tab--submit,
 .hub-tab--submit:visited {
-  border-color: #ffe600;
-  color: #ffe600;
+  border-color: var(--yellow);
+  color: var(--yellow);
 }
 
 .hub-tab--submit:hover,
 .hub-tab--submit[aria-current="page"] {
-  color: #ffe600;
-  border-color: #ffe600;
-  background: rgba(255, 230, 0, 0.15);
-  box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
+  color: var(--yellow);
+  border-color: var(--yellow);
+  background: rgb(var(--yellow-rgb) / 0.15);
+  box-shadow: 0 0 10px rgb(var(--yellow-rgb) / 0.6);
 }
 
 /* Project cards are links; keep terminal colors instead of link colors */
@@ -1248,7 +1310,7 @@ button:hover {
 }
 
 .hub-cat {
-  border-color: rgba(0, 255, 102, 0.5);
+  border-color: rgb(var(--green-rgb) / 0.5);
 }
 
 .hub-card-meta {
@@ -1259,9 +1321,9 @@ button:hover {
 }
 
 .status-pending {
-  border-color: #ffb347;
-  color: #ffb347;
-  background: rgba(255, 179, 71, 0.1);
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgb(var(--amber-rgb) / 0.1);
 }
 
 .status-rejected {
@@ -1279,8 +1341,8 @@ button:hover {
 
 .hub-detail {
   border: 1px solid var(--accent);
-  background: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.35);
+  background: rgb(var(--surface-rgb) / 0.6);
+  box-shadow: 0 0 12px rgb(var(--glow-rgb) / 0.35);
   padding: 20px;
 }
 
@@ -1310,7 +1372,7 @@ button:hover {
 .hub-mod-actions {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px dashed var(--accent);
+  border-top: 1px var(--rule-style) var(--accent);
 }
 
 .hub-status:empty {
@@ -1355,7 +1417,7 @@ button:hover {
 }
 
 .hub-confirm input {
-  accent-color: #00cc55;
+  accent-color: var(--accent);
   margin-top: 3px;
 }
 
@@ -1399,7 +1461,7 @@ button:hover {
 /* Listed members who aren't links (signed-out visitors) don't react to hover */
 div.roster-card:hover {
   border-color: var(--line);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.08);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.08);
   transform: none;
 }
 
@@ -1512,12 +1574,12 @@ div.roster-card:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 30% 30%, #0b2d0b 0, #000 70%);
+  background: radial-gradient(circle at 30% 30%, #0b2d0b 0, var(--base) 70%);
   font-family: var(--font-display);
   font-size: 1.3rem;
   font-weight: bold;
   letter-spacing: 0.06em;
-  text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+  text-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.6);
 }
 
 .tool-name {
@@ -1585,8 +1647,8 @@ div.roster-card:hover {
 
 .request-vote[aria-pressed="true"] {
   border-color: var(--text);
-  background: rgba(0, 255, 102, 0.18);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+  background: rgb(var(--green-rgb) / 0.18);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.4);
 }
 
 .request-vote:disabled {
@@ -1637,7 +1699,7 @@ div.roster-card:hover {
 
 .request-delete {
   margin-left: auto;
-  border-color: rgba(255, 85, 85, 0.5);
+  border-color: rgb(var(--error-rgb) / 0.5);
   color: var(--error);
 }
 
@@ -1662,7 +1724,7 @@ div.roster-card:hover {
   display: block;
   height: 100%;
   background: var(--text);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.7);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.7);
 }
 
 .section .path-list {
@@ -1672,7 +1734,7 @@ div.roster-card:hover {
 
 .path-list li {
   padding: 8px 0;
-  border-top: 1px dashed var(--line);
+  border-top: 1px var(--rule-style) var(--line);
 }
 
 .path-list li::marker {
@@ -1698,7 +1760,7 @@ div.roster-card:hover {
 
 .path-done[aria-pressed="true"] {
   border-color: var(--text);
-  background: rgba(0, 255, 102, 0.18);
+  background: rgb(var(--green-rgb) / 0.18);
 }
 
 .path-controls {
@@ -1724,7 +1786,7 @@ div.roster-card:hover {
 .hub-cite-text {
   padding: 10px 12px;
   border-left: 2px solid var(--accent);
-  background: rgba(0, 255, 102, 0.04);
+  background: rgb(var(--green-rgb) / 0.04);
   font-size: 0.85rem;
   overflow-wrap: anywhere;
   user-select: all;
@@ -1739,7 +1801,7 @@ button.copy-btn {
   margin: 10px 0 4px;
   padding: 2px 14px 12px;
   border: 1px solid var(--yellow);
-  background: rgba(255, 230, 0, 0.04);
+  background: rgb(var(--yellow-rgb) / 0.04);
 }
 
 .onboard[hidden] {
@@ -1812,12 +1874,12 @@ button.onboard-hide {
 
 .chat-tab[aria-pressed="true"] {
   border-color: var(--accent);
-  background: rgba(0, 255, 102, 0.15);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+  background: rgb(var(--green-rgb) / 0.15);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.4);
 }
 
 .chat-tab--new {
-  border-style: dashed;
+  border-style: var(--rule-style);
 }
 
 .chat-tab--archived {
@@ -1846,8 +1908,8 @@ button.onboard-hide {
 
 .inbox-new {
   margin-left: 10px;
-  border-color: #ffe600;
-  color: #ffe600;
+  border-color: var(--yellow);
+  color: var(--yellow);
 }
 
 .hub-contact-form {
@@ -1886,8 +1948,8 @@ button.onboard-hide {
   max-height: 55vh;
   overflow-y: auto;
   border: 1px solid var(--accent);
-  background: rgba(0, 0, 0, 0.7);
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.25);
+  background: rgb(var(--surface-rgb) / 0.7);
+  box-shadow: 0 0 12px rgb(var(--glow-rgb) / 0.25);
 }
 
 .section .chat-log {
@@ -1896,7 +1958,7 @@ button.onboard-hide {
 
 .chat-log:focus-visible {
   outline: none;
-  box-shadow: 0 0 14px rgba(0, 255, 102, 0.5);
+  box-shadow: 0 0 14px rgb(var(--glow-rgb) / 0.5);
 }
 
 .chat-message {
@@ -1904,7 +1966,7 @@ button.onboard-hide {
   align-items: flex-start;
   gap: 10px;
   padding: 8px 0;
-  border-bottom: 1px dashed rgba(0, 255, 102, 0.18);
+  border-bottom: 1px var(--rule-style) rgb(var(--green-rgb) / 0.18);
 }
 
 .chat-message:last-child {
@@ -1959,7 +2021,7 @@ button.onboard-hide {
 .chat-delete:focus-visible {
   opacity: 1;
   border-color: var(--error);
-  background: rgba(255, 85, 85, 0.12);
+  background: rgb(var(--error-rgb) / 0.12);
 }
 
 .chat-composer {
@@ -2009,7 +2071,7 @@ button.onboard-hide {
   line-height: 1.05;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  text-shadow: 0 0 10px rgba(0, 255, 102, 0.75), 0 0 40px rgba(0, 255, 102, 0.35);
+  text-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.75), 0 0 40px rgb(var(--glow-rgb) / 0.35);
 }
 
 /* Out of the flow, so the blinking cursor doesn't pull the title off-center */
@@ -2052,13 +2114,13 @@ button.onboard-hide {
 }
 
 .hero-stat + .hero-stat {
-  border-left: 1px dashed var(--line);
+  border-left: 1px var(--rule-style) var(--line);
 }
 
 .hero-stat dt {
   font-size: clamp(1.5rem, 5vw, 2.2rem);
   font-weight: bold;
-  text-shadow: 0 0 10px rgba(0, 255, 102, 0.6);
+  text-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.6);
   font-family: var(--font-display);
   color: var(--text);
 }
@@ -2136,7 +2198,7 @@ button.onboard-hide {
 }
 
 .home-list li + li {
-  border-top: 1px dashed var(--line);
+  border-top: 1px var(--rule-style) var(--line);
 }
 
 .home-list-title {
@@ -2255,9 +2317,9 @@ button.onboard-hide {
 .project-item {
   display: block;
   padding: 10px 12px;
-  border: 1px solid rgba(0, 255, 102, 0.25);
-  background: rgba(0, 0, 0, 0.75);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.08);
+  border: 1px solid rgb(var(--green-rgb) / 0.25);
+  background: rgb(var(--surface-rgb) / 0.75);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.08);
   text-decoration: none;
   color: var(--text);
   transition: 0.15s ease-out;
@@ -2265,7 +2327,7 @@ button.onboard-hide {
 
 .project-item:hover {
   border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.22);
+  box-shadow: 0 0 12px rgb(var(--glow-rgb) / 0.22);
   transform: translateX(4px);
 }
 
@@ -2315,37 +2377,37 @@ button.onboard-hide {
 
 /* Instructions = bright cyan */
 .project-doc-link {
-  border-color: #00e5ff;
-  color: #00e5ff;
+  border-color: var(--cyan);
+  color: var(--cyan);
 }
 
 .project-doc-link:hover {
-  background-color: rgba(0, 229, 255, 0.12);
-  box-shadow: 0 0 8px rgba(0, 229, 255, 0.45);
+  background-color: rgb(var(--cyan-rgb) / 0.12);
+  box-shadow: 0 0 8px rgb(var(--cyan-rgb) / 0.45);
   transform: translateY(-1px);
 }
 
 /* Launch = neon yellow */
 .project-launch-btn {
-  border-color: #ffe600;
-  color: #ffe600;
+  border-color: var(--yellow);
+  color: var(--yellow);
 }
 
 .project-launch-btn:hover {
-  background-color: rgba(255, 230, 0, 0.15);
-  box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
+  background-color: rgb(var(--yellow-rgb) / 0.15);
+  box-shadow: 0 0 10px rgb(var(--yellow-rgb) / 0.6);
   transform: translateY(-1px);
 }
 
 /* Keep button colors after a link has been visited */
 .project-doc-link:visited {
-  color: #00e5ff;
-  border-color: #00e5ff;
+  color: var(--cyan);
+  border-color: var(--cyan);
 }
 
 .project-launch-btn:visited {
-  color: #ffe600;
-  border-color: #ffe600;
+  color: var(--yellow);
+  border-color: var(--yellow);
 }
 
 
@@ -2376,13 +2438,13 @@ button.onboard-hide {
   padding: 4px 14px;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
-  border-color: rgba(0, 255, 102, 0.4);
+  border-color: rgb(var(--green-rgb) / 0.4);
 }
 
 .filter-btn[aria-pressed="true"] {
   border-color: var(--accent);
-  background-color: rgba(0, 255, 102, 0.15);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+  background-color: rgb(var(--green-rgb) / 0.15);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.4);
 }
 
 .roster-hint {
@@ -2402,9 +2464,9 @@ button.onboard-hide {
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid rgba(0, 255, 102, 0.25);
-  background: rgba(0, 0, 0, 0.7);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.08);
+  border: 1px solid rgb(var(--green-rgb) / 0.25);
+  background: rgb(var(--surface-rgb) / 0.7);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.08);
   color: var(--text);
   font-weight: normal;
   text-decoration: none;
@@ -2416,7 +2478,7 @@ button.onboard-hide {
   color: var(--text);
   text-shadow: none;
   border-color: var(--accent);
-  box-shadow: 0 0 14px rgba(0, 255, 102, 0.25);
+  box-shadow: 0 0 14px rgb(var(--glow-rgb) / 0.25);
   transform: translateX(4px);
 }
 
@@ -2429,7 +2491,7 @@ button.onboard-hide {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 30% 30%, #0b2d0b 0, #000 65%);
+  background: radial-gradient(circle at 30% 30%, #0b2d0b 0, var(--base) 65%);
   flex-shrink: 0;
   font-size: 0.8rem;
   letter-spacing: 0.08em;
@@ -2497,21 +2559,21 @@ button.onboard-hide {
 }
 
 .tag-im {
-  border-color: #00ff66;
-  color: #00ff66;
-  background: rgba(0, 255, 102, 0.08);
+  border-color: var(--text);
+  color: var(--text);
+  background: rgb(var(--green-rgb) / 0.08);
 }
 
 .tag-medpeds {
-  border-color: #00ffd5;
-  color: #00ffd5;
-  background: rgba(0, 255, 213, 0.08);
+  border-color: var(--teal);
+  color: var(--teal);
+  background: rgb(var(--teal-rgb) / 0.08);
 }
 
 .tag-em {
-  border-color: #ffb347;
-  color: #ffb347;
-  background: rgba(255, 179, 71, 0.1);
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgb(var(--amber-rgb) / 0.1);
 }
 
 @media (max-width: 480px) {
@@ -2539,9 +2601,9 @@ button.onboard-hide {
 .profile-photo-frame {
   width: 100%;
   border: 2px solid var(--accent);
-  background: radial-gradient(circle at top, #071707 0, #000 65%);
+  background: radial-gradient(circle at top, #071707 0, var(--base) 65%);
   padding: 10px;
-  box-shadow: 0 0 16px rgba(0, 255, 102, 0.25);
+  box-shadow: 0 0 16px rgb(var(--glow-rgb) / 0.25);
 }
 
 /* Keep heads in frame and photos a consistent size */
@@ -2576,7 +2638,7 @@ button.onboard-hide {
 
 .profile-fields {
   font-size: 0.85rem;
-  border-top: 1px dashed var(--accent);
+  border-top: 1px var(--rule-style) var(--accent);
   padding-top: 8px;
 }
 
@@ -2595,7 +2657,7 @@ button.onboard-hide {
 .profile-actions {
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px dashed var(--accent);
+  border-top: 1px var(--rule-style) var(--accent);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -2621,8 +2683,8 @@ button.onboard-hide {
 }
 
 .copy-email-btn:hover {
-  background: rgba(0, 255, 102, 0.08);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+  background: rgb(var(--green-rgb) / 0.08);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.4);
 }
 
 .copy-email-btn.copied {
@@ -2664,9 +2726,9 @@ button.onboard-hide {
 }
 
 .resource-group {
-  border: 1px solid rgba(0, 255, 102, 0.35);
-  background: rgba(0, 0, 0, 0.8);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.12);
+  border: 1px solid rgb(var(--green-rgb) / 0.35);
+  background: rgb(var(--surface-rgb) / 0.8);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.12);
 }
 
 .resource-summary {
@@ -2689,7 +2751,7 @@ button.onboard-hide {
 }
 
 .resource-body {
-  border-top: 1px dashed var(--accent);
+  border-top: 1px var(--rule-style) var(--accent);
   padding: 8px 12px 10px;
 }
 
@@ -2709,7 +2771,7 @@ button.onboard-hide {
   gap: 10px 16px;
   align-items: start;
   padding: 14px 0;
-  border-top: 1px dashed var(--line);
+  border-top: 1px var(--rule-style) var(--line);
 }
 
 .video-card:first-of-type {
@@ -2760,15 +2822,15 @@ button.onboard-hide {
 }
 
 .video-play:hover {
-  background-color: rgba(255, 230, 0, 0.12);
-  box-shadow: 0 0 10px rgba(255, 230, 0, 0.5);
+  background-color: rgb(var(--yellow-rgb) / 0.12);
+  box-shadow: 0 0 10px rgb(var(--yellow-rgb) / 0.5);
 }
 
 .video-frame {
   grid-column: 1 / -1;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--line-strong);
-  background: #000;
+  background: var(--base);
 }
 
 .video-frame iframe {
@@ -2786,7 +2848,7 @@ button.onboard-hide {
 
 .link-list li {
   padding: 12px 0;
-  border-top: 1px dashed var(--line);
+  border-top: 1px var(--rule-style) var(--line);
 }
 
 .link-list li:first-child {
@@ -2846,7 +2908,7 @@ button.onboard-hide {
 .lightbox-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.88);
+  background: rgb(var(--surface-rgb) / 0.88);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2858,8 +2920,8 @@ button.onboard-hide {
   max-width: 90vw;
   max-height: 90vh;
   border: 2px solid var(--accent);
-  background: radial-gradient(circle at top, #051505 0, #000 60%);
-  box-shadow: 0 0 30px rgba(0, 255, 102, 0.5);
+  background: radial-gradient(circle at top, #051505 0, var(--base) 60%);
+  box-shadow: 0 0 30px rgb(var(--glow-rgb) / 0.5);
   padding: 10px;
 }
 
@@ -2874,7 +2936,7 @@ button.onboard-hide {
   top: 4px;
   right: 8px;
   border: 1px solid var(--accent);
-  background: rgba(0, 0, 0, 0.9);
+  background: rgb(var(--surface-rgb) / 0.9);
   color: var(--accent);
   font-family: inherit;
   font-size: 0.85rem;
@@ -2883,7 +2945,7 @@ button.onboard-hide {
 }
 
 .lightbox-close:hover {
-  background: rgba(0, 255, 102, 0.15);
+  background: rgb(var(--green-rgb) / 0.15);
 }
 
 
@@ -2902,8 +2964,8 @@ a {
 }
 
 a:hover {
-  color: #00e5ff;
-  text-shadow: 0 0 6px #00e5ff;
+  color: var(--cyan);
+  text-shadow: 0 0 6px var(--cyan);
 }
 
 a:visited {
@@ -2911,14 +2973,14 @@ a:visited {
 }
 
 a:active {
-  color: #00e5ff;
+  color: var(--cyan);
 }
 
 /* Pink "< Back" link so it pops (stays pink once visited) */
 .back-link {
   display: inline-block;
   margin-top: 14px;
-  color: #ff4da6;
+  color: var(--pink);
   font-weight: 700;
   font-size: 1.1rem;
   letter-spacing: 0.04em;
@@ -2926,7 +2988,7 @@ a:active {
 }
 
 .back-link:visited {
-  color: #ff4da6;
+  color: var(--pink);
 }
 
 .back-link:hover {
@@ -2951,7 +3013,7 @@ a:active {
   padding: 28px;
   border: 1px solid var(--line-strong);
   border-top: 2px solid var(--accent);
-  background: #000;
+  background: var(--base);
   box-shadow: var(--glow);
   overflow: hidden;
 }
@@ -2965,7 +3027,7 @@ a:active {
   width: 440px;
   height: 440px;
   transform: translateY(-50%);
-  background: radial-gradient(circle, rgba(0, 255, 102, 0.16) 0, transparent 65%);
+  background: radial-gradient(circle, rgb(var(--green-rgb) / 0.16) 0, transparent 65%);
   pointer-events: none;
 }
 
@@ -2980,8 +3042,8 @@ a:active {
   object-fit: contain;
   mix-blend-mode: screen;
   /* Fade the picture's edges away so no rectangle shows */
-  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent 100%);
-  mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side, var(--base) 72%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side, var(--base) 72%, transparent 100%);
   animation: emblemPulse 5s ease-in-out infinite;
 }
 
@@ -3003,7 +3065,7 @@ a:active {
   line-height: 1.1;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  text-shadow: 0 0 10px rgba(0, 255, 102, 0.7);
+  text-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.7);
 }
 
 /* Phones: the staff becomes a banner above the text */
@@ -3079,11 +3141,11 @@ a:active {
 
 .join-input:focus {
   outline: none;
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.5);
 }
 
 select.join-input option {
-  background: #000;
+  background: var(--base);
   color: var(--text);
 }
 
@@ -3112,28 +3174,28 @@ textarea.join-input {
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  border: 1px solid rgba(0, 255, 102, 0.4);
+  border: 1px solid rgb(var(--green-rgb) / 0.4);
   border-radius: 999px;
   font-size: 0.8rem;
   cursor: pointer;
 }
 
 .interest-chip input {
-  accent-color: #00cc55;
+  accent-color: var(--accent);
   margin: 0;
 }
 
 .interest-chip:has(input:checked) {
   border-color: var(--accent);
-  background: rgba(0, 255, 102, 0.12);
+  background: rgb(var(--green-rgb) / 0.12);
 }
 
 .join-submit {
   margin-top: 6px;
   padding: 8px 22px;
   border-radius: 999px;
-  border: 1px solid #ff4da6;
-  color: #ff4da6;
+  border: 1px solid var(--pink);
+  color: var(--pink);
   background: transparent;
   font-size: 0.8rem;
   font-weight: 700;
@@ -3144,8 +3206,8 @@ textarea.join-input {
 
 .join-submit:hover,
 .join-submit:focus-visible {
-  background: rgba(255, 77, 166, 0.08);
-  box-shadow: 0 0 10px rgba(255, 77, 166, 0.4);
+  background: rgb(var(--pink-rgb) / 0.08);
+  box-shadow: 0 0 10px rgb(var(--pink-rgb) / 0.4);
 }
 
 .join-submit:disabled {
@@ -3312,7 +3374,7 @@ textarea.join-input {
   margin: 14px 0 0;
   padding: 12px 14px;
   border-left: 3px solid var(--yellow);
-  background: rgba(255, 230, 0, 0.05);
+  background: rgb(var(--yellow-rgb) / 0.05);
   font-size: 1.02rem;
   line-height: 1.55;
   color: var(--body);
@@ -3388,7 +3450,7 @@ textarea.join-input {
 .meeting-confirmed {
   margin-bottom: 18px;
   border-color: var(--yellow);
-  box-shadow: 0 0 12px rgba(255, 230, 0, 0.2);
+  box-shadow: 0 0 12px rgb(var(--yellow-rgb) / 0.2);
 }
 
 .meeting-when {
@@ -3408,7 +3470,7 @@ textarea.join-input {
 button.meeting-undo {
   margin-top: 12px;
   background: transparent;
-  border-color: rgba(255, 85, 85, 0.5);
+  border-color: rgb(var(--error-rgb) / 0.5);
   color: var(--error);
 }
 
@@ -3423,7 +3485,7 @@ button.meeting-undo {
   gap: 6px 12px;
   align-items: center;
   padding: 10px 0;
-  border-top: 1px dashed var(--line);
+  border-top: 1px var(--rule-style) var(--line);
 }
 
 .poll-day-name {
@@ -3450,14 +3512,14 @@ button.meeting-undo {
 
 .poll-slot.is-top {
   border-color: var(--text);
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.45);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.45);
 }
 
 /* A time you ticked */
 .poll-slot[aria-pressed="true"] {
   border-color: var(--yellow);
   color: var(--yellow);
-  background: rgba(255, 230, 0, 0.12);
+  background: rgb(var(--yellow-rgb) / 0.12);
 }
 
 .poll-slot:disabled {
@@ -3512,9 +3574,9 @@ button.meeting-undo {
   margin-bottom: 10px;
   padding: 8px 10px;
   border-radius: 3px;
-  border: 1px solid rgba(0, 255, 102, 0.28);
-  background: rgba(0, 0, 0, 0.8);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
+  border: 1px solid rgb(var(--green-rgb) / 0.28);
+  background: rgb(var(--surface-rgb) / 0.8);
+  box-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.15);
 }
 
 .ms-link {
@@ -3529,7 +3591,7 @@ button.meeting-undo {
 
 .ms-link:hover {
   border-color: transparent;
-  text-shadow: 0 0 6px rgba(0, 255, 102, 0.7);
+  text-shadow: 0 0 6px rgb(var(--glow-rgb) / 0.7);
 }
 
 /* Date badge: same width for every row */
@@ -3538,8 +3600,8 @@ button.meeting-undo {
   font-size: 0.8rem;
   padding: 4px 10px;
   border-radius: 6px;
-  border: 1px solid rgba(0, 255, 102, 0.4);
-  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgb(var(--green-rgb) / 0.4);
+  background: rgb(var(--surface-rgb) / 0.7);
   display: inline-block;
   min-width: 110px;
   text-align: center;
@@ -3556,17 +3618,17 @@ button.meeting-undo {
   text-transform: uppercase;
   padding: 4px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(0, 255, 102, 0.6);
+  border: 1px solid rgb(var(--green-rgb) / 0.6);
   color: var(--text);
   text-decoration: none;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgb(var(--surface-rgb) / 0.9);
   white-space: nowrap;
   transition: 0.15s ease-out;
 }
 
 .ms-cta:hover {
-  background: rgba(0, 255, 102, 0.15);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+  background: rgb(var(--green-rgb) / 0.15);
+  box-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.4);
 }
 
 .ms-cta--minutes {
@@ -3575,8 +3637,8 @@ button.meeting-undo {
 }
 
 .ms-cta--signup {
-  border-color: rgba(0, 255, 102, 0.8);
-  color: #00ff66;
+  border-color: rgb(var(--green-rgb) / 0.8);
+  color: var(--text);
 }
 
 /* Phones: button drops under the row; long titles wrap below the date */
@@ -3606,9 +3668,9 @@ button.meeting-undo {
 .app-card {
   width: 160px;
   padding: 10px 8px;
-  border: 1px solid rgba(0, 255, 102, 0.28);
-  background: rgba(0, 0, 0, 0.8);
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
+  border: 1px solid rgb(var(--green-rgb) / 0.28);
+  background: rgb(var(--surface-rgb) / 0.8);
+  box-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.15);
   text-align: center;
 }
 
@@ -3634,7 +3696,7 @@ button.meeting-undo {
   padding: 1rem 1.25rem 1.75rem;
   border: 1px solid #22c55e60;
   box-shadow: 0 0 0 1px #22c55e40;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgb(var(--surface-rgb) / 0.35);
 }
 
 .app-store-page .app-icon-launch {
@@ -3765,8 +3827,8 @@ button.meeting-undo {
   position: relative;
   aspect-ratio: 1 / 1;
   border: 2px solid var(--accent);
-  background: radial-gradient(circle at top, #071707 0, #000 65%);
-  box-shadow: 0 0 16px rgba(0, 255, 102, 0.25);
+  background: radial-gradient(circle at top, #071707 0, var(--base) 65%);
+  box-shadow: 0 0 16px rgb(var(--glow-rgb) / 0.25);
   overflow: hidden;
 }
 
@@ -3798,18 +3860,18 @@ button.meeting-undo {
   background:
     repeating-linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.18) 0,
-      rgba(0, 0, 0, 0.18) 1px,
+      rgb(var(--surface-rgb) / 0.18) 0,
+      rgb(var(--surface-rgb) / 0.18) 1px,
       transparent 1px,
       transparent 3px
     ),
-    radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.45) 100%);
+    radial-gradient(circle at center, transparent 60%, rgb(var(--surface-rgb) / 0.45) 100%);
 }
 
 /* Captions in terminal style */
 .guide-video::cue {
-  color: #00ff66;
-  background: rgba(0, 0, 0, 0.8);
+  color: var(--text);
+  background: rgb(var(--surface-rgb) / 0.8);
   font-family: inherit;
 }
 
@@ -3828,19 +3890,19 @@ button.meeting-undo {
 
 .guide-btn:hover,
 .guide-btn:focus-visible {
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.5);
 }
 
 /* Primary action = neon yellow, like Launch buttons */
 .guide-btn--play {
-  border-color: #ffe600;
-  color: #ffe600;
+  border-color: var(--yellow);
+  color: var(--yellow);
 }
 
 .guide-btn--play:hover,
 .guide-btn--play:focus-visible {
-  background-color: rgba(255, 230, 0, 0.15);
-  box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
+  background-color: rgb(var(--yellow-rgb) / 0.15);
+  box-shadow: 0 0 10px rgb(var(--yellow-rgb) / 0.6);
 }
 
 .guide-transcript {
