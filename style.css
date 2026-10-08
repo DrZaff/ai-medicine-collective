@@ -2166,6 +2166,47 @@ button.onboard-hide {
   box-shadow: var(--glow);
 }
 
+/* A grid of unequal cards: the briefing is the large one, the meeting and
+   the team sit beside it, tools and new projects share the row below.
+   (In the page the hub card comes second; "order" moves it to the end.) */
+.home-panel--briefing {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.home-panel--tools {
+  order: 1;
+}
+
+.home-panel--hub {
+  grid-column: span 2;
+  order: 2;
+}
+
+.bento-apps,
+.bento-faces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.bento-apps img {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--line-strong);
+}
+
+/* faces as seen on a green phosphor screen */
+.bento-faces img {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  object-fit: cover;
+  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(2.4) brightness(0.9);
+}
+
 .home-panel-title {
   margin: 0 0 10px;
   font-size: 0.85rem;
@@ -2288,6 +2329,12 @@ button.onboard-hide {
 @media (max-width: 720px) {
   .home-panels {
     grid-template-columns: 1fr;
+  }
+
+  .home-panel--briefing,
+  .home-panel--hub {
+    grid-column: auto;
+    grid-row: auto;
   }
 
   .tile-grid {
