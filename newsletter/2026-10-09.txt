@@ -1,0 +1,43 @@
+:: AI MEDICINE COLLECTIVE ::
+Weekly digest, Oct 03 - Oct 09, 2026
+
+[[AMC:NOTE]]
+// THE ONE THING
+Award-Winning AI Curriculum Keeps Residents on Their Toes
+Programs building their own AI teaching get a concrete model for one of the hardest design problems: teaching residents to use AI in a way that supports their clinical reasoning instead of causing deskilling. The model also allows for very uneven starting knowledge across a residency class.
+https://medicine.stanford.edu/news/stories/2026/10/award-winning-ai-curriculum-keeps-residents-on-their-toes.html
+
+// AI VS HUMAN
+This week: Mixed results
+Divergent impacts of explainable AI for dermatological diagnosis on clinicians versus lay people
+In this skin diagnosis task, AI help raised PCPs' accuracy, but medical students and lay people were more easily misled when the AI was wrong. Polished LLM explanations did not make the advice more useful to doctors. Educators can use this to show trainees why they should commit to their own diagnosis before checking the AI's answer.
+https://www.nature.com/articles/s41591-026-04553-w
+Running tally: AI ahead 0, humans ahead 0, even or mixed 1.
+
+// ALSO THIS WEEK
+> Machine Learning for Human-Autonomy Teaming in Surgical Skill Assessment: Scoping Review (JMIR AI)
+  https://ai.jmir.org/2026/1/e94109
+> Artificial Intelligence as a Core Public Health Competency: Proposal and Perspectives in Education and Research (JMIR Medical Education)
+  https://mededu.jmir.org/2026/1/e92246
+> AI Tool Finds and Fixes Training Gaps for Radiology Residents (NYU Langone News (press release on a study in Academic Radiology))
+  https://nyulangone.org/news/ai-tool-finds-and-fixes-training-gaps-radiology-residents
+> UCLA alumnus turns medical school frustrations into AI study app 'Neural Consult' (Daily Bruin)
+  https://dailybruin.com/2026/10/03/ucla-alumnus-turns-medical-school-frustrations-into-ai-study-app-neural-consult
+
+// TOOL OF THE WEEK
+NextSet AI Personal Trainer
+Personal trainer that guides workouts, answers questions, and logs performance. Custom GPT: needs a paid ChatGPT subscription.
+https://www.aimedicinecollective.com/hub.html?project=99df7586-7b25-43b4-b973-39e312d673fd
+
+// FROM THE COLLECTIVE
+Brandon Zaffuto added 16 tools, including Acid-Base Calculator and ANKIGen AI.
+Matt Still published Obesity Phenotype Calculator.
+[[AMC:COLLECTIVE]]
+
+// ONE ASK
+[[AMC:ASK]]Open one tool from the hub this week and tell its author what you think. https://www.aimedicinecollective.com/tools.html[[/AMC:ASK]]
+
+Every briefing: https://www.aimedicinecollective.com/blog.html
+Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.
+
+You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" under Your profile on your account page: https://www.aimedicinecollective.com/account.html#profile
