@@ -1,0 +1,12 @@
+Stanford's resident AI curriculum, and a trial of AI help for primary care physicians diagnosing skin disease
+
+Stanford's award-winning curriculum teaches internal medicine residents to use AI tools well. A Nature Medicine study shows why that matters: how much AI advice helps, or misleads, depends on who receives it, and doctors handled wrong advice better than medical students or the public.
+
+Med-ed: Award-Winning AI Curriculum Keeps Residents on Their Toes (Stanford Medicine, Department of Medicine)
+AI vs human: Divergent impacts of explainable AI for dermatological diagnosis on clinicians versus lay people (Nature Medicine)
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-10-09 (link in bio).
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AiCurriculum #AutomationBias #ClinicalReasoning #Dermatology #Deskilling #DiagnosticAccuracy
