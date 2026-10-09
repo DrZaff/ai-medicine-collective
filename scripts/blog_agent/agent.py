@@ -285,8 +285,16 @@ def add_usage(total: dict | None, extra: dict | None) -> dict | None:
 
 # ---------------------------------------------------------------- Claude call
 
-def run_claude(prompt: str) -> tuple[dict, set[str], dict]:
+def run_claude(prompt: str, system: str | None = None, schema: dict | None = None,
+               tools: list | None = None) -> tuple[dict, set[str], dict]:
+    """One request, returning (the JSON answer, links seen in search results,
+    usage). The defaults are the blog's own instructions, answer format and
+    search tools; living_review.py passes its own (tools=[] means no searching)."""
     import anthropic  # imported here so --fixture runs without the SDK
+
+    request = {"tools": TOOLS if tools is None else tools}
+    if not request["tools"]:
+        request = {}
 
     client = anthropic.Anthropic()
     user_turn = {"role": "user", "content": prompt}
@@ -301,13 +309,13 @@ def run_claude(prompt: str) -> tuple[dict, set[str], dict]:
             max_tokens=32000,
             betas=["server-side-fallback-2026-07-01"],
             fallbacks="default",
-            system=SYSTEM_PROMPT,
-            tools=TOOLS,
+            system=system or SYSTEM_PROMPT,
             output_config={
                 "effort": EFFORT,
-                "format": {"type": "json_schema", "schema": POST_SCHEMA},
+                "format": {"type": "json_schema", "schema": schema or POST_SCHEMA},
             },
             messages=messages,
+            **request,
         ) as stream:
             response = stream.get_final_message()
 

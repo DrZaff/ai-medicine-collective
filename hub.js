@@ -929,6 +929,8 @@ function initHubPage() {
       // The outside library on learn.html (static, hidden until now)
       const library = document.getElementById("learning-library");
       if (library) library.hidden = !approved || !!params.get("project") || !!params.get("view");
+      const evidence = document.getElementById("learning-evidence");
+      if (evidence) evidence.hidden = !library || library.hidden;
 
       if (approved) {
         me = profile;
