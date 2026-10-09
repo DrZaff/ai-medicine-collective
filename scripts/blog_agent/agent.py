@@ -45,6 +45,7 @@ MAX_FETCH_TOKENS = 6000
 
 # Approximate list prices, used only for the cost line in the PR description.
 # Check current pricing at https://www.anthropic.com/pricing before relying on it.
+# (Writing to the cache costs 1.25x the input price; reading from it, PRICE_CACHE_READ.)
 PRICE_INPUT_PER_MTOK = 4.00
 PRICE_OUTPUT_PER_MTOK = 20.00
 PRICE_CACHE_READ_PER_MTOK = 0.20
@@ -293,7 +294,13 @@ def run_claude(prompt: str, system: str | None = None, schema: dict | None = Non
     import anthropic  # imported here so --fixture runs without the SDK
 
     request = {"tools": TOOLS if tools is None else tools}
-    if not request["tools"]:
+    if request["tools"]:
+        # A search request is a long loop: after every search the model reads
+        # everything gathered so far again. With caching on, those re-reads
+        # are billed at the cached rate (about a twentieth of the normal
+        # input price) instead of in full. This was most of the cost.
+        request["cache_control"] = {"type": "ephemeral"}
+    else:
         request = {}
 
     client = anthropic.Anthropic()

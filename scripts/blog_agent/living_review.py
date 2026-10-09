@@ -55,8 +55,8 @@ FIRST_TOOLS = [
     {"type": "web_fetch_20260209", "name": "web_fetch", "max_uses": 14, "max_content_tokens": 6000},
 ]
 MONTHLY_TOOLS = [
-    {"type": "web_search_20260209", "name": "web_search", "max_uses": 25},
-    {"type": "web_fetch_20260209", "name": "web_fetch", "max_uses": 10, "max_content_tokens": 6000},
+    {"type": "web_search_20260209", "name": "web_search", "max_uses": 18},
+    {"type": "web_fetch_20260209", "name": "web_fetch", "max_uses": 8, "max_content_tokens": 5000},
 ]
 
 DOMAINS = ["diagnosis", "imaging", "management", "documentation", "communication",
