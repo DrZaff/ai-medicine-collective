@@ -1378,8 +1378,8 @@ const DIGEST_MARKS = {
   textAsk: /\[\[AMC:ASK\]\][\s\S]*?\[\[\/AMC:ASK\]\]/,
 };
 // Inline styles matching the digest's own (email clients ignore stylesheets)
-const DIGEST_P = "margin:0 0 10px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:#e9f1eb;";
-const DIGEST_LINK = "color:#00ff66;text-decoration:none;font-weight:bold;";
+const DIGEST_P = "margin:0 0 14px;font-family:Georgia,'Times New Roman',Times,serif;font-size:17px;line-height:1.7;color:#333b36;";
+const DIGEST_LINK = "color:#0b5d45;text-decoration:underline;";
 
 function initDigestSender() {
   const app = document.getElementById("moderate-digest");
@@ -1568,9 +1568,9 @@ function initDigestSender() {
     function assemble() {
       const paragraphs = note.value.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
       const noteHtml = paragraphs.length
-        ? `<div style="margin:16px 0 4px;padding:12px 14px;border-left:3px solid #00cc55;background:#07130a;">`
+        ? `<div style="margin:0 0 34px;padding:2px 0 2px 20px;border-left:3px solid #0b5d45;font-style:italic;">`
           + paragraphs.map((p) => `<p style="${DIGEST_P}">${escapeHtml(p).replace(/\n/g, "<br>")}</p>`).join("")
-          + (firstName ? `<p style="${DIGEST_P}margin-bottom:0;color:#9db8a6;">${escapeHtml(firstName)}</p>` : "")
+          + (firstName ? `<p style="${DIGEST_P}margin-bottom:0;color:#7b766a;">&mdash; ${escapeHtml(firstName)}</p>` : "")
           + "</div>"
         : "";
       const noteText = paragraphs.length ? `${paragraphs.join("\n\n")}${firstName ? `\n${firstName}` : ""}\n` : "";
