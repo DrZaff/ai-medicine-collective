@@ -31,7 +31,10 @@ MODEL = "claude-opus-5-5"
 EFFORT = "medium"
 LOOKBACK_DAYS = 7              # med-ed review
 VS_HUMAN_LOOKBACK_DAYS = 30    # "AI vs human" review: good comparison studies are rarer
-RECENT_DAYS_TO_AVOID = 45      # must stay longer than both lookback windows
+# If the first pass comes back without one of the two reviews, a second pass
+# looks for just that one, further back (see fill_missing).
+FALLBACK_LOOKBACK_DAYS = {"med_ed": 21, "ai_vs_human": 120}
+RECENT_DAYS_TO_AVOID = 130     # must stay longer than every lookback window
 MAX_PAUSE_RESUMES = 5
 
 # Tool budgets. Fetched pages are the main cost (they count as input tokens),
@@ -97,18 +100,21 @@ conclusions. Say plainly when something is a preprint, a press release, or \
 an opinion piece.
 - Never include patient-identifiable information of any kind.
 - Skip items already covered recently (you are given that list).
-- One item per section, never more. If nothing qualifies for a section, leave \
-that section out rather than stretching: a briefing with one good review is \
-better than one with a weak second. If nothing qualifies at all, return an \
-empty items list.
+- One item per section, never more. Readers expect both reviews, so work to \
+find both. If, after a real search, nothing meets the bar for a section, \
+leave that section out rather than lowering the bar, and say why in "note". \
+If nothing qualifies at all, return an empty items list.
+- "note" is for the editors only and is never published. Leave it empty when \
+both reviews are present. Otherwise say in 2 to 4 sentences what you searched \
+for and why the best candidates did not qualify (name them).
 - Write in clear, plain language for busy clinicians. The med-ed summary is 2 \
 to 3 sentences; the AI-vs-human summary is 3 to 5. "Why it matters" is 1 to 2 \
 sentences aimed at learners and educators.
 - The headline is a short, specific title for the whole briefing (no \
 clickbait). The intro is 1 to 2 sentences tying the two reviews together.
-- Everything you write is published for readers. Never mention your search \
-process, tools, limits, what you could not find or check, or how many items \
-there are.
+- Everything you write except "note" is published for readers. There, never \
+mention your search process, tools, limits, what you could not find or check, \
+or how many items there are.
 - You have a limited number of searches and page fetches. Split your searches \
 roughly evenly between the two sections, and fetch a page only when the \
 search result does not give you enough to summarize it accurately. For the \
@@ -143,8 +149,9 @@ POST_SCHEMA = {
             },
         },
         "tags": {"type": "array", "items": {"type": "string"}},
+        "note": {"type": "string", "description": "For the editors only; never published"},
     },
-    "required": ["headline", "intro", "items", "tags"],
+    "required": ["headline", "intro", "items", "tags", "note"],
     "additionalProperties": False,
 }
 
@@ -241,13 +248,48 @@ def build_user_prompt(date: dt.date, avoid: list[dict]) -> str:
     )
 
 
+def build_fill_prompt(date: dt.date, avoid: list[dict], post: dict, section: str) -> str:
+    """Second pass: the briefing has one review; find the other, further back."""
+    window_start = date - dt.timedelta(days=FALLBACK_LOOKBACK_DAYS[section])
+    covered = [
+        f"- {item['title']} ({item['url']})"
+        for entry in [*avoid, post] for item in entry.get("items", [])
+    ]
+    have = "\n\n".join(
+        f"[{SECTION_LABELS.get(item.get('section'), 'review')}] {item['title']} "
+        f"({item['source']}, {item['published']})\n{item['summary']}"
+        for item in post.get("items", [])
+    )
+    return (
+        f"Today is {date.isoformat()}. This briefing already has one review:\n\n"
+        f"{have}\n\n"
+        f"It is missing the {SECTION_LABELS[section]} review (section "
+        f"\"{section}\"). Find it. Spend every search on this one review. The "
+        f"lookback window is widened for it: published from "
+        f"{window_start.isoformat()} through {date.isoformat()}; prefer the most "
+        "recent item that fully meets the bar. If a journal page will not load, "
+        "try the PubMed, PubMed Central or preprint page for the same study.\n\n"
+        "Do not repeat any of these:\n" + "\n".join(covered) + "\n\n"
+        "Return the required JSON with exactly one item, in that section; a "
+        "headline and an intro rewritten for the two reviews together; tags for "
+        "the new review; and an empty note. If, after using your searches, "
+        "nothing meets the bar, return an empty items list and explain in note."
+    )
+
+
+def add_usage(total: dict | None, extra: dict | None) -> dict | None:
+    if total is None or extra is None:
+        return total or extra
+    return {key: total[key] + extra[key] for key in total}
+
+
 # ---------------------------------------------------------------- Claude call
 
-def run_claude(date: dt.date, avoid: list[dict]) -> tuple[dict, set[str], dict]:
+def run_claude(prompt: str) -> tuple[dict, set[str], dict]:
     import anthropic  # imported here so --fixture runs without the SDK
 
     client = anthropic.Anthropic()
-    user_turn = {"role": "user", "content": build_user_prompt(date, avoid)}
+    user_turn = {"role": "user", "content": prompt}
     messages = [user_turn]
     assistant_so_far: list = []  # content from paused turns, resent so work isn't lost
     found_urls: set[str] = set()
@@ -345,14 +387,68 @@ def verify_items(result: dict, found_urls: set[str], avoid: list[dict]) -> tuple
     return kept, dropped
 
 
+def missing_sections(items: list[dict]) -> list[str]:
+    """Sections a two-review briefing still lacks. Posts from before the
+    two-review format (no sections at all) are left alone."""
+    present = {item.get("section") for item in items}
+    if not present & set(SECTIONS):
+        return []
+    return [section for section in SECTIONS if section not in present]
+
+
+def fill_missing(date: dt.date, avoid: list[dict], post: dict, fixture: dict | None):
+    """Run a focused second pass for each missing review and add what it finds
+    to the post. Returns (changed, dropped reasons, notes, usage)."""
+    changed, dropped, notes, usage = False, [], [], None
+    for section in missing_sections(post["items"]):
+        if fixture is not None:
+            second = (fixture.get("second_pass") or {}).get(section)
+            if second is None:
+                notes.append(f"{SECTION_LABELS[section]}: no second pass in the fixture.")
+                continue
+            result = second["result"]
+            found_urls = {normalize_url(u) for u in second.get("search_urls", [])}
+        else:
+            print(f"Second pass for the {SECTION_LABELS[section]} review...")
+            result, found_urls, extra = run_claude(build_fill_prompt(date, avoid, post, section))
+            usage = add_usage(usage, extra)
+
+        wanted = [item for item in result.get("items", []) if item.get("section") == section]
+        kept, reasons = verify_items({"items": wanted}, found_urls, [*avoid, post])
+        dropped += reasons
+        if kept:
+            post["items"] = sorted([*post["items"], kept[0]], key=lambda item: SECTIONS.index(item["section"]))
+            post["headline"] = (result.get("headline") or post["headline"]).strip()
+            post["intro"] = (result.get("intro") or post["intro"]).strip()
+            post["tags"] = sorted({*post.get("tags", []), *(t.strip().lower() for t in result.get("tags", []) if t.strip())})
+            changed = True
+        else:
+            why = (result.get("note") or "").strip() or "the second pass returned nothing it could verify."
+            notes.append(f"{SECTION_LABELS[section]}: {why}")
+    return changed, dropped, notes, usage
+
+
 # ---------------------------------------------------------------- output
 
-def write_pr_body(path: Path, post: dict, dropped: list[str], usage: dict | None) -> None:
+def write_pr_body(path: Path, post: dict, dropped: list[str], usage: dict | None,
+                  notes: list[str] | None = None) -> None:
     lines = [
         f"## {post['headline']}",
         "",
         post["intro"],
         "",
+    ]
+    still_missing = missing_sections(post["items"])
+    if still_missing:
+        names = " and ".join(SECTION_LABELS[section] for section in still_missing)
+        lines += [
+            f"**Only one review in this draft: no {names} review was found, even on a second, wider search.** "
+            "Publish it as it is, close this PR to skip the day, or re-run the Blog draft job to try again.",
+            "",
+        ]
+    if notes:
+        lines += ["### Notes from the agent (not published)", *[f"- {note}" for note in notes], ""]
+    lines += [
         "### Items",
     ]
     for n, item in enumerate(post["items"], 1):
@@ -399,28 +495,49 @@ def main() -> int:
     parser.add_argument("--date", type=dt.date.fromisoformat, help="Defaults to today (US Eastern)")
     parser.add_argument("--pr-body", type=Path, help="Where to write the PR description")
     parser.add_argument("--fixture", type=Path,
-                        help='Test without the API: JSON {"result": {...}, "search_urls": [...]}')
+                        help='Test without the API: JSON {"result": {...}, "search_urls": [...], '
+                             '"second_pass": {"<section>": {"result": {...}, "search_urls": [...]}}}')
+    parser.add_argument("--fill", action="store_true",
+                        help="If the post already exists as an unpublished draft with one review, "
+                             "look for the missing one and add it")
     args = parser.parse_args()
 
     date: dt.date = args.date or today_eastern()
     post_path = POSTS_DIR / f"{date.isoformat()}.json"
     set_output("date", date.isoformat())
 
+    avoid = recent_posts(date, RECENT_DAYS_TO_AVOID)
+    fixture = json.loads(args.fixture.read_text(encoding="utf-8")) if args.fixture else None
+
     if post_path.exists():
-        print(f"{post_path.relative_to(ROOT)} already exists; nothing to do.")
-        set_output("post_created", "false")
+        # Only a draft that has not been published is topped up (the workflow
+        # passes --fill when it brought the file in from the draft's branch).
+        post = json.loads(post_path.read_text(encoding="utf-8"))
+        if not args.fill or not missing_sections(post.get("items", [])):
+            print(f"{post_path.relative_to(ROOT)} already exists; nothing to do.")
+            set_output("post_created", "false")
+            return 0
+        changed, dropped, notes, usage = fill_missing(date, avoid, post, fixture)
+        for line in [*(f"Dropped: {d}" for d in dropped), *(f"Note: {n}" for n in notes)]:
+            print(line)
+        if usage is not None:
+            print(f"Usage: {usage} (about ${estimate_cost(usage):.2f})")
+        if changed:
+            post_path.write_text(json.dumps(post, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            print(f"Added the missing review to {post_path.relative_to(ROOT)}.")
+        if args.pr_body:
+            write_pr_body(args.pr_body, post, dropped, usage, notes)
+        # "true" also when nothing was found, so the draft's description is
+        # updated with the reason
+        set_output("post_created", "true")
         return 0
 
-    avoid = recent_posts(date, RECENT_DAYS_TO_AVOID)
-
-    if args.fixture:
-        fixture = json.loads(args.fixture.read_text(encoding="utf-8"))
+    if fixture is not None:
         result = fixture["result"]
         found_urls = {normalize_url(u) for u in fixture.get("search_urls", [])}
         usage = None
     else:
-        result, found_urls, usage = run_claude(date, avoid)
-        print(f"Usage: {usage} (about ${estimate_cost(usage):.2f})")
+        result, found_urls, usage = run_claude(build_user_prompt(date, avoid))
 
     items, dropped = verify_items(result, found_urls, avoid)
     for reason in dropped:
@@ -439,12 +556,27 @@ def main() -> int:
         "tags": sorted({t.strip().lower() for t in result.get("tags", []) if t.strip()}),
         "generated_by": MODEL,
     }
+    # Readers expect both reviews: if one is missing, look for it on its own
+    notes = []
+    first_note = (result.get("note") or "").strip()
+    if missing_sections(items):
+        if first_note:
+            notes.append(f"First pass: {first_note}")
+        _, more_dropped, more_notes, more_usage = fill_missing(date, avoid, post, fixture)
+        dropped += more_dropped
+        notes += more_notes
+        usage = add_usage(usage, more_usage)
+        for line in [*(f"Dropped: {d}" for d in more_dropped), *(f"Note: {n}" for n in notes)]:
+            print(line)
+    if usage is not None:
+        print(f"Usage: {usage} (about ${estimate_cost(usage):.2f})")
+
     POSTS_DIR.mkdir(parents=True, exist_ok=True)
     post_path.write_text(json.dumps(post, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"Wrote {post_path.relative_to(ROOT)} with {len(items)} item(s).")
+    print(f"Wrote {post_path.relative_to(ROOT)} with {len(post['items'])} item(s).")
 
     if args.pr_body:
-        write_pr_body(args.pr_body, post, dropped, usage)
+        write_pr_body(args.pr_body, post, dropped, usage, notes)
     set_output("post_created", "true")
     return 0
 

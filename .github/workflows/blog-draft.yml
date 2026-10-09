@@ -69,6 +69,19 @@ jobs:
         run: |
           args=(--pr-body "$RUNNER_TEMP/pr-body.md")
           if [ -n "$DATE_INPUT" ]; then args+=(--date "$DATE_INPUT"); fi
+          # A draft for this date that is still waiting for review: bring its
+          # file in, so the agent can add a review it is missing (--fill)
+          # instead of starting again.
+          date="${DATE_INPUT:-$(TZ=America/New_York date +%F)}"
+          # (never a post that is already published, i.e. already in this checkout)
+          if [ ! -e "blog/posts/$date.json" ] && git ls-remote --exit-code --heads origin "blog/$date" > /dev/null; then
+            git fetch --quiet origin "blog/$date"
+            if git cat-file -e "FETCH_HEAD:blog/posts/$date.json" 2> /dev/null; then
+              mkdir -p blog/posts
+              git show "FETCH_HEAD:blog/posts/$date.json" > "blog/posts/$date.json"
+              args+=(--fill)
+            fi
+          fi
           python scripts/blog_agent/agent.py "${args[@]}"
 
       - name: Open pull request
@@ -78,12 +91,26 @@ jobs:
           DATE: ${{ steps.draft.outputs.date }}
         run: |
           branch="blog/$DATE"
-          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
-            echo "::notice::A draft branch for $DATE already exists; not opening another."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            # The draft already has a branch: the agent topped it up. Put the
+            # new file on that branch and refresh the description.
+            cp "blog/posts/$DATE.json" "$RUNNER_TEMP/post.json"
+            rm "blog/posts/$DATE.json"
+            git fetch --quiet origin "$branch"
+            git switch --quiet -C "$branch" FETCH_HEAD
+            cp "$RUNNER_TEMP/post.json" "blog/posts/$DATE.json"
+            git add "blog/posts/$DATE.json"
+            if git diff --cached --quiet; then
+              echo "::notice::No second review was found for $DATE; the draft is unchanged."
+            else
+              git commit -m "Blog draft for $DATE: add the missing review"
+              git push origin "$branch"
+            fi
+            gh pr edit "$branch" --body-file "$RUNNER_TEMP/pr-body.md"               || echo "::notice::No open pull request for $branch to update."
+            exit 0
+          fi
           git switch -c "$branch"
           git add "blog/posts/$DATE.json"
           git commit -m "Blog draft for $DATE"
