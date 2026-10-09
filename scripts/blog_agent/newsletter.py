@@ -81,6 +81,12 @@ VERDICTS = {
     "mixed": "Mixed results",
 }
 DEFAULT_ASK = "Open one tool from the hub this week and tell its author what you think."
+# Shown in the AI vs human section until the first head-to-head review is published
+VERSUS_INTRO = ("Each week this space takes one published study that pits an AI system against clinicians on a "
+                "real medical task, or clinicians working with AI against clinicians working without it. You "
+                "get the task, who was tested, each side's numbers, the catch, and a verdict: AI ahead, humans "
+                "ahead, or too close to call.")
+VERSUS_INTRO_NOTE = "A running scoreboard will keep count here from our first review onward."
 
 
 def today_eastern() -> dt.date:
@@ -223,7 +229,7 @@ def render_html(d: dict) -> str:
 
         # masthead: the name between rules, as on a printed front page
         f'<p style="margin:0 0 14px;text-align:center;"><img src="{SITE_URL}/images/icon-192.png" width="38" height="38" '
-        'alt="AMC" style="border:0;border-radius:8px;"></p>',
+        'alt="AI Medicine Collective" style="border:0;border-radius:9px;"></p>',
         f'<p style="margin:0;text-align:center;font-family:{SANS};font-size:11px;font-weight:bold;letter-spacing:3px;color:{MUTED};">'
         "AI MEDICINE COLLECTIVE</p>",
         f'<p style="margin:10px 0 16px;text-align:center;font-family:{SERIF};font-size:40px;line-height:1.05;font-weight:normal;color:{INK};">'
@@ -268,7 +274,7 @@ def render_html(d: dict) -> str:
             f'<p style="margin:0 0 12px;font-family:{SERIF};font-size:15px;font-style:italic;color:{GREEN};">This week&rsquo;s result: {e(verdict.lower().replace("ai ", "AI "))}.</p>',
             f'<p style="{P}">{e(versus["why_it_matters"])}</p>',
         ]
-    if not d["versus"]:
+    if not d["versus"] and sum(tally.values()):
         out.append(f'<p style="{P}">No head-to-head study made the cut this week.</p>')
 
     def cell(number: int, label: str, last: bool = False) -> str:
@@ -290,8 +296,12 @@ def render_html(d: dict) -> str:
             "The running tally of every head-to-head study we have reviewed. One study never settles it.</p>",
         ]
     else:
-        out.append(f'<p style="{P}">The scoreboard opens with our first head-to-head review: '
-                   "each post now pits AI against humans on one medical task.</p>")
+        # Before the first head-to-head review: say what this section will hold
+        out += [
+            headline("Who does it better?", f"{SITE_URL}/blog.html", 23),
+            f'<p style="{P}">{e(VERSUS_INTRO)}</p>',
+            f'<p style="margin:0;font-family:{SERIF};font-size:15px;font-style:italic;color:{MUTED};">{e(VERSUS_INTRO_NOTE)}</p>',
+        ]
 
     if d["also"]:
         out += [RULE, f'<p style="{LABEL}">Also this week</p>']
@@ -364,7 +374,8 @@ def render_text(d: dict) -> str:
         lines += [f"This week: {VERDICTS.get(versus.get('verdict'), 'Result')}", versus["title"],
                   versus["why_it_matters"], versus["url"]]
     if not d["versus"]:
-        lines.append("No head-to-head study made the cut this week.")
+        lines += (["No head-to-head study made the cut this week."] if sum(tally.values())
+                  else [VERSUS_INTRO, VERSUS_INTRO_NOTE])
     if sum(tally.values()):
         lines.append(f"Running tally: AI ahead {tally['ai_ahead']}, humans ahead {tally['humans_ahead']}, "
                      f"even or mixed {tally['comparable'] + tally['mixed']}.")

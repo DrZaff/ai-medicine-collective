@@ -8,7 +8,8 @@ Surgical educators being pitched automated skill scoring should ask for external
 https://ai.jmir.org/2026/1/e94109
 
 // AI VS HUMAN
-No head-to-head study made the cut this week.
+Each week this space takes one published study that pits an AI system against clinicians on a real medical task, or clinicians working with AI against clinicians working without it. You get the task, who was tested, each side's numbers, the catch, and a verdict: AI ahead, humans ahead, or too close to call.
+A running scoreboard will keep count here from our first review onward.
 
 // ALSO THIS WEEK
 > Artificial Intelligence as a Core Public Health Competency: Proposal and Perspectives in Education and Research (JMIR Medical Education)

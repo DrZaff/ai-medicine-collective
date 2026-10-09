@@ -250,16 +250,14 @@
   color: var(--ink);
 }
 
-/* the mark beside the name: the AMC logo */
+/* the mark beside the name: the Collective's logo (images/logo.svg) */
 .modern .headline a::before {
   content: "";
   flex: 0 0 auto;
   width: 36px;
   height: 36px;
-  border-radius: 9px;
-  /* zoomed in so the letters stay readable at this size */
-  background: #000 url("images/icon-192.png") center / 165% no-repeat;
-  box-shadow: 0 2px 8px rgb(15 23 42 / 0.25);
+  background: url("images/logo.svg") center / contain no-repeat;
+  filter: drop-shadow(0 2px 5px rgb(15 23 42 / 0.22));
 }
 
 .modern .headline a:hover {
@@ -1713,7 +1711,6 @@
   .modern .headline a::before {
     width: 30px;
     height: 30px;
-    border-radius: 8px;
   }
 }
 
