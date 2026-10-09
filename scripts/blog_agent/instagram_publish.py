@@ -1,0 +1,165 @@
+"""Publish a blog post's carousel to Instagram.
+
+Runs after a blog draft is merged (.github/workflows/instagram-publish.yml).
+The slides and caption were made by instagram.py and reviewed in the same
+pull request as the post, so merging is the approval for both.
+
+Steps, using Meta's "Instagram API with Instagram Login":
+  1. wait until the slides are reachable on the live site (Instagram fetches
+     them from there, so the site has to have finished updating)
+  2. stop if this post is already on the account (so a re-run never posts twice)
+  3. make one container per slide, one carousel container, then publish it
+
+Needs two environment values (GitHub Actions secrets in CI):
+    IG_USER_ID        the Instagram professional account's id
+    IG_ACCESS_TOKEN   a long-lived token for it (lasts 60 days; see CLAUDE.md)
+
+Usage:
+    python scripts/blog_agent/instagram_publish.py --date YYYY-MM-DD [--dry-run]
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+SOCIAL_DIR = ROOT / "social"
+SITE_URL = "https://www.aimedicinecollective.com"
+API = "https://" + os.environ.get("IG_API_HOST", "graph.instagram.com")
+
+SITE_WAIT_SECONDS = 15 * 60     # how long to wait for the site to serve the slides
+CONTAINER_WAIT_SECONDS = 5 * 60
+
+
+class ApiError(RuntimeError):
+    pass
+
+
+def call(method: str, path: str, params: dict) -> dict:
+    """One request to the Instagram API. The token travels in the request
+    body or query, never in anything this script prints."""
+    data = urllib.parse.urlencode(params).encode()
+    url = f"{API}/{path}"
+    if method == "GET":
+        url, data = f"{url}?{data.decode()}", None
+    request = urllib.request.Request(url, data=data, method=method)
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            return json.loads(response.read().decode())
+    except urllib.error.HTTPError as err:
+        try:
+            detail = json.loads(err.read().decode()).get("error", {})
+        except Exception:
+            detail = {}
+        message = detail.get("message") or f"HTTP {err.code}"
+        if detail.get("code") == 190:
+            message += " (the access token has expired or is wrong: make a new one, see CLAUDE.md)"
+        raise ApiError(f"{method} /{path.split('/')[-1]}: {message}") from None
+    except urllib.error.URLError as err:
+        raise ApiError(f"{method} /{path.split('/')[-1]}: could not reach Instagram ({err.reason})") from None
+
+
+def reachable(url: str) -> bool:
+    try:
+        request = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "amc-instagram-publish"})
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return response.status == 200 and "image" in response.headers.get("Content-Type", "")
+    except Exception:
+        return False
+
+
+def wait_for_site(urls: list[str]) -> bool:
+    deadline = time.time() + SITE_WAIT_SECONDS
+    while True:
+        missing = [u for u in urls if not reachable(u)]
+        if not missing:
+            return True
+        if time.time() > deadline:
+            print(f"Still not on the site after {SITE_WAIT_SECONDS // 60} minutes: {missing[0]}")
+            return False
+        print(f"Waiting for the site to update ({len(missing)} of {len(urls)} slides not there yet)...")
+        time.sleep(30)
+
+
+def wait_until_ready(container: str, token: str) -> None:
+    deadline = time.time() + CONTAINER_WAIT_SECONDS
+    while True:
+        status = call("GET", container, {"fields": "status_code", "access_token": token}).get("status_code")
+        if status in (None, "FINISHED", "PUBLISHED"):
+            return
+        if status in ("ERROR", "EXPIRED"):
+            raise ApiError(f"Instagram could not process a slide (status {status})")
+        if time.time() > deadline:
+            raise ApiError("Instagram was still processing the slides after 5 minutes")
+        time.sleep(5)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--date", required=True, help="The post's date (YYYY-MM-DD)")
+    parser.add_argument("--dry-run", action="store_true", help="Show what would be posted; contact nobody")
+    args = parser.parse_args()
+
+    folder = SOCIAL_DIR / args.date
+    slides = sorted(folder.glob("*.jpg"))
+    caption_file = folder / "caption.txt"
+    if len(slides) < 2 or not caption_file.exists():
+        print(f"No carousel in {folder.relative_to(ROOT)} (needs at least 2 slides and caption.txt); nothing to post.")
+        return 0
+    if len(slides) > 10:
+        print("A carousel holds at most 10 slides; nothing posted.")
+        return 1
+    caption = caption_file.read_text(encoding="utf-8").strip()
+    urls = [f"{SITE_URL}/social/{args.date}/{slide.name}" for slide in slides]
+    marker = f"blog?date={args.date}"       # in every caption; how a post is recognised later
+
+    if args.dry_run:
+        print(f"Would post {len(urls)} slides:")
+        for url in urls:
+            print(f"  {url}")
+        print(f"Caption ({len(caption)} characters):\n{caption}")
+        return 0
+
+    user, token = os.environ.get("IG_USER_ID", "").strip(), os.environ.get("IG_ACCESS_TOKEN", "").strip()
+    if not user or not token:
+        print("IG_USER_ID and IG_ACCESS_TOKEN are not set; nothing posted.")
+        return 0
+
+    try:
+        recent = call("GET", f"{user}/media", {"fields": "caption", "limit": 30, "access_token": token})
+        if any(marker in (media.get("caption") or "") for media in recent.get("data", [])):
+            print(f"The {args.date} post is already on Instagram; nothing to do.")
+            return 0
+
+        if not wait_for_site(urls):
+            return 1
+
+        children = []
+        for url in urls:
+            made = call("POST", f"{user}/media", {"image_url": url, "is_carousel_item": "true", "access_token": token})
+            children.append(made["id"])
+        for child in children:
+            wait_until_ready(child, token)
+
+        carousel = call("POST", f"{user}/media", {
+            "media_type": "CAROUSEL", "children": ",".join(children), "caption": caption, "access_token": token})
+        wait_until_ready(carousel["id"], token)
+        published = call("POST", f"{user}/media_publish", {"creation_id": carousel["id"], "access_token": token})
+    except ApiError as err:
+        print(f"::error::Instagram post for {args.date} failed: {err}")
+        return 1
+
+    print(f"Posted the {args.date} carousel ({len(urls)} slides). Instagram media id: {published.get('id')}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

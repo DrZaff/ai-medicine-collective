@@ -83,6 +83,11 @@ jobs:
             fi
           fi
           python scripts/blog_agent/agent.py "${args[@]}"
+          # The Instagram slides and caption for this post (no AI call), so
+          # they are reviewed in the same pull request
+          if [ -f "blog/posts/$date.json" ]; then
+            python scripts/blog_agent/instagram.py --date "$date"
+          fi
 
       - name: Open pull request
         if: steps.draft.outputs.post_created == 'true'
@@ -98,10 +103,12 @@ jobs:
             # new file on that branch and refresh the description.
             cp "blog/posts/$DATE.json" "$RUNNER_TEMP/post.json"
             rm "blog/posts/$DATE.json"
+            rm -rf "$RUNNER_TEMP/social" && mv "social/$DATE" "$RUNNER_TEMP/social"
             git fetch --quiet origin "$branch"
             git switch --quiet -C "$branch" FETCH_HEAD
             cp "$RUNNER_TEMP/post.json" "blog/posts/$DATE.json"
-            git add "blog/posts/$DATE.json"
+            rm -rf "social/$DATE" && mkdir -p social && mv "$RUNNER_TEMP/social" "social/$DATE"
+            git add "blog/posts/$DATE.json" "social/$DATE"
             if git diff --cached --quiet; then
               echo "::notice::No second review was found for $DATE; the draft is unchanged."
             else
@@ -112,7 +119,7 @@ jobs:
             exit 0
           fi
           git switch -c "$branch"
-          git add "blog/posts/$DATE.json"
+          git add "blog/posts/$DATE.json" "social/$DATE"
           git commit -m "Blog draft for $DATE"
           git push -u origin "$branch"
           gh pr create --base main --head "$branch" \
