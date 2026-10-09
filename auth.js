@@ -224,7 +224,33 @@ async function getSessionAndProfile() {
   return { session, profile, details };
 }
 
+// Signing in ends on the home page for approved members. Sign-in always
+// passes through the account page (Google sends people back there), so each
+// way of signing in leaves this mark, and the account page moves approved
+// members on when it finds it. Visiting the account page later, to edit it,
+// leaves no mark and so stays put.
+const SIGNING_IN_KEY = "amc-signing-in";
+
+function markSigningIn() {
+  try {
+    sessionStorage.setItem(SIGNING_IN_KEY, "1");
+  } catch {
+    // no redirect; the account page still works
+  }
+}
+
+function takeSigningInMark() {
+  try {
+    const marked = sessionStorage.getItem(SIGNING_IN_KEY) === "1";
+    sessionStorage.removeItem(SIGNING_IN_KEY);
+    return marked;
+  } catch {
+    return false;
+  }
+}
+
 function signInWithGoogle() {
+  markSigningIn();
   // Come back to the account page on whatever site we're on
   // (live site, a deploy preview, or localhost).
   const redirectTo = new URL("account.html", window.location.href).href;
@@ -435,6 +461,7 @@ function initAccountPage() {
 
       if (mode === "signin") {
         say("> SIGNING IN...");
+        markSigningIn();
         const { error } = await db.auth.signInWithPassword({
           email: address,
           password: password.value,
@@ -487,6 +514,7 @@ function initAccountPage() {
       say("> CHECKING...");
       // The server names the code by how it was sent; try each in turn
       let error;
+      markSigningIn();
       for (const type of ["email", "signup", "magiclink"]) {
         ({ error } = await db.auth.verifyOtp({ email: address, token, type }));
         if (!error) break;
@@ -1162,8 +1190,17 @@ function initAccountPage() {
   async function refresh() {
     try {
       const { session, profile, details } = await getSessionAndProfile();
-      if (session) await renderSignedIn(session, profile, details);
-      else renderSignedOut();
+      if (session) {
+        // Just signed in, and already a member: on to the home page.
+        // (People still waiting for approval stay here to see their status.)
+        if (takeSigningInMark() && profile && APPROVED_ROLES.includes(profile.role)) {
+          window.location.replace("index.html");
+          return;
+        }
+        await renderSignedIn(session, profile, details);
+      } else {
+        renderSignedOut();
+      }
     } catch (err) {
       console.error(err);
       show(el("p", "account-status is-error", "> COULD NOT LOAD YOUR ACCOUNT. Please refresh the page."));
@@ -1203,6 +1240,7 @@ function initModerationPage() {
   const show = (...nodes) => app.replaceChildren(...nodes);
   let me = null;
   let detailsById = new Map();
+  let canHide = false; // true once the database has migration 019
 
   function gate(text, linkText, href) {
     const p = el("p", "account-status is-error", text);
@@ -1248,6 +1286,7 @@ function initModerationPage() {
     } else if (person.role === "pending") {
       who.append(el("span", "note", "// hasn't filled in their details yet"));
     }
+    if (person.hidden_by_moderator) who.append(el("span", "mod-hidden-tag", "Hidden from the member list"));
     const actions = el("div", "mod-actions");
     row.append(avatar(person), who, roleTag(person.role), actions);
 
@@ -1288,27 +1327,71 @@ function initModerationPage() {
         })
       );
     }
+
+    // The next two need migration 019; before it has run they are left out.
+    if (canHide && APPROVED_ROLES.includes(person.role)) {
+      const hidden = person.hidden_by_moderator;
+      actions.append(
+        button(hidden ? "SHOW ON LIST" : "HIDE FROM LIST", null, () =>
+          act(status, `${hidden ? "Showing" : "Hiding"} ${person.email} ${hidden ? "on" : "from"} the member list`,
+            "set_member_hidden", { target: person.id, hidden: !hidden }))
+      );
+    }
+    // Deleting is for duplicate sign-ups. The database refuses if the account
+    // has posted anything, and for moderators and admins.
+    if (canHide && me.role === "admin" && person.id !== me.id && !["moderator", "admin"].includes(person.role)) {
+      actions.append(
+        button("DELETE", "mod-delete", () => {
+          if (window.confirm(`Permanently delete the sign-up for ${person.email}?\n\n` +
+            "Use this for a duplicate account. The person will have to sign up again to come back. This cannot be undone.")) {
+            act(status, `Deleting the sign-up for ${person.email}`, "delete_account", { target: person.id });
+          }
+        })
+      );
+    }
     return row;
   }
 
-  function section(title, people, status, emptyText) {
-    const wrap = el("section", "mod-section");
-    wrap.append(el("h3", "subsection-title", `// ${title} (${people.length})`));
-    if (!people.length) {
-      wrap.append(el("p", "note", emptyText));
-      return wrap;
-    }
+  // Long lists (members, declined) are folds: closed until asked for, and
+  // they stay as they were left while the page redraws after a change.
+  const openFolds = new Set();
+
+  function section(title, people, status, emptyText, folded) {
     const list = el("ul", "mod-list");
     people.forEach((person) => list.append(personRow(person, status)));
-    wrap.append(list);
+    const content = people.length ? list : el("p", "note", emptyText);
+
+    if (folded) {
+      const fold = el("details", "resource-group mod-section mod-fold");
+      fold.open = openFolds.has(title);
+      fold.addEventListener("toggle", () => {
+        if (fold.open) openFolds.add(title);
+        else openFolds.delete(title);
+      });
+      const body = el("div", "resource-body");
+      body.append(content);
+      fold.append(el("summary", "resource-summary", `// ${title} (${people.length})`), body);
+      return fold;
+    }
+    const wrap = el("section", "mod-section");
+    wrap.append(el("h3", "subsection-title", `// ${title} (${people.length})`), content);
     return wrap;
   }
 
   async function load(message) {
-    const { data: people, error } = await db
+    // hidden_by_moderator arrives with migration 019; before that, ask
+    // without it and leave the hide and delete buttons out
+    let { data: people, error } = await db
       .from("profiles")
-      .select("id, full_name, avatar_url, role, created_at")
+      .select("id, full_name, avatar_url, role, created_at, hidden_by_moderator")
       .order("created_at", { ascending: false });
+    canHide = !error;
+    if (error) {
+      ({ data: people, error } = await db
+        .from("profiles")
+        .select("id, full_name, avatar_url, role, created_at")
+        .order("created_at", { ascending: false }));
+    }
 
     if (error) {
       console.error(error);
@@ -1337,8 +1420,8 @@ function initModerationPage() {
       el("p", "note", `// Signed in as ${me.email} (${ROLE_LABELS[me.role]})`),
       status,
       section("Pending requests", by(["pending"]), status, "No requests waiting."),
-      section("Members", by(APPROVED_ROLES), status, "No approved members yet."),
-      section("Declined", by(["rejected"]), status, "None.")
+      section("Members", by(APPROVED_ROLES), status, "No approved members yet.", true),
+      section("Declined", by(["rejected"]), status, "None.", true)
     );
   }
 

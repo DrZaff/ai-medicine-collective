@@ -848,7 +848,8 @@ function initLivingReview() {
     .then((review) => {
       const ready = review && Array.isArray(review.studies) && Array.isArray(review.sections) && review.sections.length;
       if (teaser && ready) {
-        teaser.textContent = `${review.summary.replace(/\s*\[S\d+\]/g, "")} ` +
+        const brief = review.summary.replace(/\s*\[S\d+\]/g, "").split(/(?<=\.)\s+/).slice(0, 2).join(" ");
+        teaser.textContent = `${brief} ` +
           `Edition ${review.edition}, ${review.studies.length} studies, updated ${longDate(review.updated)}.`;
       }
       if (!app) return;

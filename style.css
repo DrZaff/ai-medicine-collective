@@ -661,6 +661,17 @@ button:hover {
 
 /* === FOOTER ================================================== */
 
+/* The independence note above the footer on every page */
+.site-note {
+  max-width: 70ch;
+  margin: 28px auto 0;
+  font-family: var(--font-read);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--muted);
+}
+
 .footer {
   margin-top: 8px;
   font-size: 0.8rem;
@@ -1433,6 +1444,58 @@ button:hover {
 /* Learning Materials: cards inside a folder, and the moderator's add button */
 .hub-folder-list {
   margin-top: 8px;
+}
+
+/* The folders inside their fold: closer together and a size smaller */
+.hub-shelf,
+.learning-shelves {
+  margin-top: 26px;
+}
+
+.hub-folders {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 8px;
+  margin: 0;
+}
+
+.hub-folders .hub-folder {
+  margin: 0;
+}
+
+.hub-folders .hub-folder[open] {
+  grid-column: 1 / -1;
+}
+
+.hub-folders .resource-summary {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .hub-folders {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Moderation: someone a moderator has left off the member list */
+.mod-hidden-tag {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.mod-delete {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+/* Moderation: the folded lists */
+.mod-fold {
+  margin-top: 16px;
 }
 
 .hub-new-folder {
