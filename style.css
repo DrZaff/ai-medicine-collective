@@ -3971,3 +3971,266 @@ button.meeting-undo {
     flex: 1 1 auto;
   }
 }
+
+
+/* === AI VS HUMAN: THE LIVING REVIEW ========================== */
+
+/* The card on the Learning page */
+.evidence-card,
+.evidence-card:visited {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--cyan);
+  background: var(--panel);
+  color: var(--body);
+  font-weight: normal;
+  transition: 0.15s ease-out;
+}
+
+.evidence-card:hover {
+  color: var(--body);
+  text-shadow: none;
+  border-color: var(--cyan);
+  box-shadow: var(--glow);
+}
+
+.evidence-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+.evidence-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: bold;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.evidence-text {
+  font-family: var(--font-read);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.evidence-go {
+  font-size: 0.85rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+
+/* The paper */
+.review {
+  margin-top: 16px;
+}
+
+.review-meta {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.review-title {
+  margin: 8px 0 12px;
+  font-size: clamp(1.4rem, 4.5vw, 2rem);
+  line-height: 1.2;
+}
+
+.review-summary,
+.review-text,
+.review-list li {
+  font-family: var(--font-read);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.review-summary {
+  margin: 0 0 18px;
+}
+
+.review-text {
+  margin: 0 0 12px;
+}
+
+.review-cite {
+  font-family: var(--font-body);
+  font-size: 0.82em;
+  white-space: nowrap;
+}
+
+.review-tally {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 0 0 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.review-tally-cell {
+  min-width: 0;
+  padding: 12px 8px;
+  border-right: 1px var(--rule-style) var(--line);
+  border-bottom: 1px var(--rule-style) var(--line);
+  text-align: center;
+}
+
+.review-tally-cell:nth-child(3n) {
+  border-right: 0;
+}
+
+.review-tally-cell:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+
+.review-tally dt {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: bold;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.review-tally dd {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.review-findings {
+  margin: 22px 0 0;
+  padding: 16px 18px 8px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--yellow);
+  background: var(--panel);
+}
+
+.review-section {
+  margin-top: 28px;
+}
+
+.review-heading {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.review-list {
+  margin: 0 0 10px;
+  padding-left: 22px;
+}
+
+.review-list li {
+  margin-bottom: 8px;
+}
+
+.review-studies {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: study;
+}
+
+.review-study {
+  position: relative;
+  padding: 14px 16px 6px 52px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  counter-increment: study;
+  scroll-margin-top: 90px;
+}
+
+.review-study::before {
+  content: "[" counter(study) "]";
+  position: absolute;
+  left: 14px;
+  top: 15px;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+/* the study a citation was followed to */
+.review-study:target {
+  border-color: var(--yellow);
+}
+
+.review-study-title {
+  display: block;
+  font-weight: bold;
+  line-height: 1.35;
+}
+
+.review-study-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.review-verdict {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.review-study-who,
+.review-study-limit {
+  margin: 0 0 8px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.review-study-limit .blog-why-label {
+  margin-right: 8px;
+}
+
+.review-log li {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .review-tally {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .review-tally-cell:nth-child(3n) {
+    border-right: 1px var(--rule-style) var(--line);
+  }
+
+  .review-tally-cell:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .review-tally-cell:nth-last-child(-n + 3) {
+    border-bottom: 1px var(--rule-style) var(--line);
+  }
+
+  .review-tally-cell:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .review-study {
+    padding-left: 16px;
+  }
+
+  .review-study::before {
+    position: static;
+    display: block;
+    margin-bottom: 4px;
+  }
+}

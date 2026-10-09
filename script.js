@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", initThemeToggle);
 const TERMINAL_MARK = /^(\s*)(\/\/ |> |< )/;
 const RAW_TEXT = ".t-only, .chat-body, .hub-description, .hub-comment-body, .request-details, .member-profile-text, " +
   ".blog-headline, .blog-intro, .blog-item-title, .blog-summary, .blog-why, .blog-archive-list a, .inbox-thread, " +
+  ".review-title, .review-summary, .review-text, .review-list, .review-study-title, " +
   "textarea, script, style, code, pre, [contenteditable], [contenteditable] *";
 
 function markTerminalText(textNode) {
@@ -811,6 +812,179 @@ function initBlog() {
 }
 
 document.addEventListener("DOMContentLoaded", initBlog);
+
+/* ========= AI VS HUMAN: the living review ========= */
+
+// Draws evidence/ai-vs-human.json: a paper rewritten each month by the
+// "Living review" job from a register of studies, and approved by a person
+// before it is published. Everything is written with textContent, because the
+// text comes from an AI draft. Also fills the teaser on the Learning page.
+function initLivingReview() {
+  const app = document.getElementById("review-app");
+  const teaser = document.getElementById("evidence-teaser");
+  if (!app && !teaser) return;
+
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined && text !== null) node.textContent = text;
+    return node;
+  };
+  const VERDICTS = {
+    ai_ahead: "AI ahead", humans_ahead: "Humans ahead", comparable: "Comparable",
+    ai_help_improved: "AI help improved", ai_help_no_benefit: "AI help: no difference",
+    ai_help_harmed: "AI help made it worse", mixed: "Mixed results",
+  };
+  const DOMAINS = {
+    diagnosis: "Diagnosis", imaging: "Imaging", management: "Management", documentation: "Documentation",
+    communication: "Communication", education: "Education", procedures: "Procedures",
+  };
+  const longDate = (iso) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US",
+    { timeZone: "UTC", year: "numeric", month: "long", day: "numeric" });
+
+  fetch("evidence/ai-vs-human.json", { cache: "no-cache" })
+    .then((response) => (response.ok ? response.json() : null))
+    .catch(() => null)
+    .then((review) => {
+      const ready = review && Array.isArray(review.studies) && Array.isArray(review.sections) && review.sections.length;
+      if (teaser && ready) {
+        teaser.textContent = `${review.summary.replace(/\s*\[S\d+\]/g, "")} ` +
+          `Edition ${review.edition}, ${review.studies.length} studies, updated ${longDate(review.updated)}.`;
+      }
+      if (!app) return;
+      if (!ready) {
+        const empty = el("div", "empty-state");
+        empty.append(
+          el("p", "empty-state-title", "> THE FIRST EDITION IS BEING PREPARED"),
+          el("p", "empty-state-text", "This page will hold a paper that weighs the published evidence on AI and physician performance, with every claim tied to its source. It is drafted by an AI agent, checked by the Collective, and rewritten every month.")
+        );
+        app.replaceChildren(empty);
+        return;
+      }
+
+      // Studies are numbered in the order they are listed: newest first
+      const studies = [...review.studies].sort((a, b) => String(b.published).localeCompare(String(a.published)));
+      const number = new Map(studies.map((study, i) => [study.id, i + 1]));
+
+      // "... performance [S4][S9]." -> text with numbered links to the study list
+      const cited = (tag, className, text) => {
+        const node = el(tag, className);
+        String(text).split(/(\[S\d+\])/).forEach((part) => {
+          const id = /^\[(S\d+)\]$/.exec(part);
+          if (!id) return node.append(part);
+          if (!number.has(id[1])) return;
+          const link = el("a", "review-cite", `[${number.get(id[1])}]`);
+          link.href = `#study-${id[1]}`;
+          node.append(link);
+        });
+        return node;
+      };
+
+      const article = el("article", "review");
+      article.append(
+        el("p", "review-meta", `// Edition ${review.edition} · Updated ${longDate(review.updated)} · ${studies.length} studies`),
+        el("h3", "review-title", review.title),
+        cited("p", "review-summary", review.summary)
+      );
+
+      // How the studies came out
+      const tally = el("dl", "review-tally");
+      const count = (...verdicts) => studies.filter((study) => verdicts.includes(study.verdict)).length;
+      [
+        [count("ai_ahead"), "AI ahead of clinicians"],
+        [count("humans_ahead"), "Clinicians ahead of AI"],
+        [count("comparable"), "Comparable"],
+        [count("ai_help_improved"), "AI help improved clinicians"],
+        [count("ai_help_no_benefit", "ai_help_harmed"), "AI help: no gain, or worse"],
+        [count("mixed"), "Mixed results"],
+      ].forEach(([value, label]) => {
+        const cell = el("div", "review-tally-cell");
+        cell.append(el("dt", null, String(value)), el("dd", null, label));
+        tally.append(cell);
+      });
+      article.append(tally, el("p", "note", "// A count of studies, not a score: they differ in size, design and how close they are to real practice."));
+
+      if (review.key_findings && review.key_findings.length) {
+        const box = el("section", "review-findings");
+        box.append(el("h4", "review-heading", "Key findings"));
+        const list = el("ol", "review-list");
+        review.key_findings.forEach((finding) => list.append(cited("li", null, finding)));
+        box.append(list);
+        article.append(box);
+      }
+
+      review.sections.forEach((section) => {
+        const block = el("section", "review-section");
+        block.append(el("h4", "review-heading", section.heading));
+        (section.paragraphs || []).forEach((paragraph) => block.append(cited("p", "review-text", paragraph)));
+        article.append(block);
+      });
+
+      if (review.open_questions && review.open_questions.length) {
+        const block = el("section", "review-section");
+        block.append(el("h4", "review-heading", "What the evidence cannot tell us yet"));
+        const list = el("ul", "review-list");
+        review.open_questions.forEach((question) => list.append(cited("li", null, question)));
+        block.append(list);
+        article.append(block);
+      }
+
+      // The register: every study the paper draws on
+      const register = el("section", "review-section");
+      register.append(el("h4", "review-heading", `The studies (${studies.length})`));
+      const list = el("ol", "review-studies");
+      studies.forEach((study) => {
+        const item = el("li", "review-study");
+        item.id = `study-${study.id}`;
+        let safe = null;
+        try {
+          const url = new URL(study.url);
+          if (url.protocol === "https:" || url.protocol === "http:") safe = url.href;
+        } catch {
+          // no link
+        }
+        const title = el(safe ? "a" : "span", "review-study-title", study.title);
+        if (safe) {
+          title.href = safe;
+          title.target = "_blank";
+          title.rel = "noopener noreferrer";
+        }
+        const labels = el("div", "review-study-labels");
+        if (VERDICTS[study.verdict]) labels.append(el("span", `blog-cat review-verdict review-verdict--${study.verdict}`, VERDICTS[study.verdict]));
+        if (DOMAINS[study.domain]) labels.append(el("span", "blog-cat", DOMAINS[study.domain]));
+        item.append(title, el("p", "blog-source", [study.source, study.published, study.design].filter(Boolean).join(" · ")), labels);
+        const who = [study.ai_system && `AI: ${study.ai_system}`, study.humans && `Humans: ${study.humans}`].filter(Boolean).join(" · ");
+        if (who) item.append(el("p", "review-study-who", who));
+        item.append(el("p", "review-text", study.finding));
+        if (study.limitation) {
+          const limit = el("p", "review-study-limit");
+          limit.append(el("span", "blog-why-label", "The catch"), study.limitation);
+          item.append(limit);
+        }
+        list.append(item);
+      });
+      register.append(list);
+      article.append(register);
+
+      if (review.changes && review.changes.length) {
+        const block = el("section", "review-section");
+        block.append(el("h4", "review-heading", "What changed"));
+        const log = el("ul", "review-list review-log");
+        review.changes.slice(0, 12).forEach((change) => {
+          const added = (change.added || []).length;
+          log.append(el("li", null, `Edition ${change.edition}, ${longDate(change.date)}: ${change.text}` +
+            (added ? ` (${added} ${added === 1 ? "study" : "studies"} added)` : "")));
+        });
+        block.append(log);
+        article.append(block);
+      }
+
+      article.append(el("p", "note", "// Drafted by an AI agent from the studies listed above and reviewed by the Collective before publishing. It is a summary of research, not clinical guidance: read the original paper before relying on any result."));
+      app.replaceChildren(article);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", initLivingReview);
 
 /* ========= MEMBER PROFILE: copy email button ========= */
 

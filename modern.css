@@ -2332,3 +2332,208 @@ html.terminal::view-transition-new(root) {
     height: 44px;
   }
 }
+
+/* --- AI vs Human: the living review, set as a journal article --- */
+
+/* a page title that keeps its own capitals */
+.modern .section-title--as-written {
+  text-transform: none;
+}
+
+.modern .evidence-card,
+.modern .evidence-card:visited {
+  gap: 10px;
+  padding: 28px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--night);
+  box-shadow: var(--shadow);
+  color: rgb(226 240 235 / 0.9);
+}
+
+.modern .evidence-card:hover {
+  box-shadow: var(--shadow-lift);
+  color: rgb(226 240 235 / 0.9);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.modern .evidence-kicker {
+  color: var(--spark-soft);
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.modern .evidence-title {
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.modern .evidence-go {
+  margin-top: 6px;
+  color: var(--spark-soft);
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  text-transform: lowercase;
+}
+
+.modern .evidence-go::first-letter {
+  text-transform: uppercase;
+}
+
+.modern .review {
+  max-width: 780px;
+}
+
+.modern .review-meta {
+  color: var(--muted);
+  font-family: var(--font-label);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.modern .review-title {
+  margin: 12px 0 18px;
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.modern .review-summary {
+  color: #334155;
+  font-size: 1.2rem;
+  line-height: 1.65;
+}
+
+.modern .review-text,
+.modern .review-list li {
+  color: #334155;
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.modern .review-cite {
+  padding: 0 1px;
+  font-size: 0.78em;
+  font-weight: 600;
+  vertical-align: 0.25em;
+}
+
+.modern .review-tally {
+  overflow: hidden;
+  margin-top: 26px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .review-tally-cell {
+  padding: 20px 10px 18px;
+}
+
+.modern .review-tally dt {
+  color: var(--brand);
+  font-family: var(--font-serif);
+  font-size: 2.3rem;
+  font-weight: 500;
+}
+
+.modern .review-tally dd {
+  margin-top: 8px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.modern .review-findings {
+  margin-top: 32px;
+  padding: 26px 28px 14px;
+  border: 0;
+  border-left: 4px solid var(--spark);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--brand-soft);
+}
+
+.modern .review-section {
+  margin-top: 44px;
+}
+
+.modern .review-heading {
+  margin-bottom: 14px;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.modern .review-study {
+  padding: 22px 24px 12px 64px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .review-study::before {
+  content: counter(study);
+  left: 22px;
+  top: 22px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 28px;
+  text-align: center;
+}
+
+.modern .review-study:target {
+  border-color: var(--spark);
+  box-shadow: 0 0 0 3px rgb(16 185 129 / 0.25), var(--shadow);
+}
+
+.modern .review-study-title,
+.modern a.review-study-title:visited {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.modern a.review-study-title:hover {
+  color: var(--brand);
+}
+
+.modern .review-verdict {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.modern .review-verdict--mixed,
+.modern .review-verdict--ai_help_harmed,
+.modern .review-verdict--ai_help_no_benefit {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+@media (max-width: 600px) {
+  .modern .review-study {
+    padding: 18px 18px 8px;
+  }
+
+  .modern .review-study::before {
+    display: block;
+    margin-bottom: 10px;
+  }
+}
