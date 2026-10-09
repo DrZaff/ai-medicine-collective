@@ -75,6 +75,11 @@ function initDirectoryPage() {
       const { data: choices } = await db.from("profiles").select("id, directory_listing")
         .in("role", ["member", "moderator", "admin"]);
       (choices || []).forEach((row) => { if (row.directory_listing === false) hidden.add(row.id); });
+      // ...and people a moderator has left off the list (migration 019),
+      // asked for separately so the list still loads before that column exists
+      const { data: removed } = await db.from("profiles").select("id, hidden_by_moderator")
+        .in("role", ["member", "moderator", "admin"]);
+      (removed || []).forEach((row) => { if (row.hidden_by_moderator === true) hidden.add(row.id); });
       const listedPeople = people.filter((person) => !hidden.has(person.id) || person.id === me.id);
 
       const total = `${listedPeople.length} member${listedPeople.length === 1 ? "" : "s"}`;

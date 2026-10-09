@@ -661,6 +661,17 @@ button:hover {
 
 /* === FOOTER ================================================== */
 
+/* The independence note above the footer on every page */
+.site-note {
+  max-width: 70ch;
+  margin: 28px auto 0;
+  font-family: var(--font-read);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--muted);
+}
+
 .footer {
   margin-top: 8px;
   font-size: 0.8rem;
@@ -1467,6 +1478,19 @@ button:hover {
   .hub-folders {
     grid-template-columns: 1fr;
   }
+}
+
+/* Moderation: someone a moderator has left off the member list */
+.mod-hidden-tag {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.mod-delete {
+  border-color: var(--error);
+  color: var(--error);
 }
 
 /* Moderation: the folded lists */

@@ -1240,6 +1240,7 @@ function initModerationPage() {
   const show = (...nodes) => app.replaceChildren(...nodes);
   let me = null;
   let detailsById = new Map();
+  let canHide = false; // true once the database has migration 019
 
   function gate(text, linkText, href) {
     const p = el("p", "account-status is-error", text);
@@ -1285,6 +1286,7 @@ function initModerationPage() {
     } else if (person.role === "pending") {
       who.append(el("span", "note", "// hasn't filled in their details yet"));
     }
+    if (person.hidden_by_moderator) who.append(el("span", "mod-hidden-tag", "Hidden from the member list"));
     const actions = el("div", "mod-actions");
     row.append(avatar(person), who, roleTag(person.role), actions);
 
@@ -1325,6 +1327,28 @@ function initModerationPage() {
         })
       );
     }
+
+    // The next two need migration 019; before it has run they are left out.
+    if (canHide && APPROVED_ROLES.includes(person.role)) {
+      const hidden = person.hidden_by_moderator;
+      actions.append(
+        button(hidden ? "SHOW ON LIST" : "HIDE FROM LIST", null, () =>
+          act(status, `${hidden ? "Showing" : "Hiding"} ${person.email} ${hidden ? "on" : "from"} the member list`,
+            "set_member_hidden", { target: person.id, hidden: !hidden }))
+      );
+    }
+    // Deleting is for duplicate sign-ups. The database refuses if the account
+    // has posted anything, and for moderators and admins.
+    if (canHide && me.role === "admin" && person.id !== me.id && !["moderator", "admin"].includes(person.role)) {
+      actions.append(
+        button("DELETE", "mod-delete", () => {
+          if (window.confirm(`Permanently delete the sign-up for ${person.email}?\n\n` +
+            "Use this for a duplicate account. The person will have to sign up again to come back. This cannot be undone.")) {
+            act(status, `Deleting the sign-up for ${person.email}`, "delete_account", { target: person.id });
+          }
+        })
+      );
+    }
     return row;
   }
 
@@ -1355,10 +1379,19 @@ function initModerationPage() {
   }
 
   async function load(message) {
-    const { data: people, error } = await db
+    // hidden_by_moderator arrives with migration 019; before that, ask
+    // without it and leave the hide and delete buttons out
+    let { data: people, error } = await db
       .from("profiles")
-      .select("id, full_name, avatar_url, role, created_at")
+      .select("id, full_name, avatar_url, role, created_at, hidden_by_moderator")
       .order("created_at", { ascending: false });
+    canHide = !error;
+    if (error) {
+      ({ data: people, error } = await db
+        .from("profiles")
+        .select("id, full_name, avatar_url, role, created_at")
+        .order("created_at", { ascending: false }));
+    }
 
     if (error) {
       console.error(error);
