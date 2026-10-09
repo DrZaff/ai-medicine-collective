@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-09",
+  "headline": "Stanford's longitudinal AI curriculum for internal medicine residents",
+  "intro": "This briefing looks at how one internal medicine residency teaches trainees to use AI tools, with the goal of strengthening their clinical reasoning rather than handing their thinking over to the tool.",
+  "items": [
+    {
+      "title": "Award-Winning AI Curriculum Keeps Residents on Their Toes",
+      "source": "Stanford Medicine, Department of Medicine",
+      "url": "https://medicine.stanford.edu/news/stories/2026/10/award-winning-ai-curriculum-keeps-residents-on-their-toes.html",
+      "published": "2026-10-05",
+      "category": "education",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "Stanford's Department of Medicine has profiled a longitudinal AI curriculum for its internal medicine residents, built by associate program directors Poonam Hosamani and Kevin Keet. It began in June 2025 and won the 2026 Outstanding Graduate Medical Education Contributions Award. The sessions build on each other and mix expert lectures with hands-on use of AI tools in research and clinical settings. They are adjusted for residents whose AI experience ranges from computer science PhDs to almost none, and they are updated often because the technology changes so fast. This is an institutional news story, not an evaluation of outcomes; the team also published a practical guide to teaching residents about AI in BMJ Digital Health in September 2026.",
+      "why_it_matters": "Programs building their own AI teaching get a concrete model for one of the hardest design problems: teaching residents to use AI in a way that supports their clinical reasoning instead of causing deskilling. The model also allows for very uneven starting knowledge across a residency class."
+    }
+  ],
+  "tags": [
+    "ai curriculum",
+    "clinical reasoning",
+    "deskilling",
+    "faculty development",
+    "graduate medical education",
+    "internal medicine residency"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
