@@ -224,7 +224,33 @@ async function getSessionAndProfile() {
   return { session, profile, details };
 }
 
+// Signing in ends on the home page for approved members. Sign-in always
+// passes through the account page (Google sends people back there), so each
+// way of signing in leaves this mark, and the account page moves approved
+// members on when it finds it. Visiting the account page later, to edit it,
+// leaves no mark and so stays put.
+const SIGNING_IN_KEY = "amc-signing-in";
+
+function markSigningIn() {
+  try {
+    sessionStorage.setItem(SIGNING_IN_KEY, "1");
+  } catch {
+    // no redirect; the account page still works
+  }
+}
+
+function takeSigningInMark() {
+  try {
+    const marked = sessionStorage.getItem(SIGNING_IN_KEY) === "1";
+    sessionStorage.removeItem(SIGNING_IN_KEY);
+    return marked;
+  } catch {
+    return false;
+  }
+}
+
 function signInWithGoogle() {
+  markSigningIn();
   // Come back to the account page on whatever site we're on
   // (live site, a deploy preview, or localhost).
   const redirectTo = new URL("account.html", window.location.href).href;
@@ -435,6 +461,7 @@ function initAccountPage() {
 
       if (mode === "signin") {
         say("> SIGNING IN...");
+        markSigningIn();
         const { error } = await db.auth.signInWithPassword({
           email: address,
           password: password.value,
@@ -487,6 +514,7 @@ function initAccountPage() {
       say("> CHECKING...");
       // The server names the code by how it was sent; try each in turn
       let error;
+      markSigningIn();
       for (const type of ["email", "signup", "magiclink"]) {
         ({ error } = await db.auth.verifyOtp({ email: address, token, type }));
         if (!error) break;
@@ -1162,8 +1190,17 @@ function initAccountPage() {
   async function refresh() {
     try {
       const { session, profile, details } = await getSessionAndProfile();
-      if (session) await renderSignedIn(session, profile, details);
-      else renderSignedOut();
+      if (session) {
+        // Just signed in, and already a member: on to the home page.
+        // (People still waiting for approval stay here to see their status.)
+        if (takeSigningInMark() && profile && APPROVED_ROLES.includes(profile.role)) {
+          window.location.replace("index.html");
+          return;
+        }
+        await renderSignedIn(session, profile, details);
+      } else {
+        renderSignedOut();
+      }
     } catch (err) {
       console.error(err);
       show(el("p", "account-status is-error", "> COULD NOT LOAD YOUR ACCOUNT. Please refresh the page."));
@@ -1291,16 +1328,29 @@ function initModerationPage() {
     return row;
   }
 
-  function section(title, people, status, emptyText) {
-    const wrap = el("section", "mod-section");
-    wrap.append(el("h3", "subsection-title", `// ${title} (${people.length})`));
-    if (!people.length) {
-      wrap.append(el("p", "note", emptyText));
-      return wrap;
-    }
+  // Long lists (members, declined) are folds: closed until asked for, and
+  // they stay as they were left while the page redraws after a change.
+  const openFolds = new Set();
+
+  function section(title, people, status, emptyText, folded) {
     const list = el("ul", "mod-list");
     people.forEach((person) => list.append(personRow(person, status)));
-    wrap.append(list);
+    const content = people.length ? list : el("p", "note", emptyText);
+
+    if (folded) {
+      const fold = el("details", "resource-group mod-section mod-fold");
+      fold.open = openFolds.has(title);
+      fold.addEventListener("toggle", () => {
+        if (fold.open) openFolds.add(title);
+        else openFolds.delete(title);
+      });
+      const body = el("div", "resource-body");
+      body.append(content);
+      fold.append(el("summary", "resource-summary", `// ${title} (${people.length})`), body);
+      return fold;
+    }
+    const wrap = el("section", "mod-section");
+    wrap.append(el("h3", "subsection-title", `// ${title} (${people.length})`), content);
     return wrap;
   }
 
@@ -1337,8 +1387,8 @@ function initModerationPage() {
       el("p", "note", `// Signed in as ${me.email} (${ROLE_LABELS[me.role]})`),
       status,
       section("Pending requests", by(["pending"]), status, "No requests waiting."),
-      section("Members", by(APPROVED_ROLES), status, "No approved members yet."),
-      section("Declined", by(["rejected"]), status, "None.")
+      section("Members", by(APPROVED_ROLES), status, "No approved members yet.", true),
+      section("Declined", by(["rejected"]), status, "None.", true)
     );
   }
 

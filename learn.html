@@ -46,19 +46,15 @@
         guides, and a picked library of videos, courses and references.
         Never include patient information in anything you add.</p>
 
+      <!-- What members see, top to bottom: the page's buttons (hub.js), the
+           AI vs Human paper, the outside library, then the core path and the
+           members' folders (hub.js again, in #learning-shelves below). -->
+
       <!-- Filled by hub.js -->
       <div id="hub-app" class="account-app" data-kind="material" aria-live="polite">
         <p class="account-status">&gt; LOADING...</p>
       </div>
 
-      <!-- Outside videos, courses and references (was the Resources page).
-           hub.js shows this to approved members on the main list view.
-           It is ordinary public material, hidden only to encourage joining:
-           the text is in this file, so don't put anything private here.
-           To add a video: copy a <div class="video-card"> and change
-           data-video (the part after "v=" in the YouTube address), the two
-           links' video id, the title, channel and note.
-           To add a link: copy an <li> inside a <ul class="link-list">. -->
       <!-- The living review (ai-vs-human.html). Shown to approved members by
            hub.js, like the library below; script.js fills in the details. -->
       <section id="learning-evidence" class="learning-evidence" hidden>
@@ -71,6 +67,14 @@
         </a>
       </section>
 
+      <!-- Outside videos, courses and references (was the Resources page).
+           hub.js shows this to approved members on the main list view.
+           It is ordinary public material, hidden only to encourage joining:
+           the text is in this file, so don't put anything private here.
+           To add a video: copy a <div class="video-card"> and change
+           data-video (the part after "v=" in the YouTube address), the two
+           links' video id, the title, channel and note.
+           To add a link: copy an <li> inside a <ul class="link-list">. -->
       <section id="learning-library" class="learning-library" hidden>
         <h3 class="subsection-title">// Videos, courses and references</h3>
         <p class="note">
@@ -314,6 +318,9 @@
 
         </section>
       </section>
+
+      <!-- The core path and the members' folders. Filled by hub.js. -->
+      <div id="learning-shelves" class="learning-shelves" hidden></div>
 
       <noscript>
         <p>&gt; Learning Materials needs JavaScript.</p>

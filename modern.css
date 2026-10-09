@@ -1484,11 +1484,12 @@
   display: none;
 }
 
+/* The emblem is green light on black. Here it is turned inside out:
+   inverting makes the black white, and the half-turn of hue brings the
+   green back, now as dark green ink on the white card. */
 .modern .join-emblem {
-  padding: 16px;
-  border-radius: 16px;
-  background: #050b06;
-  mix-blend-mode: normal;
+  filter: invert(1) hue-rotate(180deg) contrast(1.15);
+  mix-blend-mode: multiply;
   -webkit-mask-image: none;
   mask-image: none;
   animation: none;
@@ -2536,4 +2537,26 @@ html.terminal::view-transition-new(root) {
     display: block;
     margin-bottom: 10px;
   }
+}
+
+/* the join card is white, so its label is green ink, not mint on glass */
+.modern .join-hero .hero-kicker {
+  border-color: var(--line-strong);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+/* folders inside their fold */
+.modern .hub-folders .resource-summary {
+  font-size: 0.95rem;
+}
+
+.modern .hub-shelf > .resource-body,
+.modern .mod-fold > .resource-body {
+  padding-top: 4px;
+}
+
+/* the card is a link, but its text reads as text */
+.modern .evidence-card .evidence-text {
+  font-weight: 400;
 }

@@ -1435,6 +1435,45 @@ button:hover {
   margin-top: 8px;
 }
 
+/* The folders inside their fold: closer together and a size smaller */
+.hub-shelf,
+.learning-shelves {
+  margin-top: 26px;
+}
+
+.hub-folders {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 8px;
+  margin: 0;
+}
+
+.hub-folders .hub-folder {
+  margin: 0;
+}
+
+.hub-folders .hub-folder[open] {
+  grid-column: 1 / -1;
+}
+
+.hub-folders .resource-summary {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .hub-folders {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Moderation: the folded lists */
+.mod-fold {
+  margin-top: 16px;
+}
+
 .hub-new-folder {
   margin-top: 12px;
   border-radius: 999px;

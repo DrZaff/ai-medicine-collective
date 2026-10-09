@@ -243,7 +243,16 @@ function initHubPage() {
     if (message) nodes.push(el("p", "account-status hub-status", message));
 
     if (isMaterial) {
-      nodes.push(...(await pathNodes(projects)), ...(await folderNodes(projects)));
+      // On the Learning page the core path and the folders sit below the
+      // AI vs Human paper and the outside library, in their own container
+      const shelfNodes = [...(await pathNodes(projects)), ...(await folderNodes(projects))];
+      const shelves = document.getElementById("learning-shelves");
+      if (shelves) {
+        shelves.replaceChildren(...shelfNodes);
+        shelves.hidden = false;
+      } else {
+        nodes.push(...shelfNodes);
+      }
     } else if (!projects.length) {
       nodes.push(emptyState("// No projects published yet", "Be the first to share one.",
         me ? kind.submitLabel : "> SIGN IN TO SUBMIT", me ? `${kind.page}?view=submit` : "account.html"));
@@ -411,6 +420,8 @@ function initHubPage() {
   }
 
   // Materials: one fold-out section per folder
+  let foldersOpen = false; // whether the folders fold is open
+
   async function folderNodes(projects) {
     let folders;
     try {
@@ -420,12 +431,22 @@ function initHubPage() {
       return [el("p", "account-status is-error", "> COULD NOT LOAD FOLDERS. Please refresh the page.")];
     }
 
+    // Every folder lives inside one fold, closed until asked for, so the
+    // page stays short. It remembers being open while the page is redrawn.
     const nodes = [];
-    const accordion = el("section", "resource-accordion");
+    const shelf = el("details", "resource-group hub-shelf");
+    shelf.open = foldersOpen;
+    shelf.addEventListener("toggle", () => { foldersOpen = shelf.open; });
+    const filed = projects.filter((p) => folders.some((f) => f.name === p.folder)).length;
+    shelf.append(el("summary", "resource-summary",
+      `// Members' library by topic (${folders.length} folder${folders.length === 1 ? "" : "s"}, ${filed} item${filed === 1 ? "" : "s"})`));
+    const shelfBody = el("div", "resource-body");
+    shelf.append(shelfBody);
+
+    const accordion = el("section", "resource-accordion hub-folders");
     for (const folder of folders) {
       const items = projects.filter((p) => p.folder === folder.name);
       const group = el("details", "resource-group hub-folder");
-      group.open = items.length > 0;
       group.append(el("summary", "resource-summary", `// ${folder.name} (${items.length})`));
       const body = el("div", "resource-body");
       if (items.length) {
@@ -438,10 +459,11 @@ function initHubPage() {
       group.append(body);
       accordion.append(group);
     }
-    nodes.push(accordion);
+    shelfBody.append(accordion);
+    nodes.push(shelf);
 
     if (isModerator()) {
-      nodes.push(button("+ NEW FOLDER", "hub-new-folder", async () => {
+      shelfBody.append(button("+ NEW FOLDER", "hub-new-folder", async () => {
         const name = (window.prompt("Name of the new folder:", "") || "").trim();
         if (!name) return;
         const position = Math.max(0, ...folders.filter((f) => f.position < 900).map((f) => f.position)) + 10;
@@ -931,6 +953,9 @@ function initHubPage() {
       if (library) library.hidden = !approved || !!params.get("project") || !!params.get("view");
       const evidence = document.getElementById("learning-evidence");
       if (evidence) evidence.hidden = !library || library.hidden;
+      // the list view fills and shows this; every other view keeps it hidden
+      const shelves = document.getElementById("learning-shelves");
+      if (shelves) shelves.hidden = true;
 
       if (approved) {
         me = profile;
