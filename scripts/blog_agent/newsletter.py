@@ -56,16 +56,24 @@ MARK_ASK_OPEN, MARK_ASK_CLOSE = "<!--AMC:ASK-->", "<!--/AMC:ASK-->"
 TEXT_NOTE, TEXT_COLLECTIVE = "[[AMC:NOTE]]", "[[AMC:COLLECTIVE]]"
 TEXT_ASK_OPEN, TEXT_ASK_CLOSE = "[[AMC:ASK]]", "[[/AMC:ASK]]"
 
-# Email design. Inline because email clients drop <style>. Same idea as the
-# site: green monospace for the frame and labels, near-white plain text for
-# anything people read.
-BG, PANEL, GREEN, ACCENT, BODY, MUTED, YELLOW, CYAN = (
-    "#000000", "#050b06", "#00ff66", "#00cc55", "#e9f1eb", "#9db8a6", "#ffe600", "#00e5ff")
-MONO = "'Courier New', Courier, monospace"
-SANS = "-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-P = f"margin:0 0 10px;font-family:{SANS};font-size:16px;line-height:1.55;color:{BODY};"
-LABEL = f"margin:26px 0 10px;font-family:{MONO};font-size:12px;letter-spacing:2px;color:{ACCENT};text-transform:uppercase;"
-LINK = f"color:{GREEN};text-decoration:none;font-weight:bold;"
+# Email design, matching the site's light look: white card on pale grey, a
+# dark-green masthead, serif headlines, deep-green links. Everything is inline
+# and laid out with tables, because email clients drop <style> and most of
+# modern CSS. Web fonts do not load in most mail apps, so the serif falls back
+# to Georgia. The Moderation page adds the note and members-only news with
+# matching styles (DIGEST_P and DIGEST_LINK in auth.js): keep them in step.
+PAGE, CARD, NIGHT, INK, BODY, MUTED, LINE = (
+    "#f1f4f8", "#ffffff", "#05261f", "#0f172a", "#334155", "#64748b", "#e5e9f0")
+BRAND, SPARK, MINT, SOFT, SKY, SKY_INK, AMBER_BG, AMBER_INK = (
+    "#0b6b4f", "#10b981", "#6ee7b7", "#ecf7f2", "#e0f2fe", "#075985", "#fef3c7", "#92400e")
+SERIF = "Fraunces, Georgia, 'Times New Roman', serif"
+SANS = "Inter, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+MONO = "ui-monospace, 'SF Mono', Consolas, Menlo, 'Courier New', monospace"
+P = f"margin:0 0 12px;font-family:{SANS};font-size:16px;line-height:1.6;color:{BODY};"
+LABEL = (f"margin:0 0 12px;font-family:{MONO};font-size:11px;font-weight:bold;letter-spacing:2px;"
+         f"color:{BRAND};text-transform:uppercase;")
+LINK = f"color:{BRAND};text-decoration:none;font-weight:bold;"
+RULE = f'<hr style="border:0;border-top:1px solid {LINE};margin:28px 0;">'
 
 VERDICTS = {
     "ai_ahead": "AI ahead",
@@ -181,63 +189,85 @@ def build(end: dt.date, days: int) -> dict:
 def render_html(d: dict) -> str:
     e = html.escape
     start, end, tally = d["start"], d["end"], d["tally"]
+
+    def pill(text: str, background: str, color: str) -> str:
+        return (f'<span style="display:inline-block;padding:4px 12px;border-radius:999px;background:{background};'
+                f'font-family:{SANS};font-size:12px;font-weight:bold;letter-spacing:0.5px;color:{color};">{text}</span>')
+
+    def button(text: str, href: str) -> str:
+        return (f'<a href="{href}" style="display:inline-block;padding:11px 22px;border-radius:999px;background:{BRAND};'
+                f'font-family:{SANS};font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;">{text}</a>')
+
     out = [
         "<!DOCTYPE html>",
         '<html lang="en"><head><meta charset="UTF-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+        '<meta name="color-scheme" content="light">',
         f"<title>{e(d['subject'])}</title></head>",
-        f'<body style="margin:0;background:{BG};">',
+        f'<body style="margin:0;background:{PAGE};">',
         f'<div style="display:none;max-height:0;overflow:hidden;">{e(short((d["one_thing"] or {}).get("why_it_matters", ""), 120))}</div>',
-        f'<div style="background:{BG};padding:24px 12px;">',
+        f'<div style="background:{PAGE};padding:28px 12px;">',
         f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
-        f'style="max-width:600px;margin:0 auto;background:{PANEL};border:1px solid {ACCENT};">',
-        '<tr><td style="padding:26px 24px 22px;">',
-        f'<p style="margin:0;text-align:center;font-family:{MONO};font-size:20px;font-weight:bold;letter-spacing:2px;color:{GREEN};">'
-        ":: AI MEDICINE COLLECTIVE ::</p>",
-        f'<p style="margin:6px 0 0;text-align:center;font-family:{MONO};font-size:12px;letter-spacing:1px;color:{MUTED};">'
-        f'WEEKLY DIGEST &middot; {e(start.strftime("%b %d").upper())} &ndash; {e(end.strftime("%b %d, %Y").upper())}</p>',
-        f'<hr style="border:0;border-top:1px dashed {ACCENT};margin:18px 0 4px;">',
+        f'style="max-width:600px;margin:0 auto;background:{CARD};border:1px solid {LINE};border-radius:16px;overflow:hidden;">',
+        # masthead: a bright strip, then the name on dark green
+        f'<tr><td style="height:4px;line-height:4px;font-size:0;background:{SPARK};'
+        f'background-image:linear-gradient(90deg,{SPARK},#06b6d4);">&nbsp;</td></tr>',
+        f'<tr><td style="padding:26px 32px 24px;background:{NIGHT};">',
+        '<table role="presentation" cellpadding="0" cellspacing="0"><tr>',
+        f'<td style="padding-right:12px;vertical-align:middle;"><img src="{SITE_URL}/images/icon-192.png" width="40" height="40" '
+        'alt="AMC" style="display:block;border:0;border-radius:10px;"></td>',
+        f'<td style="vertical-align:middle;font-family:{SANS};font-size:15px;font-weight:bold;letter-spacing:1px;color:#ffffff;">'
+        "AI MEDICINE COLLECTIVE</td>",
+        "</tr></table>",
+        f'<p style="margin:22px 0 0;font-family:{SERIF};font-size:34px;line-height:1.05;font-weight:500;letter-spacing:-0.5px;color:#ffffff;">'
+        f'The weekly <em style="font-style:italic;color:{MINT};">digest</em></p>',
+        f'<p style="margin:10px 0 0;font-family:{MONO};font-size:11px;letter-spacing:2px;color:{MINT};">'
+        f'{e(start.strftime("%b %d").upper())} &ndash; {e(end.strftime("%b %d, %Y").upper())} &nbsp;&middot;&nbsp; A TWO-MINUTE READ</p>',
+        "</td></tr>",
+        '<tr><td style="padding:30px 32px 28px;">',
         MARK_NOTE,
     ]
 
     item = d["one_thing"]
     if item:
         out += [
-            f'<p style="{LABEL}">// The one thing</p>',
-            f'<p style="margin:0 0 8px;font-family:{SANS};font-size:20px;line-height:1.3;font-weight:bold;">'
-            f'<a href="{e(item["url"])}" style="color:{GREEN};text-decoration:none;">{e(item["title"])}</a></p>',
-            f'<p style="{P}">{e(item["why_it_matters"])}</p>',
-            f'<p style="margin:0;font-family:{MONO};font-size:12px;color:{MUTED};">{e(item["source"])} &middot; '
-            f'<a href="{SITE_URL}/blog.html?date={e(item["post_date"])}" style="color:{MUTED};">our summary</a></p>',
+            f'<p style="{LABEL}">The one thing</p>',
+            f'<p style="margin:0 0 12px;font-family:{SERIF};font-size:27px;line-height:1.18;font-weight:500;letter-spacing:-0.4px;">'
+            f'<a href="{e(item["url"])}" style="color:{INK};text-decoration:none;">{e(item["title"])}</a></p>',
+            f'<p style="{P}font-size:17px;">{e(item["why_it_matters"])}</p>',
+            f'<p style="margin:0;font-family:{SANS};font-size:13px;color:{MUTED};">{e(item["source"])} &nbsp;&middot;&nbsp; '
+            f'<a href="{SITE_URL}/blog.html?date={e(item["post_date"])}" style="{LINK}">Read our summary &rarr;</a></p>',
+            RULE,
         ]
 
     # AI vs human: this week's result, then the season tally
-    out.append(f'<p style="{LABEL}">// AI vs human</p>')
+    out.append(f'<p style="{LABEL}">AI vs human</p>')
     for versus in d["versus"]:
         verdict = VERDICTS.get(versus.get("verdict"), "Result")
         out += [
-            f'<p style="margin:0 0 6px;"><span style="display:inline-block;padding:3px 10px;border:1px solid {YELLOW};'
-            f'border-radius:999px;font-family:{MONO};font-size:12px;letter-spacing:1px;color:{YELLOW};">'
-            f"THIS WEEK: {e(verdict.upper())}</span></p>",
-            f'<p style="margin:0 0 6px;font-family:{SANS};font-size:17px;line-height:1.35;font-weight:bold;">'
-            f'<a href="{e(versus["url"])}" style="color:{CYAN};text-decoration:none;">{e(versus["title"])}</a></p>',
+            f'<p style="margin:0 0 12px;">{pill("This week: " + e(verdict), SKY, SKY_INK)}</p>',
+            f'<p style="margin:0 0 10px;font-family:{SERIF};font-size:21px;line-height:1.25;font-weight:500;letter-spacing:-0.2px;">'
+            f'<a href="{e(versus["url"])}" style="color:{INK};text-decoration:none;">{e(versus["title"])}</a></p>',
             f'<p style="{P}">{e(versus["why_it_matters"])}</p>',
         ]
     if not d["versus"]:
         out.append(f'<p style="{P}">No head-to-head study made the cut this week.</p>')
-    def cell(number: int, label: str) -> str:
-        return (f'<td width="33%" style="padding:12px 6px;text-align:center;border:1px solid #14301c;">'
-                f'<div style="font-family:{MONO};font-size:30px;font-weight:bold;color:{GREEN};">{number}</div>'
-                f'<div style="font-family:{MONO};font-size:11px;letter-spacing:1px;color:{MUTED};">{label}</div></td>')
+
+    def cell(number: int, label: str, last: bool = False) -> str:
+        edge = "" if last else f"border-right:1px solid {LINE};"
+        return (f'<td width="33%" style="padding:18px 6px 16px;text-align:center;{edge}">'
+                f'<div style="font-family:{SERIF};font-size:36px;line-height:1;font-weight:500;color:{BRAND};">{number}</div>'
+                f'<div style="margin-top:8px;font-family:{MONO};font-size:10px;font-weight:bold;letter-spacing:1.5px;color:{MUTED};">{label}</div></td>')
 
     if sum(tally.values()):
         out += [
-            '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 4px;border-collapse:collapse;"><tr>',
+            f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+            f'style="margin:16px 0 10px;background:#f8fafc;border:1px solid {LINE};border-radius:12px;"><tr>',
             cell(tally["ai_ahead"], "AI AHEAD"),
             cell(tally["humans_ahead"], "HUMANS AHEAD"),
-            cell(tally["comparable"] + tally["mixed"], "EVEN OR MIXED"),
+            cell(tally["comparable"] + tally["mixed"], "EVEN OR MIXED", last=True),
             "</tr></table>",
-            f'<p style="margin:0;font-family:{MONO};font-size:11px;color:{MUTED};">'
+            f'<p style="margin:0;font-family:{SANS};font-size:13px;line-height:1.5;color:{MUTED};">'
             "Running tally of the head-to-head studies we've reviewed. One study never settles it.</p>",
         ]
     else:
@@ -245,24 +275,28 @@ def render_html(d: dict) -> str:
                    "each post now pits AI against humans on one medical task.</p>")
 
     if d["also"]:
-        out.append(f'<p style="{LABEL}">// Also this week</p>')
+        out += [RULE, f'<p style="{LABEL}">Also this week</p>']
         for other in d["also"][:4]:
             out.append(
-                f'<p style="margin:0 0 8px;font-family:{SANS};font-size:15px;line-height:1.4;color:{BODY};">'
-                f'&gt; <a href="{e(other["url"])}" style="{LINK}">{e(other["title"])}</a> '
+                f'<p style="margin:0 0 10px;padding-left:14px;border-left:3px solid {LINE};font-family:{SANS};font-size:15px;line-height:1.45;color:{BODY};">'
+                f'<a href="{e(other["url"])}" style="{LINK}">{e(other["title"])}</a> '
                 f'<span style="color:{MUTED};">({e(other["source"])})</span></p>')
 
     tool = d["tool"]
     if tool:
         out += [
-            f'<p style="{LABEL}">// Tool of the week</p>',
-            f'<p style="margin:0 0 6px;font-family:{SANS};font-size:17px;font-weight:bold;">'
-            f'<a href="{SITE_URL}/hub.html?project={urllib.parse.quote(str(tool["id"]))}" style="color:{GREEN};text-decoration:none;">{e(tool["title"])}</a></p>',
-            f'<p style="{P}">{e(short(tool.get("description"), 200))}</p>',
-            f'<p style="margin:0;font-family:{MONO};font-size:13px;"><a href="{SITE_URL}/tools.html" style="{LINK}">&gt; OPEN ALL TOOLS</a></p>',
+            RULE,
+            f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+            f'style="background:{SOFT};border-radius:14px;"><tr><td style="padding:24px 24px 22px;">',
+            f'<p style="{LABEL}">Tool of the week</p>',
+            f'<p style="margin:0 0 8px;font-family:{SERIF};font-size:22px;line-height:1.2;font-weight:500;letter-spacing:-0.2px;">'
+            f'<a href="{SITE_URL}/hub.html?project={urllib.parse.quote(str(tool["id"]))}" style="color:{INK};text-decoration:none;">{e(tool["title"])}</a></p>',
+            f'<p style="{P}margin-bottom:18px;">{e(short(tool.get("description"), 200))}</p>',
+            f'<p style="margin:0;">{button("Open all tools", SITE_URL + "/tools.html")}</p>',
+            "</td></tr></table>",
         ]
 
-    out.append(f'<p style="{LABEL}">// From the Collective</p>')
+    out += [RULE, f'<p style="{LABEL}">From the Collective</p>']
     for line in d["published_lines"]:
         out.append(f'<p style="{P}">{e(line)}</p>')
     out.append(MARK_COLLECTIVE)
@@ -271,16 +305,22 @@ def render_html(d: dict) -> str:
                    f'<a href="{SITE_URL}/hub.html" style="{LINK}">Projects hub</a>.</p>')
 
     out += [
-        f'<p style="{LABEL}">// One ask</p>',
+        RULE,
+        f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+        f'style="border:1px solid {LINE};border-left:4px solid {SPARK};border-radius:12px;"><tr><td style="padding:20px 22px 10px;">',
+        f'<p style="{LABEL}">One ask</p>',
         f'{MARK_ASK_OPEN}<p style="{P}">{e(DEFAULT_ASK)} '
         f'<a href="{SITE_URL}/tools.html" style="{LINK}">Open tools</a></p>{MARK_ASK_CLOSE}',
-        f'<hr style="border:0;border-top:1px dashed {ACCENT};margin:24px 0 14px;">',
-        f'<p style="margin:0 0 8px;font-family:{SANS};font-size:13px;line-height:1.5;color:{MUTED};">'
-        f'Every briefing: <a href="{SITE_URL}/blog.html" style="color:{GREEN};">aimedicinecollective.com/blog</a>. '
+        "</td></tr></table>",
+        "</td></tr>",
+        # footer
+        f'<tr><td style="padding:22px 32px 26px;background:#f8fafc;border-top:1px solid {LINE};">',
+        f'<p style="margin:0 0 8px;font-family:{SANS};font-size:13px;line-height:1.55;color:{MUTED};">'
+        f'Every briefing: <a href="{SITE_URL}/blog.html" style="{LINK}">aimedicinecollective.com/blog</a>. '
         "Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.</p>",
-        f'<p style="margin:0;font-family:{SANS};font-size:13px;line-height:1.5;color:{MUTED};">'
+        f'<p style="margin:0;font-family:{SANS};font-size:13px;line-height:1.55;color:{MUTED};">'
         'You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" '
-        f'under Your profile on your <a href="{SITE_URL}/account.html#profile" style="color:{GREEN};">account page</a>.</p>',
+        f'under Your profile on your <a href="{SITE_URL}/account.html#profile" style="{LINK}">account page</a>.</p>',
         "</td></tr></table></div>",
         "</body></html>",
     ]
