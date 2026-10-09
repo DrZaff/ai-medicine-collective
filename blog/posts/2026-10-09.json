@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-09",
+  "headline": "Stanford's resident AI curriculum, and a trial of AI help for primary care physicians diagnosing skin disease",
+  "intro": "Stanford's award-winning curriculum teaches internal medicine residents to use AI tools well. A Nature Medicine study shows why that matters: how much AI advice helps, or misleads, depends on who receives it, and doctors handled wrong advice better than medical students or the public.",
+  "items": [
+    {
+      "title": "Award-Winning AI Curriculum Keeps Residents on Their Toes",
+      "source": "Stanford Medicine, Department of Medicine",
+      "url": "https://medicine.stanford.edu/news/stories/2026/10/award-winning-ai-curriculum-keeps-residents-on-their-toes.html",
+      "published": "2026-10-05",
+      "category": "education",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "Stanford's Department of Medicine has profiled a longitudinal AI curriculum for its internal medicine residents, built by associate program directors Poonam Hosamani and Kevin Keet. It began in June 2025 and won the 2026 Outstanding Graduate Medical Education Contributions Award. The sessions build on each other and mix expert lectures with hands-on use of AI tools in research and clinical settings. They are adjusted for residents whose AI experience ranges from computer science PhDs to almost none, and they are updated often because the technology changes so fast. This is an institutional news story, not an evaluation of outcomes; the team also published a practical guide to teaching residents about AI in BMJ Digital Health in September 2026.",
+      "why_it_matters": "Programs building their own AI teaching get a concrete model for one of the hardest design problems: teaching residents to use AI in a way that supports their clinical reasoning instead of causing deskilling. The model also allows for very uneven starting knowledge across a residency class."
+    },
+    {
+      "title": "Divergent impacts of explainable AI for dermatological diagnosis on clinicians versus lay people",
+      "source": "Nature Medicine",
+      "url": "https://www.nature.com/articles/s41591-026-04553-w",
+      "published": "2026-08-04",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_ahead",
+      "summary": "Task: giving a top-three differential diagnosis from clinical photographs of skin conditions. The study focused on atopic dermatitis, pityriasis rosea, Lyme disease and cutaneous T-cell lymphoma, with images balanced across light and dark skin tones. AI system: a deep learning model trained to perform evenly across skin tones, shown with one of four kinds of explanation (prediction only, heatmap, similar example images, or a multimodal large language model's written explanation). Humans: 153 primary care physicians (PCPs) diagnosed each image first on their own and then again with AI help. The paper also tested 320 medical students on the same task and 623 lay people on a simpler melanoma-versus-mole task. Main result: without AI, PCPs had 11.5 ± 1.4% top-1 accuracy and 16.1 ± 1.8% top-3 accuracy; with AI suggestions, top-1 accuracy rose by 21.5% and top-3 by 43.5%. When the AI was wrong, the PCPs' final answers barely changed, but medical students and lay people relied on the AI more. The written LLM explanations helped PCPs the least. Main limitation: this was a simplified online experiment with only 12 images per participant and no patient history. The authors also chose the images on purpose so the AI was right about 79% of the time, which does not reflect how the model would behave in real use.",
+      "why_it_matters": "In this skin diagnosis task, AI help raised PCPs' accuracy, but medical students and lay people were more easily misled when the AI was wrong. Polished LLM explanations did not make the advice more useful to doctors. Educators can use this to show trainees why they should commit to their own diagnosis before checking the AI's answer."
+    }
+  ],
+  "tags": [
+    "ai curriculum",
+    "automation bias",
+    "clinical reasoning",
+    "dermatology",
+    "deskilling",
+    "diagnostic accuracy",
+    "explainable ai",
+    "faculty development",
+    "graduate medical education",
+    "human-ai collaboration",
+    "internal medicine residency",
+    "large language models",
+    "medical students",
+    "primary care"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
