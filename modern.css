@@ -1094,8 +1094,47 @@
 }
 
 .modern .dash-card {
+  position: relative;
   border-top: 1px solid var(--line);
-  padding: 16px;
+  padding: 18px;
+}
+
+/* each card's icon, in its top corner */
+.modern .dash-icon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: block;
+  box-sizing: border-box;
+  width: 38px;
+  height: 38px;
+  padding: 9px;
+  border-radius: 11px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  transition: 0.18s ease-out;
+}
+
+.modern .dash-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.modern .dash-card:hover .dash-icon {
+  background: var(--brand);
+  color: #fff;
+}
+
+.modern .dash-card--alert .dash-icon,
+.modern .dash-card--alert:hover .dash-icon {
+  background: #fde68a;
+  color: #92400e;
+}
+
+/* keep the label clear of the icon */
+.modern .dash-card .dash-title {
+  padding-right: 46px;
 }
 
 .modern .dash-card--alert,
