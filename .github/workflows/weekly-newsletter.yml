@@ -30,6 +30,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install the drawing library (for the Instagram recap)
+        run: pip install -r scripts/blog_agent/requirements.txt
+
       - name: Build newsletter
         id: build
         run: python scripts/blog_agent/newsletter.py
@@ -42,6 +45,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git add "newsletter/$DATE.html" "newsletter/$DATE.txt" "newsletter/$DATE.json" newsletter/latest.json
+          if [ -d "social/digest-$DATE" ]; then git add "social/digest-$DATE"; fi
           if git diff --cached --quiet; then
             echo "::notice::The digest for $DATE is already published and unchanged."
             exit 0
@@ -51,3 +55,20 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
           echo "::notice::Published newsletter/$DATE.html. Send it from the Moderation page."
+
+      # The week's recap goes to Instagram straight away: everything in it was
+      # approved when its blog posts were merged. (A push made by this job
+      # does not start the "Instagram publish" job, so it is posted here.)
+      # The publisher waits for the site to serve the slides, and skips if
+      # this recap is already on the account.
+      - name: Post the recap to Instagram
+        if: steps.build.outputs.created == 'true' && steps.build.outputs.carousel == 'true'
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          DATE: ${{ steps.build.outputs.date }}
+        run: |
+          if [ -z "$IG_ACCESS_TOKEN" ]; then
+            echo "::notice::The Instagram access token is not set; the recap was not posted."
+            exit 0
+          fi
+          python scripts/blog_agent/instagram_publish.py --name "digest-$DATE"

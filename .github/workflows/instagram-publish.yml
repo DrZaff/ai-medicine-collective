@@ -1,12 +1,13 @@
-# Posts a blog post's carousel to Instagram once its draft has been merged.
-# The slides (social/<date>/) were reviewed in the same pull request as the
-# post, so merging is the approval for both.
+# Posts a carousel to Instagram once its pull request has been merged.
+# A carousel is a folder under social/ made by scripts/blog_agent/instagram.py:
+# a blog post's (social/<date>/) or an AI vs Human edition's (social/review-<date>/).
+# The slides were reviewed in the same pull request, so merging is the approval.
+# (The weekly digest's recap is posted by the digest job itself.)
 #
 # Setup (one time, by the repo owner): Settings > Secrets and variables >
 # Actions > New repository secret:
 #   IG_ACCESS_TOKEN   a long-lived access token for the Instagram account
-# Until it exists, this job skips quietly. (IG_USER_ID is optional: the
-# account is looked up from the token.)
+# Until it exists, this job skips quietly.
 
 name: Instagram publish
 
@@ -14,14 +15,14 @@ on:
   push:
     branches: [main]
     paths:
-      - "blog/posts/*.json"
+      - "social/*/caption.txt"
   workflow_dispatch:
     inputs:
       date:
-        description: "Date of the post to publish (YYYY-MM-DD)"
+        description: "Folder under social/ to publish (for a blog post, its date)"
         required: true
       dry_run:
-        description: "Only show what would be posted"
+        description: "Only show what would be posted, and check the token (posts nothing)"
         type: boolean
         default: false
 
@@ -54,9 +55,9 @@ jobs:
           if [ -n "$DATE_INPUT" ]; then
             dates="$DATE_INPUT"
           else
-            # posts that this push ADDED (a later correction to a post does not post again)
-            dates=$(git diff --name-only --diff-filter=A "$BEFORE" "$GITHUB_SHA" -- 'blog/posts/*.json' \
-              | sed -E 's#.*/([0-9]{4}-[0-9]{2}-[0-9]{2})\.json#\1#' | sort | tr '\n' ' ')
+            # carousels that this push ADDED (a later correction does not post again)
+            dates=$(git diff --name-only --diff-filter=A "$BEFORE" "$GITHUB_SHA" -- 'social/*/caption.txt' \
+              | sed -E 's#^social/([^/]+)/caption\.txt$#\1#' | sort | tr '\n' ' ')
           fi
           echo "dates=$dates" >> "$GITHUB_OUTPUT"
           echo "Posts to publish: ${dates:-none}"
@@ -74,8 +75,8 @@ jobs:
             exit 0
           fi
           for date in $DATES; do
-            if ! echo "$date" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
-              echo "::error::Not a date: $date"; exit 1
+            if ! echo "$date" | grep -Eq '^[A-Za-z0-9-]+$'; then
+              echo "::error::Not a carousel name: $date"; exit 1
             fi
             if [ "$DRY_RUN" = "true" ]; then
               python scripts/blog_agent/instagram_publish.py --date "$date" --dry-run

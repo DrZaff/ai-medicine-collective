@@ -409,6 +409,7 @@ def write_pr_body(path: Path, review: dict, new: list[dict], dropped: list[str],
         "- [ ] Each new study: the link works, and the numbers and verdict match the paper",
         "- [ ] The summary and key findings say no more than the studies support",
         "- [ ] No patient information; nothing that reads as clinical advice",
+        "- [ ] The Instagram slides in `social/review-<date>/` say what the paper says (merging posts them)",
         "",
         "To skip this edition, close this PR without merging.",
     ]
@@ -492,6 +493,16 @@ def main() -> int:
           f"{len(review['sections'])} sections.")
     if usage is not None:
         print(f"Usage: {usage} (about ${agent.estimate_cost(usage):.2f})")
+
+    # The edition's Instagram carousel (social/review-<date>/), reviewed in
+    # the same pull request and posted when it is merged
+    try:
+        import instagram
+        slides = instagram.build_review(review, ROOT / "social" / f"review-{date.isoformat()}")
+        print(f"Wrote {len(slides)} Instagram slides to social/review-{date.isoformat()}/")
+    except ImportError as err:
+        print(f"No Instagram slides ({err}).")
+
     if args.pr_body:
         write_pr_body(args.pr_body, review, new, dropped, removed, flagged, note, usage)
     agent.set_output("created", "true")

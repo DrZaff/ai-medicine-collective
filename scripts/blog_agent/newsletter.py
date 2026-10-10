@@ -348,6 +348,7 @@ def render_html(d: dict) -> str:
         f'Every briefing: <a href="{SITE_URL}/blog.html" style="color:{GREEN};">aimedicinecollective.com/blog</a>. '
         "Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.</p>",
         f'<p style="margin:0;text-align:center;font-family:{SANS};font-size:12px;line-height:1.6;color:{MUTED};">'
+        f'On Instagram: <a href="https://www.instagram.com/aimedicinecollective/" style="color:{GREEN};">@aimedicinecollective</a>, three briefings a week. '
         'You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" '
         f'under Your profile on your <a href="{SITE_URL}/account.html#profile" style="color:{GREEN};">account page</a>.</p>',
         "</td></tr></table></div>",
@@ -397,6 +398,7 @@ def render_text(d: dict) -> str:
         f"Every briefing: {SITE_URL}/blog.html",
         "Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.",
         "",
+        "On Instagram: @aimedicinecollective (https://www.instagram.com/aimedicinecollective/)",
         "You get this as a member. Reply to this email to reach us. To stop it, untick "
         f"\"Email me the weekly digest\" under Your profile on your account page: {SITE_URL}/account.html#profile",
     ]
@@ -435,6 +437,17 @@ def main() -> int:
     # The Moderation page reads this to offer the newest issue
     (OUT_DIR / "latest.json").write_text(json.dumps({"date": end.isoformat()}) + chr(10), encoding="utf-8")
     print(f"Wrote {stem.name}.html, .txt and .json from {len(digest['week'])} post(s). Subject: {digest['subject']}")
+
+    # The week's recap for Instagram (social/digest-<date>/). Left out, with a
+    # note, where the drawing library isn't installed.
+    try:
+        import instagram
+        slides = instagram.build_digest(digest, ROOT / "social" / f"digest-{end.isoformat()}")
+        print(f"Wrote {len(slides)} Instagram slides to social/digest-{end.isoformat()}/")
+        set_output("carousel", "true" if slides else "false")
+    except ImportError as err:
+        print(f"No Instagram slides ({err}).")
+        set_output("carousel", "false")
     set_output("created", "true")
     set_output("post_count", str(len(digest["week"])))
     return 0

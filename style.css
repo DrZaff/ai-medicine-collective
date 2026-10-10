@@ -661,6 +661,30 @@ button:hover {
 
 /* === FOOTER ================================================== */
 
+/* The Instagram link above the independence note on every page */
+.site-social {
+  margin: 32px 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+}
+
+.site-social a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.site-social-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.site-social + .site-note {
+  margin-top: 12px;
+}
+
 /* The independence note above the footer on every page */
 .site-note {
   max-width: 70ch;
