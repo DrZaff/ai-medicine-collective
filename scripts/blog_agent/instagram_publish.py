@@ -122,14 +122,39 @@ def main() -> int:
     urls = [f"{SITE_URL}/social/{args.date}/{slide.name}" for slide in slides]
     marker = f"blog?date={args.date}"       # in every caption; how a post is recognised later
 
+    token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
     if args.dry_run:
         print(f"Would post {len(urls)} slides:")
         for url in urls:
-            print(f"  {url}")
-        print(f"Caption ({len(caption)} characters):\n{caption}")
+            print(f"  {url}  ({'on the site' if reachable(url) else 'NOT on the site yet'})")
+        print(f"Caption ({len(caption)} characters):\n{caption}\n")
+        if not token:
+            print("::warning::IG_ACCESS_TOKEN is not set, so the account was not checked.")
+            return 0
+        # Reading only: who the token belongs to, and whether this post is there already
+        try:
+            me = call("GET", "me", {"fields": "user_id,username", "access_token": token})
+            print(f"The token works. It belongs to @{me.get('username', '?')}.")
+            listed = None
+            for candidate in dict.fromkeys(str(me.get(key) or "") for key in ("user_id", "id")):
+                if not candidate:
+                    continue
+                try:
+                    listed = call("GET", f"{candidate}/media", {"fields": "caption", "limit": 30, "access_token": token})
+                    break
+                except ApiError as err:
+                    print(f"(One of the account's two ids could not list posts: {err})")
+            if listed is None:
+                print("::error::The token could not list the account's posts; publishing would fail.")
+                return 1
+            already = any(marker in (media.get("caption") or "") for media in listed.get("data", []))
+            print(f"The account has {len(listed.get('data', []))} recent post(s); this one is "
+                  f"{'ALREADY there' if already else 'not there yet'}. Nothing was posted.")
+        except ApiError as err:
+            print(f"::error::The token check failed: {err}")
+            return 1
         return 0
 
-    token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
     if not token:
         print("IG_ACCESS_TOKEN is not set; nothing posted.")
         return 0
