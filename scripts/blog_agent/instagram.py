@@ -29,6 +29,7 @@ POSTS_DIR = ROOT / "blog" / "posts"
 SOCIAL_DIR = ROOT / "social"
 FONTS = Path(__file__).resolve().parent / "fonts"
 SITE = "aimedicinecollective.com"
+HANDLE = "@aimedicinecollective"
 
 W, H = 1080, 1350          # 4:5, the tallest shape Instagram shows in the feed
 PAD = 84                   # side margin
@@ -283,7 +284,7 @@ def closing(post: dict, total: int) -> Image.Image:
             "Not medical advice.")
     paragraph(draw, (PAD, H - 330), wrap(draw, note, small, W - 2 * PAD), small, (190, 220, 210), 1.45)
     footer_dots_only(draw, total - 1, total, dark=True)
-    draw.text((PAD, H - 108), "Follow for the next one", font=sans(29, 600), fill=MINT)
+    draw.text((PAD, H - 108), f"Follow {HANDLE}", font=sans(29, 600), fill=MINT)
     return im
 
 
@@ -307,6 +308,8 @@ def caption(post: dict) -> str:
     lines += [
         "",
         f"Full summaries and links to every source: {SITE}/blog?date={post['date']} (link in bio).",
+        "",
+        f"Follow {HANDLE} for three briefings a week on AI in medicine.",
         "",
         "AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.",
         "",
