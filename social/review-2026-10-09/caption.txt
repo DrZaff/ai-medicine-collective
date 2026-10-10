@@ -1,0 +1,11 @@
+AI vs Human, edition 1: how AI is changing what physicians can do.
+
+The strongest evidence so far comes from real-world trials in which clinicians work with AI. A large Swedish mammography screening trial found AI-supported screening at least as safe as standard double reading. Colonoscopy detection trials showed no clear overall benefit, and an ambient scribe trial gave mixed results. On written cases, large language models (LLMs) raised physicians' diagnostic scores in several small randomised trials, and the model alone often scored higher than the assisted physicians. On real emergency patients the comparisons point in opposite directions, and wrong AI suggestions measurably lowered physicians' accuracy, even among physicians trained in AI use.
+
+The full paper, with every study and its source: aimedicinecollective.com/ai-vs-human (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+A summary of published research, drafted by AI and reviewed by clinicians. Not medical advice.
+
+#AIinMedicine #MedEd #EvidenceBasedMedicine #DigitalHealth #ClinicalAI
