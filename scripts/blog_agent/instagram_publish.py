@@ -1,8 +1,11 @@
-"""Publish a blog post's carousel to Instagram.
+"""Publish a carousel from social/<name>/ to Instagram.
 
-Runs after a blog draft is merged (.github/workflows/instagram-publish.yml).
-The slides and caption were made by instagram.py and reviewed in the same
-pull request as the post, so merging is the approval for both.
+<name> is a blog post's date, or "digest-<date>" or "review-<date>" (see
+instagram.py). For blog posts and AI vs Human editions this runs after their
+pull request is merged (.github/workflows/instagram-publish.yml): the slides
+were reviewed in that pull request, so merging is the approval. The weekly
+digest's recap is posted by the digest job itself, since everything in it was
+already approved when its blog posts were merged.
 
 Steps, using Meta's "Instagram API with Instagram Login":
   1. wait until the slides are reachable on the live site (Instagram fetches
@@ -16,7 +19,7 @@ The account's id is looked up from the token. IG_USER_ID can be set to
 override that, but is not needed.
 
 Usage:
-    python scripts/blog_agent/instagram_publish.py --date YYYY-MM-DD [--dry-run]
+    python scripts/blog_agent/instagram_publish.py --name <folder under social/> [--dry-run]
 """
 
 from __future__ import annotations
@@ -105,11 +108,15 @@ def wait_until_ready(container: str, token: str) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--date", required=True, help="The post's date (YYYY-MM-DD)")
+    parser.add_argument("--name", "--date", dest="name", required=True,
+                        help="The folder under social/: a blog post's date, digest-<date> or review-<date>")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be posted; contact nobody")
     args = parser.parse_args()
 
-    folder = SOCIAL_DIR / args.date
+    if not all(ch.isalnum() or ch == "-" for ch in args.name):
+        print(f"Not a carousel name: {args.name}")
+        return 1
+    folder = SOCIAL_DIR / args.name
     slides = sorted(folder.glob("*.jpg"))
     caption_file = folder / "caption.txt"
     if len(slides) < 2 or not caption_file.exists():
@@ -119,8 +126,13 @@ def main() -> int:
         print("A carousel holds at most 10 slides; nothing posted.")
         return 1
     caption = caption_file.read_text(encoding="utf-8").strip()
-    urls = [f"{SITE_URL}/social/{args.date}/{slide.name}" for slide in slides]
-    marker = f"blog?date={args.date}"       # in every caption; how a post is recognised later
+    urls = [f"{SITE_URL}/social/{args.name}/{slide.name}" for slide in slides]
+    # A phrase that is in this caption and no other: how the post is recognised later
+    marker_file = folder / "marker.txt"
+    marker = marker_file.read_text(encoding="utf-8").strip() if marker_file.exists() else f"blog?date={args.name}"
+    if not marker or marker not in caption:
+        print("The marker is missing from the caption; nothing posted (a re-run could post twice).")
+        return 1
 
     token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
     if args.dry_run:
@@ -178,7 +190,7 @@ def main() -> int:
             raise problem or ApiError("could not work out which Instagram account the token belongs to")
         print(f"Posting as @{me.get('username', '?')}")
         if any(marker in (media.get("caption") or "") for media in recent.get("data", [])):
-            print(f"The {args.date} post is already on Instagram; nothing to do.")
+            print(f"The {args.name} post is already on Instagram; nothing to do.")
             return 0
 
         if not wait_for_site(urls):
@@ -196,10 +208,10 @@ def main() -> int:
         wait_until_ready(carousel["id"], token)
         published = call("POST", f"{user}/media_publish", {"creation_id": carousel["id"], "access_token": token})
     except ApiError as err:
-        print(f"::error::Instagram post for {args.date} failed: {err}")
+        print(f"::error::Instagram post for {args.name} failed: {err}")
         return 1
 
-    print(f"Posted the {args.date} carousel ({len(urls)} slides). Instagram media id: {published.get('id')}")
+    print(f"Posted the {args.name} carousel ({len(urls)} slides). Instagram media id: {published.get('id')}")
     return 0
 
 

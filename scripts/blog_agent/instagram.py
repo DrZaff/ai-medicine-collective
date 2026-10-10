@@ -1,8 +1,15 @@
-"""Instagram carousel for a blog post: the slides and the caption.
+"""Instagram carousels: the slides and the caption.
 
-Reads blog/posts/YYYY-MM-DD.json and writes social/YYYY-MM-DD/:
-    01.jpg ... NN.jpg   1080 x 1350 slides: a cover, one per review, a closing slide
+Three kinds, each written to its own folder under social/:
+    social/YYYY-MM-DD/          a blog post (build)
+    social/digest-YYYY-MM-DD/   the weekly digest (build_digest; called by newsletter.py)
+    social/review-YYYY-MM-DD/   an AI vs Human edition (build_review; called by living_review.py)
+
+Each folder holds:
+    01.jpg ... NN.jpg   1080 x 1350 slides: a cover, the content, a closing slide
     caption.txt         the text that goes under the post
+    marker.txt          a phrase that is in the caption and in no other post's,
+                        which is how the publisher knows a post is already up
 
 No AI call: it only lays out text that is already in the post, so what is
 reviewed in the blog draft is exactly what the slides say. The blog draft job
@@ -193,30 +200,6 @@ def long_date(iso: str) -> str:
 
 # ---------------------------------------------------------------- slides
 
-def cover(post: dict, total: int) -> Image.Image:
-    im = night_canvas()
-    draw = ImageDraw.Draw(im)
-    masthead(im, draw, dark=True)
-
-    label = f"BRIEFING  ·  {long_date(post['date']).upper()}"
-    font = sans(24, 700)
-    width = tracked_width(draw, label, font, 2.6) + 52
-    draw.rounded_rectangle((PAD, 300, PAD + width, 356), radius=28, fill=(18, 62, 54), outline=(44, 96, 86))
-    tracked(draw, (PAD + 26, 314), label, font, MINT, 2.6)
-
-    font, lines = fit(draw, post["headline"], lambda s: serif(s, 500), range(104, 59, -4), W - 2 * PAD, 7)
-    y = paragraph(draw, (PAD, 410), lines, font, (255, 255, 255), 1.08)
-
-    count = len(post["items"])
-    kinds = " + ".join(SECTION_LABELS.get(i.get("section"), "REVIEW").title().replace("Ai Vs", "AI vs").replace("Med-Ed", "Med-ed")
-                       for i in post["items"][:2]) if count <= 2 else f"{count} reviews"
-    draw.text((PAD, min(y + 36, H - 250)), kinds, font=serif(40, 400, italic=True), fill=MINT)
-
-    draw.text((PAD, H - 108), "Swipe for the takeaways  →", font=sans(29, 600), fill=MINT)
-    footer_dots_only(draw, 0, total, dark=True)
-    return im
-
-
 def footer_dots_only(draw, index: int, total: int, dark: bool) -> None:
     gap, r = 26, 7
     x = W - PAD - (total - 1) * gap
@@ -227,32 +210,36 @@ def footer_dots_only(draw, index: int, total: int, dark: bool) -> None:
         x += gap
 
 
-def item_slide(item: dict, index: int, total: int) -> Image.Image:
+def card_slide(index: int, total: int, labels: list, title: str, source: str,
+               box_label: str, box_text: str) -> Image.Image:
+    """A light slide: small labels, a serif title, a source line, and a white
+    card of reading text that takes the rest of the slide.
+    labels: [(text, background, text colour), ...]"""
     im = Image.new("RGB", (W, H), PAPER)
     draw = ImageDraw.Draw(im)
     draw.rectangle((0, 0, W, 12), fill=SPARK)
     masthead(im, draw, dark=False)
 
-    versus = item.get("section") == "ai_vs_human"
-    x = pill(draw, (PAD, 210), SECTION_LABELS.get(item.get("section"), str(item.get("category", "REVIEW")).upper()),
-             SKY if versus else SOFT, SKY_INK if versus else BRAND)
-    if VERDICT_LABELS.get(item.get("verdict")):
-        pill(draw, (x + 14, 210), VERDICT_LABELS[item["verdict"]], AMBER, AMBER_INK)
+    x = PAD
+    for text, background, color in labels:
+        x = pill(draw, (x, 210), text, background, color) + 14
 
-    font, lines = fit(draw, item["title"], lambda s: serif(s, 500), range(66, 43, -2), W - 2 * PAD, 5)
+    font, lines = fit(draw, title, lambda s: serif(s, 500), range(66, 43, -2), W - 2 * PAD, 5)
     y = paragraph(draw, (PAD, 300), lines, font, INK, 1.14)
-    draw.text((PAD, y + 14), str(item.get("source", "")), font=serif(31, 400, italic=True), fill=MUTED)
-    y += 96
+    if source:
+        draw.text((PAD, y + 14), source, font=serif(31, 400, italic=True), fill=MUTED)
+        y += 96
+    else:
+        y += 40
 
-    # "Why it matters" on a white card that takes the rest of the slide
     top, bottom = y, H - 170
     draw.rounded_rectangle((PAD - 24, top, W - PAD + 24, bottom), radius=30, fill=CARD, outline=LINE, width=2)
     draw.rounded_rectangle((PAD - 24, top + 34, PAD - 14, bottom - 34), radius=5, fill=SPARK)
-    tracked(draw, (PAD + 22, top + 42), "WHY IT MATTERS", sans(24, 700), BRAND, 2.6)
+    tracked(draw, (PAD + 22, top + 42), box_label, sans(24, 700), BRAND, 2.6)
     room = bottom - (top + 104) - 34
     for size in range(44, 27, -2):
         font = sans(size, 400)
-        lines = wrap(draw, item.get("why_it_matters", ""), font, W - 2 * PAD - 44)
+        lines = wrap(draw, box_text, font, W - 2 * PAD - 44)
         if len(lines) * round(size * 1.42) <= room:
             break
     else:
@@ -265,16 +252,95 @@ def item_slide(item: dict, index: int, total: int) -> Image.Image:
     return im
 
 
-def closing(post: dict, total: int) -> Image.Image:
+def item_labels(item: dict) -> list:
+    versus = item.get("section") == "ai_vs_human"
+    labels = [(SECTION_LABELS.get(item.get("section"), str(item.get("category", "REVIEW")).upper()),
+               SKY if versus else SOFT, SKY_INK if versus else BRAND)]
+    if VERDICT_LABELS.get(item.get("verdict")):
+        labels.append((VERDICT_LABELS[item["verdict"]], AMBER, AMBER_INK))
+    return labels
+
+
+def item_slide(item: dict, index: int, total: int) -> Image.Image:
+    return card_slide(index, total, item_labels(item), item["title"], str(item.get("source", "")),
+                      "WHY IT MATTERS", item.get("why_it_matters", ""))
+
+
+def list_slide(index: int, total: int, label: str, heading: str, rows: list) -> Image.Image:
+    """A light slide with a heading and up to five two-line rows: [(title, small print), ...]"""
+    im = Image.new("RGB", (W, H), PAPER)
+    draw = ImageDraw.Draw(im)
+    draw.rectangle((0, 0, W, 12), fill=SPARK)
+    masthead(im, draw, dark=False)
+    pill(draw, (PAD, 210), label, SOFT, BRAND)
+    y = paragraph(draw, (PAD, 300), [heading], serif(66, 500), INK, 1.14) + 30
+    rows = rows[:5]
+    space = (H - 190 - y) // max(1, len(rows))
+    for title, small in rows:
+        draw.rounded_rectangle((PAD, y + 6, PAD + 8, y + space - 26), radius=4, fill=SPARK)
+        font, lines = fit(draw, title, lambda s: serif(s, 500), range(40, 29, -2), W - 2 * PAD - 40, 3)
+        end = paragraph(draw, (PAD + 36, y), lines, font, INK, 1.2)
+        if small:
+            draw.text((PAD + 36, end + 4), small, font=sans(26, 400), fill=MUTED)
+        y += space
+    footer(draw, index, total, dark=False)
+    return im
+
+
+def tally_slide(index: int, total: int, label: str, heading: str, cells: list, note: str) -> Image.Image:
+    """A light slide with a grid of big numbers: [(number, caption), ...] (2 per row)"""
+    im = Image.new("RGB", (W, H), PAPER)
+    draw = ImageDraw.Draw(im)
+    draw.rectangle((0, 0, W, 12), fill=SPARK)
+    masthead(im, draw, dark=False)
+    pill(draw, (PAD, 210), label, SOFT, BRAND)
+    font, lines = fit(draw, heading, lambda s: serif(s, 500), range(62, 43, -2), W - 2 * PAD, 2)
+    y = paragraph(draw, (PAD, 300), lines, font, INK, 1.14) + 34
+    gap = 24
+    cell_w = (W - 2 * PAD - gap) // 2
+    rows = (len(cells) + 1) // 2
+    cell_h = min(216, (H - 300 - y) // max(1, rows) - gap)
+    for i, (number, caption_text) in enumerate(cells):
+        x = PAD + (i % 2) * (cell_w + gap)
+        top = y + (i // 2) * (cell_h + gap)
+        draw.rounded_rectangle((x, top, x + cell_w, top + cell_h), radius=26, fill=CARD, outline=LINE, width=2)
+        draw.text((x + 34, top + 10), str(number), font=serif(84, 500), fill=BRAND)
+        small = sans(26, 600)
+        paragraph(draw, (x + 34, top + 128), wrap(draw, caption_text, small, cell_w - 68)[:2], small, MUTED, 1.2)
+    small = sans(27, 400)
+    paragraph(draw, (PAD, y + rows * (cell_h + gap) + 14), wrap(draw, note, small, W - 2 * PAD)[:3], small, MUTED, 1.4)
+    footer(draw, index, total, dark=False)
+    return im
+
+
+def title_slide(kicker: str, headline: str, sub: str, total: int) -> Image.Image:
+    """The dark cover."""
+    im = night_canvas()
+    draw = ImageDraw.Draw(im)
+    masthead(im, draw, dark=True)
+    font = sans(24, 700)
+    width = tracked_width(draw, kicker, font, 2.6) + 52
+    draw.rounded_rectangle((PAD, 300, PAD + width, 356), radius=28, fill=(18, 62, 54), outline=(44, 96, 86))
+    tracked(draw, (PAD + 26, 314), kicker, font, MINT, 2.6)
+    font, lines = fit(draw, headline, lambda s: serif(s, 500), range(104, 59, -4), W - 2 * PAD, 7)
+    y = paragraph(draw, (PAD, 410), lines, font, (255, 255, 255), 1.08)
+    if sub:
+        draw.text((PAD, min(y + 36, H - 250)), sub, font=serif(40, 400, italic=True), fill=MINT)
+    draw.text((PAD, H - 108), "Swipe for the takeaways  →", font=sans(29, 600), fill=MINT)
+    footer_dots_only(draw, 0, total, dark=True)
+    return im
+
+
+def closing(total: int, big=("Read the full", "briefing."), small=("Sources, summaries", "and the fine print."),
+            address: str = f"{SITE}/blog") -> Image.Image:
     im = night_canvas()
     draw = ImageDraw.Draw(im)
     masthead(im, draw, dark=True)
 
-    y = paragraph(draw, (PAD, 330), ["Read the full", "briefing."], serif(108, 500), (255, 255, 255), 1.06)
-    y = paragraph(draw, (PAD, y + 26), ["Sources, summaries", "and the fine print."], serif(54, 400, italic=True), MINT, 1.2)
+    y = paragraph(draw, (PAD, 330), list(big), serif(108, 500), (255, 255, 255), 1.06)
+    y = paragraph(draw, (PAD, y + 26), list(small), serif(54, 400, italic=True), MINT, 1.2)
 
     draw.rounded_rectangle((PAD, y + 60, W - PAD, y + 190), radius=65, fill=MINT)
-    address = f"{SITE}/blog"
     font = sans(42, 700)
     draw.text(((W - draw.textlength(address, font=font)) / 2, y + 98), address, font=font, fill=NIGHT)
 
@@ -300,30 +366,36 @@ def caption(post: dict) -> str:
     for item in post["items"]:
         label = {"med_ed": "Med-ed", "ai_vs_human": "AI vs human"}.get(item.get("section"), "Review")
         lines.append(f"{label}: {item['title']} ({item['source']})")
-    tags = ["#AIinMedicine", "#MedEd", "#MedicalEducation", "#DigitalHealth"]
-    for tag in post.get("tags", []):
-        made = hashtag(tag)
-        if made and made.lower() not in {t.lower() for t in tags} and len(tags) < 10:
-            tags.append(made)
     lines += [
         "",
         f"Full summaries and links to every source: {SITE}/blog?date={post['date']} (link in bio).",
         "",
         f"Follow {HANDLE} for three briefings a week on AI in medicine.",
         "",
-        "AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.",
+        DISCLAIMER,
         "",
-        " ".join(tags),
+        hashtags(post.get("tags", []), ["#AIinMedicine", "#MedEd", "#MedicalEducation", "#DigitalHealth"]),
     ]
     return "\n".join(lines).strip() + "\n"
 
 
-# ---------------------------------------------------------------- main
+# ---------------------------------------------------------------- writing a carousel
 
-def build(post: dict, out: Path) -> list[Path]:
-    items = post["items"][:MAX_ITEM_SLIDES]
-    total = len(items) + 2
-    slides = [cover(post, total), *(item_slide(item, i + 1, total) for i, item in enumerate(items)), closing(post, total)]
+DISCLAIMER = "AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice."
+
+
+def hashtags(extra: list[str], base: list[str]) -> str:
+    tags = list(base)
+    for tag in extra:
+        made = hashtag(tag)
+        if made and made.lower() not in {t.lower() for t in tags} and len(tags) < 10:
+            tags.append(made)
+    return " ".join(tags)
+
+
+def save_carousel(out: Path, slides: list, caption_text: str, marker: str) -> list[Path]:
+    assert marker in caption_text, "the marker has to be in the caption"
+    assert 2 <= len(slides) <= 10, "a carousel holds 2 to 10 slides"
     out.mkdir(parents=True, exist_ok=True)
     for old in out.glob("*.jpg"):
         old.unlink()
@@ -332,8 +404,98 @@ def build(post: dict, out: Path) -> list[Path]:
         path = out / f"{n:02d}.jpg"
         slide.convert("RGB").save(path, "JPEG", quality=90, optimize=True)
         paths.append(path)
-    (out / "caption.txt").write_text(caption(post), encoding="utf-8")
+    (out / "caption.txt").write_text(caption_text.strip() + "\n", encoding="utf-8")
+    (out / "marker.txt").write_text(marker + "\n", encoding="utf-8")
     return paths
+
+
+def build(post: dict, out: Path) -> list[Path]:
+    """A blog post."""
+    items = post["items"][:MAX_ITEM_SLIDES]
+    total = len(items) + 2
+    count = len(post["items"])
+    kinds = " + ".join({"med_ed": "Med-ed review", "ai_vs_human": "AI vs human"}.get(i.get("section"), "Review")
+                       for i in post["items"][:2]) if count <= 2 else f"{count} reviews"
+    slides = [title_slide(f"BRIEFING  ·  {long_date(post['date']).upper()}", post["headline"], kinds, total),
+              *(item_slide(item, i + 1, total) for i, item in enumerate(items)),
+              closing(total)]
+    return save_carousel(out, slides, caption(post), f"blog?date={post['date']}")
+
+
+def build_digest(d: dict, out: Path) -> list[Path]:
+    """The weekly digest, from the same data as the email (newsletter.build)."""
+    start, end = d["start"], d["end"]
+    span = f"{start.strftime('%b')} {start.day} – {end.strftime('%b')} {end.day}"
+    inner = []
+    if d.get("one_thing"):
+        item = d["one_thing"]
+        inner.append(lambda i, n, item=item: card_slide(i, n, [("THE ONE THING", SOFT, BRAND)], item["title"],
+                                                        str(item.get("source", "")), "WHY IT MATTERS", item.get("why_it_matters", "")))
+    for item in d.get("versus", [])[:1]:
+        inner.append(lambda i, n, item=item: card_slide(i, n, item_labels(item), item["title"],
+                                                        str(item.get("source", "")), "WHY IT MATTERS", item.get("why_it_matters", "")))
+    also = d.get("also", [])[:4]
+    if also:
+        inner.append(lambda i, n: list_slide(i, n, "ALSO THIS WEEK", "Worth a look", [(o["title"], str(o.get("source", ""))) for o in also]))
+    tool = d.get("tool")
+    if tool:
+        inner.append(lambda i, n: card_slide(i, n, [("TOOL OF THE WEEK", SOFT, BRAND)], tool["title"], "Built by a member",
+                                             "WHAT IT DOES", " ".join(str(tool.get("description") or "").split())))
+    if not inner:
+        return []
+    total = len(inner) + 2
+    headline = (d.get("one_thing") or {}).get("title") or "The week in AI and medicine"
+    slides = [title_slide(f"THE WEEK  ·  {span.upper()}", "The week in AI and medicine", "A two-minute recap", total),
+              *(make(i + 1, total) for i, make in enumerate(inner)),
+              closing(total, ("Catch up on", "the week."), ("Every briefing,", "with its sources."))]
+    marker = f"Week ending {end.isoformat()}"
+    lines = [f"The week in AI and medicine, {span}.", "", f"The one thing: {headline}"]
+    for item in d.get("versus", [])[:1]:
+        lines.append(f"AI vs human: {item['title']} ({VERDICT_LABELS.get(item.get('verdict'), 'result').lower()})")
+    for other in also:
+        lines.append(f"Also: {other['title']}")
+    if tool:
+        lines.append(f"Tool of the week: {tool['title']}")
+    lines += ["", f"Every briefing with its sources: {SITE}/blog (link in bio). {marker}.", "",
+              f"Follow {HANDLE} for three briefings a week on AI in medicine.", "", DISCLAIMER, "",
+              hashtags([], ["#AIinMedicine", "#MedEd", "#MedicalEducation", "#DigitalHealth", "#WeekInReview"])]
+    return save_carousel(out, slides, "\n".join(lines), marker)
+
+
+def build_review(review: dict, out: Path) -> list[Path]:
+    """An edition of the living review "AI vs Human" (evidence/ai-vs-human.json)."""
+    import re
+    plain = lambda text: re.sub(r"\s*\[S\d+\]", "", str(text)).strip()
+    studies = review.get("studies", [])
+    count = lambda *verdicts: sum(1 for s in studies if s.get("verdict") in verdicts)
+    findings = [plain(f) for f in review.get("key_findings", [])][:5]
+    if not findings:
+        return []
+    total = len(findings) + 3
+    edition, updated = review.get("edition", 1), review["updated"]
+    month = dt.date.fromisoformat(updated).strftime("%B %Y")
+    slides = [
+        title_slide(f"AI VS HUMAN  ·  EDITION {edition}", "How AI is changing what physicians can do",
+                    f"{len(studies)} studies, weighed. {month}.", total),
+        tally_slide(1, total, "THE EVIDENCE SO FAR", f"{len(studies)} studies, by how they came out", [
+            (count("ai_ahead"), "AI ahead of clinicians"),
+            (count("humans_ahead"), "Clinicians ahead of AI"),
+            (count("ai_help_improved"), "AI help improved clinicians"),
+            (count("ai_help_no_benefit", "ai_help_harmed"), "AI help: no gain, or worse"),
+            (count("comparable"), "Comparable"),
+            (count("mixed"), "Mixed results"),
+        ], "A count of studies, not a score: they differ in size, design and how close they are to real practice."),
+        *(card_slide(i + 2, total, [(f"FINDING {i + 1} OF {len(findings)}", SOFT, BRAND)], "What the studies show", "",
+                     "KEY FINDING", finding) for i, finding in enumerate(findings)),
+        closing(total, ("Read the", "evidence."), ("Every study,", "with its source."), f"{SITE}/ai-vs-human"),
+    ]
+    marker = f"AI vs Human, edition {edition}"
+    lines = [f"{marker}: how AI is changing what physicians can do.", "", plain(review.get("summary", "")), "",
+             f"The full paper, with every study and its source: {SITE}/ai-vs-human (link in bio).", "",
+             f"Follow {HANDLE} for three briefings a week on AI in medicine.", "",
+             "A summary of published research, drafted by AI and reviewed by clinicians. Not medical advice.", "",
+             hashtags([], ["#AIinMedicine", "#MedEd", "#EvidenceBasedMedicine", "#DigitalHealth", "#ClinicalAI"])]
+    return save_carousel(out, slides, "\n".join(lines), marker)
 
 
 def main() -> int:
