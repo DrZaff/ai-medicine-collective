@@ -3,10 +3,10 @@
 # post, so merging is the approval for both.
 #
 # Setup (one time, by the repo owner): Settings > Secrets and variables >
-# Actions > New repository secret, twice:
-#   IG_USER_ID        the Instagram professional account's id
-#   IG_ACCESS_TOKEN   a long-lived access token for it
-# Until both exist, this job skips quietly.
+# Actions > New repository secret:
+#   IG_ACCESS_TOKEN   a long-lived access token for the Instagram account
+# Until it exists, this job skips quietly. (IG_USER_ID is optional: the
+# account is looked up from the token.)
 
 name: Instagram publish
 
@@ -69,8 +69,8 @@ jobs:
           DATES: ${{ steps.find.outputs.dates }}
           DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: |
-          if [ "$DRY_RUN" != "true" ] && { [ -z "$IG_USER_ID" ] || [ -z "$IG_ACCESS_TOKEN" ]; }; then
-            echo "::notice::The Instagram secrets are not set yet; skipping."
+          if [ "$DRY_RUN" != "true" ] && [ -z "$IG_ACCESS_TOKEN" ]; then
+            echo "::notice::The Instagram access token is not set yet; skipping."
             exit 0
           fi
           for date in $DATES; do
