@@ -10,9 +10,10 @@ Steps, using Meta's "Instagram API with Instagram Login":
   2. stop if this post is already on the account (so a re-run never posts twice)
   3. make one container per slide, one carousel container, then publish it
 
-Needs two environment values (GitHub Actions secrets in CI):
-    IG_USER_ID        the Instagram professional account's id
-    IG_ACCESS_TOKEN   a long-lived token for it (lasts 60 days; see CLAUDE.md)
+Needs one environment value (a GitHub Actions secret in CI):
+    IG_ACCESS_TOKEN   a long-lived token for the account (lasts 60 days; see CLAUDE.md)
+The account's id is looked up from the token. IG_USER_ID can be set to
+override that, but is not needed.
 
 Usage:
     python scripts/blog_agent/instagram_publish.py --date YYYY-MM-DD [--dry-run]
@@ -128,13 +129,29 @@ def main() -> int:
         print(f"Caption ({len(caption)} characters):\n{caption}")
         return 0
 
-    user, token = os.environ.get("IG_USER_ID", "").strip(), os.environ.get("IG_ACCESS_TOKEN", "").strip()
-    if not user or not token:
-        print("IG_USER_ID and IG_ACCESS_TOKEN are not set; nothing posted.")
+    token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
+    if not token:
+        print("IG_ACCESS_TOKEN is not set; nothing posted.")
         return 0
 
     try:
-        recent = call("GET", f"{user}/media", {"fields": "caption", "limit": 30, "access_token": token})
+        # Whose token is this? Meta gives an account two ids; the first one
+        # that can list the account's posts is the one to publish with.
+        me = call("GET", "me", {"fields": "user_id,username", "access_token": token})
+        candidates = [os.environ.get("IG_USER_ID", "").strip(), str(me.get("user_id") or ""), str(me.get("id") or "")]
+        candidates = [c for i, c in enumerate(candidates) if c and c not in candidates[:i]]
+        user = recent = None
+        problem = None
+        for candidate in candidates:
+            try:
+                recent = call("GET", f"{candidate}/media", {"fields": "caption", "limit": 30, "access_token": token})
+                user = candidate
+                break
+            except ApiError as err:
+                problem = err
+        if user is None:
+            raise problem or ApiError("could not work out which Instagram account the token belongs to")
+        print(f"Posting as @{me.get('username', '?')}")
         if any(marker in (media.get("caption") or "") for media in recent.get("data", [])):
             print(f"The {args.date} post is already on Instagram; nothing to do.")
             return 0
