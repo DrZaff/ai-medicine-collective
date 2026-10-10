@@ -1,0 +1,56 @@
+# Renews the Instagram access token every week, so it never reaches its
+# 60-day expiry. See scripts/blog_agent/instagram_token.py.
+#
+# Usually nothing else is needed. If Meta hands back a DIFFERENT token when
+# renewing, this job has to store it as the IG_ACCESS_TOKEN secret, and for
+# that it needs one more secret, set up once by the repo owner:
+#   SECRETS_WRITE_TOKEN   a fine-grained personal access token for this
+#                         repository only, with "Secrets: Read and write"
+# Without it, the job fails with a message saying so (the old token keeps
+# working until its own expiry, so nothing breaks straight away).
+
+name: Instagram token renewal
+
+on:
+  schedule:
+    - cron: "41 10 * * 1" # Mondays, about 6:41 AM Eastern
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: instagram-token
+  cancel-in-progress: false
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Renew the token
+        id: renew
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python scripts/blog_agent/instagram_token.py --out "$RUNNER_TEMP/ig_token"
+
+      - name: Store the new token
+        if: steps.renew.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SECRETS_WRITE_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            rm -f "$RUNNER_TEMP/ig_token"
+            echo "::error::Meta issued a new Instagram token, but this job cannot store it: the SECRETS_WRITE_TOKEN secret is not set. See the top of .github/workflows/instagram-token.yml."
+            exit 1
+          fi
+          # read from the file, so the token never appears in a command line or the log
+          gh secret set IG_ACCESS_TOKEN --repo "$GITHUB_REPOSITORY" < "$RUNNER_TEMP/ig_token"
+          rm -f "$RUNNER_TEMP/ig_token"
+          echo "Stored the new token as IG_ACCESS_TOKEN."
