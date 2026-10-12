@@ -4321,3 +4321,141 @@ button.meeting-undo {
     margin-bottom: 4px;
   }
 }
+
+
+/* === TOOLS PAGE: ONE CARD PER TOOL ============================ */
+
+.toolbox-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toolbox-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbox-card .tool-icon {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  margin: 0;
+}
+
+.toolbox-card .tool-icon--text {
+  font-size: 1rem;
+}
+
+.toolbox-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.toolbox-title,
+.toolbox-title:visited {
+  font-weight: bold;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.hub-grid .toolbox-card .project-desc {
+  margin: 0;
+}
+
+.toolbox-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.toolbox-wide {
+  font-size: 0.82rem;
+  font-weight: normal;
+  color: var(--muted);
+}
+
+.hub-grid .toolbox-card .hub-card-meta {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.toolbox-recent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+
+.toolbox-recent .note {
+  margin: 0;
+}
+
+
+/* === HOME PAGE: THREE WAYS IN ================================ */
+
+.home-doors {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 30px;
+  text-align: left;
+}
+
+.home-door {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+}
+
+.home-door[hidden] {
+  display: none;
+}
+
+.home-door-step {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+.home-door-title,
+.home-door-title:visited {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: bold;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.home-door-text {
+  flex: 1;
+  margin: 0 0 4px;
+  font-family: var(--font-read);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--body);
+}
+
+.home-door-link {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .home-doors {
+    grid-template-columns: 1fr;
+  }
+}

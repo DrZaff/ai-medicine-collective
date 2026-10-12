@@ -1,4 +1,4 @@
-// === AI Medicine Collective: Projects hub + Learning Materials ===
+// === AI Medicine Collective: Tools (the projects table) + Learning Materials ===
 //
 // Loaded on hub.html, learn.html and moderate.html, after the Supabase
 // library and auth.js (it uses db, el, button, avatar, formatDate,
@@ -19,17 +19,17 @@
 const HUB_KINDS = {
   project: {
     page: "hub.html",
-    name: "Projects hub",
-    noun: "project",
-    plural: "projects",
-    allLabel: "ALL PROJECTS",
-    submitLabel: "> SUBMIT A PROJECT",
+    name: "Tools",
+    noun: "tool",
+    plural: "tools",
+    allLabel: "ALL TOOLS",
+    submitLabel: "> SUBMIT A TOOL",
     categoryLabel: "Category",
     categories: [
       "Medical education", "Patient care", "Research", "Guidelines",
       "Learning", "Lifestyle", "Productivity", "Other",
     ],
-    intro: "The Projects hub is where members share and discuss their AI projects.",
+    intro: "Tools is where the Collective and its members share what they have built.",
     titleHint: "e.g. Discharge summary helper",
     descriptionHint: "What does it do, who is it for, and how do people use it?",
     linkHint: "https://… (custom GPT, app, repo; optional)",
@@ -254,7 +254,7 @@ function initHubPage() {
         nodes.push(...shelfNodes);
       }
     } else if (!projects.length) {
-      nodes.push(emptyState("// No projects published yet", "Be the first to share one.",
+      nodes.push(emptyState("// No tools published yet", "Be the first to share one.",
         me ? kind.submitLabel : "> SIGN IN TO SUBMIT", me ? `${kind.page}?view=submit` : "account.html"));
     } else {
       nodes.push(...categoryNodes(projects));
@@ -262,12 +262,111 @@ function initHubPage() {
     show(...nodes);
   }
 
-  // Projects: a search box, category filter buttons with counts, and a
-  // compact grid of cards
+  /* ---- the Tools page: one card per tool, with Open and Details ---- */
+
+  // A tool's link, if it is one that can be opened from here
+  function toolUrl(project) {
+    try {
+      const url = new URL(project.link_url || "");
+      return url.protocol === "https:" ? url : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Opening a tool is remembered on this device (script.js's keys): it fills
+  // the "Recently opened" row and ticks "Try a tool" on the account page
+  const recentKey = typeof TOOL_RECENT_KEY === "string" ? TOOL_RECENT_KEY : "amc-recent-tools";
+  const usedKey = typeof TOOL_USED_KEY === "string" ? TOOL_USED_KEY : "amc-tool-used";
+  function recentTools() {
+    try {
+      const ids = JSON.parse(localStorage.getItem(recentKey) || "[]");
+      return Array.isArray(ids) ? ids : [];
+    } catch {
+      return [];
+    }
+  }
+  function rememberTool(id) {
+    try {
+      localStorage.setItem(recentKey, JSON.stringify([id, ...recentTools().filter((x) => x !== id)].slice(0, 4)));
+      localStorage.setItem(usedKey, "1");
+    } catch {
+      // nothing remembered; the page still works
+    }
+  }
+
+  function openLink(project, url, label, className) {
+    const link = el("a", className, label);
+    link.href = url.href;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.addEventListener("click", () => rememberTool(project.id));
+    return link;
+  }
+
+  function toolIcon(project, url) {
+    const known = url && typeof TOOL_ICONS === "object" ? TOOL_ICONS[url.hostname] : null;
+    if (known) {
+      const img = el("img", "tool-icon");
+      img.src = known.icon;
+      img.alt = "";
+      img.loading = "lazy";
+      return img;
+    }
+    const letters = project.title.split(/\s+/).filter((word) => /^[A-Za-z0-9]/.test(word))
+      .map((word) => word[0]).join("").slice(0, 2).toUpperCase();
+    return el("span", "tool-icon tool-icon--text", letters || "?");
+  }
+
+  // The icon, the name, what kind of thing it is, one or two lines on what
+  // it does, and two buttons: Open (if it has a link) and Details
+  function toolCard(project) {
+    const url = toolUrl(project);
+    const known = url && typeof TOOL_ICONS === "object" ? TOOL_ICONS[url.hostname] : null;
+    const detailsHref = `${kind.page}?project=${encodeURIComponent(project.id)}`;
+    const sort = !url ? "Guide or file" : url.hostname === "chatgpt.com" ? "Custom GPT" : known ? "Web app" : "Web link";
+
+    const card = el("article", "project-item hub-card toolbox-card");
+    const head = el("div", "toolbox-head");
+    const titles = el("div", "toolbox-titles");
+    const tags = el("span", "hub-card-head");
+    tags.append(el("span", "member-tag hub-cat", project.category), el("span", "member-tag hub-cat toolbox-sort", sort));
+    titles.append(hubLink(project.title, detailsHref, "project-title toolbox-title"), tags);
+    head.append(toolIcon(project, url), titles);
+
+    const actions = el("div", "toolbox-actions");
+    if (url) actions.append(openLink(project, url, "> OPEN", "btn btn--primary"));
+    actions.append(hubLink("> DETAILS", detailsHref, "btn"));
+    if (url && known && known.desktop) {
+      const wide = new URL(url.href);
+      wide.searchParams.set("desktop", "1");
+      actions.append(openLink(project, wide, "use on a computer", "toolbox-wide"));
+    }
+
+    card.append(
+      head,
+      el("p", "project-desc", project.description),
+      actions,
+      el("span", "hub-card-meta", `// ${authorName(project)} · ${formatDate(project.created_at)}`)
+    );
+    return card;
+  }
+
+  // The tools this device opened last, as a row of quick buttons
+  function recentRow(projects) {
+    const recent = recentTools().map((id) => projects.find((p) => p.id === id)).filter((p) => p && toolUrl(p));
+    if (!recent.length) return null;
+    const row = el("div", "toolbox-recent");
+    row.append(el("span", "note", "// Recently opened:"));
+    recent.forEach((project) => row.append(openLink(project, toolUrl(project), project.title, "hub-tab")));
+    return row;
+  }
+
+  // A search box, category filter buttons with counts, and the grid of cards
   function categoryNodes(projects) {
     const list = el("div", "projects-list hub-grid");
     const cards = projects.map((project) => {
-      const card = projectCard(project, false);
+      const card = toolCard(project);
       card.dataset.category = project.category;
       card.dataset.search = `${project.title} ${project.description} ${project.category} ${authorName(project)}`.toLowerCase();
       list.append(card);
@@ -276,12 +375,12 @@ function initHubPage() {
 
     const search = el("input", "join-input directory-search");
     search.type = "search";
-    search.placeholder = "Search projects";
-    search.setAttribute("aria-label", "Search projects by name, description or author");
+    search.placeholder = "Search tools";
+    search.setAttribute("aria-label", "Search tools by name, description or author");
 
     const shown = el("p", "roster-stats");
     shown.setAttribute("role", "status");
-    const none = el("p", "note", "// No projects match that. Try a different word or category.");
+    const none = el("p", "note", "// No tools match that. Try a different word or category.");
 
     let category = "All";
     const apply = () => {
@@ -293,15 +392,15 @@ function initHubPage() {
         if (!card.hidden) visible++;
       });
       shown.textContent = visible === cards.length
-        ? `> ${cards.length} project${cards.length === 1 ? "" : "s"}`
-        : `> ${visible} of ${cards.length} projects`;
+        ? `> ${cards.length} tool${cards.length === 1 ? "" : "s"}`
+        : `> ${visible} of ${cards.length} tools`;
       none.hidden = visible > 0;
     };
 
     const used = kind.categories.filter((c) => projects.some((p) => p.category === c));
     const filter = el("div", "filter-bar");
     filter.setAttribute("role", "group");
-    filter.setAttribute("aria-label", "Filter projects by category");
+    filter.setAttribute("aria-label", "Filter tools by category");
     const buttons = ["All", ...used].map((name) => {
       const count = name === "All" ? projects.length : projects.filter((p) => p.category === name).length;
       const btn = button(`${name.toUpperCase()} (${count})`, "filter-btn", () => {
@@ -316,7 +415,8 @@ function initHubPage() {
 
     search.addEventListener("input", apply);
     apply();
-    return [search, filter, shown, list, none];
+    const recent = recentRow(projects);
+    return [...(recent ? [recent] : []), search, filter, shown, list, none];
   }
 
   /* ---- core path (materials only): a short ordered list picked by moderators ---- */
@@ -951,8 +1051,9 @@ function initHubPage() {
       // The outside library on learn.html (static, hidden until now)
       const library = document.getElementById("learning-library");
       if (library) library.hidden = !approved || !!params.get("project") || !!params.get("view");
+      // The AI vs Human card is for everyone, signed in or not
       const evidence = document.getElementById("learning-evidence");
-      if (evidence) evidence.hidden = !library || library.hidden;
+      if (evidence) evidence.hidden = !!params.get("project") || !!params.get("view");
       // the list view fills and shows this; every other view keeps it hidden
       const shelves = document.getElementById("learning-shelves");
       if (shelves) shelves.hidden = true;
@@ -1052,7 +1153,7 @@ function initProjectModeration() {
     }
     const links = el("p", "hub-mod-links");
     links.append(
-      hubLink("> Open the Projects hub", HUB_KINDS.project.page, "account-mod-link"),
+      hubLink("> Open Tools", HUB_KINDS.project.page, "account-mod-link"),
       hubLink("> Open Learning Materials", HUB_KINDS.material.page, "account-mod-link")
     );
     section.append(links);

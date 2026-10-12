@@ -219,6 +219,10 @@ function initAccountLinks() {
   document.querySelectorAll("[data-signed-out-only]").forEach((link) => {
     link.hidden = role !== null;
   });
+  // ...and a few things only make sense once someone has
+  document.querySelectorAll("[data-signed-in-only]").forEach((item) => {
+    item.hidden = role === null;
+  });
 
   // Status strip, top right of the frame: signed in or not, and as what
   const strip = document.querySelector(".terminal-frame > .horizontal-rule:first-child");
@@ -360,7 +364,7 @@ document.addEventListener("DOMContentLoaded", initMobileNav);
 const PUBLIC_API_URL = "https://ahwnarhmuzxgjindreuz.supabase.co/rest/v1";
 const PUBLIC_API_KEY = "sb_publishable_3C4xXn0j3GiunX-t6cd0HQ_ze_yTErT";
 
-// Fills "Latest briefing" and "New in the hub". If either request fails the
+// Fills "Latest briefing" and "Newest tools". If either request fails the
 // panel keeps the plain text already in index.html. Text only, never HTML.
 function initHome() {
   const briefing = document.getElementById("home-briefing");
@@ -464,171 +468,7 @@ const TOOL_ICONS = {
 const TOOL_RECENT_KEY = "amc-recent-tools"; // ids of the last few tools opened, this device only
 const TOOL_USED_KEY = "amc-tool-used";      // auth.js ticks "Try a tool" when this is set
 
-// Every published project that has a link is a tool. Anyone may read those
-// (migration 007), so this is a plain request like the home page's. If it
-// fails, the page keeps the five apps already in tools.html.
-function initTools() {
-  const app = document.getElementById("tools-app");
-  if (!app) return; // not on the tools page
-
-  const node = (tag, className, text) => {
-    const made = document.createElement(tag);
-    if (className) made.className = className;
-    if (text !== undefined) made.textContent = text;
-    return made;
-  };
-  const readRecent = () => {
-    try {
-      const ids = JSON.parse(localStorage.getItem(TOOL_RECENT_KEY) || "[]");
-      return Array.isArray(ids) ? ids.filter((id) => typeof id === "string") : [];
-    } catch {
-      return [];
-    }
-  };
-  const remember = (id) => {
-    try {
-      localStorage.setItem(TOOL_RECENT_KEY, JSON.stringify([id, ...readRecent().filter((x) => x !== id)].slice(0, 4)));
-      localStorage.setItem(TOOL_USED_KEY, "1");
-    } catch {
-      // nothing remembered; the launcher still works
-    }
-  };
-
-  function toolCard(tool) {
-    let url;
-    try {
-      url = new URL(tool.link_url);
-    } catch {
-      return null;
-    }
-    if (url.protocol !== "https:") return null;
-    const known = TOOL_ICONS[url.hostname];
-
-    const card = node("div", "tool-card");
-    const launch = node("a", "tool-launch");
-    launch.href = url.href;
-    launch.target = "_blank";
-    launch.rel = "noopener noreferrer";
-    launch.addEventListener("click", () => remember(tool.id));
-
-    if (known) {
-      const img = node("img", "tool-icon");
-      img.src = known.icon;
-      img.alt = "";
-      img.loading = "lazy";
-      launch.append(img);
-    } else {
-      const letters = tool.title.split(/\s+/).filter((word) => /^[A-Za-z0-9]/.test(word))
-        .map((word) => word[0]).join("").slice(0, 2).toUpperCase();
-      launch.append(node("span", "tool-icon tool-icon--text", letters || "?"));
-    }
-    launch.append(node("span", "tool-name", tool.title));
-    card.append(launch);
-
-    const links = node("div", "tool-links");
-    const details = node("a", null, "details");
-    details.href = `hub.html?project=${encodeURIComponent(tool.id)}`;
-    links.append(details);
-    if (url.hostname === "chatgpt.com") links.append(node("span", "tool-kind", "custom GPT"));
-    if (known && known.desktop) {
-      const desktop = node("a", null, "use on computer");
-      const wide = new URL(url.href);
-      wide.searchParams.set("desktop", "1");
-      desktop.href = wide.href;
-      desktop.target = "_blank";
-      desktop.rel = "noopener noreferrer";
-      desktop.addEventListener("click", () => remember(tool.id));
-      links.append(desktop);
-    }
-    card.append(links);
-    card.dataset.category = tool.category;
-    card.dataset.search = `${tool.title} ${tool.description} ${tool.category}`.toLowerCase();
-    return card;
-  }
-
-  (async () => {
-    let tools;
-    try {
-      const response = await fetch(
-        `${PUBLIC_API_URL}/projects?select=id,title,category,description,link_url&kind=eq.project&status=eq.published&link_url=not.is.null&order=title.asc`,
-        { headers: { apikey: PUBLIC_API_KEY } }
-      );
-      if (!response.ok) return;
-      tools = await response.json();
-    } catch {
-      return; // keep the built-in list
-    }
-    if (!Array.isArray(tools) || !tools.length) return;
-
-    const grid = node("div", "tool-grid");
-    const cards = [];
-    for (const tool of tools) {
-      const card = toolCard(tool);
-      if (!card) continue;
-      cards.push(card);
-      grid.append(card);
-    }
-    if (!cards.length) return;
-
-    const search = node("input", "join-input directory-search");
-    search.type = "search";
-    search.placeholder = "Search tools";
-    search.setAttribute("aria-label", "Search tools by name or description");
-
-    const filter = node("div", "filter-bar");
-    filter.setAttribute("role", "group");
-    filter.setAttribute("aria-label", "Filter tools by category");
-    const shown = node("p", "roster-stats");
-    shown.setAttribute("role", "status");
-    const none = node("p", "note", "// No tools match that.");
-
-    let category = "All";
-    const apply = () => {
-      const term = search.value.trim().toLowerCase();
-      let visible = 0;
-      cards.forEach((card) => {
-        card.hidden = (category !== "All" && card.dataset.category !== category)
-          || (!!term && !card.dataset.search.includes(term));
-        if (!card.hidden) visible++;
-      });
-      shown.textContent = visible === cards.length ? `> ${cards.length} tools` : `> ${visible} of ${cards.length} tools`;
-      none.hidden = visible > 0;
-    };
-
-    const categories = [...new Set(cards.map((card) => card.dataset.category))].sort();
-    const buttons = ["All", ...categories].map((name) => {
-      const btn = node("button", "filter-btn", name.toUpperCase());
-      btn.type = "button";
-      btn.setAttribute("aria-pressed", String(name === "All"));
-      btn.addEventListener("click", () => {
-        category = name;
-        buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-        apply();
-      });
-      filter.append(btn);
-      return btn;
-    });
-    search.addEventListener("input", apply);
-
-    // The last few tools opened on this device, for one-tap repeat use
-    const nodes = [];
-    const recent = readRecent().map((id) => tools.find((tool) => tool.id === id)).filter(Boolean);
-    if (recent.length) {
-      const row = node("div", "tool-grid tool-grid--recent");
-      recent.forEach((tool) => {
-        const card = toolCard(tool);
-        if (card) row.append(card);
-      });
-      nodes.push(node("h3", "subsection-title", "// Recently used"), row, node("h3", "subsection-title", "// All tools"));
-    }
-
-    apply();
-    app.classList.remove("app-store-page");
-    app.replaceChildren(...nodes, search, filter, shown, grid, none);
-  })();
-}
-
-document.addEventListener("DOMContentLoaded", initTools);
+// (The Tools page itself is drawn by hub.js, which uses the three constants above.)
 
 /* ========= MEMBERS PAGE: program filter ========= */
 
