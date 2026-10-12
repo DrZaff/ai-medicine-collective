@@ -181,7 +181,7 @@ def build(end: dt.date, days: int) -> dict:
         else:
             published_lines.append(f"{name} added {len(titles)} tools, including {titles[0]} and {titles[1]}.")
 
-    headline = week[-1]["headline"] if week else (f"New in the hub: {new_tools[0]['title']}" if new_tools else "")
+    headline = week[-1]["headline"] if week else (f"New tool: {new_tools[0]['title']}" if new_tools else "")
     return {
         "start": start, "end": end, "week": week, "one_thing": one_thing, "versus": versus_week,
         "also": also, "tally": tally, "tool": tool, "published_lines": published_lines,
@@ -320,7 +320,7 @@ def render_html(d: dict) -> str:
             f'<p style="margin:0 0 10px;font-family:{SERIF};font-size:25px;line-height:1.2;color:{INK};">'
             f'<a href="{SITE_URL}/hub.html?project={urllib.parse.quote(str(tool["id"]))}" style="color:{INK};text-decoration:none;">{e(tool["title"])}</a></p>',
             f'<p style="{P}margin-bottom:20px;">{e(short(tool.get("description"), 200))}</p>',
-            f'<p style="margin:0;"><a href="{SITE_URL}/tools.html" style="display:inline-block;padding:12px 26px;background:{GREEN};'
+            f'<p style="margin:0;"><a href="{SITE_URL}/hub.html" style="display:inline-block;padding:12px 26px;background:{GREEN};'
             f'font-family:{SANS};font-size:13px;font-weight:bold;letter-spacing:1px;color:#ffffff;text-decoration:none;">OPEN ALL TOOLS</a></p>',
             "</td></tr></table>",
         ]
@@ -331,13 +331,13 @@ def render_html(d: dict) -> str:
     out.append(MARK_COLLECTIVE)
     if not d["published_lines"]:
         out.append(f'<p style="{P}">See what members are building in the '
-                   f'<a href="{SITE_URL}/hub.html" style="{LINK}">Projects hub</a>.</p>')
+                   f'<a href="{SITE_URL}/hub.html" style="{LINK}">Tools page</a>.</p>')
 
     out += [
         RULE,
         f'<p style="{LABEL}text-align:center;">One ask</p>',
         f'<div style="text-align:center;">{MARK_ASK_OPEN}<p style="{P}">{e(DEFAULT_ASK)} '
-        f'<a href="{SITE_URL}/tools.html" style="{LINK}">Open tools</a></p>{MARK_ASK_CLOSE}</div>',
+        f'<a href="{SITE_URL}/hub.html" style="{LINK}">Open tools</a></p>{MARK_ASK_CLOSE}</div>',
 
         # sign-off and small print
         f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:34px;"><tr>'
@@ -393,7 +393,7 @@ def render_text(d: dict) -> str:
     lines.append("// FROM THE COLLECTIVE")
     lines += d["published_lines"]
     lines += [TEXT_COLLECTIVE, ""]
-    lines += ["// ONE ASK", f"{TEXT_ASK_OPEN}{DEFAULT_ASK} {SITE_URL}/tools.html{TEXT_ASK_CLOSE}", ""]
+    lines += ["// ONE ASK", f"{TEXT_ASK_OPEN}{DEFAULT_ASK} {SITE_URL}/hub.html{TEXT_ASK_CLOSE}", ""]
     lines += [
         f"Every briefing: {SITE_URL}/blog.html",
         "Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.",

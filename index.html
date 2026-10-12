@@ -38,32 +38,47 @@
           <em class="hero-em">in medicine</em><span class="cursor" aria-hidden="true">_</span>
         </h2>
         <p class="hero-text">
-          Clinicians, trainees and curious thinkers exploring the evolving edge
-          of AI in healthcare. We build practical tools, share what works, and
-          teach each other. No technical background required.
+          <strong>Free AI tools and research briefings for clinicians, built by residents.</strong>
+          Open a clinical calculator, read this week's AI-in-medicine evidence in
+          two minutes, or join to share what you're building. No technical
+          background needed.
         </p>
         <div class="hero-actions">
           <a class="btn btn--primary" href="join.html" data-signed-out-only>&gt; Join the Collective</a>
-          <a class="btn" href="tools.html">&gt; Open tools</a>
-          <a class="btn" href="about.html">&gt; Meet the guide</a>
-          <a class="btn" href="https://www.instagram.com/aimedicinecollective/" target="_blank" rel="noopener noreferrer">&gt; Instagram</a>
           <a class="btn" href="account.html" data-account-link="&gt; Edit account">&gt; Sign in</a>
         </div>
 
-        <dl class="hero-stats">
-          <div class="hero-stat">
-            <dt id="home-project-count">&mdash;</dt>
-            <dd>projects in the hub</dd>
+        <!-- Three ways in, so nobody has to work out the menu first. The
+             third door changes once someone is signed in. -->
+        <div class="home-doors">
+          <div class="home-door">
+            <span class="home-door-step">// 01</span>
+            <a class="home-door-title" href="hub.html">Use a tool</a>
+            <p class="home-door-text"><span id="home-project-count">17</span> calculators and assistants built by clinicians. Free, with nothing to install.</p>
+            <a class="home-door-link" href="hub.html">&gt; BROWSE THE TOOLS</a>
           </div>
-          <div class="hero-stat">
-            <dt>3</dt>
-            <dd>residency programs</dd>
+          <div class="home-door">
+            <span class="home-door-step">// 02</span>
+            <a class="home-door-title" href="blog.html">Read the evidence</a>
+            <p class="home-door-text">Three short briefings a week on AI in medicine, and AI vs Human: one paper weighing the studies.</p>
+            <a class="home-door-link" href="blog.html">&gt; LATEST BRIEFING</a>
+            <a class="home-door-link home-door-link--as-written" href="ai-vs-human.html">&gt; AI vs Human</a>
           </div>
-          <div class="hero-stat">
-            <dt>3&times;</dt>
-            <dd>briefings a week</dd>
+          <div class="home-door" data-signed-out-only>
+            <span class="home-door-step">// 03</span>
+            <a class="home-door-title" href="join.html">Join the community</a>
+            <p class="home-door-text">Chat, a monthly meeting, a members' library and a place to share what you build. Free.</p>
+            <a class="home-door-link" href="join.html">&gt; REQUEST MEMBERSHIP</a>
           </div>
-        </dl>
+          <div class="home-door" data-signed-in-only hidden>
+            <span class="home-door-step">// 03</span>
+            <a class="home-door-title" href="chat.html">Your community</a>
+            <p class="home-door-text">Ask a question in chat, vote on the monthly meeting time, or post a tool you wish existed.</p>
+            <a class="home-door-link" href="chat.html">&gt; CHAT</a>
+            <a class="home-door-link" href="schedule.html">&gt; MEETINGS</a>
+            <a class="home-door-link" href="requests.html">&gt; REQUESTS</a>
+          </div>
+        </div>
       </section>
 
       <!-- Live panels. The briefing and project panels are filled by
@@ -80,11 +95,11 @@
         </article>
 
         <article class="home-panel home-panel--hub" data-reveal>
-          <h3 class="home-panel-title">// New in the hub</h3>
+          <h3 class="home-panel-title">// Newest tools</h3>
           <div class="home-panel-body" id="home-projects">
             <p>Tools and projects from the Collective and its members, open for anyone to browse.</p>
           </div>
-          <a class="home-panel-link" href="hub.html">&gt; ALL PROJECTS</a>
+          <a class="home-panel-link" href="hub.html">&gt; ALL TOOLS</a>
         </article>
 
         <article class="home-panel home-panel--meeting" data-reveal>
@@ -109,7 +124,7 @@
             </div>
             <p>Clinical calculators and assistants built by members. One tap to open, on a phone or a computer.</p>
           </div>
-          <a class="home-panel-link" href="tools.html">&gt; OPEN TOOLS</a>
+          <a class="home-panel-link" href="hub.html">&gt; OPEN TOOLS</a>
         </article>
 
         <article class="home-panel home-panel--members" data-reveal>
@@ -135,15 +150,15 @@
         <h3 id="explore-heading" class="subsection-title">// Explore</h3>
 
         <div class="tile-grid">
-          <a class="tile" href="tools.html">
+          <a class="tile" href="hub.html">
             <svg class="tile-icon m-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
             <span class="tile-title">&gt; TOOLS</span>
-            <span class="tile-text">One-tap launcher for every tool we've built.</span>
+            <span class="tile-text">Calculators and assistants. Open one, or read how it works.</span>
           </a>
-          <a class="tile" href="hub.html">
-            <svg class="tile-icon m-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-            <span class="tile-title">&gt; PROJECTS</span>
-            <span class="tile-text">What members are building. Open to browse.</span>
+          <a class="tile" href="ai-vs-human.html">
+            <svg class="tile-icon m-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7l-3 7a3.5 3.5 0 0 0 6 0z"/><path d="M19 7l-3 7a3.5 3.5 0 0 0 6 0z"/><path d="M8 21h8"/></svg>
+            <span class="tile-title">&gt; AI VS HUMAN</span>
+            <span class="tile-text">The evidence on AI and physician performance, in one paper.</span>
           </a>
           <a class="tile" href="requests.html">
             <svg class="tile-icon m-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>

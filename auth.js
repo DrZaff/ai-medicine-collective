@@ -144,7 +144,7 @@ function citationFor(item, author) {
   const isMaterial = item.kind === "material";
   const year = new Date(item.created_at).getFullYear();
   return `${author || "AI Medicine Collective"}. ${item.title}. AI Medicine Collective ` +
-    `${isMaterial ? "Learning Materials" : "Projects Hub"}; ${year}. ` +
+    `${isMaterial ? "Learning Materials" : "Tools"}; ${year}. ` +
     `${SITE_ORIGIN}/${isMaterial ? "learn" : "hub"}.html?project=${item.id}`;
 }
 
@@ -672,7 +672,7 @@ function initAccountPage() {
         const { data } = await db.from("profiles").select("bio, focus_areas").eq("id", profile.id).maybeSingle();
         return !!data && !!(data.bio || data.focus_areas);
       }],
-      ["Try a tool", "tools.html", async () => !!read(TOOL_USED_KEY)],
+      ["Try a tool", "hub.html", async () => !!read(TOOL_USED_KEY)],
       ["Say hello in chat", "chat.html", () => has(
         db.from("chat_messages").select("id", { count: "exact", head: true }).eq("author_id", profile.id))],
       ["Vote on a tool request, or post your own", "requests.html", async () =>
@@ -768,7 +768,7 @@ function initAccountPage() {
     const chat = card("// Chat", "chat.html", "latest message", "chat");
     const people = card("// Directory", "directory.html", "members", "people");
     const requests = card("// Requests", "requests.html", "open tool requests", "requests");
-    const hub = card("// Projects hub", "hub.html", "published projects", "hub");
+    const hub = card("// Tools", "hub.html", "published tools", "hub");
     const learn = card("// Learning", "learn.html", "published materials", "learn");
     const mod = isMod ? card("// Moderation", "moderate.html", "waiting for review", "mod") : null;
 
