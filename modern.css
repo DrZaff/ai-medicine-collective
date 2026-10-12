@@ -2767,3 +2767,167 @@ html.terminal::view-transition-new(root) {
   padding: 6px 14px;
   font-size: 0.78rem;
 }
+
+
+/* === POLISH PASS (2026-10-12) ================================
+   One scale for the small text, so nothing is hard to read:
+     labels and tags      0.75rem  (12px), semibold
+     small print          0.875rem (14px): dates, sources, bylines
+     buttons and tabs     0.875rem (14px)
+   Reading text stays at 1rem or more. Long prose is kept to a
+   comfortable line length. */
+
+/* labels and tags */
+.modern .member-tag,
+.modern .blog-cat,
+.modern .blog-tag,
+.modern .tile-tag,
+.modern .blog-why-label,
+.modern .roster-role,
+.modern .home-panel-title,
+.modern .evidence-kicker,
+.modern .hero-kicker,
+.modern .review-meta,
+.modern .dash-title,
+.modern .home-door-step,
+.modern .review-tally dd {
+  font-size: 0.75rem;
+}
+
+/* small print */
+.modern .blog-date,
+.modern .blog-source,
+.modern .blog-archive-date,
+.modern .home-list-meta,
+.modern .hub-card-meta,
+.modern .roster-meta,
+.modern .account-email,
+.modern .mod-detail,
+.modern .ms-date,
+.modern .video-meta,
+.modern .link-source,
+.modern .chat-time,
+.modern .chat-project-link,
+.modern .interest-chip,
+.modern .toolbox-wide,
+.modern .review-study-who,
+.modern .review-study-limit {
+  font-size: 0.875rem;
+}
+
+.modern .blog-date,
+.modern .review-meta {
+  letter-spacing: 0.06em;
+}
+
+/* buttons, tabs and filters: one size, easy to hit */
+.modern .btn,
+.modern .hub-tab,
+.modern .filter-btn,
+.modern .ms-cta,
+.modern .project-doc-link,
+.modern button {
+  font-size: 0.875rem;
+}
+
+.modern .section-tabs .hub-tab {
+  padding: 7px 15px;
+  font-size: 0.8125rem;
+}
+
+.modern .theme-toggle {
+  font-size: 0.8125rem;
+}
+
+.modern .blog-more summary,
+.modern .account-details-summary {
+  font-size: 0.95rem;
+}
+
+/* prose pages (privacy, about): a comfortable line length */
+.modern main.section > p:not([class]),
+.modern main.section > ul:not([class]),
+.modern main.section > ol:not([class]),
+.modern .evidence-text {
+  max-width: 72ch;
+}
+
+/* a tile or title that keeps its own capitals */
+.modern .tile-title--as-written {
+  text-transform: none;
+}
+
+/* the phone menu button: a plain word, no terminal brackets */
+.modern .nav-toggle-icon {
+  display: none;
+}
+
+.modern .nav-toggle {
+  text-transform: capitalize;
+}
+
+/* home: the large briefing card uses its room */
+.modern .home-panel--briefing .home-headline {
+  font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+}
+
+.modern .home-panel--briefing .home-panel-text {
+  font-size: 1.15rem;
+  line-height: 1.6;
+}
+
+.modern .home-list-title {
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+/* a tool's details page: the name reads as a title, the text as text */
+.modern .hub-detail {
+  padding: 32px;
+}
+
+.modern .hub-title {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  line-height: 1.15;
+}
+
+.modern .hub-detail .hub-description {
+  max-width: 72ch;
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+
+/* cards breathe a little more, and sections sit further apart */
+.modern .projects-list.hub-grid {
+  gap: 18px;
+}
+
+.modern .roster-grid {
+  gap: 18px;
+}
+
+.modern .back-link {
+  display: inline-block;
+  margin-top: 40px;
+}
+
+@media (max-width: 600px) {
+  .modern .hub-detail {
+    padding: 22px 18px;
+  }
+
+  .modern .theme-toggle,
+  .modern .nav-toggle {
+    font-size: 0.78rem;
+  }
+
+  /* headings a touch smaller on phones, so two-word titles stay on one line */
+  .modern .section-title {
+    font-size: clamp(2rem, 9vw, 2.6rem);
+  }
+
+  .modern .section-title + .note,
+  .modern .section-title + p {
+    font-size: 1.02rem;
+  }
+}
