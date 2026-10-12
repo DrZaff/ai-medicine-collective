@@ -21,7 +21,7 @@
       "published": "2026-09-29",
       "category": "research",
       "section": "ai_vs_human",
-      "verdict": "ai_ahead",
+      "verdict": "mixed",
       "summary": "Task: classify dermoscopic images of pigmented skin lesions into seven diagnosis groups and choose what to do next (dismiss, biopsy or treat, or follow up). AI: idea®, an interactive decision-support platform that detects and highlights dermoscopic patterns and, once the physician has reviewed them, gives a rule-based diagnosis grounded in established dermoscopic criteria. Humans: 16 physicians with proven dermoscopy experience read 208 images, first without the tool and then, after a washout of at least 14 days, with it. On the 49 hard lesions (cases misclassified or read with low confidence without the tool), the share correctly called malignant or benign rose from 50.6% without AI to 69.3% with AI (p < 0.001), correct diagnosis from 28.3% to 45.0% (p < 0.001), and correct management from 53.0% to 64.8% (p = 0.02). The biggest limitation: this was a non-randomised, before-and-after reader study on images rather than real patients. The second phase was deliberately weighted toward hard lesions, and the key results apply to that subset, not to every lesion.",
       "why_it_matters": "An AI that shows its reasoning through recognisable dermoscopic features may help on hard cases and can double as a teaching aid. Learners should still treat it as a second reader tested on images, not a proven tool for real patients."
     }
