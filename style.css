@@ -349,6 +349,15 @@ html.theme-fading body {
 }
 
 
+/* The tabs inside a menu group (Evidence, Community): script.js adds them */
+.section-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 2px 0 14px;
+}
+
+
 /* === NAV ===================================================== */
 
 .nav {
