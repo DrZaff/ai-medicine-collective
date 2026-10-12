@@ -2757,3 +2757,13 @@ html.terminal::view-transition-new(root) {
 .modern .home-door-link--as-written {
   text-transform: none;
 }
+
+/* the tabs inside a menu group sit quietly above the page title */
+.modern .section-tabs {
+  margin: 0 0 4px;
+}
+
+.modern .section-tabs .hub-tab {
+  padding: 6px 14px;
+  font-size: 0.78rem;
+}

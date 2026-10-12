@@ -259,11 +259,10 @@ function renderMembersBar(role) {
     // no count shown
   }
 
-  // (Projects and Learning are already in the main menu.)
+  // The member's own shortcuts. (Requests, the member list and meetings are
+  // under Community in the main menu.)
   const items = [
     ["chat", "CHAT"],
-    ["requests", "REQUESTS"],
-    ["directory", "DIRECTORY"],
     ["inbox", unread > 0 ? `INBOX (${unread})` : "INBOX"],
   ];
   if (role === "moderator" || role === "admin") items.push(["moderate", "MODERATION"]);
@@ -299,18 +298,56 @@ window.addEventListener("amc-role-changed", initAccountLinks);
 
 /* ========= ALL PAGES: mark the current page in the menu ========= */
 
+// The menu has five destinations. Two of them are groups of pages:
+// "Evidence" and "Community". A page inside a group shows a row of tabs for
+// the group's pages (drawn here, so the pages themselves need no markup),
+// and the group's menu item is marked as the current one.
+const MENU_GROUPS = [
+  {
+    menu: "blog",
+    label: "Evidence",
+    tabs: [["blog", "BRIEFINGS"], ["ai-vs-human", "AI VS HUMAN"]],
+    also: [],
+  },
+  {
+    menu: "members",
+    label: "Community",
+    tabs: [["members", "MEMBERS"], ["schedule", "MEETINGS"], ["chat", "CHAT"], ["requests", "REQUESTS"]],
+    also: ["directory", "profile", "inbox"],   // pages that belong here without a tab of their own
+  },
+];
+
 function initCurrentNav() {
   const path = window.location.pathname;
   let here = path.split("/").pop().replace(/\.html$/, "") || "index";
-  if (/\/member\/[^/]*$/.test(path)) here = "members"; // the hand-made profile pages
-  if (here === "appstore") here = "tools";
-  if (here === "projects") here = "hub";
+  const inMemberFolder = /\/member\/[^/]*$/.test(path);
+  if (inMemberFolder) here = "members"; // the hand-made profile pages
+  if (here === "appstore" || here === "projects" || here === "tools") here = "hub";
   if (here === "resources") here = "learn";
 
+  const group = MENU_GROUPS.find((g) => g.tabs.some(([page]) => page === here) || g.also.includes(here));
+  const menuPage = group ? group.menu : here;
   document.querySelectorAll(".nav a").forEach((link) => {
     const href = link.getAttribute("href") || "";
-    if (href.split("/").pop().replace(/\.html$/, "") === here) link.setAttribute("aria-current", "page");
+    if (href.split("/").pop().replace(/\.html$/, "") === menuPage) link.setAttribute("aria-current", "page");
   });
+
+  // The group's tabs, at the top of the page
+  const main = document.querySelector(".terminal-frame main");
+  if (!group || !main || main.querySelector(".section-tabs")) return;
+  const prefix = inMemberFolder ? "../" : "";
+  const tabs = document.createElement("nav");
+  tabs.className = "section-tabs";
+  tabs.setAttribute("aria-label", group.label);
+  for (const [page, text] of group.tabs) {
+    const link = document.createElement("a");
+    link.className = "hub-tab";
+    link.href = `${prefix}${page}.html`;
+    link.textContent = text;
+    if (page === here) link.setAttribute("aria-current", "page");
+    tabs.append(link);
+  }
+  main.prepend(tabs);
 }
 
 document.addEventListener("DOMContentLoaded", initCurrentNav);
