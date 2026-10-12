@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-12",
+  "headline": "Students lean on AI but doubt their own checking; a dermoscopy aid helps most on the hardest lesions",
+  "intro": "A multi-institution survey finds US medical students use generative AI often, yet only half feel confident judging what it produces. A dermoscopy reader study shows what well-designed AI support can do: experienced physicians read hard pigmented lesions more accurately with an interpretable assistant.",
+  "items": [
+    {
+      "title": "Generative Artificial Intelligence Use Among Medical Students: Learner Perspectives for Clinical Educators",
+      "source": "The Clinical Teacher (Wiley)",
+      "url": "https://asmepublications.onlinelibrary.wiley.com/doi/10.1111/tct.70531?af=R",
+      "published": "2026-09-23",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "In this survey of 552 US medical students from at least 37 schools (a convenience sample), 87.0% used text-based generative AI, 74.7% used AI tools at least weekly, and 67.8% rated them moderately or extremely useful. Only 50.3% felt moderately or extremely confident evaluating AI-generated content, and just 12.2% had used an AI tool their school provided. 64.2% wanted more training or clearer guidance, and 78.7% had academic-integrity or ethical concerns.",
+      "why_it_matters": "Students already use AI heavily, but many are left to work out on their own how to check its output, so educators should make critically appraising AI an explicit part of teaching. Because this was a self-selected sample, schools should check how well it matches their own students before acting on it."
+    },
+    {
+      "title": "Improving Diagnostic And Management Accuracy In Hard-To-Diagnose Pigmented Skin Lesions With Interactive And Interpretable AI Assistant For Dermatoscopy: Results From A Two-Phase Reader Study",
+      "source": "Dermatology Practical & Conceptual",
+      "url": "https://dpcj.org/index.php/dpc/article/view/7730",
+      "published": "2026-09-29",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_ahead",
+      "summary": "Task: classify dermoscopic images of pigmented skin lesions into seven diagnosis groups and choose what to do next (dismiss, biopsy or treat, or follow up). AI: idea®, an interactive decision-support platform that detects and highlights dermoscopic patterns and, once the physician has reviewed them, gives a rule-based diagnosis grounded in established dermoscopic criteria. Humans: 16 physicians with proven dermoscopy experience read 208 images, first without the tool and then, after a washout of at least 14 days, with it. On the 49 hard lesions (cases misclassified or read with low confidence without the tool), the share correctly called malignant or benign rose from 50.6% without AI to 69.3% with AI (p < 0.001), correct diagnosis from 28.3% to 45.0% (p < 0.001), and correct management from 53.0% to 64.8% (p = 0.02). The biggest limitation: this was a non-randomised, before-and-after reader study on images rather than real patients. The second phase was deliberately weighted toward hard lesions, and the key results apply to that subset, not to every lesion.",
+      "why_it_matters": "An AI that shows its reasoning through recognisable dermoscopic features may help on hard cases and can double as a teaching aid. Learners should still treat it as a second reader tested on images, not a proven tool for real patients."
+    }
+  ],
+  "tags": [
+    "academic integrity",
+    "ai literacy",
+    "clinician-ai teaming",
+    "curriculum guidance",
+    "dermatology",
+    "dermoscopy",
+    "explainable ai",
+    "generative ai",
+    "medical students",
+    "reader study",
+    "survey"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
