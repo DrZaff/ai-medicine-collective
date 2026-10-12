@@ -1,6 +1,13 @@
 // === AI Medicine Collective - shared page behavior ===
 // (Sign-in, account and moderation code lives in auth.js.)
 
+// "2026-10-07" -> "Oct 7, 2026". Anything that isn't a plain date comes back unchanged.
+function niceDate(iso) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(iso))) return iso;
+  return new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US",
+    { timeZone: "UTC", year: "numeric", month: "short", day: "numeric" });
+}
+
 /* ========= ALL PAGES: two looks, one site ========= */
 
 // The site has two themes. "modern" (clean, light) is what everyone sees
@@ -424,7 +431,7 @@ function initHome() {
 
       const link = node("a", "home-headline", entry.headline);
       link.href = `blog.html?date=${entry.date}`;
-      const nodes = [node("p", "home-list-meta", `// ${entry.date}`), link];
+      const nodes = [node("p", "home-list-meta", `// ${niceDate(entry.date)}`), link];
 
       try {
         const post = await (await fetch(`blog/posts/${entry.date}.json`)).json();
@@ -589,7 +596,7 @@ function initBlog() {
   function renderPost(post) {
     const article = el("article", "blog-post");
     article.append(
-      el("p", "blog-date", `// ${post.date}`),
+      el("p", "blog-date", `// ${niceDate(post.date)}`),
       el("h3", "blog-headline", post.headline),
       el("p", "blog-intro", post.intro)
     );
@@ -629,7 +636,7 @@ function initBlog() {
       const more = el("details", "blog-more");
       more.append(el("summary", null, "Read the summary"), el("p", "blog-summary", item.summary));
 
-      li.append(head, el("p", "blog-source", `${item.source} · ${item.published}`), why, more);
+      li.append(head, el("p", "blog-source", `${item.source} · ${niceDate(item.published)}`), why, more);
       list.append(li);
     }
     article.append(list);
@@ -648,7 +655,7 @@ function initBlog() {
     const list = el("ul", "blog-archive-list");
     for (const entry of index.slice(0, 60)) {
       const li = el("li");
-      li.append(el("span", "blog-archive-date", entry.date));
+      li.append(el("span", "blog-archive-date", niceDate(entry.date)));
       const link = el("a", null, entry.headline);
       link.href = `blog.html?date=${encodeURIComponent(entry.date)}`;
       if (entry.date === currentDate) link.setAttribute("aria-current", "page");
@@ -830,7 +837,7 @@ function initLivingReview() {
         const labels = el("div", "review-study-labels");
         if (VERDICTS[study.verdict]) labels.append(el("span", `blog-cat review-verdict review-verdict--${study.verdict}`, VERDICTS[study.verdict]));
         if (DOMAINS[study.domain]) labels.append(el("span", "blog-cat", DOMAINS[study.domain]));
-        item.append(title, el("p", "blog-source", [study.source, study.published, study.design].filter(Boolean).join(" · ")), labels);
+        item.append(title, el("p", "blog-source", [study.source, niceDate(study.published), study.design].filter(Boolean).join(" · ")), labels);
         const who = [study.ai_system && `AI: ${study.ai_system}`, study.humans && `Humans: ${study.humans}`].filter(Boolean).join(" · ");
         if (who) item.append(el("p", "review-study-who", who));
         item.append(el("p", "review-text", study.finding));
