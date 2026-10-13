@@ -198,7 +198,7 @@
       ]
     }
   ],
-  "title": "AI vs Human: how AI is changing what physicians can do",
+  "title": "AI vs Physician: how AI is changing what physicians can do",
   "updated": "2026-10-09",
   "summary": "The strongest evidence so far comes from real-world trials in which clinicians work with AI. A large Swedish mammography screening trial found AI-supported screening at least as safe as standard double reading [S2]. Colonoscopy detection trials showed no clear overall benefit [S7][S8], and an ambient scribe trial gave mixed results [S3]. On written cases, large language models (LLMs) raised physicians' diagnostic scores in several small randomised trials, and the model alone often scored higher than the assisted physicians [S5][S9]. On real emergency patients the comparisons point in opposite directions [S4][S10], and wrong AI suggestions measurably lowered physicians' accuracy, even among physicians trained in AI use [S6].",
   "key_findings": [

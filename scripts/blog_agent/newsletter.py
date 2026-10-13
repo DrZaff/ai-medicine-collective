@@ -1,7 +1,7 @@
 """Assemble the weekly digest: a two-minute read with a fixed shape.
 
   1. The one thing        the week's most useful item, in two sentences
-  2. AI vs human          this week's head-to-head result and the running tally
+  2. AI vs physician          this week's head-to-head result and the running tally
   3. Tool of the week     one tool from the hub
   4. From the Collective  who published what (public part; the members-only
                           part is added when an admin sends it)
@@ -76,12 +76,12 @@ RULE = f'<hr style="border:0;border-top:1px solid {RULE_COLOR};margin:34px 0 30p
 
 VERDICTS = {
     "ai_ahead": "AI ahead",
-    "humans_ahead": "Humans ahead",
+    "humans_ahead": "Physicians ahead",
     "comparable": "Comparable",
     "mixed": "Mixed results",
 }
 DEFAULT_ASK = "Open one tool from the hub this week and tell its author what you think."
-# Shown in the AI vs human section until the first head-to-head review is published
+# Shown in the AI vs physician section until the first head-to-head review is published
 VERSUS_INTRO = ("Each week this space takes one published study that pits an AI system against clinicians on a "
                 "real medical task, or clinicians working with AI against clinicians working without it. You "
                 "get the task, who was tested, each side's numbers, the catch, and a verdict: AI ahead, humans "
@@ -210,7 +210,7 @@ def render_html(d: dict) -> str:
         inside.append(short(item["title"], 70))
     if d["versus"]:
         verdict = VERDICTS.get(d["versus"][0].get("verdict"), "the result")
-        inside.append(f"AI vs human: {verdict.lower().replace("ai ", "AI ")}")
+        inside.append(f"AI vs physician: {verdict.lower().replace("ai ", "AI ")}")
     if tool:
         inside.append(f"Tool of the week: {tool['title']}")
 
@@ -265,8 +265,8 @@ def render_html(d: dict) -> str:
             RULE,
         ]
 
-    # AI vs human: this week's result, then the season tally
-    out.append(f'<p style="{LABEL}">AI vs human</p>')
+    # AI vs physician: this week's result, then the season tally
+    out.append(f'<p style="{LABEL}">AI vs physician</p>')
     for versus in d["versus"]:
         verdict = VERDICTS.get(versus.get("verdict"), "Result")
         out += [
@@ -289,7 +289,7 @@ def render_html(d: dict) -> str:
             f'style="margin:22px 0 14px;border-top:1px solid {RULE_COLOR};border-bottom:1px solid {RULE_COLOR};">'
             '<tr><td style="padding:20px 0 18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>',
             cell(tally["ai_ahead"], "AI AHEAD"),
-            cell(tally["humans_ahead"], "HUMANS AHEAD"),
+            cell(tally["humans_ahead"], "PHYSICIANS AHEAD"),
             cell(tally["comparable"] + tally["mixed"], "EVEN OR MIXED", last=True),
             "</tr></table></td></tr></table>",
             f'<p style="margin:0;text-align:center;font-family:{SERIF};font-size:14px;font-style:italic;line-height:1.5;color:{MUTED};">'
@@ -370,7 +370,7 @@ def render_text(d: dict) -> str:
     item = d["one_thing"]
     if item:
         lines += ["// THE ONE THING", item["title"], item["why_it_matters"], item["url"], ""]
-    lines.append("// AI VS HUMAN")
+    lines.append("// AI VS PHYSICIAN")
     for versus in d["versus"]:
         lines += [f"This week: {VERDICTS.get(versus.get('verdict'), 'Result')}", versus["title"],
                   versus["why_it_matters"], versus["url"]]
@@ -378,7 +378,7 @@ def render_text(d: dict) -> str:
         lines += (["No head-to-head study made the cut this week."] if sum(tally.values())
                   else [VERSUS_INTRO, VERSUS_INTRO_NOTE])
     if sum(tally.values()):
-        lines.append(f"Running tally: AI ahead {tally['ai_ahead']}, humans ahead {tally['humans_ahead']}, "
+        lines.append(f"Running tally: AI ahead {tally['ai_ahead']}, physicians ahead {tally['humans_ahead']}, "
                      f"even or mixed {tally['comparable'] + tally['mixed']}.")
     lines.append("")
     if d["also"]:

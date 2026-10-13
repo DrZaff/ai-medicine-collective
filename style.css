@@ -298,6 +298,36 @@ textarea:focus-visible {
 }
 
 
+/* The hidden attribute always wins. Without this, any rule that sets
+   "display" (a menu link, a card) would show an element the page has hidden,
+   such as JOIN once someone is signed in. */
+[hidden] {
+  display: none !important;
+}
+
+/* The Home button on phones (script.js adds it to every page but the home
+   page). Wider screens have Home in the menu, so it is hidden there. */
+.home-button {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .home-button,
+  .home-button:visited {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 6px;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+
+  .home-button svg {
+    display: none;
+  }
+}
+
+
 /* === THEME SWITCH (both looks) =============================== */
 
 /* Marks of the terminal voice ("// ", "> ", ":: "); modern.css hides them */
@@ -2262,21 +2292,24 @@ button.onboard-hide {
   box-shadow: var(--glow);
 }
 
-/* A grid of unequal cards: the briefing is the large one, the meeting and
-   the team sit beside it, tools and new projects share the row below.
-   (In the page the hub card comes second; "order" moves it to the end.) */
-.home-panel--briefing {
+/* A grid of unequal cards: the AI vs Physician paper is the large one, the
+   latest briefing and the team sit beside it, and the meeting, the tools
+   and the newest tools share the row below. */
+.home-panel--review {
   grid-column: span 2;
   grid-row: span 2;
 }
 
-.home-panel--tools {
-  order: 1;
+.home-findings {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  font-family: var(--font-read);
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-.home-panel--hub {
-  grid-column: span 2;
-  order: 2;
+.home-findings li {
+  margin-bottom: 6px;
 }
 
 .bento-apps,
@@ -2428,8 +2461,7 @@ button.onboard-hide {
     grid-template-columns: 1fr;
   }
 
-  .home-panel--briefing,
-  .home-panel--hub {
+  .home-panel--review {
     grid-column: auto;
     grid-row: auto;
   }
@@ -3488,7 +3520,7 @@ textarea.join-input {
   gap: 6px;
 }
 
-/* The "AI vs human" review: cyan edge, and who came out ahead */
+/* The "AI vs physician" review: cyan edge, and who came out ahead */
 .blog-item--versus {
   border-left-color: var(--cyan);
 }
@@ -4070,7 +4102,7 @@ button.meeting-undo {
 }
 
 
-/* === AI VS HUMAN: THE LIVING REVIEW ========================== */
+/* === AI VS PHYSICIAN: THE LIVING REVIEW ========================== */
 
 /* The card on the Learning page */
 .evidence-card,

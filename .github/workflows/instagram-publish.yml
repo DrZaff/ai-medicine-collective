@@ -1,6 +1,6 @@
 # Posts a carousel to Instagram once its pull request has been merged.
 # A carousel is a folder under social/ made by scripts/blog_agent/instagram.py:
-# a blog post's (social/<date>/) or an AI vs Human edition's (social/review-<date>/).
+# a blog post's (social/<date>/) or an AI vs Physician edition's (social/review-<date>/).
 # The slides were reviewed in the same pull request, so merging is the approval.
 # (The weekly digest's recap is posted by the digest job itself.)
 #

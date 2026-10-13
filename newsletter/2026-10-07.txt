@@ -7,7 +7,7 @@ Machine Learning for Human-Autonomy Teaming in Surgical Skill Assessment: Scopin
 Surgical educators being pitched automated skill scoring should ask for external validation and evidence from real settings first, because most tools have only been tested on benchmark data. Residents should treat AI-generated skill scores as experimental, not as an established assessment.
 https://ai.jmir.org/2026/1/e94109
 
-// AI VS HUMAN
+// AI VS PHYSICIAN
 Each week this space takes one published study that pits an AI system against clinicians on a real medical task, or clinicians working with AI against clinicians working without it. You get the task, who was tested, each side's numbers, the catch, and a verdict: AI ahead, humans ahead, or too close to call.
 A running scoreboard will keep count here from our first review onward.
 
@@ -22,18 +22,19 @@ A running scoreboard will keep count here from our first review onward.
   https://www.frontiersin.org/journals/digital-health/articles/10.3389/fdgth.2026.1918847/full
 
 // TOOL OF THE WEEK
-QT Interval Corrector
-Clinical micro-app that corrects the QT interval, built with ClinicalToolsDEV. Opens in the browser on phone or computer.
-https://www.aimedicinecollective.com/hub.html?project=86dfa07e-7e5c-4997-9858-a9212713c8bd
+NextSet AI Personal Trainer
+Personal trainer that guides workouts, answers questions, and logs performance. Custom GPT: needs a paid ChatGPT subscription.
+https://www.aimedicinecollective.com/hub.html?project=99df7586-7b25-43b4-b973-39e312d673fd
 
 // FROM THE COLLECTIVE
 Brandon Zaffuto added 16 tools, including Acid-Base Calculator and ANKIGen AI.
 [[AMC:COLLECTIVE]]
 
 // ONE ASK
-[[AMC:ASK]]Open one tool from the hub this week and tell its author what you think. https://www.aimedicinecollective.com/tools.html[[/AMC:ASK]]
+[[AMC:ASK]]Open one tool from the hub this week and tell its author what you think. https://www.aimedicinecollective.com/hub.html[[/AMC:ASK]]
 
 Every briefing: https://www.aimedicinecollective.com/blog.html
 Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.
 
+On Instagram: @aimedicinecollective (https://www.instagram.com/aimedicinecollective/)
 You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" under Your profile on your account page: https://www.aimedicinecollective.com/account.html#profile
