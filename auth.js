@@ -845,17 +845,6 @@ function initAccountPage() {
     fill(learn, async () => {
       const n = await published("material");
       learn.value.textContent = n === null ? "—" : String(n);
-      // Core path progress, once there is a path (migration 009)
-      const [steps, done] = await Promise.all([
-        db.from("learning_path_items").select("project_id"),
-        db.from("learning_progress").select("project_id").eq("user_id", profile.id),
-      ]);
-      if (steps.error || done.error || !steps.data.length) return;
-      const finished = new Set(done.data.map((row) => row.project_id));
-      const n2 = steps.data.filter((step) => finished.has(step.project_id)).length;
-      learn.note.textContent = n2 === steps.data.length
-        ? "published materials · core path complete"
-        : `published materials · core path ${n2} of ${steps.data.length}`;
     });
     fill(requests, async () => {
       const n = await count(db.from("tool_requests").select("id", { count: "exact", head: true }).eq("status", "open"));

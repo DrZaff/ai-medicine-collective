@@ -1,7 +1,7 @@
 """Publish a carousel from social/<name>/ to Instagram.
 
 <name> is a blog post's date, or "digest-<date>" or "review-<date>" (see
-instagram.py). For blog posts and AI vs Human editions this runs after their
+instagram.py). For blog posts and AI vs Physician editions this runs after their
 pull request is merged (.github/workflows/instagram-publish.yml): the slides
 were reviewed in that pull request, so merging is the approval. The weekly
 digest's recap is posted by the digest job itself, since everything in it was

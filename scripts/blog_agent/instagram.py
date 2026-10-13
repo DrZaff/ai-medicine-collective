@@ -3,7 +3,7 @@
 Three kinds, each written to its own folder under social/:
     social/YYYY-MM-DD/          a blog post (build)
     social/digest-YYYY-MM-DD/   the weekly digest (build_digest; called by newsletter.py)
-    social/review-YYYY-MM-DD/   an AI vs Human edition (build_review; called by living_review.py)
+    social/review-YYYY-MM-DD/   an AI vs Physician edition (build_review; called by living_review.py)
 
 Each folder holds:
     01.jpg ... NN.jpg   1080 x 1350 slides: a cover, the content, a closing slide
@@ -49,8 +49,8 @@ INK, BODY, MUTED, LINE = (15, 23, 42), (51, 65, 85), (100, 116, 139), (226, 232,
 BRAND, SPARK, MINT, SOFT = (11, 107, 79), (16, 185, 129), (110, 231, 183), (232, 244, 239)
 SKY, SKY_INK, AMBER, AMBER_INK = (224, 242, 254), (7, 89, 133), (254, 243, 199), (146, 64, 14)
 
-SECTION_LABELS = {"med_ed": "MED-ED REVIEW", "ai_vs_human": "AI VS HUMAN"}
-VERDICT_LABELS = {"ai_ahead": "AI AHEAD", "humans_ahead": "HUMANS AHEAD",
+SECTION_LABELS = {"med_ed": "MED-ED REVIEW", "ai_vs_human": "AI VS PHYSICIAN"}
+VERDICT_LABELS = {"ai_ahead": "AI AHEAD", "humans_ahead": "PHYSICIANS AHEAD",
                   "comparable": "COMPARABLE", "mixed": "MIXED RESULTS"}
 
 
@@ -364,7 +364,7 @@ def hashtag(tag: str) -> str:
 def caption(post: dict) -> str:
     lines = [post["headline"], "", post.get("intro", ""), ""]
     for item in post["items"]:
-        label = {"med_ed": "Med-ed", "ai_vs_human": "AI vs human"}.get(item.get("section"), "Review")
+        label = {"med_ed": "Med-ed", "ai_vs_human": "AI vs physician"}.get(item.get("section"), "Review")
         lines.append(f"{label}: {item['title']} ({item['source']})")
     lines += [
         "",
@@ -414,7 +414,7 @@ def build(post: dict, out: Path) -> list[Path]:
     items = post["items"][:MAX_ITEM_SLIDES]
     total = len(items) + 2
     count = len(post["items"])
-    kinds = " + ".join({"med_ed": "Med-ed review", "ai_vs_human": "AI vs human"}.get(i.get("section"), "Review")
+    kinds = " + ".join({"med_ed": "Med-ed review", "ai_vs_human": "AI vs physician"}.get(i.get("section"), "Review")
                        for i in post["items"][:2]) if count <= 2 else f"{count} reviews"
     slides = [title_slide(f"BRIEFING  ·  {long_date(post['date']).upper()}", post["headline"], kinds, total),
               *(item_slide(item, i + 1, total) for i, item in enumerate(items)),
@@ -451,7 +451,7 @@ def build_digest(d: dict, out: Path) -> list[Path]:
     marker = f"Week ending {end.isoformat()}"
     lines = [f"The week in AI and medicine, {span}.", "", f"The one thing: {headline}"]
     for item in d.get("versus", [])[:1]:
-        lines.append(f"AI vs human: {item['title']} ({VERDICT_LABELS.get(item.get('verdict'), 'result').lower()})")
+        lines.append(f"AI vs physician: {item['title']} ({VERDICT_LABELS.get(item.get('verdict'), 'result').lower()})")
     for other in also:
         lines.append(f"Also: {other['title']}")
     if tool:
@@ -463,7 +463,7 @@ def build_digest(d: dict, out: Path) -> list[Path]:
 
 
 def build_review(review: dict, out: Path) -> list[Path]:
-    """An edition of the living review "AI vs Human" (evidence/ai-vs-human.json)."""
+    """An edition of the living review "AI vs Physician" (evidence/ai-vs-human.json)."""
     import re
     plain = lambda text: re.sub(r"\s*\[S\d+\]", "", str(text)).strip()
     studies = review.get("studies", [])
@@ -475,7 +475,7 @@ def build_review(review: dict, out: Path) -> list[Path]:
     edition, updated = review.get("edition", 1), review["updated"]
     month = dt.date.fromisoformat(updated).strftime("%B %Y")
     slides = [
-        title_slide(f"AI VS HUMAN  ·  EDITION {edition}", "How AI is changing what physicians can do",
+        title_slide(f"AI VS PHYSICIAN  ·  EDITION {edition}", "How AI is changing what physicians can do",
                     f"{len(studies)} studies, weighed. {month}.", total),
         tally_slide(1, total, "THE EVIDENCE SO FAR", f"{len(studies)} studies, by how they came out", [
             (count("ai_ahead"), "AI ahead of clinicians"),
@@ -487,11 +487,11 @@ def build_review(review: dict, out: Path) -> list[Path]:
         ], "A count of studies, not a score: they differ in size, design and how close they are to real practice."),
         *(card_slide(i + 2, total, [(f"FINDING {i + 1} OF {len(findings)}", SOFT, BRAND)], "What the studies show", "",
                      "KEY FINDING", finding) for i, finding in enumerate(findings)),
-        closing(total, ("Read the", "evidence."), ("Every study,", "with its source."), f"{SITE}/ai-vs-human"),
+        closing(total, ("Read the", "evidence."), ("Every study,", "with its source."), f"{SITE}/ai-vs-physician"),
     ]
-    marker = f"AI vs Human, edition {edition}"
+    marker = f"AI vs Physician, edition {edition}"
     lines = [f"{marker}: how AI is changing what physicians can do.", "", plain(review.get("summary", "")), "",
-             f"The full paper, with every study and its source: {SITE}/ai-vs-human (link in bio).", "",
+             f"The full paper, with every study and its source: {SITE}/ai-vs-physician (link in bio).", "",
              f"Follow {HANDLE} for three briefings a week on AI in medicine.", "",
              "A summary of published research, drafted by AI and reviewed by clinicians. Not medical advice.", "",
              hashtags([], ["#AIinMedicine", "#MedEd", "#EvidenceBasedMedicine", "#DigitalHealth", "#ClinicalAI"])]

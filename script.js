@@ -127,6 +127,21 @@ function initThemeToggle() {
     }
   });
   header.prepend(btn);
+
+  // On phones the menu is folded away, so every page but the home page gets
+  // a Home button beside it (hidden on wider screens, where the menu has one)
+  const brand = header.querySelector(".headline a");
+  const onHome = /(^|\/)(index(\.html)?)?$/.test(window.location.pathname);
+  if (brand && !onHome && !header.querySelector(".home-button")) {
+    const home = document.createElement("a");
+    home.className = "home-button";
+    home.href = brand.getAttribute("href");
+    home.setAttribute("aria-label", "Home");
+    home.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" ' +
+      'stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>' +
+      "<span>[ HOME ]</span>";
+    header.prepend(home);
+  }
   setSiteTheme(siteTheme());
 }
 
@@ -313,7 +328,7 @@ const MENU_GROUPS = [
   {
     menu: "blog",
     label: "Evidence",
-    tabs: [["blog", "BRIEFINGS"], ["ai-vs-human", "AI VS HUMAN"]],
+    tabs: [["blog", "BRIEFINGS"], ["ai-vs-physician", "AI VS PHYSICIAN"]],
     also: [],
   },
   {
@@ -331,6 +346,7 @@ function initCurrentNav() {
   if (inMemberFolder) here = "members"; // the hand-made profile pages
   if (here === "appstore" || here === "projects" || here === "tools") here = "hub";
   if (here === "resources") here = "learn";
+  if (here === "ai-vs-human") here = "ai-vs-physician";
 
   const group = MENU_GROUPS.find((g) => g.tabs.some(([page]) => page === here) || g.also.includes(here));
   const menuPage = group ? group.menu : here;
@@ -606,9 +622,9 @@ function initBlog() {
       const li = el("li", "blog-item");
       // Newer posts have two reviews, each labelled by section; older ones
       // carry only a category.
-      const SECTION_NAMES = { med_ed: "Med-ed review", ai_vs_human: "AI vs human" };
+      const SECTION_NAMES = { med_ed: "Med-ed review", ai_vs_human: "AI vs physician" };
       const VERDICT_NAMES = {
-        ai_ahead: "AI ahead", humans_ahead: "Humans ahead", comparable: "Comparable", mixed: "Mixed results",
+        ai_ahead: "AI ahead", humans_ahead: "Physicians ahead", comparable: "Comparable", mixed: "Mixed results",
       };
       const head = el("div", "blog-item-head");
       const labels = el("div", "blog-item-labels");
@@ -697,7 +713,7 @@ function initBlog() {
 
 document.addEventListener("DOMContentLoaded", initBlog);
 
-/* ========= AI VS HUMAN: the living review ========= */
+/* ========= AI VS PHYSICIAN: the living review ========= */
 
 // Draws evidence/ai-vs-human.json: a paper rewritten each month by the
 // "Living review" job from a register of studies, and approved by a person
@@ -705,8 +721,8 @@ document.addEventListener("DOMContentLoaded", initBlog);
 // text comes from an AI draft. Also fills the teaser on the Learning page.
 function initLivingReview() {
   const app = document.getElementById("review-app");
-  const teaser = document.getElementById("evidence-teaser");
-  if (!app && !teaser) return;
+  const feature = document.getElementById("home-review");   // the home page's featured card
+  if (!app && !feature) return;
 
   const el = (tag, className, text) => {
     const node = document.createElement(tag);
@@ -715,7 +731,7 @@ function initLivingReview() {
     return node;
   };
   const VERDICTS = {
-    ai_ahead: "AI ahead", humans_ahead: "Humans ahead", comparable: "Comparable",
+    ai_ahead: "AI ahead", humans_ahead: "Physicians ahead", comparable: "Comparable",
     ai_help_improved: "AI help improved", ai_help_no_benefit: "AI help: no difference",
     ai_help_harmed: "AI help made it worse", mixed: "Mixed results",
   };
@@ -731,10 +747,16 @@ function initLivingReview() {
     .catch(() => null)
     .then((review) => {
       const ready = review && Array.isArray(review.studies) && Array.isArray(review.sections) && review.sections.length;
-      if (teaser && ready) {
-        const brief = review.summary.replace(/\s*\[S\d+\]/g, "").split(/(?<=\.)\s+/).slice(0, 2).join(" ");
-        teaser.textContent = `${brief} ` +
-          `Edition ${review.edition}, ${review.studies.length} studies, updated ${longDate(review.updated)}.`;
+      if (feature && ready) {
+        const plain = (text) => String(text).replace(/\s*\[S\d+\]/g, "");
+        const meta = el("p", "home-list-meta",
+          `// Edition ${review.edition} · ${review.studies.length} studies · updated ${longDate(review.updated)}`);
+        const title = el("a", "home-headline", "How AI is changing what physicians can do");
+        title.href = "ai-vs-physician.html";
+        const summary = el("p", "home-panel-text", plain(review.summary).split(/(?<=\.)\s+/).slice(0, 2).join(" "));
+        const findings = el("ul", "home-findings");
+        (review.key_findings || []).slice(0, 3).forEach((finding) => findings.append(el("li", null, plain(finding))));
+        feature.replaceChildren(meta, title, summary, findings);
       }
       if (!app) return;
       if (!ready) {

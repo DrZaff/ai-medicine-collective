@@ -1,4 +1,4 @@
-"""The living review "AI vs Human": how AI changes what physicians can do.
+"""The living review "AI vs Physician": how AI changes what physicians can do.
 
 Runs once a month. Two requests to Claude:
 
@@ -12,7 +12,7 @@ Runs once a month. Two requests to Claude:
 The result is evidence/ai-vs-human.json (the register and the paper together).
 The workflow (.github/workflows/living-review.yml) opens a pull request;
 merging it is the human review step that publishes the edition. The page
-ai-vs-human.html draws it (initLivingReview in script.js).
+ai-vs-physician.html draws it (initLivingReview in script.js).
 
 Safeguards: a study is kept only if its link appeared in that run's search
 results and is not already in the register; head-to-head reviews already
@@ -66,7 +66,7 @@ COMPARISONS = ["ai_alone", "clinician_with_ai", "both"]
 VERDICTS = ["ai_ahead", "humans_ahead", "comparable",
             "ai_help_improved", "ai_help_no_benefit", "ai_help_harmed", "mixed"]
 VERDICT_LABELS = {
-    "ai_ahead": "AI ahead", "humans_ahead": "Humans ahead", "comparable": "Comparable",
+    "ai_ahead": "AI ahead", "humans_ahead": "Physicians ahead", "comparable": "Comparable",
     "ai_help_improved": "AI help improved performance", "ai_help_no_benefit": "AI help made no difference",
     "ai_help_harmed": "AI help made things worse", "mixed": "Mixed results",
 }
@@ -87,7 +87,7 @@ STUDY_FIELDS = {
 }
 
 SEARCH_SYSTEM = """\
-You keep the register of studies behind "AI vs Human", a living review \
+You keep the register of studies behind "AI vs Physician", a living review \
 published by the AI Medicine Collective (residents and faculty) on how AI \
 changes what physicians can do. Each month you add the new studies.
 
@@ -127,7 +127,7 @@ searched and anything worth knowing about gaps.
 """
 
 WRITE_SYSTEM = """\
-You write "AI vs Human", a living review published by the AI Medicine \
+You write "AI vs Physician", a living review published by the AI Medicine \
 Collective for medical students, residents and faculty. It gives an \
 evidence-based picture of how AI changes what physicians can do and where \
 medicine is heading. It is rewritten every month from a register of studies.
@@ -149,7 +149,7 @@ treating patients.
 was produced.
 
 Shape:
-- "title": keep it "AI vs Human: how AI is changing what physicians can do".
+- "title": keep it "AI vs Physician: how AI is changing what physicians can do".
 - "summary": 3 to 4 sentences, the state of the evidence right now, with citations.
 - "key_findings": 4 to 7 single sentences, each one a finding a reader \
 should remember, each with citations.
@@ -375,12 +375,12 @@ def agent_short(text: str, limit: int = 110) -> str:
 def write_pr_body(path: Path, review: dict, new: list[dict], dropped: list[str], removed: list[str],
                   flagged: list[str], note: str, usage: dict | None) -> None:
     lines = [
-        f"## AI vs Human: edition {review['edition']} ({review['updated']})",
+        f"## AI vs Physician: edition {review['edition']} ({review['updated']})",
         "",
         review["summary"],
         "",
         f"**{len(review['studies'])} studies in the register, {len(new)} new this edition.** "
-        "Merging publishes this edition on the AI vs Human page.",
+        "Merging publishes this edition on the AI vs Physician page.",
         "",
         "### New studies (check each one against its source)",
     ]
@@ -477,7 +477,7 @@ def main() -> int:
     change = {"date": date.isoformat(), "edition": review["edition"],
               "text": str(paper.get("what_changed", "")).strip(), "added": [s["id"] for s in new]}
     review.update({
-        "title": str(paper.get("title", "")).strip() or "AI vs Human: how AI is changing what physicians can do",
+        "title": str(paper.get("title", "")).strip() or "AI vs Physician: how AI is changing what physicians can do",
         "updated": date.isoformat(),
         "summary": paper["summary"],
         "key_findings": paper["key_findings"],

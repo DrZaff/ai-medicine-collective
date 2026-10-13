@@ -1,4 +1,4 @@
-# Drafts the monthly edition of the living review "AI vs Human" and opens a PR.
+# Drafts the monthly edition of the living review "AI vs Physician" and opens a PR.
 # Merging the PR publishes the edition (human review step, see CLAUDE.md).
 # Uses the same ANTHROPIC_API_KEY secret and settings as the blog draft job.
 
@@ -80,8 +80,8 @@ jobs:
           git switch -c "$branch"
           git add evidence/ai-vs-human.json
           if [ -d "social/review-$DATE" ]; then git add "social/review-$DATE"; fi
-          git commit -m "AI vs Human: edition $EDITION ($DATE)"
+          git commit -m "AI vs Physician: edition $EDITION ($DATE)"
           git push -u origin "$branch"
           gh pr create --base main --head "$branch" \
-            --title "AI vs Human: edition $EDITION ($DATE)" \
+            --title "AI vs Physician: edition $EDITION ($DATE)" \
             --body-file "$RUNNER_TEMP/pr-body.md"
