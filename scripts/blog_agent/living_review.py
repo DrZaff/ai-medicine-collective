@@ -66,7 +66,7 @@ COMPARISONS = ["ai_alone", "clinician_with_ai", "both"]
 VERDICTS = ["ai_ahead", "humans_ahead", "comparable",
             "ai_help_improved", "ai_help_no_benefit", "ai_help_harmed", "mixed"]
 VERDICT_LABELS = {
-    "ai_ahead": "AI helped improve", "humans_ahead": "Physicians ahead", "comparable": "Comparable",
+    "ai_ahead": "AI outperformed physicians", "humans_ahead": "Physicians outperformed AI", "comparable": "Comparable",
     "ai_help_improved": "AI helped improve", "ai_help_no_benefit": "AI help made no difference",
     "ai_help_harmed": "AI help made things worse", "mixed": "Mixed results",
 }

@@ -57,9 +57,9 @@ CATEGORIES = ["education", "research", "news", "policy", "tool"]
 SECTIONS = ["med_ed", "ai_vs_human"]
 SECTION_LABELS = {"med_ed": "Med-ed review", "ai_vs_human": "AI vs physician"}
 # Who came out ahead on the study's main measure (AI vs physician reviews only).
-# (Shown to readers as: AI helped improve, Physicians ahead, Comparable, AI helped
-# improve, AI help: no difference, AI help made it worse, Mixed results; "ai_ahead"
-# reads "AI helped improve" too, at the owner's request.)
+# Shown to readers as: AI outperformed physicians, Physicians outperformed AI,
+# Comparable (AI on its own vs physicians); AI helped improve, AI help: no
+# difference, AI help made it worse (physicians with vs without AI); Mixed results.
 VERDICTS = ["ai_ahead", "humans_ahead", "comparable",
             "ai_help_improved", "ai_help_no_benefit", "ai_help_harmed", "mixed", "not_applicable"]
 
