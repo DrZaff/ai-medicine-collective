@@ -50,8 +50,10 @@ BRAND, SPARK, MINT, SOFT = (11, 107, 79), (16, 185, 129), (110, 231, 183), (232,
 SKY, SKY_INK, AMBER, AMBER_INK = (224, 242, 254), (7, 89, 133), (254, 243, 199), (146, 64, 14)
 
 SECTION_LABELS = {"med_ed": "MED-ED REVIEW", "ai_vs_human": "AI VS PHYSICIAN"}
-VERDICT_LABELS = {"ai_ahead": "AI AHEAD", "humans_ahead": "PHYSICIANS AHEAD",
-                  "comparable": "COMPARABLE", "mixed": "MIXED RESULTS"}
+VERDICT_LABELS = {"ai_ahead": "AI HELPED IMPROVE", "humans_ahead": "PHYSICIANS AHEAD",
+                  "comparable": "COMPARABLE", "mixed": "MIXED RESULTS",
+                  "ai_help_improved": "AI HELPED IMPROVE", "ai_help_no_benefit": "AI HELP: NO DIFFERENCE",
+                  "ai_help_harmed": "AI HELP MADE IT WORSE"}
 
 
 # ---------------------------------------------------------------- type
@@ -478,11 +480,11 @@ def build_review(review: dict, out: Path) -> list[Path]:
         title_slide(f"AI VS PHYSICIAN  ·  EDITION {edition}", "How AI is changing what physicians can do",
                     f"{len(studies)} studies, weighed. {month}.", total),
         tally_slide(1, total, "THE EVIDENCE SO FAR", f"{len(studies)} studies, by how they came out", [
-            (count("ai_ahead"), "AI ahead of clinicians"),
-            (count("humans_ahead"), "Clinicians ahead of AI"),
-            (count("ai_help_improved"), "AI help improved clinicians"),
-            (count("ai_help_no_benefit", "ai_help_harmed"), "AI help: no gain, or worse"),
+            (count("ai_ahead", "ai_help_improved"), "AI helped improve"),
+            (count("humans_ahead"), "Physicians ahead"),
             (count("comparable"), "Comparable"),
+            (count("ai_help_no_benefit"), "AI help: no difference"),
+            (count("ai_help_harmed"), "AI help made it worse"),
             (count("mixed"), "Mixed results"),
         ], "A count of studies, not a score: they differ in size, design and how close they are to real practice."),
         *(card_slide(i + 2, total, [(f"FINDING {i + 1} OF {len(findings)}", SOFT, BRAND)], "What the studies show", "",

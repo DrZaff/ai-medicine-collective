@@ -624,7 +624,8 @@ function initBlog() {
       // carry only a category.
       const SECTION_NAMES = { med_ed: "Med-ed review", ai_vs_human: "AI vs physician" };
       const VERDICT_NAMES = {
-        ai_ahead: "AI ahead", humans_ahead: "Physicians ahead", comparable: "Comparable", mixed: "Mixed results",
+        ai_ahead: "AI helped improve", humans_ahead: "Physicians ahead", comparable: "Comparable", mixed: "Mixed results",
+        ai_help_improved: "AI helped improve", ai_help_no_benefit: "AI help: no difference", ai_help_harmed: "AI help made it worse",
       };
       const head = el("div", "blog-item-head");
       const labels = el("div", "blog-item-labels");
@@ -731,8 +732,8 @@ function initLivingReview() {
     return node;
   };
   const VERDICTS = {
-    ai_ahead: "AI ahead", humans_ahead: "Physicians ahead", comparable: "Comparable",
-    ai_help_improved: "AI help improved", ai_help_no_benefit: "AI help: no difference",
+    ai_ahead: "AI helped improve", humans_ahead: "Physicians ahead", comparable: "Comparable",
+    ai_help_improved: "AI helped improve", ai_help_no_benefit: "AI help: no difference",
     ai_help_harmed: "AI help made it worse", mixed: "Mixed results",
   };
   const DOMAINS = {
@@ -798,11 +799,11 @@ function initLivingReview() {
       const tally = el("dl", "review-tally");
       const count = (...verdicts) => studies.filter((study) => verdicts.includes(study.verdict)).length;
       [
-        [count("ai_ahead"), "AI ahead of clinicians"],
-        [count("humans_ahead"), "Clinicians ahead of AI"],
+        [count("ai_ahead", "ai_help_improved"), "AI helped improve"],
+        [count("humans_ahead"), "Physicians ahead"],
         [count("comparable"), "Comparable"],
-        [count("ai_help_improved"), "AI help improved clinicians"],
-        [count("ai_help_no_benefit", "ai_help_harmed"), "AI help: no gain, or worse"],
+        [count("ai_help_no_benefit"), "AI help: no difference"],
+        [count("ai_help_harmed"), "AI help made it worse"],
         [count("mixed"), "Mixed results"],
       ].forEach(([value, label]) => {
         const cell = el("div", "review-tally-cell");

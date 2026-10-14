@@ -3536,7 +3536,9 @@ textarea.join-input {
 }
 
 .blog-item--versus .blog-verdict--ai_ahead,
-.blog-item--versus .blog-verdict--humans_ahead {
+.blog-item--versus .blog-verdict--humans_ahead,
+.blog-item--versus .blog-verdict--ai_help_improved,
+.blog-item--versus .blog-verdict--ai_help_harmed {
   border-color: var(--yellow);
   color: var(--yellow);
 }
