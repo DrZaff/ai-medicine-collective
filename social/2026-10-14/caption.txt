@@ -1,0 +1,14 @@
+LLMs at both ends of training: thesis writing in China and GPT-4o help for physicians in three countries
+
+One review tracks how quickly Chinese medical graduates started using large language models for their graduation theses. The other is a randomised trial in Indonesia, Kenya and the Netherlands that tested whether giving physicians GPT-4o improves their clinical decisions on standardised cases.
+
+Med-ed: Current status of medical students' use of large language models for graduation thesis writing: a comparative cross-sectional survey (Frontiers in Medicine)
+AI vs physician: Impact of LLM assistance on physician decision-making: a multi-country randomized controlled trial (npj Digital Medicine)
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-10-14 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AcademicIntegrity #AcademicWriting #ClinicalDecisionMaking #ClinicalVignettes #GlobalHealth #Gpt4o

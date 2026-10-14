@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-14",
+  "headline": "LLMs at both ends of training: thesis writing in China and GPT-4o help for physicians in three countries",
+  "intro": "One review tracks how quickly Chinese medical graduates started using large language models for their graduation theses. The other is a randomised trial in Indonesia, Kenya and the Netherlands that tested whether giving physicians GPT-4o improves their clinical decisions on standardised cases.",
+  "items": [
+    {
+      "title": "Current status of medical students' use of large language models for graduation thesis writing: a comparative cross-sectional survey",
+      "source": "Frontiers in Medicine",
+      "url": "https://www.frontiersin.org/journals/medicine/articles/10.3389/fmed.2026.1948768/full",
+      "published": "2026-10-12",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "This is a convenience-sample questionnaire of medical graduates from medical schools in China, run in 2024 and again in 2025 (341 valid responses). In 2024, 27.37% (52/190) said they used large language models (LLMs) to write their graduation thesis, compared with 88.08% (133/151) in 2025. Most used them at the literature-review stage, mainly for writing suggestions. Concerns about academic integrity, hallucinations and data privacy were the main barriers.",
+      "why_it_matters": "Students are adopting AI for research writing faster than many schools are writing policy. Educators should set clear rules on disclosure and verification, and teach students how to check AI output, now rather than later."
+    },
+    {
+      "title": "Impact of LLM assistance on physician decision-making: a multi-country randomized controlled trial",
+      "source": "npj Digital Medicine",
+      "url": "https://www.nature.com/articles/s41746-026-03111-5",
+      "published": "2026-09-09",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_improved",
+      "summary": "Physicians worked through standardised clinical vignettes to test their clinical decision-making. Physicians given access to GPT-4o were compared with physicians who had no AI access. The parallel-group randomised trial enrolled 249 physicians in Indonesia, Kenya and the Netherlands. Physicians with GPT-4o access scored higher on the vignettes in every country. The gap was 18 percentage points in Kenya (95% CI 12.7 to 23.2, p < 0.001), 10.7 percentage points in Indonesia (95% CI 5.7 to 15.7, p < 0.001) and 7.2 percentage points in the Netherlands (95% CI 3.7 to 10.7, p < 0.001). The main limitation is that this was done with written cases under controlled conditions, not with real patients. The control group was also not allowed to use the internet or clinical guidelines, and harms were not assessed. The paper is an early peer-reviewed version that may still be edited before the final version.",
+      "why_it_matters": "The result shows a general-purpose chatbot helping doctors on written cases compared with doctors who had no references at all. It does not show better patient outcomes or better results than doctors using their usual tools. Educators should keep that distinction clear when teaching about AI decision support."
+    }
+  ],
+  "tags": [
+    "academic integrity",
+    "academic writing",
+    "clinical decision-making",
+    "clinical vignettes",
+    "global health",
+    "gpt-4o",
+    "large language models",
+    "low- and middle-income countries",
+    "medical education",
+    "primary care",
+    "randomized controlled trial",
+    "student survey"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
