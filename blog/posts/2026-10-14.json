@@ -21,7 +21,7 @@
       "published": "2026-09-09",
       "category": "research",
       "section": "ai_vs_human",
-      "verdict": "ai_ahead",
+      "verdict": "ai_help_improved",
       "summary": "Physicians worked through standardised clinical vignettes to test their clinical decision-making. Physicians given access to GPT-4o were compared with physicians who had no AI access. The parallel-group randomised trial enrolled 249 physicians in Indonesia, Kenya and the Netherlands. Physicians with GPT-4o access scored higher on the vignettes in every country. The gap was 18 percentage points in Kenya (95% CI 12.7 to 23.2, p < 0.001), 10.7 percentage points in Indonesia (95% CI 5.7 to 15.7, p < 0.001) and 7.2 percentage points in the Netherlands (95% CI 3.7 to 10.7, p < 0.001). The main limitation is that this was done with written cases under controlled conditions, not with real patients. The control group was also not allowed to use the internet or clinical guidelines, and harms were not assessed. The paper is an early peer-reviewed version that may still be edited before the final version.",
       "why_it_matters": "The result shows a general-purpose chatbot helping doctors on written cases compared with doctors who had no references at all. It does not show better patient outcomes or better results than doctors using their usual tools. Educators should keep that distinction clear when teaching about AI decision support."
     }
