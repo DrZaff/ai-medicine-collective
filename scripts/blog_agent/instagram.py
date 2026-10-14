@@ -50,8 +50,10 @@ BRAND, SPARK, MINT, SOFT = (11, 107, 79), (16, 185, 129), (110, 231, 183), (232,
 SKY, SKY_INK, AMBER, AMBER_INK = (224, 242, 254), (7, 89, 133), (254, 243, 199), (146, 64, 14)
 
 SECTION_LABELS = {"med_ed": "MED-ED REVIEW", "ai_vs_human": "AI VS PHYSICIAN"}
-VERDICT_LABELS = {"ai_ahead": "AI AHEAD", "humans_ahead": "PHYSICIANS AHEAD",
-                  "comparable": "COMPARABLE", "mixed": "MIXED RESULTS"}
+VERDICT_LABELS = {"ai_ahead": "AI OUTPERFORMED PHYSICIANS", "humans_ahead": "PHYSICIANS OUTPERFORMED AI",
+                  "comparable": "COMPARABLE", "mixed": "MIXED RESULTS",
+                  "ai_help_improved": "AI HELPED IMPROVE", "ai_help_no_benefit": "AI HELP: NO DIFFERENCE",
+                  "ai_help_harmed": "AI HELP MADE IT WORSE"}
 
 
 # ---------------------------------------------------------------- type
@@ -287,8 +289,10 @@ def list_slide(index: int, total: int, label: str, heading: str, rows: list) -> 
     return im
 
 
-def tally_slide(index: int, total: int, label: str, heading: str, cells: list, note: str) -> Image.Image:
-    """A light slide with a grid of big numbers: [(number, caption), ...] (2 per row)"""
+def tally_slide(index: int, total: int, label: str, heading: str, cells: list, note: str,
+                columns: tuple = ()) -> Image.Image:
+    """A light slide with a grid of big numbers: [(number, caption), ...] (2 per row),
+    optionally under two column headings"""
     im = Image.new("RGB", (W, H), PAPER)
     draw = ImageDraw.Draw(im)
     draw.rectangle((0, 0, W, 12), fill=SPARK)
@@ -298,6 +302,10 @@ def tally_slide(index: int, total: int, label: str, heading: str, cells: list, n
     y = paragraph(draw, (PAD, 300), lines, font, INK, 1.14) + 34
     gap = 24
     cell_w = (W - 2 * PAD - gap) // 2
+    for i, column in enumerate(columns[:2]):
+        tracked(draw, (PAD + i * (cell_w + gap) + 4, y), column, sans(22, 700), BRAND, 2.2)
+    if columns:
+        y += 46
     rows = (len(cells) + 1) // 2
     cell_h = min(216, (H - 300 - y) // max(1, rows) - gap)
     for i, (number, caption_text) in enumerate(cells):
@@ -478,13 +486,15 @@ def build_review(review: dict, out: Path) -> list[Path]:
         title_slide(f"AI VS PHYSICIAN  ·  EDITION {edition}", "How AI is changing what physicians can do",
                     f"{len(studies)} studies, weighed. {month}.", total),
         tally_slide(1, total, "THE EVIDENCE SO FAR", f"{len(studies)} studies, by how they came out", [
-            (count("ai_ahead"), "AI ahead of clinicians"),
-            (count("humans_ahead"), "Clinicians ahead of AI"),
-            (count("ai_help_improved"), "AI help improved clinicians"),
-            (count("ai_help_no_benefit", "ai_help_harmed"), "AI help: no gain, or worse"),
+            (count("ai_help_improved"), "AI helped improve"),
+            (count("ai_ahead"), "AI outperformed physicians"),
+            (count("ai_help_no_benefit"), "AI help: no difference"),
+            (count("humans_ahead"), "Physicians outperformed AI"),
+            (count("ai_help_harmed"), "AI help made it worse"),
             (count("comparable"), "Comparable"),
-            (count("mixed"), "Mixed results"),
-        ], "A count of studies, not a score: they differ in size, design and how close they are to real practice."),
+        ], (f"Mixed results: {count('mixed')}. " if count("mixed") else "")
+           + "A count of studies, not a score: they differ in size, design and closeness to real practice.",
+           ("WHEN PHYSICIANS USED AI", "WHEN AI WORKED ALONE")),
         *(card_slide(i + 2, total, [(f"FINDING {i + 1} OF {len(findings)}", SOFT, BRAND)], "What the studies show", "",
                      "KEY FINDING", finding) for i, finding in enumerate(findings)),
         closing(total, ("Read the", "evidence."), ("Every study,", "with its source."), f"{SITE}/ai-vs-physician"),

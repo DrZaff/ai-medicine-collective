@@ -3536,7 +3536,9 @@ textarea.join-input {
 }
 
 .blog-item--versus .blog-verdict--ai_ahead,
-.blog-item--versus .blog-verdict--humans_ahead {
+.blog-item--versus .blog-verdict--humans_ahead,
+.blog-item--versus .blog-verdict--ai_help_improved,
+.blog-item--versus .blog-verdict--ai_help_harmed {
   border-color: var(--yellow);
   color: var(--yellow);
 }
@@ -4500,4 +4502,27 @@ button.meeting-undo {
   .home-doors {
     grid-template-columns: 1fr;
   }
+}
+
+/* What a head-to-head study compared, beside its verdict */
+.blog-compare {
+  align-self: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* The paper's tally: one row per kind of study */
+.review-tallies {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.review-tally-heading {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
 }

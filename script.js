@@ -624,7 +624,9 @@ function initBlog() {
       // carry only a category.
       const SECTION_NAMES = { med_ed: "Med-ed review", ai_vs_human: "AI vs physician" };
       const VERDICT_NAMES = {
-        ai_ahead: "AI ahead", humans_ahead: "Physicians ahead", comparable: "Comparable", mixed: "Mixed results",
+        ai_ahead: "AI outperformed physicians", humans_ahead: "Physicians outperformed AI", comparable: "Comparable",
+        mixed: "Mixed results",
+        ai_help_improved: "AI helped improve", ai_help_no_benefit: "AI help: no difference", ai_help_harmed: "AI help made it worse",
       };
       const head = el("div", "blog-item-head");
       const labels = el("div", "blog-item-labels");
@@ -632,6 +634,10 @@ function initBlog() {
       if (VERDICT_NAMES[item.verdict]) {
         labels.append(el("span", `blog-cat blog-verdict blog-verdict--${item.verdict}`, VERDICT_NAMES[item.verdict]));
       }
+      // What was compared, so the verdict can't be misread
+      const compared = /^ai_help_/.test(item.verdict) ? "Physicians with vs without AI"
+        : ["ai_ahead", "humans_ahead", "comparable"].includes(item.verdict) ? "AI alone vs physicians" : "";
+      if (compared) labels.append(el("span", "blog-compare", compared));
       head.append(labels);
       if (item.section === "ai_vs_human") li.classList.add("blog-item--versus");
 
@@ -731,8 +737,8 @@ function initLivingReview() {
     return node;
   };
   const VERDICTS = {
-    ai_ahead: "AI ahead", humans_ahead: "Physicians ahead", comparable: "Comparable",
-    ai_help_improved: "AI help improved", ai_help_no_benefit: "AI help: no difference",
+    ai_ahead: "AI outperformed physicians", humans_ahead: "Physicians outperformed AI", comparable: "Comparable",
+    ai_help_improved: "AI helped improve", ai_help_no_benefit: "AI help: no difference",
     ai_help_harmed: "AI help made it worse", mixed: "Mixed results",
   };
   const DOMAINS = {
@@ -794,22 +800,34 @@ function initLivingReview() {
         cited("p", "review-summary", review.summary)
       );
 
-      // How the studies came out
-      const tally = el("dl", "review-tally");
+      // How the studies came out, in two rows, one per kind of study
       const count = (...verdicts) => studies.filter((study) => verdicts.includes(study.verdict)).length;
+      const tallies = el("div", "review-tallies");
       [
-        [count("ai_ahead"), "AI ahead of clinicians"],
-        [count("humans_ahead"), "Clinicians ahead of AI"],
-        [count("comparable"), "Comparable"],
-        [count("ai_help_improved"), "AI help improved clinicians"],
-        [count("ai_help_no_benefit", "ai_help_harmed"), "AI help: no gain, or worse"],
-        [count("mixed"), "Mixed results"],
-      ].forEach(([value, label]) => {
-        const cell = el("div", "review-tally-cell");
-        cell.append(el("dt", null, String(value)), el("dd", null, label));
-        tally.append(cell);
+        ["When physicians used AI", [
+          [count("ai_help_improved"), "AI helped improve"],
+          [count("ai_help_no_benefit"), "AI help: no difference"],
+          [count("ai_help_harmed"), "AI help made it worse"],
+        ]],
+        ["When AI worked alone", [
+          [count("ai_ahead"), "AI outperformed physicians"],
+          [count("humans_ahead"), "Physicians outperformed AI"],
+          [count("comparable"), "Comparable"],
+        ]],
+      ].forEach(([heading, cells]) => {
+        const group = el("div", "review-tally-group");
+        const tally = el("dl", "review-tally");
+        cells.forEach(([value, label]) => {
+          const cell = el("div", "review-tally-cell");
+          cell.append(el("dt", null, String(value)), el("dd", null, label));
+          tally.append(cell);
+        });
+        group.append(el("p", "review-tally-heading", heading), tally);
+        tallies.append(group);
       });
-      article.append(tally, el("p", "note", "// A count of studies, not a score: they differ in size, design and how close they are to real practice."));
+      const mixed = count("mixed");
+      article.append(tallies, el("p", "note", `// ${mixed ? `Mixed results: ${mixed} ${mixed === 1 ? "study" : "studies"}. ` : ""}` +
+        "A count of studies, not a score: they differ in size, design and how close they are to real practice."));
 
       if (review.key_findings && review.key_findings.length) {
         const box = el("section", "review-findings");
@@ -858,6 +876,8 @@ function initLivingReview() {
         }
         const labels = el("div", "review-study-labels");
         if (VERDICTS[study.verdict]) labels.append(el("span", `blog-cat review-verdict review-verdict--${study.verdict}`, VERDICTS[study.verdict]));
+        const COMPARED = { ai_alone: "AI alone vs physicians", clinician_with_ai: "Physicians with vs without AI", both: "Both comparisons" };
+        if (COMPARED[study.comparison]) labels.append(el("span", "blog-compare", COMPARED[study.comparison]));
         if (DOMAINS[study.domain]) labels.append(el("span", "blog-cat", DOMAINS[study.domain]));
         item.append(title, el("p", "blog-source", [study.source, niceDate(study.published), study.design].filter(Boolean).join(" · ")), labels);
         const who = [study.ai_system && `AI: ${study.ai_system}`, study.humans && `Humans: ${study.humans}`].filter(Boolean).join(" · ");

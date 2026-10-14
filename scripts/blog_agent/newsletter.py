@@ -75,8 +75,11 @@ LINK = f"color:{GREEN};text-decoration:underline;"
 RULE = f'<hr style="border:0;border-top:1px solid {RULE_COLOR};margin:34px 0 30px;">'
 
 VERDICTS = {
-    "ai_ahead": "AI ahead",
-    "humans_ahead": "Physicians ahead",
+    "ai_ahead": "AI outperformed physicians",
+    "ai_help_improved": "AI helped improve",
+    "ai_help_no_benefit": "AI help: no difference",
+    "ai_help_harmed": "AI help made it worse",
+    "humans_ahead": "Physicians outperformed AI",
     "comparable": "Comparable",
     "mixed": "Mixed results",
 }
@@ -84,8 +87,8 @@ DEFAULT_ASK = "Open one tool from the hub this week and tell its author what you
 # Shown in the AI vs physician section until the first head-to-head review is published
 VERSUS_INTRO = ("Each week this space takes one published study that pits an AI system against clinicians on a "
                 "real medical task, or clinicians working with AI against clinicians working without it. You "
-                "get the task, who was tested, each side's numbers, the catch, and a verdict: AI ahead, humans "
-                "ahead, or too close to call.")
+                "get the task, who was tested, each side's numbers, the catch, and a verdict: whether AI helped "
+                "physicians, or, where AI worked alone, whether it outperformed them.")
 VERSUS_INTRO_NOTE = "A running scoreboard will keep count here from our first review onward."
 
 
@@ -154,7 +157,8 @@ def build(end: dt.date, days: int) -> dict:
     also = [i for i in week_items if i is not one_thing and i not in versus_week]
 
     # Running tally over every head-to-head review published so far
-    tally = {"ai_ahead": 0, "humans_ahead": 0, "comparable": 0, "mixed": 0}
+    tally = {"ai_ahead": 0, "humans_ahead": 0, "comparable": 0, "mixed": 0,
+             "ai_help_improved": 0, "ai_help_no_benefit": 0, "ai_help_harmed": 0}
     for post in posts:
         for item in post.get("items", []):
             if item.get("section") == "ai_vs_human" and item.get("verdict") in tally:
@@ -279,7 +283,7 @@ def render_html(d: dict) -> str:
 
     def cell(number: int, label: str, last: bool = False) -> str:
         edge = "" if last else f"border-right:1px solid {RULE_COLOR};"
-        return (f'<td width="33%" style="padding:6px 6px 4px;text-align:center;{edge}">'
+        return (f'<td width="25%" style="padding:6px 6px 4px;text-align:center;{edge}">'
                 f'<div style="font-family:{SERIF};font-size:44px;line-height:1;color:{INK};">{number}</div>'
                 f'<div style="margin-top:10px;font-family:{SANS};font-size:10px;font-weight:bold;letter-spacing:2px;color:{MUTED};">{label}</div></td>')
 
@@ -288,12 +292,15 @@ def render_html(d: dict) -> str:
             f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
             f'style="margin:22px 0 14px;border-top:1px solid {RULE_COLOR};border-bottom:1px solid {RULE_COLOR};">'
             '<tr><td style="padding:20px 0 18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>',
-            cell(tally["ai_ahead"], "AI AHEAD"),
-            cell(tally["humans_ahead"], "PHYSICIANS AHEAD"),
-            cell(tally["comparable"] + tally["mixed"], "EVEN OR MIXED", last=True),
+            cell(tally["ai_help_improved"], "AI HELPED PHYSICIANS"),
+            cell(tally["ai_help_no_benefit"] + tally["ai_help_harmed"], "AI HELP: NO GAIN OR WORSE"),
+            cell(tally["ai_ahead"], "AI ALONE OUTPERFORMED"),
+            cell(tally["humans_ahead"] + tally["comparable"], "PHYSICIANS AHEAD OR EVEN", last=True),
             "</tr></table></td></tr></table>",
             f'<p style="margin:0;text-align:center;font-family:{SERIF};font-size:14px;font-style:italic;line-height:1.5;color:{MUTED};">'
-            "The running tally of every head-to-head study we have reviewed. One study never settles it.</p>",
+            "The running tally of every head-to-head study we have reviewed"
+            + (f" (plus {tally['mixed']} with mixed results)" if tally["mixed"] else "")
+            + ". One study never settles it.</p>",
         ]
     else:
         # Before the first head-to-head review: say what this section will hold
@@ -378,8 +385,10 @@ def render_text(d: dict) -> str:
         lines += (["No head-to-head study made the cut this week."] if sum(tally.values())
                   else [VERSUS_INTRO, VERSUS_INTRO_NOTE])
     if sum(tally.values()):
-        lines.append(f"Running tally: AI ahead {tally['ai_ahead']}, physicians ahead {tally['humans_ahead']}, "
-                     f"even or mixed {tally['comparable'] + tally['mixed']}.")
+        lines.append(f"Running tally: AI helped physicians {tally['ai_help_improved']}, "
+                     f"AI help made no difference or worse {tally['ai_help_no_benefit'] + tally['ai_help_harmed']}, "
+                     f"AI alone outperformed physicians {tally['ai_ahead']}, "
+                     f"physicians ahead or even {tally['humans_ahead'] + tally['comparable']}, mixed {tally['mixed']}.")
     lines.append("")
     if d["also"]:
         lines.append("// ALSO THIS WEEK")

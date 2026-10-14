@@ -57,7 +57,11 @@ CATEGORIES = ["education", "research", "news", "policy", "tool"]
 SECTIONS = ["med_ed", "ai_vs_human"]
 SECTION_LABELS = {"med_ed": "Med-ed review", "ai_vs_human": "AI vs physician"}
 # Who came out ahead on the study's main measure (AI vs physician reviews only).
-VERDICTS = ["ai_ahead", "humans_ahead", "comparable", "mixed", "not_applicable"]
+# Shown to readers as: AI outperformed physicians, Physicians outperformed AI,
+# Comparable (AI on its own vs physicians); AI helped improve, AI help: no
+# difference, AI help made it worse (physicians with vs without AI); Mixed results.
+VERDICTS = ["ai_ahead", "humans_ahead", "comparable",
+            "ai_help_improved", "ai_help_no_benefit", "ai_help_harmed", "mixed", "not_applicable"]
 
 SYSTEM_PROMPT = """\
 You are the editor of the AI Medicine Collective's briefing, published three \
@@ -84,9 +88,12 @@ humans were and how many; the main measure and each side's result, with \
 numbers exactly as the source reports them; and the most important \
 limitation (for example: retrospective, written vignettes rather than real \
 patients, a single centre, a small sample). Set its verdict from the study's \
-own main result: "ai_ahead", "humans_ahead", "comparable", or "mixed". Do not \
-call a winner the authors did not report, and do not generalise beyond the \
-task studied.
+own main result. If it compares clinicians working WITH the AI against \
+clinicians working WITHOUT it, use "ai_help_improved", "ai_help_no_benefit" \
+or "ai_help_harmed". If it compares the AI on its own against clinicians, use \
+"ai_ahead", "humans_ahead" or "comparable". Use "mixed" when the answer \
+depends on the subgroup, task or measure. Do not call a winner the authors \
+did not report, and do not generalise beyond the task studied.
 
 Editorial rules:
 - Use web search to find items. Prefer primary sources: journal articles, \
