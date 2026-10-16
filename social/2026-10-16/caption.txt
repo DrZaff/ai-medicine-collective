@@ -1,0 +1,14 @@
+Generative AI in medical training, and what source-linked AI advice does to physicians' answers
+
+A JMIR scoping review maps how generative AI is being used in medical education and proposes a road map for building it into teaching. A new preprint shows why that teaching needs to cover how clinicians judge AI evidence: an AI assistant that cites its sources made physicians more accurate, but it also made them more likely to accept its wrong answers.
+
+Med-ed: The Forgotten Student—Generative AI Use in Medical Education and the Technology-Integrated Educational Design (TIED) Road Map: Scoping Review (Journal of Medical Internet Research (JMIR))
+AI vs physician: Large language models improve physician accuracy but lead to false reliance (arXiv (preprint))
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-10-16 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AutomationBias #ClinicalDecisionSupport #CurriculumDesign #GenerativeAi #Jmir #LargeLanguageModels

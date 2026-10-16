@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-16",
+  "headline": "Generative AI in medical training, and what source-linked AI advice does to physicians' answers",
+  "intro": "A JMIR scoping review maps how generative AI is being used in medical education and proposes a road map for building it into teaching. A new preprint shows why that teaching needs to cover how clinicians judge AI evidence: an AI assistant that cites its sources made physicians more accurate, but it also made them more likely to accept its wrong answers.",
+  "items": [
+    {
+      "title": "The Forgotten Student—Generative AI Use in Medical Education and the Technology-Integrated Educational Design (TIED) Road Map: Scoping Review",
+      "source": "Journal of Medical Internet Research (JMIR)",
+      "url": "https://www.jmir.org/2026/1/e96099",
+      "published": "2026-10-15",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "This scoping review by Pienkowska, Ng, Hou and Han, published in JMIR on 15 October, maps the published work on how generative AI is being used in medical education. Building on that evidence, the authors propose a framework for bringing the technology into teaching, which they call the Technology-Integrated Educational Design (TIED) road map. It is a scoping review, so it describes the evidence that exists without testing whether any particular approach improves learning.",
+      "why_it_matters": "Curriculum leads and clerkship directors who are building generative AI into their courses can use this as a structured place to start. The title also suggests the learner's own experience may be missing from the conversation."
+    },
+    {
+      "title": "Large language models improve physician accuracy but lead to false reliance",
+      "source": "arXiv (preprint)",
+      "url": "https://arxiv.org/abs/2608.00817",
+      "published": "2026-08-01",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_improved",
+      "summary": "In this preprint, physicians answered clinical cases with and without help from an AI assistant. The AI was CORA, an agentic large language model built by researchers led by the German Cancer Research Center (DKFZ) in Heidelberg, which pulls in sources and shows citations for its answers. Among the 46 physicians in the study, accuracy rose from 70.8% unaided to 82.6% with CORA. The citations cut both ways: when they appeared to back a correct answer, physicians took the advice 76.9% of the time, up from 34%, but when they appeared to back a wrong answer, physicians' resistance to that answer fell from 92% to 34.8%. The most important limitations are that the preprint has not been peer reviewed and that 46 physicians were tested on study cases, not on real patients in live care.",
+      "why_it_matters": "A citation makes AI advice look trustworthy, but it does not make the advice correct. Learners and educators should practise checking whether the cited sources actually support the answer before accepting it."
+    }
+  ],
+  "tags": [
+    "automation bias",
+    "clinical decision support",
+    "curriculum design",
+    "generative ai",
+    "jmir",
+    "large language models",
+    "medical education",
+    "physician-ai collaboration",
+    "preprint",
+    "retrieval-augmented generation",
+    "scoping review"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
