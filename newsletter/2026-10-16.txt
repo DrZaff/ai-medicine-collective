@@ -3,11 +3,15 @@ Weekly digest, Oct 10 - Oct 16, 2026
 
 [[AMC:NOTE]]
 // THE ONE THING
-Current status of medical students' use of large language models for graduation thesis writing: a comparative cross-sectional survey
-Students are adopting AI for research writing faster than many schools are writing policy. Educators should set clear rules on disclosure and verification, and teach students how to check AI output, now rather than later.
-https://www.frontiersin.org/journals/medicine/articles/10.3389/fmed.2026.1948768/full
+The Forgotten Student—Generative AI Use in Medical Education and the Technology-Integrated Educational Design (TIED) Road Map: Scoping Review
+Curriculum leads and clerkship directors who are building generative AI into their courses can use this as a structured place to start. The title also suggests the learner's own experience may be missing from the conversation.
+https://www.jmir.org/2026/1/e96099
 
 // AI VS PHYSICIAN
+This week: AI helped improve
+Large language models improve physician accuracy but lead to false reliance
+A citation makes AI advice look trustworthy, but it does not make the advice correct. Learners and educators should practise checking whether the cited sources actually support the answer before accepting it.
+https://arxiv.org/abs/2608.00817
 This week: AI helped improve
 Impact of LLM assistance on physician decision-making: a multi-country randomized controlled trial
 The result shows a general-purpose chatbot helping doctors on written cases compared with doctors who had no references at all. It does not show better patient outcomes or better results than doctors using their usual tools. Educators should keep that distinction clear when teaching about AI decision support.
@@ -16,9 +20,11 @@ This week: Mixed results
 Improving Diagnostic And Management Accuracy In Hard-To-Diagnose Pigmented Skin Lesions With Interactive And Interpretable AI Assistant For Dermatoscopy: Results From A Two-Phase Reader Study
 An AI that shows its reasoning through recognisable dermoscopic features may help on hard cases and can double as a teaching aid. Learners should still treat it as a second reader tested on images, not a proven tool for real patients.
 https://dpcj.org/index.php/dpc/article/view/7730
-Running tally: AI helped physicians 1, AI help made no difference or worse 0, AI alone outperformed physicians 0, physicians ahead or even 0, mixed 2.
+Running tally: AI helped physicians 2, AI help made no difference or worse 0, AI alone outperformed physicians 0, physicians ahead or even 0, mixed 2.
 
 // ALSO THIS WEEK
+> Current status of medical students' use of large language models for graduation thesis writing: a comparative cross-sectional survey (Frontiers in Medicine)
+  https://www.frontiersin.org/journals/medicine/articles/10.3389/fmed.2026.1948768/full
 > Generative Artificial Intelligence Use Among Medical Students: Learner Perspectives for Clinical Educators (The Clinical Teacher (Wiley))
   https://asmepublications.onlinelibrary.wiley.com/doi/10.1111/tct.70531?af=R
 

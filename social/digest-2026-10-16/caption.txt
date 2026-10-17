@@ -1,7 +1,8 @@
 The week in AI and medicine, Oct 10 – Oct 16.
 
-The one thing: Current status of medical students' use of large language models for graduation thesis writing: a comparative cross-sectional survey
-AI vs physician: Impact of LLM assistance on physician decision-making: a multi-country randomized controlled trial (ai helped improve)
+The one thing: The Forgotten Student—Generative AI Use in Medical Education and the Technology-Integrated Educational Design (TIED) Road Map: Scoping Review
+AI vs physician: Large language models improve physician accuracy but lead to false reliance (ai helped improve)
+Also: Current status of medical students' use of large language models for graduation thesis writing: a comparative cross-sectional survey
 Also: Generative Artificial Intelligence Use Among Medical Students: Learner Perspectives for Clinical Educators
 Tool of the week: VA Night Float Algorithm – App
 
