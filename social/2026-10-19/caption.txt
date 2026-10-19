@@ -1,0 +1,14 @@
+Johns Hopkins teams up with OpenEvidence on AI training, and radiologists and LLMs both struggle to spot synthetic chest X-rays
+
+This issue covers a new partnership between a medical school and an AI company on how future clinicians will learn, and a study of how well radiologists and AI models catch fake images. In that study, neither humans nor AI could reliably tell the real chest X-rays from the AI-generated ones.
+
+Med-ed: OpenEvidence and Johns Hopkins Medicine Announce Landmark Collaboration to Design the Future of Medicine and Medical Education in the Age of AI (Johns Hopkins Medicine (news release))
+AI vs physician: Radiologists, LLMs fail at spotting AI-generated chest x-rays (AuntMinnie (reporting a study in the Journal of Imaging Informatics in Medicine))
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-10-19 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AcademicPartnerships #HumanVsAi #LargeLanguageModels #Openevidence #Radiology #SyntheticImages
