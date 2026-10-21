@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-19",
+  "headline": "Johns Hopkins teams up with OpenEvidence on AI training, and radiologists and LLMs both struggle to spot synthetic chest X-rays",
+  "intro": "This issue covers a new partnership between a medical school and an AI company on how future clinicians will learn, and a study of how well radiologists and AI models catch fake images. In that study, neither humans nor AI could reliably tell the real chest X-rays from the AI-generated ones.",
+  "items": [
+    {
+      "title": "OpenEvidence and Johns Hopkins Medicine Announce Landmark Collaboration to Design the Future of Medicine and Medical Education in the Age of AI",
+      "source": "Johns Hopkins Medicine (news release)",
+      "url": "https://www.hopkinsmedicine.org/news/newsroom/news-releases/2026/10/openevidence-and-johns-hopkins-medicine-announce-landmark-collaboration-to-design-the-future-of-medicine-and-medical-education-in-the-age-of-ai",
+      "published": "2026-10-13",
+      "category": "news",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "Johns Hopkins Medicine and OpenEvidence, the company behind a widely used clinical AI tool, have announced a strategic collaboration to reshape medical education and clinical care for the AI era. The release names two goals: preparing the next generation of clinicians for the way they will practise, and making sure patients get care based on current evidence-based guidelines. This is a joint press release and does not describe curriculum changes or outcome data in detail.",
+      "why_it_matters": "A major academic medical centre is formally building a commercial AI tool into how it trains clinicians, a model other schools may copy. Educators should watch for details on what learners will actually do with the tool and how the results will be evaluated."
+    },
+    {
+      "title": "Radiologists, LLMs fail at spotting AI-generated chest x-rays",
+      "source": "AuntMinnie (reporting a study in the Journal of Imaging Informatics in Medicine)",
+      "url": "https://www.auntminnie.com/clinical-news/digital-x-ray/article/15837620/radiologists-llms-fail-at-spotting-aigenerated-chest-xrays",
+      "published": "2026-10-15",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "mixed",
+      "summary": "The task was sorting 160 chest X-rays into real (40) or AI-generated (120, made by three different image-generation pipelines). Three large language models (Gemini 3.5 Flash, GPT-4o and Claude 3.7 Sonnet) were compared with four human readers from a Seoul National University Hospital team: two radiologists and two general practitioners. On the main measure, balanced accuracy, the top performers were Gemini 3.5 Flash at 77.9% and one radiologist at 75.8%, with no statistically significant difference between them, while the general practitioners performed near chance. Humans were better at spotting images made by diffusion models (82% to 100% vs 32% to 72% for the LLMs), and the LLMs were better at correctly calling real images real (90% to 100% vs 50% to 100%). The main limitation is size: only four human readers and 160 images, on a task about checking image authenticity rather than making a diagnosis. These figures come from a trade-press report of the peer-reviewed paper.",
+      "why_it_matters": "The models and the readers made different kinds of mistakes, so having one check the other does not reliably catch fake images. The authors suggest that tracking where an image came from at the point it is created, for example with watermarking, should be the main safeguard, with visual review as a backup."
+    }
+  ],
+  "tags": [
+    "academic partnerships",
+    "human vs ai",
+    "large language models",
+    "medical education",
+    "openevidence",
+    "radiology",
+    "synthetic images"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
