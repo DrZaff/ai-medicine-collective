@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-21",
+  "headline": "An Armenian conference on AI in medical training, and a trial where AI helped specialists pinpoint the genetic cause of inherited retinal disease",
+  "intro": "The med-ed review covers a conference on how AI could reshape postgraduate training and continuing professional development. The AI-vs-physician review looks at a randomised trial testing whether specialists diagnose inherited retinal diseases more accurately with an AI decision-support tool than without it.",
+  "items": [
+    {
+      "title": "Advancing the Future of Medical Education: The 3rd Dr. Aram Chobanian Conference Explores AI, Innovation, and New Approaches to Learning",
+      "source": "The Armenian Mirror-Spectator",
+      "url": "https://mirrorspectator.com/2026/10/19/advancing-the-future-of-medical-education-the-3rd-dr-aram-chobanian-conference-explores-ai-innovation-and-new-approaches-to-learning/",
+      "published": "2026-10-19",
+      "category": "news",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "This is a news report on a virtual conference held on October 10 about postgraduate medical education and continuing professional development (CPD). It drew 187 participants, focused especially on AI and immersive technologies, and opened with a keynote on curriculum change by the dean of the Zucker School of Medicine at Hofstra/Northwell. Its main practical outcome was an announcement that Elsevier's ClinicalKey and ClinicalKey AI will be available through the Medical Library of Armenia's National Institute of Health. The report gives few details on how AI is to be used in teaching itself.",
+      "why_it_matters": "In this example, AI reaches postgraduate learners less through formal curricula than through national access to AI-supported reference tools. That gives CPD programmes a reason to teach clinicians how to judge AI-retrieved evidence critically."
+    },
+    {
+      "title": "AI-based clinician decision support system for diagnosis of inherited retinal diseases: a multicenter, randomized trial",
+      "source": "Nature Medicine",
+      "url": "https://www.nature.com/articles/s41591-026-04545-w",
+      "published": "2026-07-24",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_improved",
+      "summary": "The task was to predict which of 17 genotype categories caused a suspected inherited retinal disease, using retinal images (colour fundus photographs and OCT scans), before genetic test results were available. The AI was Retina4IRD, a Vision Transformer tool pretrained with RETFound. In a multicentre randomised controlled trial, 300 patients were randomised 1:1 to retinal specialists working with Retina4IRD or specialists working alone; 295 had sequencing results and were analysed. The abstract does not say how many specialists took part. On the primary outcome, top-5 genetic accuracy, the AI-assisted arm scored 88.5% and the specialist-only arm 67.3% (P < 0.001), and top-1 accuracy was 37.8% versus 22.4%. The most important limitation is that the trial measured whether the predicted genotype category matched sequencing, not patient outcomes; the finding that management decisions were better with AI came from a post hoc analysis.",
+      "why_it_matters": "This is one of the few randomised trials of AI used alongside specialists in real patients, and it shows the biggest gains in a rare-disease field where expertise is scarce. Trainees should note that it tested AI as an aid to specialists, not as a replacement, and that the evidence on management benefit is still exploratory."
+    }
+  ],
+  "tags": [
+    "clinical decision support",
+    "clinical reference tools",
+    "clinicalkey ai",
+    "continuing professional development",
+    "genetic diagnosis",
+    "human-ai collaboration",
+    "inherited retinal disease",
+    "medical education",
+    "nature medicine",
+    "ophthalmology",
+    "postgraduate training",
+    "randomized controlled trial"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
