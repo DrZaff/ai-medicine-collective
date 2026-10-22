@@ -111,6 +111,9 @@ def main() -> int:
     parser.add_argument("--name", "--date", dest="name", required=True,
                         help="The folder under social/: a blog post's date, digest-<date> or review-<date>")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be posted; contact nobody")
+    parser.add_argument("--repost", action="store_true",
+                        help="Post even if this carousel is already on the account (a corrected version); "
+                             "the old post has to be deleted by hand in the Instagram app")
     args = parser.parse_args()
 
     if not all(ch.isalnum() or ch == "-" for ch in args.name):
@@ -189,7 +192,7 @@ def main() -> int:
         if user is None:
             raise problem or ApiError("could not work out which Instagram account the token belongs to")
         print(f"Posting as @{me.get('username', '?')}")
-        if any(marker in (media.get("caption") or "") for media in recent.get("data", [])):
+        if not args.repost and any(marker in (media.get("caption") or "") for media in recent.get("data", [])):
             print(f"The {args.name} post is already on Instagram; nothing to do.")
             return 0
 

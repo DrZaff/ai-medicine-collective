@@ -25,6 +25,10 @@ on:
         description: "Only show what would be posted, and check the token (posts nothing)"
         type: boolean
         default: false
+      repost:
+        description: "Post again even if it is already on Instagram (a corrected version; delete the old one in the app)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -69,6 +73,7 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           DATES: ${{ steps.find.outputs.dates }}
           DRY_RUN: ${{ github.event.inputs.dry_run }}
+          REPOST: ${{ github.event.inputs.repost }}
         run: |
           if [ "$DRY_RUN" != "true" ] && [ -z "$IG_ACCESS_TOKEN" ]; then
             echo "::notice::The Instagram access token is not set yet; skipping."
@@ -81,6 +86,10 @@ jobs:
             if [ "$DRY_RUN" = "true" ]; then
               python scripts/blog_agent/instagram_publish.py --date "$date" --dry-run
             else
-              python scripts/blog_agent/instagram_publish.py --date "$date"
+              if [ "$REPOST" = "true" ]; then
+                python scripts/blog_agent/instagram_publish.py --date "$date" --repost
+              else
+                python scripts/blog_agent/instagram_publish.py --date "$date"
+              fi
             fi
           done

@@ -229,8 +229,9 @@ def card_slide(index: int, total: int, labels: list, title: str, source: str,
     font, lines = fit(draw, title, lambda s: serif(s, 500), range(66, 43, -2), W - 2 * PAD, 5)
     y = paragraph(draw, (PAD, 300), lines, font, INK, 1.14)
     if source:
-        draw.text((PAD, y + 14), source, font=serif(31, 400, italic=True), fill=MUTED)
-        y += 96
+        # a long source wraps (at most two lines) instead of running off the slide
+        small, source_lines = fit(draw, source, lambda s: serif(s, 400, italic=True), range(31, 25, -2), W - 2 * PAD, 2)
+        y = paragraph(draw, (PAD, y + 14), source_lines, small, MUTED, 1.25) + 28
     else:
         y += 40
 
@@ -330,10 +331,20 @@ def title_slide(kicker: str, headline: str, sub: str, total: int) -> Image.Image
     width = tracked_width(draw, kicker, font, 2.6) + 52
     draw.rounded_rectangle((PAD, 300, PAD + width, 356), radius=28, fill=(18, 62, 54), outline=(44, 96, 86))
     tracked(draw, (PAD + 26, 314), kicker, font, MINT, 2.6)
-    font, lines = fit(draw, headline, lambda s: serif(s, 500), range(104, 59, -4), W - 2 * PAD, 7)
-    y = paragraph(draw, (PAD, 410), lines, font, (255, 255, 255), 1.08)
+    # The headline gets the largest size at which it, and the line under it,
+    # fit above the "Swipe" line; it never runs into what follows.
+    top, bottom = 410, H - 150 - (70 if sub else 0)
+    for size in range(104, 47, -4):
+        font = serif(size, 500)
+        lines = wrap(draw, headline, font, W - 2 * PAD)
+        if len(lines) * round(size * 1.08) <= bottom - top:
+            break
+    else:
+        font, lines = fit(draw, headline, lambda s: serif(s, 500), range(48, 47, -1), W - 2 * PAD,
+                          max(1, (bottom - top) // round(48 * 1.08)))
+    y = paragraph(draw, (PAD, top), lines, font, (255, 255, 255), 1.08)
     if sub:
-        draw.text((PAD, min(y + 36, H - 250)), sub, font=serif(40, 400, italic=True), fill=MINT)
+        draw.text((PAD, y + 22), sub, font=serif(40, 400, italic=True), fill=MINT)
     draw.text((PAD, H - 108), "Swipe for the takeaways  →", font=sans(29, 600), fill=MINT)
     footer_dots_only(draw, 0, total, dark=True)
     return im
