@@ -66,6 +66,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git add "newsletter/$DATE.html" "newsletter/$DATE.txt" "newsletter/$DATE.json" newsletter/latest.json
+          if [ -f "newsletter/$DATE.leads.json" ]; then git add "newsletter/$DATE.leads.json"; fi
           if [ -d "social/digest-$DATE" ]; then git add "social/digest-$DATE"; fi
           if git diff --cached --quiet; then
             echo "::notice::The digest for $DATE is already published and unchanged."

@@ -1,14 +1,16 @@
 """Assemble the weekly digest: a two-minute read with a fixed shape.
 
   1. The one thing        the week's most useful item, in two sentences
-  2. AI vs physician      this week's head-to-head results
+  2. AI vs physician      the week's strongest head-to-head study (others go to 'Also')
   3. Tool of the week     one tool from the hub
   4. From the Collective  who published what (public part; the members-only
                           part is added when an admin sends it)
   5. One ask              a single thing to do this week (a different one each week)
 
 Writes newsletter/YYYY-MM-DD.html (email-ready, inline styles), .txt (plain
-text) and .json (the suggested subject line). No AI call: it only rearranges
+text), .json (the suggested subject line) and .leads.json (the same issue
+built around each of the week's items as the lead story, so the sender can
+pick a different lead on the Moderation page). No AI call: it only rearranges
 posts that were already reviewed and merged, and reads published projects
 from the site's public API (the same request the home page makes; if that
 fails, those parts are left out). The weekly workflow
@@ -165,7 +167,20 @@ def published_tools() -> list[dict]:
 
 # ---------------------------------------------------------------- content
 
-def build(end: dt.date, days: int) -> dict:
+def source_rank(item: dict) -> int:
+    """0 for a journal, 1 for a preprint, 2 for news coverage or a press release:
+    when picking what to lead with, a primary source wins."""
+    source = str(item.get("source", "")).lower()
+    if any(word in source for word in ("news", "release", "report", "press", "advisor", "spectator", "auntminnie", "blog")):
+        return 2
+    if any(word in source for word in ("preprint", "arxiv", "medrxiv", "biorxiv", "ssrn")):
+        return 1
+    return 0
+
+
+def build(end: dt.date, days: int, lead_url: str | None = None, tools: list | None = None) -> dict:
+    """lead_url: the item to lead with (default: the strongest med-ed item).
+    tools: the published tools, if already fetched."""
     start = end - dt.timedelta(days=days - 1)
     posts = all_posts(end)
     week = [p for p in posts if dt.date.fromisoformat(p["date"]) >= start]
@@ -174,13 +189,18 @@ def build(end: dt.date, days: int) -> dict:
         return {**item, "post_date": post["date"]}
 
     week_items = [tagged(p, i) for p in reversed(week) for i in p.get("items", [])]   # newest first
-    versus_week = [i for i in week_items if i.get("section") == "ai_vs_human"]
-    others = [i for i in week_items if i.get("section") != "ai_vs_human"]
-    one_thing = others[0] if others else (week_items[0] if week_items else None)
-    also = [i for i in week_items if i is not one_thing and i not in versus_week]
+    best = lambda items: min(items, key=lambda i: (source_rank(i), items.index(i))) if items else None
+    chosen = [i for i in week_items if lead_url and i.get("url") == lead_url]
+    # The default lead: the strongest source of the week (a journal beats a
+    # preprint beats news), a med-ed item winning a tie, newest first
+    lead_key = lambda i: (source_rank(i), i.get("section") == "ai_vs_human", week_items.index(i))
+    one_thing = chosen[0] if chosen else (min(week_items, key=lead_key) if week_items else None)
+    # One head-to-head study per issue: the strongest one that isn't the lead
+    head_to_head = best([i for i in week_items if i.get("section") == "ai_vs_human" and i is not one_thing])
+    versus_week = [head_to_head] if head_to_head else []
+    also = [i for i in week_items if i is not one_thing and i is not head_to_head]
 
-
-    tools = published_tools()
+    tools = published_tools() if tools is None else tools
     window_start = dt.datetime.combine(start, dt.time.min).isoformat()
     window_end = dt.datetime.combine(end + dt.timedelta(days=1), dt.time.min).isoformat()
     new_tools = [t for t in tools if window_start <= str(t.get("created_at", ""))[:19] < window_end]
@@ -209,7 +229,8 @@ def build(end: dt.date, days: int) -> dict:
 
     headline = week[-1]["headline"] if week else (f"New tool: {new_tools[0]['title']}" if new_tools else "")
     return {
-        "start": start, "end": end, "week": week, "one_thing": one_thing, "versus": versus_week,
+        "start": start, "end": end, "week": week, "items": week_items, "tools": tools,
+        "one_thing": one_thing, "versus": versus_week,
         "also": also, "tool": tool, "published_lines": published_lines,
         "subject": subject_line(headline, end),
     }
@@ -433,6 +454,22 @@ def main() -> int:
     stem.with_suffix(".json").write_text(
         json.dumps({"date": end.isoformat(), "subject": digest["subject"]}, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8")
+    # The same issue built around each item as the lead story, for the
+    # Moderation page's "Lead story" choice
+    options = []
+    for candidate in digest["items"]:
+        variant = build(end, args.days, lead_url=candidate.get("url"), tools=digest["tools"])
+        options.append({
+            "url": candidate.get("url"),
+            "label": f"{candidate['title']} ({candidate.get('source', '')})",
+            "html": render_html(variant),
+            "plain": render_text(variant),
+        })
+    stem.with_name(f"{end.isoformat()}.leads.json").write_text(json.dumps({
+        "default": (digest["one_thing"] or {}).get("url"),
+        "options": options,
+    }, ensure_ascii=False) + "\n", encoding="utf-8")
+
     # The Moderation page reads this to offer the newest issue
     (OUT_DIR / "latest.json").write_text(json.dumps({"date": end.isoformat()}) + chr(10), encoding="utf-8")
     print(f"Wrote {stem.name}.html, .txt and .json from {len(digest['week'])} post(s). Subject: {digest['subject']}")

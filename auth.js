@@ -1582,6 +1582,12 @@ function initDigestSender() {
     note.maxLength = 1200;
     note.placeholder = "Two or three sentences in your own voice: what you noticed, built, or want people to try. Optional, but it's what people read first.";
 
+    // Which item the issue leads with. The Friday job builds the issue once
+    // per item (newsletter/<date>.leads.json); choosing one swaps in that build.
+    const lead = el("select", "join-input");
+    lead.id = "digest-lead";
+    let leads = null; // { default, options: [{ url, label, html, plain }] }
+
     const preview = el("iframe", "digest-preview");
     preview.title = "Digest preview";
     // Scripts never run in here; "allow-same-origin" only lets this page turn
@@ -1689,6 +1695,24 @@ function initDigestSender() {
         // older issues have no subject file
       }
       subject.value = suggested;
+      // The lead-story choices (issues from before this existed have none)
+      leads = null;
+      lead.replaceChildren();
+      try {
+        const found = await (await fetch(`newsletter/${issue}.leads.json`, { cache: "no-cache" })).json();
+        if (found && Array.isArray(found.options) && found.options.length > 1) leads = found;
+      } catch {
+        // no choice offered
+      }
+      if (leads) {
+        leads.options.forEach((option, i) => {
+          const choice = el("option", null, option.label);
+          choice.value = String(i);
+          choice.selected = option.url === leads.default;
+          lead.append(choice);
+        });
+      }
+      lead.closest(".join-row").hidden = !leads;
       loaded = { issue, html, plain, news: await memberNews() };
       compose.hidden = false;
       say(`> LOADED ${issue}. ${loaded.news.lines.length} members-only line(s) will be added. Preview it before sending.`);
@@ -1744,12 +1768,27 @@ function initDigestSender() {
       button("Send test to me", "hub-tab", () => send(true)),
       button("> Send to members", "hub-tab hub-tab--submit", () => send(false))
     );
+    lead.addEventListener("change", () => {
+      if (!loaded || !leads) return;
+      const option = leads.options[Number(lead.value)];
+      if (!option) return;
+      if (previewEdited && !window.confirm("Change the lead story? The changes you typed into the preview will be replaced.")) {
+        lead.value = String(leads.options.findIndex((o) => o.html === loaded.html));
+        return;
+      }
+      loaded.html = option.html;
+      loaded.plain = option.plain;
+      if (previewOpen) showPreview();
+      say(`> LEAD STORY: ${option.label}`);
+    });
     note.addEventListener("input", () => {
       if (!previewOpen) return;
       if (previewEdited) noteChanged = true; // can't merge the two: ask before sending
       else showPreview();                    // nothing typed in the preview yet: just keep it current
     });
-    compose.append(field("Subject line", subject), field("A note from you", note), field("Replies go to", replyTo), actions, previewHint, preview);
+    const leadRow = field("Lead story", lead);
+    leadRow.hidden = true;
+    compose.append(field("Subject line", subject), leadRow, field("A note from you", note), field("Replies go to", replyTo), actions, previewHint, preview);
 
     const history = el("ul", "dash-list digest-history");
     for (const entry of sent) {

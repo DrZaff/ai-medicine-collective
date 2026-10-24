@@ -1,9 +1,11 @@
 The week in AI and medicine, Oct 17 – Oct 23.
 
-The one thing: AI Tool Improves Resident Confidence, Knowledge of Noninvasive Respiratory Support
-AI vs physician: Comparative Cost of Care Recommended by Large Language Models versus Treating Physicians (physicians outperformed ai)
+The one thing: Comparative Cost of Care Recommended by Large Language Models versus Treating Physicians
+AI vs physician: AI-based clinician decision support system for diagnosis of inherited retinal diseases: a multicenter, randomized trial (ai helped improve)
+Also: AI Tool Improves Resident Confidence, Knowledge of Noninvasive Respiratory Support
 Also: Advancing the Future of Medical Education: The 3rd Dr. Aram Chobanian Conference Explores AI, Innovation, and New Approaches to Learning
 Also: OpenEvidence and Johns Hopkins Medicine Announce Landmark Collaboration to Design the Future of Medicine and Medical Education in the Age of AI
+Also: Radiologists, LLMs fail at spotting AI-generated chest x-rays
 Tool of the week: HEART Score Calculator
 
 Every briefing with its sources: aimedicinecollective.com/blog (link in bio). Week ending 2026-10-23.

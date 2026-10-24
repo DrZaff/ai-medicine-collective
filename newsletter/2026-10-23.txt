@@ -3,29 +3,25 @@ Weekly digest, Oct 17 - Oct 23, 2026
 
 [[AMC:NOTE]]
 // THE ONE THING
-AI Tool Improves Resident Confidence, Knowledge of Noninvasive Respiratory Support
-Browser-based AI simulation could give every resident standardized practice with high-risk, low-frequency scenarios like escalating respiratory support. Educators should still look for objective skill outcomes before relying on it.
-https://www.pulmonologyadvisor.com/reports/ai-tool-improves-resident-confidence-knowledge-noninvasive-respiratory-support/
-
-// AI VS PHYSICIAN
-This week: Physicians outperformed AI
 Comparative Cost of Care Recommended by Large Language Models versus Treating Physicians
 Trainees who use LLMs to draft plans should watch for over-ordering, because a plan can sound thorough and still add cost with no clear benefit. Educators can use this study to teach high-value care alongside AI literacy.
 https://ai.nejm.org/doi/full/10.1056/AIoa2600537
+
+// AI VS PHYSICIAN
 This week: AI helped improve
 AI-based clinician decision support system for diagnosis of inherited retinal diseases: a multicenter, randomized trial
 This is one of the few randomised trials of AI used alongside specialists in real patients, and it shows the biggest gains in a rare-disease field where expertise is scarce. Trainees should note that it tested AI as an aid to specialists, not as a replacement, and that the evidence on management benefit is still exploratory.
 https://www.nature.com/articles/s41591-026-04545-w
-This week: Mixed results
-Radiologists, LLMs fail at spotting AI-generated chest x-rays
-The models and the readers made different kinds of mistakes, so having one check the other does not reliably catch fake images. The authors suggest that tracking where an image came from at the point it is created, for example with watermarking, should be the main safeguard, with visual review as a backup.
-https://www.auntminnie.com/clinical-news/digital-x-ray/article/15837620/radiologists-llms-fail-at-spotting-aigenerated-chest-xrays
 
 // ALSO THIS WEEK
+> AI Tool Improves Resident Confidence, Knowledge of Noninvasive Respiratory Support (Pulmonology Advisor (report on a CHEST 2026 Annual Meeting abstract))
+  https://www.pulmonologyadvisor.com/reports/ai-tool-improves-resident-confidence-knowledge-noninvasive-respiratory-support/
 > Advancing the Future of Medical Education: The 3rd Dr. Aram Chobanian Conference Explores AI, Innovation, and New Approaches to Learning (The Armenian Mirror-Spectator)
   https://mirrorspectator.com/2026/10/19/advancing-the-future-of-medical-education-the-3rd-dr-aram-chobanian-conference-explores-ai-innovation-and-new-approaches-to-learning/
 > OpenEvidence and Johns Hopkins Medicine Announce Landmark Collaboration to Design the Future of Medicine and Medical Education in the Age of AI (Johns Hopkins Medicine (news release))
   https://www.hopkinsmedicine.org/news/newsroom/news-releases/2026/10/openevidence-and-johns-hopkins-medicine-announce-landmark-collaboration-to-design-the-future-of-medicine-and-medical-education-in-the-age-of-ai
+> Radiologists, LLMs fail at spotting AI-generated chest x-rays (AuntMinnie (reporting a study in the Journal of Imaging Informatics in Medicine))
+  https://www.auntminnie.com/clinical-news/digital-x-ray/article/15837620/radiologists-llms-fail-at-spotting-aigenerated-chest-xrays
 
 // TOOL OF THE WEEK
 HEART Score Calculator
