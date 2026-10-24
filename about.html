@@ -1,191 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" class="modern">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>About – AI Medicine Collective</title>
+  <title>AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="images/icon-192.png" />
-  <meta property="og:site_name" content="AI Medicine Collective" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="About – AI Medicine Collective" />
-  <meta property="og:description" content="An independent hub for grassroots AI initiatives in medicine, built by clinicians and trainees." />
-  <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
-  <meta name="twitter:card" content="summary_large_image" />
+  <!-- The About page is off the site while its guide avatar is redone.
+       Its last version is in the git history (commit before "Take the
+       About page off the site"); restore it from there. -->
+  <meta http-equiv="refresh" content="0; url=index.html" />
+  <link rel="canonical" href="index.html" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="modern.css" />
-  <script>try{if(localStorage.getItem("amc-theme")==="terminal")document.documentElement.className="terminal"}catch(e){}</script>
+  <script>location.replace("index.html");</script>
 </head>
-
 <body>
   <div class="terminal-frame">
-
-    <div class="horizontal-rule"></div>
-
-    <header>
-      <h1 class="headline"><a href="index.html">:: AI MEDICINE COLLECTIVE ::</a></h1>
-
-      <nav class="nav" aria-label="Main">
-        <a href="index.html">HOME</a>
-        <a href="hub.html">TOOLS</a>
-        <a href="blog.html">EVIDENCE</a>
-        <a href="learn.html">LEARN</a>
-        <a href="members.html">COMMUNITY</a>
-        <a href="about.html">ABOUT</a>
-        <a href="join.html" class="nav-cta" data-signed-out-only>JOIN</a>
-        <a href="account.html" class="nav-account" data-account-link="ACCOUNT">SIGN IN</a>
-      </nav>
-
-      <div class="horizontal-rule"></div>
-    </header>
-
-    <main class="section">
-      <h2 class="section-title">ABOUT</h2>
-
-      <p class="note">// Introduction to the AI Medicine Collective</p>
-
-      <!-- GUIDE AVATAR
-           Idle loop plays silently on load; PLAY INTRO crossfades to the
-           full talking intro, then returns to idle. Assets live in media/about/:
-           guide-idle.mp4 (silent seamless loop built from the intro's final
-           pause), guide-intro.mp4, guide-intro.vtt (captions), guide-poster.jpg.
-           The guide is an AI-generated character (D-ID). -->
-      <section class="guide" aria-label="AI guide introduction">
-        <div class="guide-status" aria-live="polite">
-          <span id="guide-status-text">&gt; GUIDE ONLINE</span>
-          <span class="cursor" aria-hidden="true">█</span>
-        </div>
-
-        <div class="guide-screen">
-          <video
-            id="guide-idle"
-            class="guide-video"
-            src="media/about/guide-idle.mp4"
-            poster="media/about/guide-poster.jpg"
-            muted
-            loop
-            autoplay
-            playsinline
-            preload="auto"
-            aria-hidden="true"
-            tabindex="-1"
-          ></video>
-
-          <video
-            id="guide-intro"
-            class="guide-video guide-video--intro"
-            poster="media/about/guide-poster.jpg"
-            playsinline
-            preload="metadata"
-            aria-label="Introduction video from the AI Medicine Collective guide"
-          >
-            <source src="media/about/guide-intro.mp4" type="video/mp4" />
-            <track
-              kind="captions"
-              src="media/about/guide-intro.vtt"
-              srclang="en"
-              label="English"
-              default
-            />
-          </video>
-
-          <div class="guide-scanlines" aria-hidden="true"></div>
-        </div>
-
-        <div class="guide-controls">
-          <button type="button" id="guide-play" class="guide-btn guide-btn--play">
-            &#9654; PLAY INTRO
-          </button>
-          <button type="button" id="guide-stop" class="guide-btn hidden">
-            &#9632; STOP
-          </button>
-          <button type="button" id="guide-cc" class="guide-btn" aria-pressed="true">
-            CC: ON
-          </button>
-        </div>
-
-        <noscript>
-          <p class="note">
-            <a href="media/about/guide-intro.mp4">&gt; Watch the intro video</a>
-          </p>
-        </noscript>
-
-        <details class="resource-group guide-transcript">
-          <summary class="resource-summary">// Transcript</summary>
-          <div class="resource-body">
-            <p>
-              Welcome to the AI Medicine Collective, where clinicians, trainees,
-              researchers, and curious thinkers explore the evolving edge of AI
-              in healthcare.
-            </p>
-            <p>
-              We share practical tools, ethical guidance, and creative
-              experimentation across every training level. No technical
-              background required.
-            </p>
-            <p data-signed-out-only>
-              If you're ready to push the boundaries of what medicine can be,
-              click <a href="join.html">Join</a> above to become a member.
-            </p>
-          </div>
-        </details>
-      </section>
-
-      <section class="resource-accordion">
-        <!-- CLUB FLYERS (moved from the old Resources page) -->
-        <details class="resource-group">
-          <summary class="resource-summary">// Club flyers</summary>
-          <div class="resource-body">
-            <p class="note">
-              Share these to spread the word. Click a flyer to view it full-size.
-            </p>
-
-            <div class="resource-thumbs">
-              <!-- Flyer 1 -->
-              <figure class="resource-thumb">
-                <img
-                  src="resources/fliers/ai_medicine_collective_Digital_flyer_thumb.png"
-                  data-full="resources/fliers/ai_medicine_collective_Digital_flyer.png"
-                  alt="Terminal-style AI Medicine Collective flyer"
-                />
-              </figure>
-
-              <!-- Flyer 2 -->
-              <figure class="resource-thumb">
-                <img
-                  src="resources/fliers/ai_medicine_collective_surf_flyer_thumb.png"
-                  data-full="resources/fliers/ai_medicine_collective_surf_flyer.png"
-                  alt="Ride the Wave AI Medicine Collective flyer"
-                />
-              </figure>
-
-              <!-- Add more flyers by copying a <figure> and updating src + data-full -->
-            </div>
-          </div>
-        </details>
-      </section>
-
-      <p><a href="index.html" class="back-link">&lt; HOME</a></p>
-    </main>
-
-    <p class="site-social"><a href="https://www.instagram.com/aimedicinecollective/" target="_blank" rel="noopener noreferrer"><svg class="site-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg><span>&gt; INSTAGRAM: @aimedicinecollective</span></a></p>
-
-    <p class="site-note">// The AI Medicine Collective is an independent, volunteer-run group. It is not
-      affiliated with, sponsored by or endorsed by the University of Cincinnati.</p>
-
-    <div class="horizontal-rule bottom-rule"></div>
-
-    <footer class="footer">
-      &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
-      <span class="cursor">█</span>
-    </footer>
-
-    <script src="script.js"></script>
+    <p>&gt; <a href="index.html">Go to the home page</a>.</p>
   </div>
 </body>
 </html>
-
-
-
-
-
-
