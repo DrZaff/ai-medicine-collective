@@ -3,11 +3,15 @@ Weekly digest, Oct 17 - Oct 23, 2026
 
 [[AMC:NOTE]]
 // THE ONE THING
-Advancing the Future of Medical Education: The 3rd Dr. Aram Chobanian Conference Explores AI, Innovation, and New Approaches to Learning
-In this example, AI reaches postgraduate learners less through formal curricula than through national access to AI-supported reference tools. That gives CPD programmes a reason to teach clinicians how to judge AI-retrieved evidence critically.
-https://mirrorspectator.com/2026/10/19/advancing-the-future-of-medical-education-the-3rd-dr-aram-chobanian-conference-explores-ai-innovation-and-new-approaches-to-learning/
+AI Tool Improves Resident Confidence, Knowledge of Noninvasive Respiratory Support
+Browser-based AI simulation could give every resident standardized practice with high-risk, low-frequency scenarios like escalating respiratory support. Educators should still look for objective skill outcomes before relying on it.
+https://www.pulmonologyadvisor.com/reports/ai-tool-improves-resident-confidence-knowledge-noninvasive-respiratory-support/
 
 // AI VS PHYSICIAN
+This week: Physicians outperformed AI
+Comparative Cost of Care Recommended by Large Language Models versus Treating Physicians
+Trainees who use LLMs to draft plans should watch for over-ordering, because a plan can sound thorough and still add cost with no clear benefit. Educators can use this study to teach high-value care alongside AI literacy.
+https://ai.nejm.org/doi/full/10.1056/AIoa2600537
 This week: AI helped improve
 AI-based clinician decision support system for diagnosis of inherited retinal diseases: a multicenter, randomized trial
 This is one of the few randomised trials of AI used alongside specialists in real patients, and it shows the biggest gains in a rare-disease field where expertise is scarce. Trainees should note that it tested AI as an aid to specialists, not as a replacement, and that the evidence on management benefit is still exploratory.
@@ -16,22 +20,23 @@ This week: Mixed results
 Radiologists, LLMs fail at spotting AI-generated chest x-rays
 The models and the readers made different kinds of mistakes, so having one check the other does not reliably catch fake images. The authors suggest that tracking where an image came from at the point it is created, for example with watermarking, should be the main safeguard, with visual review as a backup.
 https://www.auntminnie.com/clinical-news/digital-x-ray/article/15837620/radiologists-llms-fail-at-spotting-aigenerated-chest-xrays
-Running tally: AI helped physicians 3, AI help made no difference or worse 0, AI alone outperformed physicians 0, physicians ahead or even 0, mixed 3.
 
 // ALSO THIS WEEK
+> Advancing the Future of Medical Education: The 3rd Dr. Aram Chobanian Conference Explores AI, Innovation, and New Approaches to Learning (The Armenian Mirror-Spectator)
+  https://mirrorspectator.com/2026/10/19/advancing-the-future-of-medical-education-the-3rd-dr-aram-chobanian-conference-explores-ai-innovation-and-new-approaches-to-learning/
 > OpenEvidence and Johns Hopkins Medicine Announce Landmark Collaboration to Design the Future of Medicine and Medical Education in the Age of AI (Johns Hopkins Medicine (news release))
   https://www.hopkinsmedicine.org/news/newsroom/news-releases/2026/10/openevidence-and-johns-hopkins-medicine-announce-landmark-collaboration-to-design-the-future-of-medicine-and-medical-education-in-the-age-of-ai
 
 // TOOL OF THE WEEK
-VA Night Float Algorithm – Excel
-Excel sheet that automates the VA night admission algorithm.
-https://www.aimedicinecollective.com/hub.html?project=5e1fa6e7-ff19-41a9-b7e4-cad86c703a2b
+HEART Score Calculator
+Clinical micro-app that calculates the HEART score, built with ClinicalToolsDEV. Opens in the browser on phone or computer.
+https://www.aimedicinecollective.com/hub.html?project=0707470a-6a02-4f6c-b753-caee52b37fb5
 
 // FROM THE COLLECTIVE
 [[AMC:COLLECTIVE]]
 
 // ONE ASK
-[[AMC:ASK]]Open one tool from the hub this week and tell its author what you think. https://www.aimedicinecollective.com/hub.html[[/AMC:ASK]]
+[[AMC:ASK]]Send this week's AI vs physician study to a colleague who would argue with it. https://www.aimedicinecollective.com/blog.html[[/AMC:ASK]]
 
 Every briefing: https://www.aimedicinecollective.com/blog.html
 Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.
