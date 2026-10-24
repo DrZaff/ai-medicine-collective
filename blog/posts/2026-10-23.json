@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-23",
+  "headline": "Residents learn ventilation support with AI simulation, and LLM care plans cost more than physicians' plans",
+  "intro": "In this briefing, an AI-assisted simulation boosted internal medicine residents' confidence with noninvasive respiratory support. Separately, a NEJM AI study found that care plans written by large language models ordered far more, and cost far more, than the plans treating physicians actually used. Both pieces are a reminder to judge AI by what it does to learning and to care, not only by whether it gets the answer right.",
+  "items": [
+    {
+      "title": "AI Tool Improves Resident Confidence, Knowledge of Noninvasive Respiratory Support",
+      "source": "Pulmonology Advisor (report on a CHEST 2026 Annual Meeting abstract)",
+      "url": "https://www.pulmonologyadvisor.com/reports/ai-tool-improves-resident-confidence-knowledge-noninvasive-respiratory-support/",
+      "published": "2026-10-21",
+      "category": "education",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "Investigators tested NIV Quest, an AI-driven simulation that runs in a web browser, alongside targeted teaching sessions and expert debriefing, to train internal medicine residents in choosing and starting noninvasive respiratory support. In 43 questionnaires before the training and 32 after, the share of residents reporting good or complete understanding rose from 39.5% to 84.4%, and median understanding scores went from 3 to 4 (P<.001). This is a conference abstract described in a news report. The results are self-reported confidence and understanding, not measured performance with patients.",
+      "why_it_matters": "Browser-based AI simulation could give every resident standardized practice with high-risk, low-frequency scenarios like escalating respiratory support. Educators should still look for objective skill outcomes before relying on it."
+    },
+    {
+      "title": "Comparative Cost of Care Recommended by Large Language Models versus Treating Physicians",
+      "source": "NEJM AI",
+      "url": "https://ai.nejm.org/doi/full/10.1056/AIoa2600537",
+      "published": "2026-10-15",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "humans_ahead",
+      "summary": "The task was writing an assessment and plan from the clinical presentation in de-identified outpatient and emergency department notes. The orders in each plan were then priced using the 2026 Medicare fee schedules. The AI side was 24 systems (20 general-purpose large language models and 4 specialized medical systems), each given the same 200 cases. The human comparison was the plan actually documented by each case's treating physician; the number of physicians is not stated in the authors' public materials. On the main measure, cost of care, a Nature research highlight of the paper reports that LLM-suggested plans were three times as costly as physicians' plans, driven by more tests, referrals and medications. The most important limitation is that this was a retrospective study of documented notes rather than real-time care, and higher cost alone does not show whether the extra orders helped or harmed patients.",
+      "why_it_matters": "Trainees who use LLMs to draft plans should watch for over-ordering, because a plan can sound thorough and still add cost with no clear benefit. Educators can use this study to teach high-value care alongside AI literacy."
+    }
+  ],
+  "tags": [
+    "cost of care",
+    "graduate medical education",
+    "high-value care",
+    "large language models",
+    "medical education",
+    "nejm ai",
+    "pulmonary and critical care",
+    "simulation"
+  ],
+  "generated_by": "claude-opus-5-5"
+}

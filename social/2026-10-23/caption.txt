@@ -1,0 +1,14 @@
+Residents learn ventilation support with AI simulation, and LLM care plans cost more than physicians' plans
+
+In this briefing, an AI-assisted simulation boosted internal medicine residents' confidence with noninvasive respiratory support. Separately, a NEJM AI study found that care plans written by large language models ordered far more, and cost far more, than the plans treating physicians actually used. Both pieces are a reminder to judge AI by what it does to learning and to care, not only by whether it gets the answer right.
+
+Med-ed: AI Tool Improves Resident Confidence, Knowledge of Noninvasive Respiratory Support (Pulmonology Advisor (report on a CHEST 2026 Annual Meeting abstract))
+AI vs physician: Comparative Cost of Care Recommended by Large Language Models versus Treating Physicians (NEJM AI)
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-10-23 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #CostOfCare #GraduateMedicalEducation #HighValueCare #LargeLanguageModels #NejmAi #PulmonaryAndCriticalCare
