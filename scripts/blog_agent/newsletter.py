@@ -1,11 +1,11 @@
 """Assemble the weekly digest: a two-minute read with a fixed shape.
 
   1. The one thing        the week's most useful item, in two sentences
-  2. AI vs physician          this week's head-to-head result and the running tally
+  2. AI vs physician      this week's head-to-head results
   3. Tool of the week     one tool from the hub
   4. From the Collective  who published what (public part; the members-only
                           part is added when an admin sends it)
-  5. One ask              a single thing to do this week
+  5. One ask              a single thing to do this week (a different one each week)
 
 Writes newsletter/YYYY-MM-DD.html (email-ready, inline styles), .txt (plain
 text) and .json (the suggested subject line). No AI call: it only rearranges
@@ -30,6 +30,7 @@ import argparse
 import datetime as dt
 import html
 import json
+import re
 import os
 import sys
 import urllib.error
@@ -83,13 +84,35 @@ VERDICTS = {
     "comparable": "Comparable",
     "mixed": "Mixed results",
 }
-DEFAULT_ASK = "Open one tool from the hub this week and tell its author what you think."
-# Shown in the AI vs physician section until the first head-to-head review is published
-VERSUS_INTRO = ("Each week this space takes one published study that pits an AI system against clinicians on a "
-                "real medical task, or clinicians working with AI against clinicians working without it. You "
-                "get the task, who was tested, each side's numbers, the catch, and a verdict: whether AI helped "
-                "physicians, or, where AI worked alone, whether it outperformed them.")
-VERSUS_INTRO_NOTE = "A running scoreboard will keep count here from our first review onward."
+# The ask changes each week (picked by the week number), so the email does not
+# repeat itself. The admin can still replace it when sending.
+ASKS = [
+    ("Open one tool this week and tell its author what you think.", "/hub.html", "Open tools"),
+    ("Send this week's AI vs physician study to a colleague who would argue with it.", "/blog.html", "Read it"),
+    ("Wish a tool existed? Post the idea, or vote for someone else's.", "/requests.html", "See requests"),
+    ("Built something useful? Add it to the Tools page; a moderator checks it first.", "/hub.html?view=submit", "Add a tool"),
+    ("Vote on a time for this month's meeting.", "/schedule.html", "Vote"),
+    ("Follow the Collective on Instagram and share one post with someone who would like it.",
+     "https://www.instagram.com/aimedicinecollective/", "Follow"),
+]
+
+
+def weekly_ask(end: dt.date) -> tuple[str, str, str]:
+    text, href, link_text = ASKS[end.isocalendar().week % len(ASKS)]
+    return text, (href if href.startswith("https://") else SITE_URL + href), link_text
+
+
+def subject_line(headline: str, end: dt.date) -> str:
+    """A subject that fits an inbox without being cut off mid-word: the
+    headline if short enough, else its first clause, else a plain label."""
+    headline = " ".join(str(headline).split())
+    if headline and len(headline) <= 90:
+        return headline
+    for cut in (";", ", and ", ": ", " and "):
+        first = headline.split(cut)[0].strip().rstrip(",")
+        if 25 <= len(first) <= 90:
+            return first
+    return f"AI in medicine this week: {end.strftime('%B')} {end.day}"
 
 
 def today_eastern() -> dt.date:
@@ -156,20 +179,19 @@ def build(end: dt.date, days: int) -> dict:
     one_thing = others[0] if others else (week_items[0] if week_items else None)
     also = [i for i in week_items if i is not one_thing and i not in versus_week]
 
-    # Running tally over every head-to-head review published so far
-    tally = {"ai_ahead": 0, "humans_ahead": 0, "comparable": 0, "mixed": 0,
-             "ai_help_improved": 0, "ai_help_no_benefit": 0, "ai_help_harmed": 0}
-    for post in posts:
-        for item in post.get("items", []):
-            if item.get("section") == "ai_vs_human" and item.get("verdict") in tally:
-                tally[item["verdict"]] += 1
 
     tools = published_tools()
     window_start = dt.datetime.combine(start, dt.time.min).isoformat()
     window_end = dt.datetime.combine(end + dt.timedelta(days=1), dt.time.min).isoformat()
     new_tools = [t for t in tools if window_start <= str(t.get("created_at", ""))[:19] < window_end]
     launchable = [t for t in tools if str(t.get("link_url") or "").startswith("https://")]
-    tool = launchable[end.isocalendar().week % len(launchable)] if launchable else None
+    # Prefer tools anyone can open in a browser over custom GPTs (which need a
+    # paid ChatGPT account) and downloadable files
+    def opens_anywhere(t):
+        link = str(t.get("link_url") or "").lower()
+        return "chatgpt.com" not in link and not re.search(r"\.(xlsx?|docx?|pptx?|pdf)(\?|$)", link)
+    pool = [t for t in launchable if opens_anywhere(t)] or launchable
+    tool = pool[end.isocalendar().week % len(pool)] if pool else None
 
     # "Hamza published X" — grouped, so one busy author doesn't fill the email
     by_author: dict[str, list[str]] = {}
@@ -188,8 +210,8 @@ def build(end: dt.date, days: int) -> dict:
     headline = week[-1]["headline"] if week else (f"New tool: {new_tools[0]['title']}" if new_tools else "")
     return {
         "start": start, "end": end, "week": week, "one_thing": one_thing, "versus": versus_week,
-        "also": also, "tally": tally, "tool": tool, "published_lines": published_lines,
-        "subject": short(headline, 90) or f"AI Medicine Collective: week ending {end.isoformat()}",
+        "also": also, "tool": tool, "published_lines": published_lines,
+        "subject": subject_line(headline, end),
     }
 
 
@@ -197,7 +219,7 @@ def build(end: dt.date, days: int) -> dict:
 
 def render_html(d: dict) -> str:
     e = html.escape
-    start, end, tally = d["start"], d["end"], d["tally"]
+    start, end = d["start"], d["end"]
     item, tool = d["one_thing"], d["tool"]
 
     def headline(text: str, href: str, size: int) -> str:
@@ -269,7 +291,7 @@ def render_html(d: dict) -> str:
             RULE,
         ]
 
-    # AI vs physician: this week's result, then the season tally
+    # AI vs physician: this week's results
     out.append(f'<p style="{LABEL}">AI vs physician</p>')
     for versus in d["versus"]:
         verdict = VERDICTS.get(versus.get("verdict"), "Result")
@@ -278,37 +300,9 @@ def render_html(d: dict) -> str:
             f'<p style="margin:0 0 12px;font-family:{SERIF};font-size:15px;font-style:italic;color:{GREEN};">This week&rsquo;s result: {e(verdict.lower().replace("ai ", "AI "))}.</p>',
             f'<p style="{P}">{e(versus["why_it_matters"])}</p>',
         ]
-    if not d["versus"] and sum(tally.values()):
-        out.append(f'<p style="{P}">No head-to-head study made the cut this week.</p>')
-
-    def cell(number: int, label: str, last: bool = False) -> str:
-        edge = "" if last else f"border-right:1px solid {RULE_COLOR};"
-        return (f'<td width="25%" style="padding:6px 6px 4px;text-align:center;{edge}">'
-                f'<div style="font-family:{SERIF};font-size:44px;line-height:1;color:{INK};">{number}</div>'
-                f'<div style="margin-top:10px;font-family:{SANS};font-size:10px;font-weight:bold;letter-spacing:2px;color:{MUTED};">{label}</div></td>')
-
-    if sum(tally.values()):
-        out += [
-            f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
-            f'style="margin:22px 0 14px;border-top:1px solid {RULE_COLOR};border-bottom:1px solid {RULE_COLOR};">'
-            '<tr><td style="padding:20px 0 18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>',
-            cell(tally["ai_help_improved"], "AI HELPED PHYSICIANS"),
-            cell(tally["ai_help_no_benefit"] + tally["ai_help_harmed"], "AI HELP: NO GAIN OR WORSE"),
-            cell(tally["ai_ahead"], "AI ALONE OUTPERFORMED"),
-            cell(tally["humans_ahead"] + tally["comparable"], "PHYSICIANS AHEAD OR EVEN", last=True),
-            "</tr></table></td></tr></table>",
-            f'<p style="margin:0;text-align:center;font-family:{SERIF};font-size:14px;font-style:italic;line-height:1.5;color:{MUTED};">'
-            "The running tally of every head-to-head study we have reviewed"
-            + (f" (plus {tally['mixed']} with mixed results)" if tally["mixed"] else "")
-            + ". One study never settles it.</p>",
-        ]
-    else:
-        # Before the first head-to-head review: say what this section will hold
-        out += [
-            headline("Who does it better?", f"{SITE_URL}/blog.html", 23),
-            f'<p style="{P}">{e(VERSUS_INTRO)}</p>',
-            f'<p style="margin:0;font-family:{SERIF};font-size:15px;font-style:italic;color:{MUTED};">{e(VERSUS_INTRO_NOTE)}</p>',
-        ]
+    if not d["versus"]:
+        out.append(f'<p style="{P}">No head-to-head study made the cut this week. Every study so far is weighed in the '
+                   f'<a href="{SITE_URL}/ai-vs-physician.html" style="{LINK}">AI vs Physician paper</a>.</p>')
 
     if d["also"]:
         out += [RULE, f'<p style="{LABEL}">Also this week</p>']
@@ -332,6 +326,7 @@ def render_html(d: dict) -> str:
             "</td></tr></table>",
         ]
 
+    ask_text, ask_href, ask_link = weekly_ask(end)
     out += [RULE, f'<p style="{LABEL}">From the Collective</p>']
     for line in d["published_lines"]:
         out.append(f'<p style="{P}">{e(line)}</p>')
@@ -343,8 +338,8 @@ def render_html(d: dict) -> str:
     out += [
         RULE,
         f'<p style="{LABEL}text-align:center;">One ask</p>',
-        f'<div style="text-align:center;">{MARK_ASK_OPEN}<p style="{P}">{e(DEFAULT_ASK)} '
-        f'<a href="{SITE_URL}/hub.html" style="{LINK}">Open tools</a></p>{MARK_ASK_CLOSE}</div>',
+        f'<div style="text-align:center;">{MARK_ASK_OPEN}<p style="{P}">{e(ask_text)} '
+        f'<a href="{e(ask_href)}" style="{LINK}">{e(ask_link)}</a></p>{MARK_ASK_CLOSE}</div>',
 
         # sign-off and small print
         f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:34px;"><tr>'
@@ -367,7 +362,7 @@ def render_html(d: dict) -> str:
 # ---------------------------------------------------------------- plain text
 
 def render_text(d: dict) -> str:
-    start, end, tally = d["start"], d["end"], d["tally"]
+    start, end = d["start"], d["end"]
     lines = [
         ":: AI MEDICINE COLLECTIVE ::",
         f"Weekly digest, {start.strftime('%b %d')} - {end.strftime('%b %d, %Y')}",
@@ -382,13 +377,7 @@ def render_text(d: dict) -> str:
         lines += [f"This week: {VERDICTS.get(versus.get('verdict'), 'Result')}", versus["title"],
                   versus["why_it_matters"], versus["url"]]
     if not d["versus"]:
-        lines += (["No head-to-head study made the cut this week."] if sum(tally.values())
-                  else [VERSUS_INTRO, VERSUS_INTRO_NOTE])
-    if sum(tally.values()):
-        lines.append(f"Running tally: AI helped physicians {tally['ai_help_improved']}, "
-                     f"AI help made no difference or worse {tally['ai_help_no_benefit'] + tally['ai_help_harmed']}, "
-                     f"AI alone outperformed physicians {tally['ai_ahead']}, "
-                     f"physicians ahead or even {tally['humans_ahead'] + tally['comparable']}, mixed {tally['mixed']}.")
+        lines.append(f"No head-to-head study made the cut this week. Every study so far: {SITE_URL}/ai-vs-physician.html")
     lines.append("")
     if d["also"]:
         lines.append("// ALSO THIS WEEK")
@@ -402,7 +391,8 @@ def render_text(d: dict) -> str:
     lines.append("// FROM THE COLLECTIVE")
     lines += d["published_lines"]
     lines += [TEXT_COLLECTIVE, ""]
-    lines += ["// ONE ASK", f"{TEXT_ASK_OPEN}{DEFAULT_ASK} {SITE_URL}/hub.html{TEXT_ASK_CLOSE}", ""]
+    ask_text, ask_href, _ = weekly_ask(end)
+    lines += ["// ONE ASK", f"{TEXT_ASK_OPEN}{ask_text} {ask_href}{TEXT_ASK_CLOSE}", ""]
     lines += [
         f"Every briefing: {SITE_URL}/blog.html",
         "Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.",
