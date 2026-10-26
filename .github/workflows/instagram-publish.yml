@@ -2,7 +2,7 @@
 # A carousel is a folder under social/ made by scripts/blog_agent/instagram.py:
 # a blog post's (social/<date>/) or an AI vs Physician edition's (social/review-<date>/).
 # The slides were reviewed in the same pull request, so merging is the approval.
-# (The weekly digest's recap is posted by the digest job itself.)
+# (There is no weekly recap post; the owner stopped it on 2026-10-26.)
 #
 # Setup (one time, by the repo owner): Settings > Secrets and variables >
 # Actions > New repository secret:
