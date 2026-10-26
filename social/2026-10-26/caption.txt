@@ -1,0 +1,14 @@
+Residents are using AI without training, and Microsoft's diagnostic AI beats generalists on hard simulated cases
+
+Most US family medicine residents now use AI at work, but few have been trained to use it. A new Science study shows why that gap matters: on complex simulated cases, an AI diagnostic system was right far more often than practising generalist physicians.
+
+Med-ed: Medical Education: How are Residents Using AI? (Yale School of Medicine)
+AI vs physician: Sequential diagnosis with language models (Science)
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-10-26 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AiLiteracy #AiVsPhysicians #DiagnosticCost #DiagnosticReasoning #FamilyMedicine #GeneralistPhysicians

@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-26",
+  "headline": "Residents are using AI without training, and Microsoft's diagnostic AI beats generalists on hard simulated cases",
+  "intro": "Most US family medicine residents now use AI at work, but few have been trained to use it. A new Science study shows why that gap matters: on complex simulated cases, an AI diagnostic system was right far more often than practising generalist physicians.",
+  "items": [
+    {
+      "title": "Medical Education: How are Residents Using AI?",
+      "source": "Yale School of Medicine",
+      "url": "https://medicine.yale.edu/news-article/how-are-residents-using-ai/",
+      "published": "2026-10-22",
+      "category": "education",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "A study led by Yale's Wendy Barr and published in the journal Family Medicine surveyed more than 15,000 US family medicine residents. In October 2025, 71% said they had used AI for work in the past month, mainly to transcribe patient conversations, search medical references and support clinical decisions. Of those users, only 36% said they had received any AI training or continuing education in the previous six months. This review is based on the school's news release, and the findings are self-reported survey answers.",
+      "why_it_matters": "Residents are already using AI, whether or not programs have planned for it. Educators should build critical appraisal of AI output into curricula now rather than wait for formal guidance."
+    },
+    {
+      "title": "Sequential diagnosis with language models",
+      "source": "Science",
+      "url": "https://www.science.org/doi/10.1126/science.aeh7930?adobe_mc=MCMID%3D66027218407067200574056250616867011642%7CMCORGID%3D242B6472541199F70A4C98A6%40AdobeOrg%7CTS%3D1792680784",
+      "published": "2026-10-22",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_ahead",
+      "summary": "The task was step-by-step diagnosis. Researchers turned 629 published NEJM case records and emergency department encounters into interactive cases where you ask questions and order tests, and each test adds to an estimated cost. The AI was Microsoft's Diagnostic Orchestrator (MAI-DxO), running on GPT-5. It was compared with practising generalist physicians, who worked through a 56-case subset of the complex NEJM cases. Depending on its test budget, the AI reached the correct diagnosis in 79.6% to 84.5% of cases. Physicians averaged 22.3% without reference tools and 36.1% with them, and even the best physician (51.8%) was beaten by the AI on both accuracy and cost. The main limitation is that these were simulated, text-only cases built from past records, not real patients. The AI could not examine anyone, the cases were hard ones given to generalists, and the authors, who work at Microsoft, say it still needs testing in real clinical practice.",
+      "why_it_matters": "For learners, this is strong evidence that AI can now run a full diagnostic workup on hard written cases, not just answer exam questions. It does not show that AI improves care for real patients. Educators should teach trainees how to check and question this kind of tool, especially since most residents report no AI training."
+    }
+  ],
+  "tags": [
+    "ai literacy",
+    "ai vs physicians",
+    "diagnostic cost",
+    "diagnostic reasoning",
+    "family medicine",
+    "generalist physicians",
+    "gpt-5",
+    "graduate medical education",
+    "large language models",
+    "mai-dxo",
+    "sequential diagnosis",
+    "simulated cases"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
