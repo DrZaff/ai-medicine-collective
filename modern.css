@@ -3597,3 +3597,71 @@ html.terminal::view-transition-new(root) {
     padding: 36px 22px 26px;
   }
 }
+
+
+/* === "OUR VISION" STANDS OUT (2026-10-27) ====================
+   In the hero: a glass pill with a mint-to-teal outline whose light slowly
+   travels round it, and a sparkle. In the menu: a soft green pill. */
+
+.modern .hero-actions .btn--vision,
+.modern .hero-actions .btn--vision:visited {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(rgb(5 38 31 / 0.82), rgb(5 38 31 / 0.82)) padding-box,
+    linear-gradient(110deg, #6ee7b7 0%, #06b6d4 35%, #6ee7b7 50%, #06b6d4 85%, #6ee7b7 100%) border-box;
+  background-size: 100% 100%, 220% 100%;
+  box-shadow: 0 0 0 4px rgb(110 231 183 / 0.08), 0 8px 24px rgb(6 182 212 / 0.18);
+  color: #ecfdf5;
+  animation: visionSweep 5s linear infinite;
+}
+
+.modern .hero-actions .btn--vision .btn-icon {
+  color: var(--spark-soft);
+  transition: transform 0.3s ease-out;
+}
+
+.modern .hero-actions .btn--vision:hover {
+  border-color: transparent;
+  background:
+    linear-gradient(rgb(5 38 31 / 0.6), rgb(5 38 31 / 0.6)) padding-box,
+    linear-gradient(110deg, #6ee7b7 0%, #06b6d4 35%, #6ee7b7 50%, #06b6d4 85%, #6ee7b7 100%) border-box;
+  background-size: 100% 100%, 220% 100%;
+  box-shadow: 0 0 0 4px rgb(110 231 183 / 0.14), 0 10px 28px rgb(6 182 212 / 0.3);
+  color: #fff;
+}
+
+.modern .hero-actions .btn--vision:hover .btn-icon {
+  transform: rotate(72deg) scale(1.1);
+}
+
+@keyframes visionSweep {
+  to {
+    background-position: 0 0, -220% 0;
+  }
+}
+
+/* the menu item: a soft green pill with the same sparkle */
+.modern .nav a[data-vision],
+.modern .nav a[data-vision]:visited {
+  padding-left: 30px;
+  background: var(--brand-soft)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b6b4f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z'/%3E%3Cpath d='M19 3v4M17 5h4'/%3E%3C/svg%3E")
+    no-repeat 11px center / 14px;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.modern .nav a[data-vision]:hover {
+  background-color: #d5ede3;
+  color: var(--brand-strong);
+}
+
+.modern .footer-links a[data-vision] {
+  color: var(--spark-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modern .hero-actions .btn--vision {
+    animation: none;
+  }
+}

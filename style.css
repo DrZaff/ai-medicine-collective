@@ -2342,6 +2342,40 @@ button.onboard-hide {
   display: none;
 }
 
+/* "Our vision": a button that glows a little brighter than its neighbours */
+.btn--vision {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-color: var(--text);
+  color: var(--text);
+  animation: visionGlow 3.2s ease-in-out infinite;
+}
+
+.btn-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+@keyframes visionGlow {
+  50% {
+    box-shadow: 0 0 14px rgb(var(--glow-rgb) / 0.55);
+  }
+}
+
+/* ...and in the menu, the one item in the bright colour */
+.nav a[data-vision],
+.nav a[data-vision]:visited {
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn--vision {
+    animation: none;
+  }
+}
+
 .hero-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
