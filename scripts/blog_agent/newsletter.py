@@ -474,16 +474,8 @@ def main() -> int:
     (OUT_DIR / "latest.json").write_text(json.dumps({"date": end.isoformat()}) + chr(10), encoding="utf-8")
     print(f"Wrote {stem.name}.html, .txt and .json from {len(digest['week'])} post(s). Subject: {digest['subject']}")
 
-    # The week's recap for Instagram (social/digest-<date>/). Left out, with a
-    # note, where the drawing library isn't installed.
-    try:
-        import instagram
-        slides = instagram.build_digest(digest, ROOT / "social" / f"digest-{end.isoformat()}")
-        print(f"Wrote {len(slides)} Instagram slides to social/digest-{end.isoformat()}/")
-        set_output("carousel", "true" if slides else "false")
-    except ImportError as err:
-        print(f"No Instagram slides ({err}).")
-        set_output("carousel", "false")
+    # (There is no weekly Instagram recap: the owner stopped it on 2026-10-26.
+    # instagram.build_digest is kept in case it comes back.)
     set_output("created", "true")
     set_output("post_count", str(len(digest["week"])))
     return 0
