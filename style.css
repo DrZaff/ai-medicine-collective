@@ -472,6 +472,56 @@ html.theme-fading body {
   display: none;
 }
 
+/* Evidence and Community open a list of their pages on hover or keyboard
+   focus (script.js: initCurrentNav). Clicking the name still opens the
+   group's first page. */
+.nav-group {
+  position: relative;
+  display: inline-flex;
+}
+
+.nav-group > a::after {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 0 3px 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  vertical-align: middle;
+}
+
+.nav-drop {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 60;
+  display: none;
+  flex-direction: column;
+  min-width: 190px;
+  padding: 6px;
+  border: 1px solid var(--accent);
+  background: var(--bg-inner);
+  box-shadow: var(--glow);
+}
+
+.nav-group:hover .nav-drop,
+.nav-group:focus-within .nav-drop {
+  display: flex;
+}
+
+.nav .nav-drop a {
+  padding: 7px 10px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Footer links written as names ("AI vs Physician") */
+.footer-links a.as-written {
+  text-transform: uppercase;
+}
+
 /* Phone menu: script.js adds a "> MENU" toggle and .nav--collapsible.
    Without JavaScript the full nav simply stays visible. */
 .nav-toggle {
@@ -514,6 +564,16 @@ html.theme-fading body {
 
   .nav--collapsible.is-open a.nav-cta {
     border-color: var(--yellow);
+  }
+
+  /* the folded phone menu lists a group's pages instead of its name */
+  .nav--collapsible .nav-group,
+  .nav--collapsible .nav-drop {
+    display: contents;
+  }
+
+  .nav--collapsible .nav-group > a {
+    display: none;
   }
 }
 
@@ -2524,6 +2584,51 @@ a.verdict-dot:focus-visible {
   margin-top: 8px;
   font-size: 0.95rem;
   color: var(--body);
+}
+
+/* The home page's Games card: icon, name and kind for each game */
+.home-games,
+.section .home-games {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-games li {
+  margin: 0;
+}
+
+.home-game,
+.home-game:visited {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.home-game .game-icon {
+  width: 52px;
+  height: 52px;
+}
+
+.home-game:hover .game-icon {
+  transform: rotate(-4deg) scale(1.05);
+}
+
+.home-game-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.home-game-title {
+  font-family: var(--font-display);
+  font-weight: bold;
+  letter-spacing: 0.04em;
 }
 
 .home-list {

@@ -3439,3 +3439,74 @@ html.terminal::view-transition-new(root) {
 .modern .game-play::after {
   content: " \2192";
 }
+
+
+/* === MENU DROP-DOWNS, FOOTER, HOME GAMES (2026-10-27) ======== */
+
+.modern .nav-group > a::after {
+  opacity: 0.6;
+}
+
+.modern .nav-drop {
+  top: calc(100% + 4px);
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--shadow-lift);
+}
+
+/* a bridge across the gap, so the list stays open on the way down */
+.modern .nav-drop::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 0;
+  left: 0;
+  height: 8px;
+}
+
+.modern .nav .nav-drop a,
+.modern .nav .nav-drop a:visited {
+  padding: 8px 12px;
+  text-transform: none;
+}
+
+.modern .footer-links a.as-written {
+  text-transform: none;
+}
+
+.modern .home-games {
+  gap: 14px;
+}
+
+.modern .home-game .game-icon {
+  border-radius: 14px;
+}
+
+.modern .home-game-title {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.modern .home-game:hover .home-game-title {
+  color: var(--brand);
+}
+
+@media (max-width: 600px) {
+  .modern .nav--collapsible .nav-group,
+  .modern .nav--collapsible .nav-drop {
+    display: contents;
+  }
+
+  .modern .nav--collapsible .nav-drop::before {
+    content: none;
+  }
+
+  .modern .nav--collapsible .nav-group > a {
+    display: none;
+  }
+}
