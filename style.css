@@ -1796,6 +1796,18 @@ div.roster-card:hover {
   object-fit: cover;
 }
 
+/* Tools without their own icon get one drawn by hub.js (generatedIcon), in
+   the Games page's line-art style (.game-icon); the lettered tile below is
+   the older fallback */
+.tool-icon--made {
+  padding: 0;
+}
+
+.tool-icon--made svg {
+  width: 72%;
+  height: 72%;
+}
+
 /* Tools without their own icon get a lettered tile */
 .tool-icon--text {
   display: flex;
@@ -4917,5 +4929,97 @@ button.meeting-undo {
 @media (prefers-reduced-motion: reduce) {
   .game-card:hover .game-icon {
     transform: none;
+  }
+}
+
+
+/* === OUR VISION (a pop-up; script.js: initVision) ============ */
+
+.vision-dialog {
+  width: min(640px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  border: 1px solid var(--accent);
+  background: var(--bg-inner);
+  box-shadow: var(--glow);
+  color: var(--body);
+  overflow: auto;
+}
+
+.vision-dialog[open] {
+  animation: fadeInSoft 0.3s ease-out;
+}
+
+.vision-dialog::backdrop {
+  background: rgb(0 0 0 / 0.75);
+}
+
+.vision-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  padding: 2px 8px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.vision-close:hover {
+  color: var(--text);
+}
+
+.vision-body {
+  padding: 32px 32px 28px;
+}
+
+.vision-kicker {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.vision-title {
+  margin: 0 0 18px;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.vision-text {
+  margin: 0 0 14px;
+  font-family: var(--font-read);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.vision-signoff {
+  margin: 20px 0 0;
+  font-family: var(--font-display);
+  color: var(--text);
+}
+
+.vision-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+@media (max-width: 600px) {
+  .vision-body {
+    padding: 28px 20px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vision-dialog[open] {
+    animation: none;
   }
 }
