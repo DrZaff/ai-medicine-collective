@@ -168,8 +168,14 @@ function initFooterNav() {
   const row = document.createElement("div");
   row.className = "footer-links";
   links.forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    const group = MENU_GROUPS.find((g) => g.menu === pageOf(href));
+    if (group) {
+      row.append(...groupLinks(group, href.replace(/[^/]*$/, ""), "as-written"));
+      return;
+    }
     const copy = document.createElement("a");
-    copy.href = link.getAttribute("href");
+    copy.href = href;
     copy.textContent = link.textContent.trim();
     row.append(copy);
   });
@@ -367,16 +373,31 @@ const MENU_GROUPS = [
   {
     menu: "blog",
     label: "Evidence",
-    tabs: [["blog", "BRIEFINGS"], ["ai-vs-physician", "AI VS PHYSICIAN"]],
+    tabs: [["blog", "BRIEFINGS", "Briefings"], ["ai-vs-physician", "AI VS PHYSICIAN", "AI vs Physician"]],
     also: [],
   },
   {
     menu: "members",
     label: "Community",
-    tabs: [["members", "MEMBERS"], ["schedule", "MEETINGS"], ["chat", "CHAT"], ["requests", "REQUESTS"]],
+    tabs: [["members", "MEMBERS", "Members"], ["schedule", "MEETINGS", "Meetings"], ["chat", "CHAT", "Chat"],
+      ["requests", "REQUESTS", "Requests"]],
     also: ["directory", "profile", "inbox"],   // pages that belong here without a tab of their own
   },
 ];
+
+// A group's pages as links, named as written ("AI vs Physician"); prefix is
+// "../" on the pages in member/
+function groupLinks(group, prefix, className) {
+  return group.tabs.map(([page, , name]) => {
+    const link = document.createElement("a");
+    link.className = className;
+    link.href = `${prefix}${page}.html`;
+    link.textContent = name;
+    return link;
+  });
+}
+
+const pageOf = (href) => (href || "").split("/").pop().replace(/\.html$/, "");
 
 function initCurrentNav() {
   const path = window.location.pathname;
@@ -389,9 +410,28 @@ function initCurrentNav() {
 
   const group = MENU_GROUPS.find((g) => g.tabs.some(([page]) => page === here) || g.also.includes(here));
   const menuPage = group ? group.menu : here;
-  document.querySelectorAll(".nav a").forEach((link) => {
-    const href = link.getAttribute("href") || "";
-    if (href.split("/").pop().replace(/\.html$/, "") === menuPage) link.setAttribute("aria-current", "page");
+
+  // Evidence and Community open a drop-down of their pages (on phones the
+  // folded menu lists those pages instead of the group's name)
+  document.querySelectorAll(".terminal-frame header .nav > a").forEach((link) => {
+    const owner = MENU_GROUPS.find((g) => g.menu === pageOf(link.getAttribute("href")));
+    if (!owner) return;
+    const wrap = document.createElement("span");
+    wrap.className = "nav-group";
+    const drop = document.createElement("span");
+    drop.className = "nav-drop";
+    const prefix = (link.getAttribute("href") || "").replace(/[^/]*$/, "");
+    groupLinks(owner, prefix, "nav-sub").forEach((sub) => {
+      if (pageOf(sub.getAttribute("href")) === here) sub.setAttribute("aria-current", "page");
+      drop.append(sub);
+    });
+    link.classList.add("nav-group-link");
+    link.replaceWith(wrap);
+    wrap.append(link, drop);
+  });
+
+  document.querySelectorAll(".nav > a, .nav-group > a").forEach((link) => {
+    if (pageOf(link.getAttribute("href")) === menuPage) link.setAttribute("aria-current", "page");
   });
 
   // The group's tabs, at the top of the page
@@ -467,8 +507,7 @@ const PUBLIC_API_KEY = "sb_publishable_3C4xXn0j3GiunX-t6cd0HQ_ze_yTErT";
 // panel keeps the plain text already in index.html. Text only, never HTML.
 function initHome() {
   const briefing = document.getElementById("home-briefing");
-  const projects = document.getElementById("home-projects");
-  if (!briefing || !projects) return; // not on the home page
+  if (!briefing) return; // not on the home page
 
   const node = (tag, className, text) => {
     const made = document.createElement(tag);
@@ -504,24 +543,12 @@ function initHome() {
   (async () => {
     try {
       const response = await fetch(
-        `${PUBLIC_API_URL}/projects?select=id,title,category&kind=eq.project&status=eq.published&order=created_at.desc,title.asc&limit=4`,
+        `${PUBLIC_API_URL}/projects?select=id&kind=eq.project&status=eq.published&limit=1`,
         { headers: { apikey: PUBLIC_API_KEY, Prefer: "count=exact" } }
       );
       if (!response.ok) return;
-      const rows = await response.json();
-      if (!Array.isArray(rows) || !rows.length) return;
 
-      const list = node("ul", "home-list");
-      for (const row of rows) {
-        const item = node("li");
-        const link = node("a", "home-list-title", row.title);
-        link.href = `hub.html?project=${encodeURIComponent(row.id)}`;
-        item.append(link, node("span", "home-list-meta", row.category));
-        list.append(item);
-      }
-      projects.replaceChildren(list);
-
-      // "0-3/16": the part after the slash is the total
+      // "0-0/16": the part after the slash is the number of tools
       const total = parseInt((response.headers.get("content-range") || "").split("/")[1], 10);
       const counter = document.getElementById("home-project-count");
       if (counter && total > 0) counter.textContent = String(total);
