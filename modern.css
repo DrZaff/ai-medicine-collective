@@ -3510,3 +3510,90 @@ html.terminal::view-transition-new(root) {
     display: none;
   }
 }
+
+
+/* === OUR VISION, GENERATED TOOL ICONS (2026-10-27) =========== */
+
+.modern .vision-dialog {
+  border: 0;
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: 0 24px 64px rgb(15 23 42 / 0.3);
+  color: var(--body);
+}
+
+.modern .vision-dialog::backdrop {
+  background: rgb(15 23 42 / 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.modern .vision-body {
+  padding: 44px 48px 38px;
+  background:
+    radial-gradient(520px 220px at 0 0, rgb(16 185 129 / 0.12), transparent 70%),
+    radial-gradient(420px 200px at 100% 0, rgb(6 182 212 / 0.08), transparent 70%);
+}
+
+.modern .vision-close {
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: var(--ink);
+  font-size: 1.4rem;
+}
+
+.modern .vision-close:hover {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.modern .vision-kicker {
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modern .vision-title {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.modern .vision-text {
+  color: var(--body);
+  font-size: 1.0625rem;
+}
+
+.modern .vision-title + .vision-text {
+  color: var(--ink);
+  font-size: 1.2rem;
+}
+
+.modern .vision-signoff {
+  color: var(--brand);
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+.modern .vision-actions .btn {
+  font-size: 0.875rem;
+}
+
+.modern .tool-icon--made {
+  border: 0;
+}
+
+@media (max-width: 600px) {
+  .modern .vision-body {
+    padding: 36px 22px 26px;
+  }
+}

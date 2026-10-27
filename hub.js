@@ -313,9 +313,69 @@ function initHubPage() {
       img.loading = "lazy";
       return img;
     }
-    const letters = project.title.split(/\s+/).filter((word) => /^[A-Za-z0-9]/.test(word))
-      .map((word) => word[0]).join("").slice(0, 2).toUpperCase();
-    return el("span", "tool-icon tool-icon--text", letters || "?");
+    return generatedIcon(project);
+  }
+
+  // Tools without their own icon get one drawn for them, in the same line-art
+  // style as the Games page: a picture chosen from the tool's name and
+  // description (a calculator, a heart, flash cards...), else from its category
+  const ICON_ART = {
+    calculator: '<rect class="a soft" x="16" y="8" width="32" height="48" rx="4" stroke-width="3"/>' +
+      '<rect class="b" x="22" y="14" width="20" height="9" rx="2" stroke-width="3"/>' +
+      '<circle class="fa" cx="24" cy="33" r="2.5"/><circle class="fa" cx="32" cy="33" r="2.5"/><circle class="fa" cx="40" cy="33" r="2.5"/>' +
+      '<circle class="fa" cx="24" cy="41" r="2.5"/><circle class="fa" cx="32" cy="41" r="2.5"/><circle class="fa" cx="40" cy="41" r="2.5"/>' +
+      '<circle class="fa" cx="24" cy="49" r="2.5"/><circle class="fa" cx="32" cy="49" r="2.5"/><path class="b" d="M40 46v6" stroke-width="3"/>',
+    heart: '<path class="a soft" d="M32 54C14 42 8 32 8 23a11 11 0 0 1 24-6 11 11 0 0 1 24 6c0 9-6 19-24 31z" stroke-width="3"/>' +
+      '<path class="b" d="M12 31h10l4-8 6 15 4-7h16" stroke-width="3"/>',
+    education: '<path class="a soft" d="M4 26 32 14l28 12-28 12z" stroke-width="3"/>' +
+      '<path class="a" d="M16 32v11c8 7 24 7 32 0V32" stroke-width="3"/><path class="b" d="M60 26v15" stroke-width="3"/>',
+    cards: '<rect class="a soft" x="9" y="17" width="28" height="36" rx="3" transform="rotate(-10 23 35)" stroke-width="3"/>' +
+      '<rect class="a soft" x="25" y="10" width="30" height="38" rx="3" stroke-width="3"/>' +
+      '<path class="b" d="M32 22h16M32 30h12" stroke-width="3"/><circle class="fa" cx="44" cy="40" r="2.5"/>',
+    document: '<path class="a soft" d="M16 6h22l12 12v40H16z" stroke-width="3"/><path class="a" d="M38 6v12h12" stroke-width="3"/>' +
+      '<path class="b" d="M22 30h20M22 38h20M22 46h12" stroke-width="3"/>',
+    fitness: '<path class="a" d="M15 20v24M8 25v14M49 20v24M56 25v14" stroke-width="4"/><path class="b" d="M15 32h34" stroke-width="4"/>',
+    research: '<circle class="a soft" cx="27" cy="27" r="16" stroke-width="3"/><path class="b" d="M39 39l15 15" stroke-width="4"/>' +
+      '<path class="a" d="M20 30l5-6 4 4 6-8" stroke-width="2.5"/>',
+    chat: '<path class="a soft" d="M8 12h48v30H30l-12 11V42H8z" stroke-width="3"/>' +
+      '<circle class="fa" cx="21" cy="27" r="2.5"/><circle class="fa" cx="32" cy="27" r="2.5"/><circle class="fa" cx="43" cy="27" r="2.5"/>' +
+      '<path class="b" d="M52 4v6M49 7h6" stroke-width="2.5"/>',
+    checklist: '<rect class="a soft" x="14" y="10" width="36" height="46" rx="3" stroke-width="3"/>' +
+      '<rect class="b" x="24" y="6" width="16" height="8" rx="2" stroke-width="3"/>' +
+      '<path class="b" d="M20 27l3 3 6-6M20 41l3 3 6-6" stroke-width="3"/><path class="a" d="M34 28h10M34 42h10" stroke-width="3"/>',
+    spark: '<path class="a soft" d="M32 6l6 18 18 8-18 8-6 18-6-18-18-8 18-8z" stroke-width="3"/>' +
+      '<path class="b" d="M52 6v8M48 10h8M12 48v8M8 52h8" stroke-width="2.5"/>',
+  };
+  // First match wins: words in the name or description, then the category
+  const ICON_WORDS = [
+    [/calculat|score|\bcalc\b|dose|dosing|formula/, "calculator"],
+    [/algorithm|guideline|protocol|checklist|workup|pathway/, "checklist"],
+    [/anki|flashcard|quiz|question bank|\bqbank\b/, "cards"],
+    [/workout|fitness|exercise|trainer|gym/, "fitness"],
+    [/heart|cardi|\becg\b|\bekg\b|\bqtc?\b/, "heart"],
+    [/writ|statement|summar|\bnote|letter|discharge|document/, "document"],
+    [/meeting|\bchat\b|assistant|tutor|coach/, "chat"],
+    [/research|evidence|literature|paper|search/, "research"],
+    [/educat|learn|teach|study|board|exam|curricul/, "education"],
+    [/reflect|introspect|wellness|well-being|wellbeing|mindful|alignment/, "spark"],
+  ];
+  const ICON_CATEGORIES = {
+    "Medical education": "education", Learning: "education", "Patient care": "heart", Research: "research",
+    Guidelines: "checklist", Lifestyle: "fitness", Productivity: "document",
+  };
+
+  function generatedIcon(project) {
+    // The name decides first; then the description, minus the stock note
+    // every custom GPT carries
+    const title = project.title.toLowerCase();
+    const about = String(project.description || "").toLowerCase().replace(/custom gpt[^.]*\.?/g, "");
+    const found = ICON_WORDS.find(([pattern]) => pattern.test(title)) || ICON_WORDS.find(([pattern]) => pattern.test(about));
+    const art = found ? found[1] : ICON_CATEGORIES[project.category] || "spark";
+    const icon = el("span", "tool-icon tool-icon--made game-icon");
+    icon.setAttribute("aria-hidden", "true");
+    // the drawing is our own fixed markup, never text from the tool
+    icon.innerHTML = `<svg viewBox="0 0 64 64">${ICON_ART[art]}</svg>`;
+    return icon;
   }
 
   // The icon, the name, what kind of thing it is, one or two lines on what
