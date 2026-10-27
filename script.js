@@ -177,6 +177,7 @@ function initFooterNav() {
     const copy = document.createElement("a");
     copy.href = href;
     copy.textContent = link.textContent.trim();
+    if (link.hasAttribute("data-vision")) copy.setAttribute("data-vision", "");
     row.append(copy);
   });
   const instagram = document.createElement("a");
@@ -191,6 +192,87 @@ function initFooterNav() {
 }
 
 document.addEventListener("DOMContentLoaded", initFooterNav);
+
+// "Our vision": a pop-up opened by any link marked data-vision (the home
+// page's hero and the menu on every page), or by arriving at #vision
+const VISION = {
+  title: "Our vision",
+  paragraphs: [
+    "Medical education has always been shaped from the ground up. Many of the tools a generation of physicians " +
+      "learned from, like Anki, Pathoma, Sketchy and Boards and Beyond, started with one learner or a small group, " +
+      "not a large company.",
+    "That's no accident. Physicians are curious by nature, and when we find a better way to learn or work, we want " +
+      "to share it.",
+    "What held most good ideas back was never the idea. It was time and money. AI has changed that: a resident with " +
+      "a clear idea can now build in a weekend what once took a team and a budget.",
+    "What's missing now is organization: a place to bring this work together, share what we build, learn from each " +
+      "other, and turn scattered side projects into tools people rely on.",
+    "That's why we built the AI Medicine Collective, a home for clinicians who create. Share a tool, borrow an idea, " +
+      "find a collaborator, and see what the evidence says about AI in medicine.",
+    "If this vision speaks to you, join us. Let's build something remarkable.",
+  ],
+  signoff: "Built by clinicians, for clinicians.",
+};
+
+function initVision() {
+  let dialog = null;
+
+  function build() {
+    const make = (tag, className, text) => {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    };
+    // Links to other pages: relative to where this page sits
+    const prefix = /\/member\/[^/]*$/.test(window.location.pathname) ? "../" : "";
+    dialog = make("dialog", "vision-dialog");
+    dialog.setAttribute("aria-labelledby", "vision-title");
+    const close = make("button", "vision-close", "\u00d7");
+    close.type = "button";
+    close.setAttribute("aria-label", "Close");
+    close.addEventListener("click", () => dialog.close());
+    const body = make("div", "vision-body");
+    const title = make("h2", "vision-title", VISION.title);
+    title.id = "vision-title";
+    body.append(make("p", "vision-kicker", "// AI Medicine Collective"), title);
+    VISION.paragraphs.forEach((text) => body.append(make("p", "vision-text", text)));
+    body.append(make("p", "vision-signoff", VISION.signoff));
+    const actions = make("div", "vision-actions");
+    const join = make("a", "btn btn--primary", "> Join the Collective");
+    join.href = `${prefix}join.html`;
+    join.hidden = readSignedInRole() !== null;   // members don't need asking
+    const tools = make("a", "btn", "> Browse the tools");
+    tools.href = `${prefix}hub.html`;
+    actions.append(join, tools);
+    body.append(actions);
+    dialog.append(close, body);
+    // a click on the backdrop (outside the box) closes it
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener("close", () => {
+      if (window.location.hash === "#vision") history.replaceState(null, "", window.location.pathname + window.location.search);
+    });
+    document.body.append(dialog);   // initTerminalMarks' observer handles its "// " and "> "
+  }
+
+  function open(event) {
+    if (event) event.preventDefault();
+    if (!dialog) build();
+    if (typeof dialog.showModal === "function" && !dialog.open) dialog.showModal();
+  }
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("[data-vision]");
+    if (!link) return;
+    // On another page the menu link goes to the home page's #vision; open it here instead
+    open(event);
+  });
+  if (window.location.hash === "#vision") open();
+}
+
+document.addEventListener("DOMContentLoaded", initVision);
 
 // The terminal voice puts "// " before captions, "> " before prompts and
 // "< " before back links, and wraps the site name in "::". Those marks are
