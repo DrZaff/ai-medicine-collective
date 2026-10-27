@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <title>Games – AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Games made by the AI Medicine Collective: Hospital Kombat, a fighting game for medical specialties, and Hospital Tycoon, a hospital-building game." />
+  <meta name="description" content="Games made by the AI Medicine Collective: Antibiose, a microbiology shooter; Hospital Kombat, a fighting game for medical specialties; and Hospital Tycoon, a hospital-building game." />
   <link rel="icon" type="image/png" href="images/icon-192.png" />
   <meta property="og:site_name" content="AI Medicine Collective" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Games – AI Medicine Collective" />
-  <meta property="og:description" content="Games made by the AI Medicine Collective: Hospital Kombat, a fighting game for medical specialties, and Hospital Tycoon, a hospital-building game." />
+  <meta property="og:description" content="Games made by the AI Medicine Collective: Antibiose, a microbiology shooter; Hospital Kombat, a fighting game for medical specialties; and Hospital Tycoon, a hospital-building game." />
   <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="stylesheet" href="style.css" />
@@ -42,37 +42,68 @@
 
       <p class="note">
         // Something for the break room. Free to play in your browser, on a phone
-        or a computer, with nothing to install.
+        or a computer, with nothing to install. Each game explains itself under
+        How to play on its main menu.
       </p>
 
-      <div class="tile-grid">
-        <a class="tile" href="games/hospital-kombat.html">
-          <svg class="tile-icon m-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h4"/><path d="M8 10v4"/><path d="M15 13h.01"/><path d="M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
-          <span class="tile-title tile-title--as-written">&gt; Hospital Kombat</span>
-          <span class="tile-text">Pick a specialty and fight. Nine fighters, five hospital stages, and a signature Final Procedure for each.</span>
+      <div class="game-grid">
+        <a class="game-card" href="games/antibiose.html">
+          <span class="game-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <circle class="b" cx="32" cy="32" r="24" stroke-width="2.5"/>
+              <path class="b" d="M32 2v9M32 53v9M2 32h9M53 32h9" stroke-width="2.5"/>
+              <path class="a" d="M44 20c3-4 6-3 8-7M47 26c4-1 6 1 10-1M18 44c-3 3-6 2-8 6M17 38c-4 0-6 2-10 1" stroke-width="2"/>
+              <rect class="a soft" x="18" y="25" width="28" height="14" rx="7" transform="rotate(-32 32 32)" stroke-width="3"/>
+              <circle class="fa" cx="28" cy="34.5" r="2"/>
+              <circle class="fa" cx="35.5" cy="29.5" r="2"/>
+            </svg>
+          </span>
+          <span class="game-body">
+            <span class="game-title">&gt; Antibiose</span>
+            <span class="game-text">Load an antibiotic, antiviral, antifungal or antiparasitic and hit only the microbes it really kills. 138 microbes, 100 drugs.</span>
+            <span class="game-meta"><span class="tile-tag">NEW</span><span class="tile-tag">MICROBIOLOGY</span><span class="tile-tag">1 PLAYER</span></span>
+            <span class="game-play">&gt; Play</span>
+          </span>
         </a>
-        <a class="tile" href="games/hospital-tycoon.html">
-          <svg class="tile-icon m-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M12 7v4"/><path d="M10 9h4"/><path d="M9 21v-4h6v4"/><path d="M8 14h.01"/><path d="M16 14h.01"/></svg>
-          <span class="tile-title tile-title--as-written">&gt; Hospital Tycoon</span>
-          <span class="tile-text">Build a hospital floor by floor, hire specialists, balance RVUs and patient care, and survive five years of crises.</span>
+
+        <a class="game-card" href="games/hospital-kombat.html">
+          <span class="game-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <path class="b" d="M52 11l5-5M55 19h7M46 7V2" stroke-width="3"/>
+              <path class="a soft" d="M28 14h10a12 12 0 0 1 12 12v8a12 12 0 0 1-12 12H24a8 8 0 0 1-8-8V26a12 12 0 0 1 12-12z" stroke-width="3"/>
+              <path class="a" d="M16 34h10a4 4 0 0 0 4-4v-2" stroke-width="3"/>
+              <rect class="a soft" x="20" y="46" width="18" height="12" rx="2" stroke-width="3"/>
+              <path class="a" d="M20 51h18" stroke-width="2"/>
+              <path class="b" d="M38 20v12M32 26h12" stroke-width="3.5"/>
+            </svg>
+          </span>
+          <span class="game-body">
+            <span class="game-title">&gt; Hospital Kombat</span>
+            <span class="game-text">Pick a specialty and fight. Nine fighters, five hospital stages, and a signature Final Procedure for each.</span>
+            <span class="game-meta"><span class="tile-tag">FIGHTING</span><span class="tile-tag">1–2 PLAYERS</span></span>
+            <span class="game-play">&gt; Play</span>
+          </span>
+        </a>
+
+        <a class="game-card" href="games/hospital-tycoon.html">
+          <span class="game-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <path class="b" d="M27 4v10M22 9h10" stroke-width="3"/>
+              <rect class="a soft" x="12" y="18" width="30" height="40" rx="2" stroke-width="3"/>
+              <rect class="a soft" x="42" y="36" width="12" height="22" rx="1" stroke-width="3"/>
+              <path class="a" d="M19 25h4M31 25h4M19 32h4M31 32h4M19 39h4M31 39h4M47 43h2M47 50h2" stroke-width="3"/>
+              <path class="a" d="M23 58v-9h8v9" stroke-width="3"/>
+              <path class="b" d="M44 28l5-6 4 3 7-11M54 14h6v6" stroke-width="3"/>
+            </svg>
+          </span>
+          <span class="game-body">
+            <span class="game-title">&gt; Hospital Tycoon</span>
+            <span class="game-text">Build a hospital floor by floor, hire specialists, balance RVUs and patient care, and survive five years of crises.</span>
+            <span class="game-meta"><span class="tile-tag">STRATEGY</span><span class="tile-tag">SAVES ON DEVICE</span></span>
+            <span class="game-play">&gt; Play</span>
+          </span>
         </a>
       </div>
-
-      <h3>How to play Hospital Kombat</h3>
-      <ul>
-        <li><strong>Arcade:</strong> beat the other eight specialties one at a time. Each rival hits harder and reacts faster, and your best score is saved on your device.</li>
-        <li><strong>Same keyboard:</strong> two players on one computer.</li>
-        <li><strong>Final Procedure:</strong> once your rival drops below 25% health, land it up close to win the round on the spot. It can't be blocked, but a miss leaves you wide open.</li>
-        <li><strong>On a phone:</strong> slide your thumb on the round pad to move and use the big buttons to attack. Turn the phone sideways for a bigger arena.</li>
-      </ul>
-
-      <h3>How to play Hospital Tycoon</h3>
-      <ul>
-        <li><strong>Set up:</strong> name your hospital and pick a scenario (suburban, rural critical access, urban safety-net or academic), a difficulty and a game length, or play in sandbox mode with unlimited money.</li>
-        <li><strong>Build:</strong> tap an empty room in the tower. Put the ED on Floor 1 with Imaging, and keep the operating rooms near the ICU.</li>
-        <li><strong>Hire:</strong> interview physicians with traits like Fast hands or Prima donna. Surgeons need anesthesia, beds, nurses and hospitalists, or outcomes and morale fall apart.</li>
-        <li><strong>Win:</strong> meet the board's operating-income target each year while mass casualties, outbreaks, strikes and cyberattacks test your hospital. Your game saves on your device.</li>
-      </ul>
 
       <p><a href="index.html" class="back-link">&lt; HOME</a></p>
     </main>

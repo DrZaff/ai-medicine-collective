@@ -70,6 +70,12 @@
   --grad-bright: linear-gradient(90deg, #10b981 0%, #06b6d4 100%);
   --font-label: ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Menlo, "Roboto Mono", monospace;
 
+  /* Game icons: the mint and cyan of the sweep, drawn on a night-green tile */
+  --icon-bg: radial-gradient(120% 120% at 25% 15%, #0f5a48 0%, #05261f 62%);
+  --icon-a: #6ee7b7;
+  --icon-b: #06b6d4;
+  --icon-a-rgb: 110 231 183;
+
   /* The tokens style.css is written against */
   --bg: var(--card);
   --bg-inner: var(--page);
@@ -3072,7 +3078,7 @@ html.terminal::view-transition-new(root) {
   font-style: italic;
   letter-spacing: 0;
 }
-
+
 
 /* === VISUAL POLISH (2026-10-26) ===============================
    The AI vs Physician chart, the blog archive as covers, the home page's
@@ -3389,4 +3395,47 @@ html.terminal::view-transition-new(root) {
   .modern .archive-headline {
     font-size: 1.3rem;
   }
+}
+
+
+/* === GAMES PAGE ============================================== */
+
+.modern .game-card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .game-card:hover {
+  border-color: rgb(16 185 129 / 0.55);
+  box-shadow: var(--shadow-lift);
+  text-decoration: none;
+}
+
+.modern .game-icon {
+  border: 0;
+  border-radius: 22px;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06), 0 6px 16px rgb(5 38 31 / 0.25);
+}
+
+.modern .game-title {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.modern .game-play {
+  color: var(--brand);
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.modern .game-play::after {
+  content: " \2192";
 }

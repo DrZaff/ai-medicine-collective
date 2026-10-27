@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Antibiose – AI Medicine Collective</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="A microbiology shooter: load an antibiotic, antiviral, antifungal or antiparasitic and hit only the microbes it really kills." />
+  <meta name="theme-color" content="#5a34b0" />
+  <meta name="game-back" content="../games.html" />
+  <link rel="apple-touch-icon" href="../images/icon-192.png" />
+  <link rel="icon" type="image/png" href="../images/icon-192.png" />
+  <meta property="og:site_name" content="AI Medicine Collective" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Antibiose" />
+  <meta property="og:description" content="Pick the drug, tap the microbe. 138 microbes, 100 antimicrobials." />
+  <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <!-- Built from the Claude Artifact version of this game (source and build_site.py are kept outside this repo). This copy uses the site's own font and follows the site's theme switch. -->
+  <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("amc-theme")==="terminal"?"dark":"light")}catch(e){}</script>
+<style>
+@font-face{font-family:"Inter";font-style:normal;font-weight:400 800;font-display:swap;src:url("../fonts/inter.woff2") format("woff2")}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+</style>
+<style>
+/* Layout: one-screen portrait app styled as a lab instrument. Monitor-style HUD, microscope eyepiece field, drug cartridges at thumb height. */
+:root{
+  --bg:#e8ebf3; --grid:rgba(90,52,176,.06); --surface:#ffffff; --surface-2:#f3f1fa; --ink:#131a2a; --muted:#5d6577; --line:#d3d6e4;
+  --accent:#5a34b0; --accent-ink:#ffffff; --accent-soft:#ece6fa; --accent-glow:rgba(90,52,176,.28);
+  --ok:#1d7f52; --warn:#a86a00; --danger:#c42f3c; --scrim:rgba(19,26,42,.55);
+  --field:#fbfaf3; --field-edge:#c8ccd8; --field-glow:rgba(90,52,176,0);
+  --label-bg:rgba(255,255,255,.9); --label-ink:#131a2a;
+  --gpos:#4f2a9c; --gneg:#d1497a; --virus:#0d7f86; --fungus:#b77a06; --nostain:#7c8590; --proto:#5f7a10; --afb:#d9480f; --helm:#8b5a2b; --ecto:#2f6db5;
+  --host:#f1e9e4; --edge:rgba(19,26,42,.45); --spore:#fffdf4; --w-bac:#5a34b0; --glow:0;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#070a12; --grid:rgba(169,139,255,.05); --surface:#111725; --surface-2:#171f31; --ink:#e7ecf6; --muted:#8f9bb2; --line:#232c40;
+  --accent:#a98bff; --accent-ink:#120a26; --accent-soft:#221a3d; --accent-glow:rgba(169,139,255,.45);
+  --ok:#43d491; --warn:#f3b74a; --danger:#ff6170; --scrim:rgba(0,0,0,.66);
+  --field:#0b1019; --field-edge:#010204; --field-glow:rgba(120,90,255,.18);
+  --label-bg:rgba(8,11,18,.82); --label-ink:#e7ecf6;
+  --gpos:#a98bff; --gneg:#ff7fab; --virus:#3fd8d0; --fungus:#f4bc4c; --nostain:#b6bfca; --proto:#c4e05a; --afb:#ff8a4c; --helm:#e0a36b; --ecto:#7fb0ff;
+  --host:#1b2333; --edge:rgba(231,236,246,.35); --spore:#f6f2e3; --w-bac:#a98bff; --glow:1;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#070a12; --grid:rgba(169,139,255,.05); --surface:#111725; --surface-2:#171f31; --ink:#e7ecf6; --muted:#8f9bb2; --line:#232c40;
+  --accent:#a98bff; --accent-ink:#120a26; --accent-soft:#221a3d; --accent-glow:rgba(169,139,255,.45);
+  --ok:#43d491; --warn:#f3b74a; --danger:#ff6170; --scrim:rgba(0,0,0,.66);
+  --field:#0b1019; --field-edge:#010204; --field-glow:rgba(120,90,255,.18);
+  --label-bg:rgba(8,11,18,.82); --label-ink:#e7ecf6;
+  --gpos:#a98bff; --gneg:#ff7fab; --virus:#3fd8d0; --fungus:#f4bc4c; --nostain:#b6bfca; --proto:#c4e05a; --afb:#ff8a4c; --helm:#e0a36b; --ecto:#7fb0ff;
+  --host:#1b2333; --edge:rgba(231,236,246,.35); --spore:#f6f2e3; --w-bac:#a98bff; --glow:1;
+  color-scheme:dark;
+}
+html{height:100%;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+body{height:100%;margin:0;overflow:hidden;color:var(--ink);font:15px/1.45 var(--f-body);
+  background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;
+  -webkit-tap-highlight-color:transparent;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#app{height:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:8px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px}
+
+/* HUD: patient-monitor panel */
+.hud{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+.hud-row{display:flex;align-items:center;gap:8px;min-width:0}
+.lbl{font:600 10px/1.2 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.score{flex:1;min-width:0;display:flex;align-items:center;gap:8px}
+.score>div{min-width:0}
+.val{font:800 clamp(19px,6.2vw,26px)/1 var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
+.bump{animation:bump .25s ease}
+@keyframes bump{40%{transform:scale(1.12)}}
+.combo{flex:none;font:800 12px/1 var(--f-display);padding:5px 7px;border-radius:99px;color:var(--muted);border:1.5px solid var(--line)}
+.combo.hot{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);box-shadow:0 0 14px var(--accent-glow)}
+.case{flex:none;text-align:right;line-height:1.2}
+.case b{display:block;font:800 14px var(--f-display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.iconbtn{width:42px;height:42px;flex:none;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);display:grid;place-items:center;padding:0}
+.iconbtn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.gauges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.gauge{padding:6px 8px;border-radius:12px;background:var(--surface-2);min-width:0}
+.g-top{display:flex;justify-content:space-between;align-items:baseline;gap:4px;min-width:0}
+.g-top b{font:600 11px var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.g-body{height:22px;display:flex;align-items:center;min-width:0}
+#ecg{width:100%;height:22px;display:block}
+.track{height:7px;width:100%;border-radius:99px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:100%;border-radius:inherit;transform-origin:left;transition:transform .25s ease,background-color .25s}
+#progFill{background:var(--accent)} #riskFill{background:var(--warn)} #riskFill.hi{background:var(--danger)}
+#vitalTxt.low{color:var(--danger)}
+@media (max-width:380px){.gauge{padding:5px 6px}.lbl{letter-spacing:.03em;font-size:9.5px}.g-top b{font-size:10px}.hud{padding:8px 10px}.iconbtn{width:38px;height:38px}}
+
+/* Field: microscope eyepiece */
+.field{flex:1;min-height:0;position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:var(--field);
+  box-shadow:0 0 28px var(--field-glow),inset 0 0 0 1px var(--field-glow)}
+#cv{display:block;width:100%;height:100%;touch-action:none}
+.pt{position:absolute;top:10px;left:10px;max-width:58%;padding:5px 9px;border-radius:10px;background:var(--label-bg);border:1.5px solid var(--danger);font-size:12px;line-height:1.25;pointer-events:none}
+.pt .lbl{display:block;color:var(--danger)}
+
+/* Lesson strip: fixed height so the slide never jumps; text shrinks to fit */
+.lesson{flex:none;height:66px;display:flex;align-items:center;padding:0 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+.lesson p{margin:0;font-size:13.5px;line-height:1.25;max-height:62px;overflow:hidden}
+.chip{display:inline-block;font:600 11px/1 var(--f-mono);letter-spacing:.03em;padding:3px 6px;border-radius:99px;margin-right:6px;vertical-align:1px;border:1.5px solid currentColor;white-space:nowrap}
+.c-ok{color:var(--ok)} .c-warn{color:var(--warn)} .c-bad{color:var(--danger)} .c-acc{color:var(--accent)}
+
+/* Drug cartridges */
+.weapons{flex:none;display:grid;gap:8px;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr))}
+.wbtn{height:76px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);text-align:left;overflow:hidden;
+  padding:21px 9px 8px;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;position:relative;min-width:0;
+  transition:transform .1s ease,border-color .15s,box-shadow .15s,background-color .15s}
+.wbtn::before{content:"";position:absolute;inset:0 0 auto;height:5px;background:var(--dc)}
+.wbtn:active{transform:scale(.97)}
+.wbtn .wn{display:block;font-weight:700;font-size:15px;line-height:1.12;max-height:2.3em;overflow:hidden;overflow-wrap:normal;word-break:normal;hyphens:manual;-webkit-hyphens:manual;min-width:0}
+.wbtn .wt{display:block;font:500 10.5px/1.2 var(--f-mono);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pips{display:flex;gap:3px;align-items:center;min-width:0;overflow:hidden}
+.pips i{flex:none;width:12px;height:4px;border-radius:2px;background:var(--line)}
+.pips i.on{background:var(--dc)}
+.loaded{position:absolute;top:8px;left:9px;font:600 9px var(--f-mono);letter-spacing:.1em;color:var(--accent);opacity:0}
+.wbtn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1.5px var(--accent),0 6px 18px var(--accent-glow);transform:translateY(-2px)}
+.wbtn[aria-pressed="true"] .loaded{opacity:1}
+.wbtn.tip{animation:tip 1s ease-in-out infinite}
+@keyframes tip{50%{box-shadow:0 0 0 4px var(--ok);border-color:var(--ok)}}
+.wbtn kbd{display:none}
+@media (hover:hover) and (pointer:fine){.wbtn kbd{display:inline;font:500 10px var(--f-mono);color:var(--muted);position:absolute;top:8px;right:9px}}
+
+/* Overlays */
+.overlay{position:fixed;inset:0;z-index:20;background:var(--scrim);display:flex;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.card{width:min(480px,100%);max-height:100%;overflow-y:auto;overflow-x:hidden;background:var(--surface);border:1px solid var(--line);border-radius:24px;
+  padding:22px 18px;display:flex;flex-direction:column;gap:14px;animation:rise .3s cubic-bezier(.2,.8,.2,1) both;-webkit-user-select:text;user-select:text;
+  box-shadow:0 20px 60px rgba(0,0,0,.25),0 0 0 1px var(--field-glow);overflow-wrap:break-word;hyphens:auto;-webkit-hyphens:auto}
+@keyframes rise{from{transform:translateY(16px) scale(.98);opacity:.3}to{transform:none;opacity:1}}
+.card h1{font:800 clamp(34px,11vw,54px)/.95 var(--f-display);margin:0;letter-spacing:-.04em;color:var(--accent);text-shadow:0 0 24px var(--accent-glow)}
+.card h2{font:800 clamp(20px,6vw,24px)/1.15 var(--f-display);margin:0;letter-spacing:-.02em;text-wrap:balance;hyphens:none}
+.card h3{font:600 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:4px 0 -6px}
+.card p{margin:0}
+.eyebrow{font:600 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:16px}
+.fine{font-size:12.5px;color:var(--muted)}
+.btns{display:flex;flex-direction:column;gap:8px}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{min-height:52px;border-radius:15px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:16px;padding:6px 14px;line-height:1.2;box-shadow:0 6px 20px var(--accent-glow);hyphens:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+a.btn{display:flex;align-items:center;justify-content:center;text-decoration:none}
+.btn:disabled{opacity:.5;cursor:default}
+.legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;font-size:13px;hyphens:none}
+.legend span{display:flex;align-items:center;gap:8px;min-width:0}
+.sw{width:14px;height:14px;border-radius:50%;flex:none;background:var(--c);box-shadow:0 0 8px var(--c)}
+.rules{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;margin:0;font-size:14px;align-items:baseline}
+.rules dt{font:700 13px var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rules dd{margin:0}
+.mics{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.mic{display:flex;align-items:center;gap:8px;min-width:0}
+.mic>div{min-width:0}
+.mic canvas{width:44px;height:44px;flex:none;border-radius:12px;background:var(--field);border:1px solid var(--line)}
+.mic b{display:block;font-size:13.5px;line-height:1.2}
+.mic small{display:block;font:500 10.5px/1.25 var(--f-mono);color:var(--muted);hyphens:none}
+.drugs{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;font-size:13.5px}
+.drugs b{font-weight:700}
+.drugs .wt{font:500 11px var(--f-mono);color:var(--muted);margin-left:6px;white-space:nowrap}
+.ptcard{padding:10px 12px;border-radius:12px;border:1.5px solid var(--danger);font-size:14px}
+.ptcard b{color:var(--danger)}
+.chart{overflow-x:auto;border:1px solid var(--line);border-radius:12px;hyphens:none}
+.chart table{border-collapse:collapse;font-size:12.5px;min-width:100%}
+.chart th,.chart td{padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+.chart th:first-child,.chart td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);font-weight:700}
+.chart thead th{font:600 10.5px var(--f-mono);color:var(--muted)}
+.chart tr:last-child td{border-bottom:0}
+.chart .s{color:var(--accent);font-weight:700}.chart .y{color:var(--ok);font-weight:700}.chart .n{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stats div{padding:10px 12px;border-radius:12px;background:var(--surface-2);min-width:0}
+.stats b{display:block;font:800 clamp(18px,5.5vw,22px)/1.2 var(--f-display);font-variant-numeric:tabular-nums}
+.grade{font:800 64px/1 var(--f-display);color:var(--accent);text-shadow:0 0 24px var(--accent-glow)}
+.review{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.chapters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.chap{display:flex;flex-direction:column;gap:4px;text-align:left;padding:12px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface-2);min-width:0;position:relative;overflow:hidden}
+.chap::before{content:"";position:absolute;inset:0 0 auto;height:5px;background:var(--c)}
+.chap-n{font:800 16px/1.15 var(--f-display);margin-top:4px}
+.chap-d{font-size:12.5px;line-height:1.3;color:var(--muted)}
+.chap-m{font:600 10.5px/1.3 var(--f-mono);color:var(--muted)}
+.chap.spec{width:100%}
+.drugpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:6px}
+.dchip{position:relative;overflow:hidden;text-align:left;padding:10px 10px 8px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface-2);min-width:0;hyphens:none}
+.dchip::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--dc)}
+.dchip b{display:block;font-size:13.5px;line-height:1.2;overflow-wrap:anywhere}
+.dchip small{display:block;font:500 10.5px/1.25 var(--f-mono);color:var(--muted);margin-top:2px}
+.home-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.eq{display:inline-flex;gap:3px;align-items:flex-end;height:16px;flex:none}
+.eq i{width:3px;height:25%;border-radius:2px;background:var(--accent);opacity:.5}
+.eq.on i{opacity:1;animation:eq .9s ease-in-out infinite}
+.eq.on i:nth-child(2){animation-delay:-.3s}.eq.on i:nth-child(3){animation-delay:-.6s}.eq.on i:nth-child(4){animation-delay:-.15s}
+@keyframes eq{0%,100%{height:25%}50%{height:100%}}
+.modes{display:grid;gap:10px}
+.mode{display:flex;flex-direction:column;gap:5px;text-align:left;padding:18px 16px 14px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface-2);position:relative;overflow:hidden;min-width:0;transition:transform .1s ease,border-color .15s}
+.mode::before{content:"";position:absolute;inset:0 0 auto;height:6px;background:var(--c)}
+.mode:active{transform:scale(.98)}
+.mode:hover{border-color:var(--c)}
+.mode-n{font:800 clamp(18px,5.4vw,21px)/1.15 var(--f-display);letter-spacing:-.01em}
+.mode-d{font-size:14px;line-height:1.35}
+.mode-m{font:600 11px/1.3 var(--f-mono);color:var(--muted);letter-spacing:.03em}
+@media (prefers-reduced-motion:reduce){.eq.on i{animation:none;height:70%}}
+.gauges.no-risk{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gauges.no-risk>.gauge:last-child{display:none}
+.rounds{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.rounds button{height:46px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface-2);font:800 15px var(--f-display);font-variant-numeric:tabular-nums}
+.rounds button.mod{border-color:var(--danger)}
+.rounds button:disabled{opacity:.35;cursor:default}
+.form{display:flex;flex-direction:column;gap:12px}
+.form label{display:flex;flex-direction:column;gap:5px;font-size:14px;font-weight:600}
+.form input,.form select,.form textarea{font-size:16px;font-weight:400;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface-2);width:100%;min-width:0}
+.form textarea{min-height:76px;resize:vertical}
+.stars{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.stars button{height:48px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface-2);font-size:22px;line-height:1;color:var(--muted)}
+.stars button.on{color:var(--warn);border-color:var(--warn)}
+.copybox{font:500 13px/1.4 var(--f-mono);min-height:140px}
+@media (prefers-reduced-motion:reduce){.card,.wbtn.tip,.bump{animation:none}.wbtn.tip{border-color:var(--ok);box-shadow:inset 0 0 0 2px var(--ok)}.fill{transition:none}}
+@media (max-height:700px){.wbtn{height:64px;padding-top:17px}.pips{display:none}.lesson{height:60px}.lesson p{max-height:57px}.hud{padding:8px 10px;gap:6px}}
+@media (max-width:380px){.wbtn{padding-left:7px;padding-right:7px}.lesson{padding:0 10px}}
+</style>
+<style>
+:root{--f-display:"Inter",system-ui,-apple-system,sans-serif;--f-body:"Inter",system-ui,-apple-system,sans-serif;--f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.card h1{letter-spacing:-.03em}
+</style>
+</head>
+<body>
+
+<div id="app" lang="en">
+  <header class="hud">
+    <div class="hud-row">
+      <div class="score"><div><span class="lbl">Score</span><div class="val" id="score">0</div></div><span class="combo" id="combo">×1</span></div>
+      <div class="case"><span class="lbl" id="lvlLbl">Round</span><b id="lvl">1/17</b></div>
+      <button class="iconbtn" id="btnPause" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button>
+      <button class="iconbtn" id="btnRestart" aria-label="Restart"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button>
+    </div>
+    <div class="gauges">
+      <div class="gauge"><div class="g-top"><span class="lbl">Vitals</span><b id="vitalTxt">100%</b></div><div class="g-body"><canvas id="ecg" aria-hidden="true"></canvas></div></div>
+      <div class="gauge"><div class="g-top"><span class="lbl">Cured</span><b id="progTxt">0/10</b></div><div class="g-body"><div class="track"><div class="fill" id="progFill" style="transform:scaleX(0)"></div></div></div></div>
+      <div class="gauge"><div class="g-top"><span class="lbl">C. diff</span><b id="riskTxt">0%</b></div><div class="g-body"><div class="track"><div class="fill" id="riskFill" style="transform:scaleX(0)"></div></div></div></div>
+    </div>
+  </header>
+  <main class="field" id="field"><canvas id="cv" aria-label="Microscope field with moving microbes"></canvas><div class="pt" id="pt" hidden></div></main>
+  <div class="lesson" id="lesson" aria-live="polite"><p>Pick a drug, then tap a microbe to fire it.</p></div>
+  <nav class="weapons" id="weapons" aria-label="Antimicrobials"></nav>
+  <div class="overlay" id="overlay" hidden><div class="card" id="card" role="dialog" aria-modal="true"></div></div>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s);
+
+/* ---------- Medical data (simplified to reliable, guideline-level coverage) ---------- */
+// Chapters keep drug classes apart: each round mixes only one kind of microbe and the drugs used against it
+const CHAPTERS={
+  bac:{name:'Bacteria',drugs:'Antibacterials',blurb:'Gram stains, atypicals, anaerobes, superbugs and mycobacteria.'},
+  vir:{name:'Viruses',drugs:'Antivirals',blurb:'Respiratory, herpes, hepatitis, HIV, and when supportive care is the answer.'},
+  fun:{name:'Fungi',drugs:'Antifungals',blurb:'Yeasts, molds, endemic fungi, skin infections and Pneumocystis.'},
+  par:{name:'Parasites',drugs:'Antiparasitics',blurb:'Malaria, gut and blood protozoa, worms, mites and lice.'}
+};
+const WPN={
+  // Antibacterials. Scope text names same-class siblings so the whole class is covered.
+  pnv:{name:'Penicillin VK',tag:'Penicillin (oral)',cls:'bac',bl:1,sp:1,covers:['spy','vir','gbs','act'],scope:'Oral penicillin for strep throat and other strep. No staph coverage.'},
+  pen:{name:'Penicillin G',tag:'Penicillin',cls:'bac',bl:1,sp:1,covers:['spy','vir','gbs','tpa','nme','act','cpe','lep','dip','lmo'],scope:'Narrow: strep, syphilis (benzathine form), Actinomyces, Clostridium perfringens, Leptospira.'},
+  naf:{name:'Nafcillin',tag:'Anti-staph penicillin',cls:'bac',bl:1,sp:1,covers:['mssa','spy','vir'],scope:'Penicillinase-resistant: MSSA. Same class: oxacillin, dicloxacillin. No MRSA.'},
+  amp:{name:'Ampicillin',tag:'Aminopenicillin',cls:'bac',bl:1,sp:2,covers:['spy','vir','gbs','efa','lmo','nme','pmi','act'],scope:'Streptococci, enterococci and Listeria. No β-lactamase protection.'},
+  amox:{name:'Amoxicillin',tag:'Aminopenicillin',cls:'bac',bl:1,sp:2,covers:['spy','vir','spn','efa','gbs','lmo','pmi','bbu','act'],scope:'Oral: strep, pneumococcus, enterococci, early Lyme. No β-lactamase protection.'},
+  amc:{name:'Amox-clav',full:'Amoxicillin-clavulanate',tag:'Penicillin + BLI',cls:'bac',bl:1,sp:3,covers:['spy','spn','mssa','efa','gbs','hin','mcat','eco','kpn','pmi','bfr','act','pas','eik'],scope:'Amoxicillin plus a β-lactamase blocker: adds H. flu, Moraxella, MSSA, anaerobes and bite organisms.'},
+  sam:{name:'Amp-sulbactam',full:'Ampicillin-sulbactam',tag:'Penicillin + BLI',cls:'bac',bl:1,sp:3,covers:['spy','mssa','efa','hin','mcat','eco','pmi','bfr','acb','pas','eik'],scope:'IV amox-clav equivalent. High-dose sulbactam itself kills Acinetobacter.'},
+  ptz:{name:'Pip-tazo',full:'Piperacillin-tazobactam',tag:'Penicillin + BLI',cls:'bac',bl:1,sp:4,covers:['spy','spn','mssa','efa','gbs','hin','mcat','eco','kpn','pmi','pae','bfr','act'],scope:'Very broad: gram-positives, gram-negatives incl. Pseudomonas, anaerobes. No MRSA, ESBL, AmpC or atypicals.'},
+  cfz:{name:'Cefazolin',tag:'Cephalosporin 1G',cls:'bac',bl:1,ceph:1,sp:2,covers:['spy','vir','mssa','gbs','eco','kpn','pmi','ssa'],scope:'MSSA and strep, some gram-negative rods. Same generation: cephalexin (oral).'},
+  cro:{name:'Ceftriaxone',tag:'Cephalosporin 3G',cls:'bac',bl:1,ceph:1,sp:3,covers:['spy','vir','spn','mssa','gbs','eco','kpn','pmi','hin','mcat','ngo','nme','sty','shi','bbu','tpa','lep','hdu','act','ssa'],scope:'Strep, pneumococcus, Neisseria, many gram-negatives. No Listeria, Pseudomonas, enterococci or AmpC/ESBL. Similar: cefotaxime.'},
+  caz:{name:'Ceftazidime',tag:'Cephalosporin 3G',cls:'bac',bl:1,ceph:1,sp:3,covers:['eco','kpn','pmi','pae','bps','hin'],scope:'Antipseudomonal 3rd-gen with weak gram-positive coverage. Treats melioidosis.'},
+  fep:{name:'Cefepime',tag:'Cephalosporin 4G',cls:'bac',bl:1,ceph:1,sp:3,covers:['spy','spn','mssa','gbs','hin','mcat','eco','kpn','pmi','pae','ent','ser','nme'],scope:'Gram-negatives incl. Pseudomonas and AmpC producers, plus MSSA and strep. No ESBL, anaerobes or enterococci.'},
+  cpt:{name:'Ceftaroline',tag:'Cephalosporin 5G',cls:'bac',bl:1,ceph:1,sp:3,covers:['spy','spn','mssa','mrsa','mrsap','gbs','hin','mcat','eco','kpn'],scope:'The one β-lactam that binds MRSA’s PBP2a. No Pseudomonas or enterococci.'},
+  cza:{name:'Ceftaz-avibactam',full:'Ceftazidime-avibactam',tag:'Ceph + new BLI',cls:'bac',bl:1,ceph:1,sp:4,covers:['eco','esbl','kpn','kpc','pmi','pae','mdrpa','ent','ser'],scope:'Beats ESBL, AmpC and KPC carbapenemases. Not metallo-β-lactamases like NDM. Similar: meropenem-vaborbactam.'},
+  ctz:{name:'Ceftolozane-tazo',full:'Ceftolozane-tazobactam',tag:'Ceph + BLI',cls:'bac',bl:1,ceph:1,sp:3,covers:['pae','mdrpa','eco','esbl','kpn','pmi'],scope:'Built for multidrug-resistant Pseudomonas. Similar: imipenem-relebactam.'},
+  fdc:{name:'Cefiderocol',tag:'Siderophore ceph',cls:'bac',bl:1,ceph:1,sp:4,covers:['eco','esbl','kpn','kpc','ndm','pae','mdrpa','acb','sma','ent','ser'],scope:'Sneaks in through iron channels. Covers metallo-β-lactamase CRE and carbapenem-resistant non-fermenters.'},
+  etp:{name:'Ertapenem',tag:'Carbapenem',cls:'bac',bl:1,sp:3,covers:['spy','spn','mssa','eco','esbl','kpn','pmi','bfr','hin','mcat','ent','ser'],scope:'Once-daily carbapenem for ESBL. No Pseudomonas, Acinetobacter or enterococci.'},
+  mem:{name:'Meropenem',tag:'Carbapenem',cls:'bac',bl:1,sp:4,covers:['spy','spn','mssa','gbs','lmo','nme','hin','mcat','eco','esbl','kpn','pmi','pae','ent','ser','bfr','act','bps'],scope:'Broadest β-lactam: ESBL, Pseudomonas, anaerobes. No MRSA, VRE, atypicals or carbapenemase producers.'},
+  ipm:{name:'Imipenem',tag:'Carbapenem',cls:'bac',bl:1,sp:4,covers:['spy','spn','mssa','gbs','lmo','nme','hin','mcat','eco','esbl','kpn','pmi','pae','ent','ser','bfr','act','bps','noc','efa'],scope:'Like meropenem, with cilastatin. Lowers the seizure threshold more than other carbapenems.'},
+  azt:{name:'Aztreonam',tag:'Monobactam',cls:'bac',bl:1,sp:2,covers:['eco','kpn','pmi','pae','hin'],scope:'Gram-negatives only, including Pseudomonas. Safe in most penicillin allergies.'},
+  vanc:{name:'Vancomycin',tag:'Glycopeptide',cls:'bac',sp:2,covers:['spy','vir','spn','mssa','mrsa','mrsap','sepi','efa','gbs','cdi'],scope:'Gram-positives only, including MRSA. Oral form for C. diff. Similar long-acting: dalbavancin, oritavancin.'},
+  dap:{name:'Daptomycin',tag:'Lipopeptide',cls:'bac',sp:2,covers:['spy','mssa','mrsa','sepi','efa','vre','gbs'],scope:'Gram-positives including MRSA and VRE. Inactivated by lung surfactant.'},
+  lzd:{name:'Linezolid',tag:'Oxazolidinone',cls:'bac',sp:2,covers:['spy','spn','mssa','mrsa','mrsap','sepi','efa','vre','gbs','noc'],scope:'Gram-positives including MRSA and VRE. A weak MAO inhibitor. Similar: tedizolid.'},
+  cli:{name:'Clindamycin',tag:'Lincosamide',cls:'bac',sp:2,covers:['spy','mssa','mrsa','cpe','act','gva'],scope:'Strep, staph, mouth anaerobes. Shuts down toxin production. Highest C. diff risk.'},
+  gen:{name:'Gentamicin',tag:'Aminoglycoside',cls:'bac',sp:2,covers:['fra','ype','bru','eco','kpn','pmi','pae','ent','ser'],scope:'Aerobic gram-negatives, tularemia, plague. Same class: tobramycin, amikacin, streptomycin.'},
+  dox:{name:'Doxycycline',tag:'Tetracycline',cls:'bac',sp:2,covers:['chl','myc','cpn','psi','cox','ric','ehr','bbu','lep','tpa','bru','vch','ban','mrsa','leg','bar','act','ype','fra','spn','onc','wuc'],scope:'Atypicals, spirochetes, Rickettsia and other tick-borne bacteria. Similar: minocycline, tigecycline.'},
+  azi:{name:'Azithromycin',tag:'Macrolide',cls:'bac',sp:2,covers:['myc','cpn','chl','leg','bpe','cam','shi','sty','bar','hdu','mac','mcat','vch'],scope:'Atypicals, pertussis, Campylobacter, Bartonella, MAC.'},
+  clr:{name:'Clarithromycin',tag:'Macrolide',cls:'bac',sp:2,covers:['myc','cpn','leg','bpe','mac','hpy','mcat'],scope:'Macrolide for MAC and older H. pylori triple therapy. Strong CYP3A4 inhibitor.'},
+  ery:{name:'Erythromycin',tag:'Macrolide',cls:'bac',sp:2,covers:['dip','bpe','chl','myc','cpn','leg'],scope:'The original macrolide. Diphtheria, pertussis. Also a GI motility agent.'},
+  lvx:{name:'Levofloxacin',tag:'Fluoroquinolone',cls:'bac',sp:3,covers:['spn','leg','myc','cpn','hin','mcat','eco','kpn','pmi','pae','sma','ban','ype','fra'],scope:'"Respiratory" fluoroquinolone: pneumococcus, atypicals, gram-negatives. Similar: moxifloxacin.'},
+  cip:{name:'Ciprofloxacin',tag:'Fluoroquinolone',cls:'bac',sp:3,covers:['eco','kpn','pmi','pae','shi','sty','ban','ype','fra','hin','vch'],scope:'Gram-negatives incl. Pseudomonas, anthrax. Weak against strep.'},
+  sxt:{name:'TMP-SMX',full:'Trimethoprim-sulfamethoxazole',tag:'Folate inhibitor',cls:'bac',sp:2,covers:['mssa','mrsa','ssa','eco','kpn','pmi','sma','noc','lmo','bps','pjp'],scope:'Staph incl. MRSA, Nocardia, Stenotrophomonas, Pneumocystis, some gram-negatives.'},
+  nit:{name:'Nitrofurantoin',tag:'Urinary antiseptic',cls:'bac',sp:1,covers:['eco','esbl','ssa','efa'],scope:'Only reaches the bladder. Cystitis from E. coli, S. saprophyticus, enterococci.'},
+  fof:{name:'Fosfomycin',tag:'Phosphonic acid',cls:'bac',sp:1,covers:['eco','esbl','efa'],scope:'One-dose oral sachet for cystitis, including ESBL E. coli.'},
+  mtz:{name:'Metronidazole',tag:'Nitroimidazole',cls:'bac',sp:1,covers:['bfr','cdi','cte','gva','gla','ehc','tva'],scope:'Obligate anaerobes and protozoa like Giardia, amoebae and Trichomonas.'},
+  fdx:{name:'Fidaxomicin',tag:'Macrocyclic',cls:'bac',sp:1,covers:['cdi'],scope:'Narrow C. diff drug with fewer relapses. Barely absorbed.'},
+  rif:{name:'Rifampin',tag:'Rifamycin',cls:'bac',sp:2,covers:['ltb','bru','mle'],scope:'Never alone for active infection. Latent TB, brucellosis, leprosy. Strong CYP inducer.'},
+  rip:{name:'RIPE',full:'Rifampin, isoniazid, pyrazinamide, ethambutol',tag:'TB regimen',cls:'tb',sp:1,covers:['mtb'],scope:'Four TB drugs for 2 months, then two drugs for 4 more.'},
+  bpal:{name:'BPaLM',full:'Bedaquiline, pretomanid, linezolid, moxifloxacin',tag:'MDR-TB regimen',cls:'tb',sp:1,covers:['mdrtb'],scope:'Six-month all-oral regimen for multidrug-resistant TB.'},
+  dps:{name:'Dapsone MDT',full:'Dapsone, rifampin, clofazimine',tag:'Leprosy regimen',cls:'tb',sp:1,covers:['mle'],scope:'Multidrug therapy for leprosy. Dapsone causes hemolysis in G6PD deficiency.'},
+  col:{name:'Colistin',tag:'Polymyxin',cls:'bac',sp:3,covers:['eco','esbl','kpn','kpc','ndm','pae','mdrpa','acb'],scope:'Last resort for carbapenem-resistant gram-negatives. Nephrotoxic. Similar: polymyxin B.'},
+  bqt:{name:'Bismuth quad',full:'PPI, bismuth, tetracycline, metronidazole',tag:'H. pylori regimen',cls:'bac',sp:2,covers:['hpy'],scope:'First-line H. pylori therapy now that clarithromycin resistance is common.'},
+  // Antivirals
+  osl:{name:'Oseltamivir',tag:'Neuraminidase inhib.',cls:'vir',sp:1,covers:['flu','flb'],scope:'Influenza A and B. Standard oral flu treatment.'},
+  zan:{name:'Zanamivir',tag:'Neuraminidase inhib.',cls:'vir',sp:1,covers:['flu','flb'],scope:'Inhaled flu drug. Can trigger bronchospasm. Similar IV drug: peramivir.'},
+  bxm:{name:'Baloxavir',tag:'Endonuclease inhib.',cls:'vir',sp:1,covers:['flu','flb'],scope:'Single-dose flu treatment.'},
+  pax:{name:'Paxlovid',full:'Nirmatrelvir-ritonavir',tag:'Protease inhib.',cls:'vir',sp:1,covers:['cov'],scope:'Outpatient COVID-19 within 5 days. Ritonavir causes many drug interactions.'},
+  rdv:{name:'Remdesivir',tag:'RNA polymerase inhib.',cls:'vir',sp:1,covers:['cov','covh'],scope:'IV COVID-19 treatment: 3 days for outpatients or longer for hospitalized patients on oxygen.'},
+  mol:{name:'Molnupiravir',tag:'Mutagenic nucleoside',cls:'vir',sp:1,covers:['cov'],scope:'Backup oral COVID-19 drug. Not used in pregnancy.'},
+  nir:{name:'Nirsevimab',tag:'Monoclonal antibody',cls:'vir',sp:1,covers:['rsvi'],scope:'One shot protects infants through RSV season. Similar: palivizumab.'},
+  acy:{name:'Acyclovir',tag:'Nucleoside analog',cls:'vir',sp:1,covers:['hsv','vzv'],scope:'HSV and VZV. IV for encephalitis. Needs viral thymidine kinase.'},
+  vacv:{name:'Valacyclovir',tag:'Nucleoside analog',cls:'vir',sp:1,covers:['hsv','vzv'],scope:'Oral prodrug of acyclovir with better absorption. Similar: famciclovir.'},
+  gcv:{name:'Ganciclovir',tag:'Nucleoside analog',cls:'vir',sp:2,covers:['cmv','hsv','vzv','cmvp'],scope:'IV CMV drug of choice. Causes bone marrow suppression.'},
+  vgcv:{name:'Valganciclovir',tag:'Nucleoside analog',cls:'vir',sp:2,covers:['cmv','cmvp'],scope:'Oral prodrug of ganciclovir.'},
+  fsc:{name:'Foscarnet',tag:'Pyrophosphate analog',cls:'vir',sp:2,covers:['arh','grc','cmv','hsv'],scope:'Needs no viral kinase, so it treats resistant HSV and CMV. Nephrotoxic, drops calcium and magnesium.'},
+  mbv:{name:'Maribavir',tag:'UL97 kinase inhib.',cls:'vir',sp:1,covers:['grc'],scope:'Oral drug for CMV that is refractory or resistant to standard drugs.'},
+  let:{name:'Letermovir',tag:'Terminase inhib.',cls:'vir',sp:1,covers:['cmvp'],scope:'Prevents CMV after transplant without marrow suppression.'},
+  cdv:{name:'Cidofovir',tag:'Nucleotide analog',cls:'vir',sp:2,covers:['adv','grc','arh','cmv'],scope:'Adenovirus and resistant herpesviruses. Very nephrotoxic; give with probenecid.'},
+  tdf:{name:'Tenofovir',tag:'NRTI',cls:'vir',sp:1,covers:['hbv'],scope:'Hepatitis B. For HIV only inside a combination. The TDF form can harm kidneys and bones.'},
+  etv:{name:'Entecavir',tag:'Nucleoside analog',cls:'vir',sp:1,covers:['hbv'],scope:'Hepatitis B with less kidney toxicity than TDF.'},
+  sof:{name:'Sof/vel',full:'Sofosbuvir-velpatasvir',tag:'HCV antiviral',cls:'vir',sp:1,covers:['hcv'],scope:'Cures hepatitis C, all genotypes, in 12 weeks.'},
+  glp:{name:'Glecaprevir/pib',full:'Glecaprevir-pibrentasvir',tag:'HCV antiviral',cls:'vir',sp:1,covers:['hcv'],scope:'8-week pan-genotypic HCV cure. Protease inhibitor: avoid in decompensated cirrhosis.'},
+  bik:{name:'BIC/FTC/TAF',full:'Bictegravir/emtricitabine/tenofovir alafenamide',tag:'HIV regimen',cls:'vir',sp:2,covers:['hiv','hbv'],scope:'Complete one-pill HIV regimen. Its tenofovir and emtricitabine also treat HBV. Similar: dolutegravir-based regimens.'},
+  cab:{name:'Cabotegravir/RPV',full:'Cabotegravir-rilpivirine',tag:'Long-acting HIV',cls:'vir',sp:1,covers:['hiv'],scope:'HIV injections every 1 to 2 months. No hepatitis B activity.'},
+  tpx:{name:'Tecovirimat',tag:'Orthopoxvirus inhib.',cls:'vir',sp:1,covers:['mpx'],scope:'For severe mpox or smallpox.'},
+  rpep:{name:'Rabies PEP',full:'Rabies immune globulin + vaccine',tag:'Post-exposure',cls:'vir',sp:1,covers:['rab'],scope:'Wound care, immune globulin, and 4 vaccine doses after a bite.'},
+  sup:{name:'Supportive care',tag:'Fluids, rest',cls:'sup',sp:1,covers:['rsv','rhv','noro','ebv','hav','mea','den'],scope:'Fluids, rest, fever control. The right call when no antiviral helps.'},
+  // Antifungals (plus the two non-antifungals that treat Pneumocystis)
+  flc:{name:'Fluconazole',tag:'Azole',cls:'fun',sp:1,covers:['can','thr','vvc','cry','coc'],scope:'Candida albicans, Cryptococcus, Coccidioides. No molds, no C. krusei, weak on C. glabrata.'},
+  itr:{name:'Itraconazole',tag:'Azole',cls:'fun',sp:2,covers:['his','bla','spo','coc','can','thr','tin','asp'],scope:'Endemic fungi (Histoplasma, Blastomyces), Sporothrix, nails.'},
+  vor:{name:'Voriconazole',tag:'Azole',cls:'fun',sp:2,covers:['can','kru','asp','fus','cry'],scope:'Aspergillus drug of choice. Visual changes and photosensitivity. No Mucorales.'},
+  pos:{name:'Posaconazole',tag:'Azole',cls:'fun',sp:3,covers:['asp','muc','can','kru','fus'],scope:'Broad azole that covers Mucorales. Used for prophylaxis in leukemia.'},
+  isa:{name:'Isavuconazole',tag:'Azole',cls:'fun',sp:3,covers:['asp','muc','can'],scope:'Aspergillus and Mucorales with fewer side effects than voriconazole.'},
+  mcf:{name:'Micafungin',tag:'Echinocandin',cls:'fun',sp:2,covers:['can','cgl','kru','cau','thr'],scope:'First-line for invasive Candida, including resistant species. No Cryptococcus. Similar: caspofungin, anidulafungin.'},
+  amb:{name:'Amphotericin B',tag:'Polyene',cls:'fun',sp:4,covers:['can','cgl','kru','cau','cry','asp','muc','fus','his','bla','coc','spo'],scope:'Broadest antifungal for severe disease. Nephrotoxic, drops potassium and magnesium.'},
+  ffc:{name:'Ampho + 5-FC',full:'Amphotericin B + flucytosine',tag:'Induction combo',cls:'fun',sp:3,covers:['cry'],scope:'Induction for cryptococcal meningitis. Flucytosine is never given alone.'},
+  nys:{name:'Nystatin',tag:'Polyene (topical)',cls:'fun',sp:1,covers:['thr'],scope:'Swish-and-swallow for thrush. Not absorbed from the gut.'},
+  clt:{name:'Clotrimazole',tag:'Azole (topical)',cls:'fun',sp:1,covers:['thr','vvc','tin'],scope:'Troches for thrush, creams for vaginal yeast and ringworm. Similar: miconazole.'},
+  trb:{name:'Terbinafine',tag:'Allylamine',cls:'fun',sp:1,covers:['tin','tcap'],scope:'Dermatophytes: ringworm, athlete’s foot, nails, tinea capitis.'},
+  gri:{name:'Griseofulvin',tag:'Microtubule inhib.',cls:'fun',sp:1,covers:['tcap','tin'],scope:'Classic oral drug for tinea capitis in children.'},
+  ket:{name:'Ketoconazole',tag:'Azole (topical)',cls:'fun',sp:1,covers:['mal'],scope:'Topical shampoo or cream for tinea versicolor and seborrheic dermatitis. Similar: selenium sulfide.'},
+  atv:{name:'Atovaquone',tag:'Antiprotozoal',cls:'par',sp:1,covers:['pjp'],scope:'Alternative for mild PJP when TMP-SMX can’t be used.'},
+  // Antiparasitics
+  art:{name:'Artemether-lum.',full:'Artemether-lumefantrine',tag:'Antimalarial (ACT)',cls:'par',sp:1,covers:['pfa','pviv'],scope:'Oral first-line for uncomplicated falciparum malaria.'},
+  asu:{name:'Artesunate IV',tag:'Antimalarial',cls:'par',sp:1,covers:['pfs','pfa'],scope:'IV treatment for severe malaria.'},
+  clq:{name:'Chloroquine',tag:'Antimalarial',cls:'par',sp:1,covers:['pviv'],scope:'Blood-stage P. vivax and ovale where still sensitive. Most falciparum is resistant. Similar: hydroxychloroquine.'},
+  pq:{name:'Primaquine',tag:'8-aminoquinoline',cls:'par',sp:1,covers:['phyp'],scope:'Kills dormant liver hypnozoites. Check G6PD first. Similar: tafenoquine.'},
+  atp:{name:'Atovaquone-proguanil',tag:'Antimalarial',cls:'par',sp:1,covers:['pfa'],scope:'Malaria prophylaxis and treatment for uncomplicated falciparum.'},
+  aaz:{name:'Atovaquone + azithro',tag:'Babesia combo',cls:'par',sp:1,covers:['bab'],scope:'Standard treatment for babesiosis.'},
+  tnd:{name:'Tinidazole',tag:'Nitroimidazole',cls:'par',sp:1,covers:['gla','ehc','tva'],scope:'Single-dose cousin of metronidazole for Giardia, amoebae and Trichomonas.'},
+  pmm:{name:'Paromomycin',tag:'Luminal amebicide',cls:'par',sp:1,covers:['ehcy'],scope:'Stays in the gut to clear amoeba cysts. Similar: iodoquinol.'},
+  ntz:{name:'Nitazoxanide',tag:'Antiprotozoal',cls:'par',sp:1,covers:['cpo','gla'],scope:'Cryptosporidium and Giardia.'},
+  pys:{name:'Pyrimethamine-SDZ',full:'Pyrimethamine-sulfadiazine + leucovorin',tag:'Folate inhibitors',cls:'par',sp:1,covers:['tox'],scope:'Toxoplasmosis. Leucovorin protects the marrow.'},
+  bnz:{name:'Benznidazole',tag:'Nitroimidazole',cls:'par',sp:1,covers:['tcr'],scope:'Chagas disease. Similar: nifurtimox.'},
+  fex:{name:'Fexinidazole',tag:'Nitroimidazole',cls:'par',sp:1,covers:['tbr'],scope:'Oral treatment for African sleeping sickness. Older drugs: suramin, melarsoprol.'},
+  mil:{name:'Miltefosine',tag:'Alkylphosphocholine',cls:'par',sp:1,covers:['lei'],scope:'Oral leishmaniasis drug. Teratogenic. Alternative: liposomal amphotericin B.'},
+  per:{name:'Permethrin',tag:'Topical insecticide',cls:'par',sp:1,covers:['sca','lic'],scope:'Cream for scabies, rinse for head lice. Treat close contacts.'},
+  ivm:{name:'Ivermectin',tag:'Avermectin',cls:'par',sp:2,covers:['str','onc','sca','lic','wuc'],scope:'Strongyloides, river blindness, crusted scabies. Dangerous with heavy Loa loa.'},
+  alb:{name:'Albendazole',tag:'Benzimidazole',cls:'par',sp:2,covers:['asc','hoo','pin','tri','txc','cys','ech','str'],scope:'Roundworms, neurocysticercosis, hydatid cysts. Avoid early in pregnancy.'},
+  meb:{name:'Mebendazole',tag:'Benzimidazole',cls:'par',sp:1,covers:['asc','hoo','pin','tri'],scope:'Intestinal roundworms like pinworm, Ascaris and hookworm.'},
+  pyr:{name:'Pyrantel',tag:'Nicotinic agonist',cls:'par',sp:1,covers:['pin','asc','hoo'],scope:'Over-the-counter pinworm treatment. Safe in pregnancy.'},
+  pzq:{name:'Praziquantel',tag:'Anthelmintic',cls:'par',sp:1,covers:['sch','clo','tsa','cys'],scope:'Flukes and tapeworms.'},
+  dec:{name:'DEC',full:'Diethylcarbamazine',tag:'Antifilarial',cls:'par',sp:1,covers:['wuc'],scope:'Lymphatic filariasis. Dangerous in onchocerciasis and heavy Loa loa.'}
+};
+// Each microbe: d = sprite drawer, o = drawer options (sh: resistance shield, ha: capsule halo)
+const MIC={
+  // Bacteria
+  spy:{name:'Streptococcus pyogenes',short:'Strep A',kind:'gpos',best:['pnv','pen','amox','amp'],fact:'Group A strep is still 100% penicillin-susceptible.',d:'chain'},
+  vir:{name:'Viridans streptococci',short:'Viridans',kind:'gpos',best:['pen','cro'],fact:'Mouth flora that seed damaged heart valves after dental work.',d:'chain',o:{n:4}},
+  gbs:{name:'Streptococcus agalactiae',short:'GBS',kind:'gpos',best:['pen','amp'],fact:'Group B strep: leading cause of newborn sepsis and meningitis.',d:'pairs'},
+  spn:{name:'Streptococcus pneumoniae',short:'S. pneumo',kind:'gpos',best:['amox','cro'],fact:'Lancet-shaped diplococci. Top cause of community pneumonia.',d:'lancet'},
+  mssa:{name:'S. aureus (MSSA)',short:'MSSA',kind:'gpos',best:['cfz','naf'],fact:'Grape-like clusters. Cefazolin or nafcillin beat vancomycin for MSSA.',d:'cluster'},
+  mrsa:{name:'Methicillin-resistant S. aureus',short:'MRSA',kind:'gpos',best:['vanc'],fact:'mecA makes PBP2a, so standard β-lactams fail.',d:'cluster',o:{sh:1}},
+  mrsap:{name:'MRSA pneumonia',short:'MRSA lung',kind:'gpos',best:['vanc','lzd'],fact:'Necrotizing MRSA pneumonia: vancomycin or linezolid, never daptomycin.',d:'cluster',o:{sh:1,ha:1}},
+  sepi:{name:'Staphylococcus epidermidis',short:'S. epi',kind:'gpos',best:['vanc'],fact:'Skin flora that forms biofilm on catheters and prosthetic joints.',d:'cluster',o:{sm:1,ha:1}},
+  ssa:{name:'Staphylococcus saprophyticus',short:'S. sapro',kind:'gpos',best:['nit','sxt'],fact:'Second most common cause of cystitis in young women.',d:'cluster',o:{sm:1}},
+  efa:{name:'Enterococcus faecalis',short:'E. faecalis',kind:'gpos',best:['amp','amox'],fact:'Gut flora behind UTIs and endocarditis. Ampicillin-type drugs are first-line.',d:'ovals'},
+  vre:{name:'Vancomycin-resistant E. faecium',short:'VRE',kind:'gpos',best:['lzd','dap'],fact:'vanA swaps the target to D-Ala-D-Lac, so vancomycin can’t bind.',d:'ovals',o:{sh:1}},
+  lmo:{name:'Listeria monocytogenes',short:'Listeria',kind:'gpos',best:['amp'],fact:'Deli meats and soft cheese. Hits newborns, pregnant patients, older adults.',d:'vrod'},
+  dip:{name:'Corynebacterium diphtheriae',short:'Diphtheria',kind:'gpos',best:['ery','pen'],fact:'Gray throat pseudomembrane. Antitoxin first, then erythromycin or penicillin.',d:'club'},
+  ban:{name:'Bacillus anthracis',short:'Anthrax',kind:'gpos',best:['cip','dox','lvx'],fact:'Boxcar rods with a protein capsule. Black eschar on the skin.',d:'box',o:{ha:1}},
+  cdi:{name:'Clostridioides difficile',short:'C. diff',kind:'gpos',best:['fdx','vanc'],fact:'Fidaxomicin or oral vancomycin. IV vancomycin does not reach the colon.',d:'spore'},
+  cpe:{name:'Clostridium perfringens',short:'C. perfringens',kind:'gpos',best:['pen','cli'],fact:'Gas gangrene. Penicillin kills it, clindamycin stops the toxin, surgery removes it.',d:'box'},
+  cte:{name:'Clostridium tetani',short:'Tetanus',kind:'gpos',best:['mtz'],fact:'Tennis-racket spores. Tetanus immune globulin plus metronidazole.',d:'drum'},
+  act:{name:'Actinomyces israelii',short:'Actinomyces',kind:'gpos',best:['pen'],fact:'Branching anaerobe with sulfur granules. Draining jaw abscesses.',d:'granule'},
+  noc:{name:'Nocardia',short:'Nocardia',kind:'gpos',best:['sxt'],fact:'Branching and weakly acid-fast. Lung and brain abscesses.',d:'branch'},
+  eco:{name:'Escherichia coli',short:'E. coli',kind:'gneg',best:['nit','fof','cro','cfz'],fact:'The most common cause of urinary tract infections.',d:'rod'},
+  esbl:{name:'ESBL-producing E. coli',short:'ESBL E. coli',kind:'gneg',best:['etp','mem'],fact:'Its enzymes destroy penicillins and cephalosporins. Carbapenems still work.',d:'rod',o:{sh:1}},
+  kpn:{name:'Klebsiella pneumoniae',short:'Klebsiella',kind:'gneg',best:['cro','cfz'],fact:'Thick mucoid capsule. Intrinsically resistant to ampicillin.',d:'rodfat'},
+  kpc:{name:'KPC-producing Klebsiella',short:'KPC-CRE',kind:'gneg',best:['cza'],fact:'A carbapenemase that destroys even meropenem. Avibactam blocks it.',d:'rodfat',o:{sh:1}},
+  ndm:{name:'NDM-producing Enterobacterales',short:'NDM-CRE',kind:'gneg',best:['fdc'],fact:'A metallo-β-lactamase that uses zinc. Avibactam can’t block it.',d:'rod',o:{sh:1,fl:2}},
+  ent:{name:'Enterobacter cloacae',short:'Enterobacter',kind:'gneg',best:['fep'],fact:'Carries inducible AmpC. Cefepime stays stable against it.',d:'rod',o:{fl:4,dots:1}},
+  ser:{name:'Serratia marcescens',short:'Serratia',kind:'gneg',best:['fep'],fact:'Red pigment, inducible AmpC. Part of the SPACE group.',d:'rod',o:{fl:3,red:1}},
+  pmi:{name:'Proteus mirabilis',short:'Proteus',kind:'gneg',best:['cro'],fact:'Swarming motility and urease. Makes struvite kidney stones.',d:'swarm'},
+  pae:{name:'Pseudomonas aeruginosa',short:'Pseudomonas',kind:'gneg',best:['ptz','fep','caz'],fact:'Water-loving rod behind ICU pneumonia, burns, and nail-through-sneaker bone infections.',d:'polar'},
+  mdrpa:{name:'MDR Pseudomonas',short:'MDR Pseudo.',kind:'gneg',best:['ctz'],fact:'Resists pip-tazo, cefepime and carbapenems through pumps and porin loss.',d:'polar',o:{sh:1}},
+  acb:{name:'Carbapenem-resistant Acinetobacter',short:'CRAB',kind:'gneg',best:['sam'],fact:'Survives on dry ICU surfaces for weeks. High-dose sulbactam is the backbone.',d:'cocco',o:{sh:1,big:1}},
+  sma:{name:'Stenotrophomonas maltophilia',short:'Stenotroph.',kind:'gneg',best:['sxt'],fact:'Intrinsically resistant to carbapenems. TMP-SMX is the drug of choice.',d:'polar',o:{tuft:1}},
+  bps:{name:'Burkholderia pseudomallei',short:'Melioidosis',kind:'gneg',best:['caz','mem'],fact:'Soil bug of Southeast Asia and northern Australia. Safety-pin staining.',d:'bipolar',o:{big:1}},
+  bfr:{name:'Bacteroides fragilis',short:'B. fragilis',kind:'gneg',best:['mtz','ptz','mem','amc','sam'],fact:'Colon anaerobe. The classic intra-abdominal abscess bug.',d:'small'},
+  hin:{name:'Haemophilus influenzae',short:'H. flu',kind:'gneg',best:['amc'],fact:'Tiny coccobacillus behind ear infections and sinusitis. Not the flu virus.',d:'cocco'},
+  mcat:{name:'Moraxella catarrhalis',short:'Moraxella',kind:'gneg',best:['amc'],fact:'Diplococcus of ears and sinuses. Almost every strain makes β-lactamase.',d:'diplo',o:{round:1}},
+  bpe:{name:'Bordetella pertussis',short:'Pertussis',kind:'gneg',best:['azi'],fact:'Whooping cough. Azithromycin, and treat close contacts.',d:'cocco',o:{tiny:1}},
+  ngo:{name:'Neisseria gonorrhoeae',short:'Gonorrhea',kind:'gneg',best:['cro'],fact:'Gram-negative diplococci. One IM dose of ceftriaxone treats it.',d:'diplo'},
+  nme:{name:'Neisseria meningitidis',short:'N. mening.',kind:'gneg',best:['cro'],fact:'Spreads in dorms and barracks. Close contacts need prophylaxis.',d:'diplo',o:{ha:1}},
+  sty:{name:'Salmonella Typhi',short:'Typhoid',kind:'gneg',best:['cro','azi'],fact:'Typhoid fever from contaminated food and water. Rose spots on the trunk.',d:'rod',o:{ha:1}},
+  shi:{name:'Shigella',short:'Shigella',kind:'gneg',best:['azi','cro','cip'],fact:'Bloody diarrhea from as few as 10 organisms. No flagella.',d:'rod',o:{fl:0}},
+  cam:{name:'Campylobacter jejuni',short:'Campylobacter',kind:'gneg',best:['azi'],fact:'Seagull-shaped. Undercooked chicken. Linked to Guillain-Barré.',d:'gull'},
+  vch:{name:'Vibrio cholerae',short:'Cholera',kind:'gneg',best:['dox','azi'],fact:'Comma-shaped. Rice-water stool. Fluids save lives; antibiotics shorten it.',d:'comma'},
+  hpy:{name:'Helicobacter pylori',short:'H. pylori',kind:'gneg',best:['bqt'],fact:'Spiral, urease-positive. Causes ulcers and gastric cancer.',d:'helix'},
+  pas:{name:'Pasteurella multocida',short:'Pasteurella',kind:'gneg',best:['amc'],fact:'Cat and dog bites. Cellulitis within 24 hours.',d:'bipolar'},
+  eik:{name:'Eikenella corrodens',short:'Eikenella',kind:'gneg',best:['amc'],fact:'Human bites and clenched-fist injuries.',d:'small',o:{slim:1}},
+  fra:{name:'Francisella tularensis',short:'Tularemia',kind:'gneg',best:['gen'],fact:'Rabbits and ticks. A bioterror agent.',d:'cocco',o:{tiny:1}},
+  ype:{name:'Yersinia pestis',short:'Plague',kind:'gneg',best:['gen'],fact:'Fleas from rodents. Buboes. Safety-pin staining.',d:'bipolar'},
+  bru:{name:'Brucella',short:'Brucella',kind:'gneg',best:['dox','rif'],fact:'Unpasteurized dairy. Undulant fever. Doxycycline plus rifampin or gentamicin.',d:'cocco',o:{tiny:1,big:1}},
+  bar:{name:'Bartonella henselae',short:'Bartonella',kind:'gneg',best:['azi'],fact:'Cat scratch disease. Bacillary angiomatosis in advanced HIV.',d:'intra',o:{in:'rods'}},
+  gva:{name:'Gardnerella vaginalis',short:'Gardnerella',kind:'gneg',best:['mtz'],fact:'Bacterial vaginosis. Clue cells and a fishy odor.',d:'clue'},
+  hdu:{name:'Haemophilus ducreyi',short:'Chancroid',kind:'gneg',best:['azi','cro'],fact:'Painful genital ulcer. "School of fish" on the stain.',d:'cocco',o:{fish:1}},
+  leg:{name:'Legionella pneumophila',short:'Legionella',kind:'gneg',intra:1,best:['azi','lvx'],fact:'Grows in water systems and lives inside macrophages.',d:'intra',o:{in:'rods'}},
+  chl:{name:'Chlamydia trachomatis',short:'Chlamydia',kind:'gneg',intra:1,best:['dox'],fact:'Lives inside host cells. Doxycycline for 7 days is first-line.',d:'intra',o:{in:'incl'}},
+  cpn:{name:'Chlamydia pneumoniae',short:'C. pneumoniae',kind:'gneg',intra:1,best:['dox','azi'],fact:'Atypical pneumonia with hoarseness and a slow cough.',d:'intra',o:{in:'incl',sm:1}},
+  psi:{name:'Chlamydia psittaci',short:'Psittacosis',kind:'gneg',intra:1,best:['dox'],fact:'Pneumonia from pet birds.',d:'intra',o:{in:'incl'}},
+  cox:{name:'Coxiella burnetii',short:'Q fever',kind:'gneg',intra:1,best:['dox'],fact:'Spores from cattle and sheep birth products. No rash, unlike Rickettsia.',d:'intra',o:{in:'scatter'}},
+  ric:{name:'Rickettsia rickettsii',short:'RMSF',kind:'gneg',intra:1,best:['dox'],fact:'Rocky Mountain spotted fever. Doxycycline at any age, even in young children.',d:'intra',o:{in:'scatter'}},
+  ehr:{name:'Ehrlichia chaffeensis',short:'Ehrlichia',kind:'gneg',intra:1,best:['dox'],fact:'Tick-borne. Berry-like morulae inside white cells.',d:'intra',o:{in:'morula'}},
+  myc:{name:'Mycoplasma pneumoniae',short:'Mycoplasma',kind:'none',nowall:1,best:['azi','dox'],fact:'No cell wall, so it does not Gram stain. "Walking pneumonia."',d:'blob'},
+  tpa:{name:'Treponema pallidum',short:'Syphilis',kind:'none',best:['pen'],fact:'A spirochete too thin to Gram stain. Benzathine penicillin G is still the cure.',d:'spiro'},
+  bbu:{name:'Borrelia burgdorferi',short:'Lyme',kind:'none',best:['dox','amox'],fact:'Spirochete from Ixodes ticks. The bull’s-eye rash is erythema migrans.',d:'spiro',o:{loose:1}},
+  lep:{name:'Leptospira interrogans',short:'Leptospira',kind:'none',best:['dox','pen'],fact:'Flood water and rat urine. Hooked ends. Weil disease.',d:'spiro',o:{hook:1}},
+  mtb:{name:'Mycobacterium tuberculosis',short:'TB',kind:'afb',best:['rip'],fact:'Waxy mycolic-acid wall makes it acid-fast and resistant to ordinary antibiotics.',d:'cord'},
+  mdrtb:{name:'Multidrug-resistant TB',short:'MDR-TB',kind:'afb',best:['bpal'],fact:'Resists both isoniazid and rifampin.',d:'cord',o:{sh:1}},
+  ltb:{name:'Latent TB infection',short:'Latent TB',kind:'afb',best:['rif'],fact:'Positive IGRA, normal chest X-ray. Treat to prevent reactivation.',d:'intra',o:{in:'globi'}},
+  mac:{name:'Mycobacterium avium complex',short:'MAC',kind:'afb',best:['azi','clr'],fact:'A macrolide plus ethambutol and a rifamycin. Disseminated in advanced HIV.',d:'clump'},
+  mle:{name:'Mycobacterium leprae',short:'Leprosy',kind:'afb',best:['dps'],fact:'Grows in cool skin and nerves. Armadillos in the US South.',d:'intra',o:{in:'globi'}},
+  // Viruses
+  flu:{name:'Influenza A',short:'Influenza A',kind:'virus',best:['osl'],fact:'Treat within 48 h, or anytime if hospitalized or high-risk.',d:'spiky'},
+  flb:{name:'Influenza B',short:'Influenza B',kind:'virus',best:['osl'],fact:'Hits children hard. Same neuraminidase inhibitors work.',d:'spiky',o:{n:12}},
+  cov:{name:'SARS-CoV-2 (outpatient)',short:'COVID-19',kind:'virus',best:['pax'],fact:'Paxlovid within 5 days cuts severe disease in high-risk patients.',d:'crown'},
+  covh:{name:'COVID-19 on oxygen',short:'COVID on O₂',kind:'virus',best:['rdv'],fact:'Hospitalized on oxygen: remdesivir, plus dexamethasone for the inflammation.',d:'crown',o:{ha:1}},
+  rsv:{name:'RSV in adults',short:'RSV adult',kind:'virus',best:['sup'],fact:'Supportive care. Older adults can get the RSV vaccine.',sn:'Adults get supportive care. Older adults can get the RSV vaccine.',d:'pleo'},
+  rsvi:{name:'RSV in infants',short:'RSV infant',kind:'virus',best:['nir'],fact:'Top cause of infant hospitalization. Nirsevimab or maternal vaccine prevents it.',d:'pleo',o:{ha:1}},
+  rhv:{name:'Rhinovirus',short:'Common cold',kind:'virus',best:['sup'],fact:'The common cold. No antiviral, and antibiotics don’t help.',sn:'It’s the common cold.',d:'vsmall',o:{st:'knob'}},
+  noro:{name:'Norovirus',short:'Norovirus',kind:'virus',best:['sup'],fact:'Cruise-ship vomiting. Rehydrate; it passes in 1 to 3 days.',sn:'Rehydrate; it passes in 1 to 3 days.',d:'vsmall',o:{st:'cup'}},
+  ebv:{name:'Epstein-Barr virus',short:'EBV (mono)',kind:'virus',best:['sup'],fact:'Mono: supportive care, no contact sports while the spleen is big.',sn:'Mono gets supportive care. Avoid contact sports while the spleen is enlarged.',d:'lymph'},
+  hav:{name:'Hepatitis A virus',short:'Hep A',kind:'virus',best:['sup'],fact:'Fecal-oral. Resolves on its own; vaccinate contacts.',sn:'It resolves on its own. Vaccinate contacts.',d:'vsmall',o:{st:'smooth'}},
+  mea:{name:'Measles virus',short:'Measles',kind:'virus',best:['sup'],fact:'Koplik spots. Give vitamin A. Vaccination prevents it.',sn:'Give vitamin A and supportive care.',d:'pleo',o:{big:1}},
+  den:{name:'Dengue virus',short:'Dengue',kind:'virus',best:['sup'],fact:'Breakbone fever from Aedes mosquitoes. Fluids and acetaminophen.',sn:'Fluids and acetaminophen. Avoid NSAIDs because of bleeding risk.',d:'vsmall',o:{st:'star'}},
+  hsv:{name:'Herpes simplex virus',short:'HSV',kind:'virus',best:['vacv','acy'],fact:'Acyclovir needs the virus’s own thymidine kinase to activate.',d:'hex'},
+  arh:{name:'Acyclovir-resistant HSV',short:'ACV-res. HSV',kind:'virus',best:['fsc'],fact:'Lost thymidine kinase. Foscarnet needs no activation.',d:'hex',o:{sh:1}},
+  vzv:{name:'Varicella-zoster virus',short:'VZV',kind:'virus',best:['vacv','acy'],fact:'Chickenpox and shingles. Valacyclovir within 72 h of a shingles rash.',d:'hex',o:{dots:1}},
+  cmv:{name:'Cytomegalovirus',short:'CMV',kind:'virus',best:['gcv','vgcv'],fact:'"Owl’s eye" inclusions. A major threat after transplant.',d:'owl'},
+  grc:{name:'Ganciclovir-resistant CMV',short:'Resistant CMV',kind:'virus',best:['mbv','fsc'],fact:'A UL97 kinase mutation blocks ganciclovir activation.',d:'owl',o:{sh:1}},
+  cmvp:{name:'CMV risk after transplant',short:'CMV post-tx',kind:'virus',best:['let'],fact:'Letermovir prevents CMV without the marrow toxicity of ganciclovir.',d:'owl',o:{faint:1}},
+  adv:{name:'Adenovirus',short:'Adenovirus',kind:'virus',best:['cdv'],fact:'Pink eye and pharyngitis. Dangerous after stem cell transplant.',d:'icosa'},
+  hbv:{name:'Hepatitis B virus',short:'Hep B',kind:'virus',best:['tdf','etv'],fact:'DNA virus spread by blood and sex. Suppressed, rarely cured. Vaccine-preventable.',d:'dane'},
+  hcv:{name:'Hepatitis C virus',short:'Hep C',kind:'virus',best:['sof','glp'],fact:'RNA virus. Direct-acting antivirals cure more than 95%.',d:'vsmall',o:{st:'ring'}},
+  hiv:{name:'Human immunodeficiency virus',short:'HIV',kind:'virus',best:['bik'],fact:'Always treated with a combination to prevent resistance.',d:'cone'},
+  mpx:{name:'Severe mpox',short:'Severe mpox',kind:'virus',best:['tpx'],fact:'Tecovirimat is for severe disease or weak immunity; trials showed no benefit in mild cases.',d:'brick'},
+  rab:{name:'Rabies virus (after a bite)',short:'Rabies',kind:'virus',best:['rpep'],fact:'Nearly always fatal once symptoms start. Post-exposure prophylaxis prevents it.',d:'bullet'},
+  // Fungi
+  can:{name:'Candida albicans (candidemia)',short:'Candida',kind:'fungus',best:['flc','mcf'],fact:'Line infections. Echinocandin first if critically ill, then step down to fluconazole.',d:'pseudo'},
+  cgl:{name:'Candida glabrata',short:'C. glabrata',kind:'fungus',best:['mcf'],fact:'Small yeast with no hyphae. Often fluconazole-resistant.',d:'tinyyeast'},
+  kru:{name:'Candida krusei',short:'C. krusei',kind:'fungus',best:['mcf'],fact:'A Candida that is intrinsically fluconazole-resistant.',d:'rice'},
+  cau:{name:'Candida auris',short:'C. auris',kind:'fungus',best:['mcf'],fact:'Spreads between hospital patients. Usually fluconazole-resistant.',d:'tinyyeast',o:{sh:1}},
+  thr:{name:'Oral thrush',short:'Thrush',kind:'fungus',best:['nys','clt','flc'],fact:'White plaques that scrape off. Common after inhaled steroids or antibiotics.',d:'pseudo',o:{sm:1}},
+  vvc:{name:'Vulvovaginal candidiasis',short:'Vaginal yeast',kind:'fungus',best:['flc','clt'],fact:'One oral fluconazole dose, or topical azoles in pregnancy.',d:'pseudo',o:{sm:1}},
+  cry:{name:'Cryptococcus neoformans',short:'Crypto',kind:'fungus',best:['ffc'],fact:'Encapsulated yeast. Meningitis in advanced HIV. India ink shows the capsule.',d:'capsule'},
+  asp:{name:'Aspergillus fumigatus',short:'Aspergillus',kind:'fungus',best:['vor','isa'],fact:'Acute-angle branching septate hyphae. Voriconazole is the drug of choice.',d:'acute'},
+  muc:{name:'Mucorales (Rhizopus)',short:'Mucor',kind:'fungus',best:['amb'],fact:'Broad ribbon hyphae at right angles. Diabetic ketoacidosis. Surgery plus amphotericin.',d:'ribbon'},
+  fus:{name:'Fusarium',short:'Fusarium',kind:'fungus',best:['vor'],fact:'Banana-shaped spores. Keratitis and infections in neutropenia.',d:'banana'},
+  his:{name:'Histoplasma capsulatum',short:'Histoplasma',kind:'fungus',best:['itr'],fact:'Bird and bat droppings, Ohio and Mississippi valleys. Tiny yeasts inside macrophages.',d:'macro'},
+  bla:{name:'Blastomyces dermatitidis',short:'Blastomyces',kind:'fungus',best:['itr'],fact:'Broad-based budding yeast. Lungs, skin and bone.',d:'bbb'},
+  coc:{name:'Coccidioides immitis',short:'Cocci',kind:'fungus',best:['flc'],fact:'Valley fever in the Southwest desert. Spherules full of endospores.',d:'spherule'},
+  spo:{name:'Sporothrix schenckii',short:'Sporothrix',kind:'fungus',best:['itr'],fact:'Rose gardener’s disease. Nodules spread up the lymphatics.',d:'cigar'},
+  pjp:{name:'Pneumocystis jirovecii',short:'PJP',kind:'fungus',best:['sxt'],fact:'Fungal pneumonia when CD4 falls below 200. TMP-SMX treats and prevents it.',d:'cup'},
+  tin:{name:'Dermatophytes (tinea corporis/pedis)',short:'Ringworm',kind:'fungus',best:['trb'],fact:'Ring-shaped scaly rash or athlete’s foot.',d:'derm'},
+  tcap:{name:'Tinea capitis',short:'Tinea capitis',kind:'fungus',best:['gri','trb'],fact:'Scalp ringworm in children. Needs oral treatment, not cream.',d:'derm',o:{hair:1}},
+  mal:{name:'Malassezia furfur',short:'Malassezia',kind:'fungus',best:['ket'],fact:'Tinea versicolor. "Spaghetti and meatballs" under the microscope.',d:'spag'},
+  // Parasites
+  pfa:{name:'Plasmodium falciparum',short:'Falciparum',kind:'proto',best:['art'],fact:'Deadliest malaria. Multiple ring forms per red cell.',d:'rbc',o:{f:'ring'}},
+  pfs:{name:'Severe falciparum malaria',short:'Severe malaria',kind:'proto',best:['asu'],fact:'Confusion, high parasitemia or organ failure: IV artesunate now.',d:'rbc',o:{f:'banana'}},
+  pviv:{name:'Plasmodium vivax (blood)',short:'P. vivax',kind:'proto',best:['clq'],fact:'Enlarged red cells with Schüffner dots.',d:'rbc',o:{f:'schuff'}},
+  phyp:{name:'P. vivax liver hypnozoites',short:'Hypnozoite',kind:'proto',best:['pq'],fact:'Dormant liver stage that causes relapses months later.',d:'hepato'},
+  bab:{name:'Babesia microti',short:'Babesia',kind:'proto',best:['aaz'],fact:'Tick-borne. "Maltese cross" tetrads in red cells. Worse without a spleen.',d:'rbc',o:{f:'maltese'}},
+  gla:{name:'Giardia lamblia',short:'Giardia',kind:'proto',best:['tnd','mtz','ntz'],fact:'Pear-shaped protozoan from untreated stream water. Causes greasy diarrhea.',d:'pear'},
+  ehc:{name:'Entamoeba histolytica (invasive)',short:'Amoeba',kind:'proto',best:['mtz','tnd'],fact:'Bloody diarrhea and liver abscess. Trophozoites swallow red cells.',d:'amoeba'},
+  ehcy:{name:'E. histolytica cysts in the gut',short:'Amoeba cysts',kind:'proto',best:['pmm'],fact:'After metronidazole, a luminal agent clears the remaining cysts.',d:'cyst4'},
+  cpo:{name:'Cryptosporidium',short:'Crypto-sporid.',kind:'proto',best:['ntz'],fact:'Watery diarrhea from pools. Severe in advanced HIV.',d:'oocyst'},
+  tva:{name:'Trichomonas vaginalis',short:'Trichomonas',kind:'proto',best:['mtz','tnd'],fact:'Motile flagellated protozoan. Treat sexual partners too.',d:'trich'},
+  tox:{name:'Toxoplasma gondii',short:'Toxoplasma',kind:'proto',best:['pys'],fact:'Cat litter and undercooked meat. Ring-enhancing brain lesions in HIV.',d:'crescent'},
+  tcr:{name:'Trypanosoma cruzi',short:'Chagas',kind:'proto',best:['bnz'],fact:'Kissing bug. Heart failure and megacolon years later.',d:'trypo'},
+  tbr:{name:'Trypanosoma brucei',short:'Sleeping sick.',kind:'proto',best:['fex'],fact:'Tsetse fly. African sleeping sickness.',d:'trypo',o:{slim:1}},
+  lei:{name:'Leishmania donovani',short:'Leishmania',kind:'proto',best:['mil'],fact:'Sandflies. Visceral form: fever, huge spleen, dark skin (kala-azar).',d:'macro',o:{kin:1}},
+  sca:{name:'Sarcoptes scabiei',short:'Scabies',kind:'ecto',best:['per'],fact:'Itchy burrows in finger webs, worse at night.',d:'mite'},
+  lic:{name:'Pediculus humanus capitis',short:'Head lice',kind:'ecto',best:['per'],fact:'Nits glued to the hair shaft near the scalp.',d:'louse'},
+  pin:{name:'Enterobius vermicularis',short:'Pinworm',kind:'helm',best:['alb','meb','pyr'],fact:'Night-time anal itching. Scotch-tape test.',d:'worm',o:{len:1.1,w:.1,pin:1}},
+  asc:{name:'Ascaris lumbricoides',short:'Ascaris',kind:'helm',best:['alb','meb'],fact:'Giant roundworm. Can obstruct the bowel or bile duct.',d:'worm',o:{len:1.9,w:.17}},
+  hoo:{name:'Hookworm (Necator)',short:'Hookworm',kind:'helm',best:['alb','meb'],fact:'Larvae enter bare feet. Iron-deficiency anemia.',d:'worm',o:{len:1.4,w:.12,hook:1}},
+  str:{name:'Strongyloides stercoralis',short:'Strongyloides',kind:'helm',best:['ivm'],fact:'Autoinfection. Hyperinfection after steroids can be fatal.',d:'worm',o:{len:1.3,w:.08,larva:1}},
+  tri:{name:'Trichinella spiralis',short:'Trichinella',kind:'helm',best:['alb'],fact:'Undercooked pork or game. Larvae coil inside muscle.',d:'musc'},
+  txc:{name:'Toxocara canis',short:'Toxocara',kind:'helm',best:['alb'],fact:'Puppy feces. Visceral and ocular larva migrans in kids.',d:'worm',o:{len:1,w:.07,larva:1}},
+  sch:{name:'Schistosoma',short:'Schistosoma',kind:'helm',best:['pzq'],fact:'Freshwater snails. Eggs with spines; bladder or liver disease.',d:'egg',o:{t:'spine'}},
+  clo:{name:'Clonorchis sinensis',short:'Liver fluke',kind:'helm',best:['pzq'],fact:'Undercooked fish. Bile duct disease and cholangiocarcinoma.',d:'fluke'},
+  tsa:{name:'Taenia (intestinal tapeworm)',short:'Tapeworm',kind:'helm',best:['pzq'],fact:'Undercooked pork or beef. Segments pass in stool.',d:'tape'},
+  cys:{name:'Neurocysticercosis',short:'Cysticercosis',kind:'helm',best:['alb'],fact:'Pork tapeworm eggs form brain cysts. Leading cause of acquired epilepsy worldwide.',d:'cysti'},
+  ech:{name:'Echinococcus granulosus',short:'Hydatid cyst',kind:'helm',best:['alb'],fact:'Dog tapeworm. Liver cysts; spilling them can cause anaphylaxis.',d:'hydatid'},
+  wuc:{name:'Wuchereria bancrofti',short:'Filariasis',kind:'helm',best:['dec'],fact:'Mosquito-borne. Lymphedema and elephantiasis.',d:'mf',o:{sheath:1}},
+  onc:{name:'Onchocerca volvulus',short:'River blind.',kind:'helm',best:['ivm'],fact:'Blackfly bites. Skin nodules and blindness.',d:'mf'}
+};
+const KIND={gpos:'Gram-positive',gneg:'Gram-negative',afb:'Acid-fast',none:'Doesn’t Gram stain',virus:'Virus',fungus:'Fungus',proto:'Protozoan',helm:'Helminth',ecto:'Ectoparasite'};
+const KIND_CH={bac:['gpos','gneg','afb','none'],vir:['virus'],fun:['fungus'],par:['proto','helm','ecto']};
+const CLS={bac:'Antibacterials',vir:'Antivirals',fun:'Antifungals',par:'Antiparasitics',tb:'TB drugs',sup:'Supportive care'};
+// Narrow-button forms: soft hyphens mark where a long name may break, and short class tags replace ones that won't fit
+const HY={};['Nitro-furantoin','Metro-nidazole','Vanco-mycin','Ceftri-axone','Amoxi-cillin','Ampi-cillin','Mero-penem','Doxy-cycline','Azithro-mycin','Oselta-mivir','Fluco-nazole',
+  'Vori-conazole','Ganci-clovir','Line-zolid','Dapto-mycin','Mica-fungin','Atova-quone','Teno-fovir','Cefa-zolin','Cefe-pime','Aztreo-nam','Acy-clovir','Clinda-mycin','Genta-micin',
+  'Clarithro-mycin','Erythro-mycin','Levo-floxacin','Cipro-floxacin','Fosfo-mycin','Fidaxo-micin','Rif-ampin','Colis-tin','Ceftaz-idime','Cefta-roline','Cefidero-col','Erta-penem',
+  'Imi-penem','Naf-cillin','Zana-mivir','Balox-avir','Remde-sivir','Molnu-piravir','Nirse-vimab','Valacy-clovir','Valganci-clovir','Fos-carnet','Mari-bavir','Leter-movir','Cido-fovir',
+  'Ente-cavir','Tecovi-rimat','Itra-conazole','Posa-conazole','Isavu-conazole','Nys-tatin','Clotri-mazole','Terbi-nafine','Griseo-fulvin','Keto-conazole','Chloro-quine','Prima-quine',
+  'Tini-dazole','Paromo-mycin','Nitazox-anide','Benzni-dazole','Fexini-dazole','Milte-fosine','Perme-thrin','Iver-mectin','Alben-dazole','Meben-dazole','Pyran-tel','Prazi-quantel'
+  ].forEach(s=>{HY[s.replace('-','')]=s.replace('-','­')});
+HY['BIC/FTC/TAF']='BIC/FTC/​TAF';HY['Cabotegravir/RPV']='Cabotegravir/​RPV';HY['Glecaprevir/pib']='Glecaprevir/​pib';
+const TG={pnv:'Penicillin',pen:'Penicillin',naf:'Anti-staph',amp:'Aminopen.',amox:'Aminopen.',amc:'PCN + BLI',sam:'PCN + BLI',ptz:'PCN + BLI',cfz:'Ceph 1G',cro:'Ceph 3G',caz:'Ceph 3G',
+  fep:'Ceph 4G',cpt:'Ceph 5G',cza:'Ceph + BLI',ctz:'Ceph + BLI',fdc:'Ceph (Fe)',etp:'Carbapenem',mem:'Carbapenem',ipm:'Carbapenem',azt:'Monobactam',vanc:'Glycopep.',dap:'Lipopep.',
+  lzd:'Oxazolid.',cli:'Lincosam.',gen:'Aminoglyc.',dox:'Tetracyc.',azi:'Macrolide',clr:'Macrolide',ery:'Macrolide',lvx:'FQ',cip:'FQ',sxt:'Folate inh.',nit:'Urinary',fof:'Urinary',
+  mtz:'Nitroimid.',fdx:'Macrocyclic',rif:'Rifamycin',rip:'TB regimen',bpal:'MDR-TB',dps:'Leprosy',col:'Polymyxin',bqt:'H. pylori',osl:'NA inhib.',zan:'NA inhib.',bxm:'Endonucl.',
+  pax:'Protease',rdv:'Polymerase',mol:'Nucleoside',nir:'Antibody',acy:'Nucleoside',vacv:'Nucleoside',gcv:'Nucleoside',vgcv:'Nucleoside',fsc:'PPi analog',mbv:'UL97 inh.',
+  let:'Terminase',cdv:'Nucleotide',tdf:'NRTI',etv:'Nucleoside',sof:'HCV DAA',glp:'HCV DAA',bik:'HIV combo',cab:'Long-acting',tpx:'Poxvirus',rpep:'Post-bite',sup:'Supportive',
+  flc:'Azole',itr:'Azole',vor:'Azole',pos:'Azole',isa:'Azole',mcf:'Echinocand.',amb:'Polyene',ffc:'Combo',nys:'Polyene',clt:'Azole',trb:'Allylamine',gri:'Griseo.',ket:'Azole',
+  atv:'Antiprotoz.',art:'ACT',asu:'IV ACT',clq:'Antimalar.',pq:'Liver stage',atp:'Antimalar.',aaz:'Combo',tnd:'Nitroimid.',pmm:'Luminal',ntz:'Antiprotoz.',pys:'Folate inh.',
+  bnz:'Nitroimid.',fex:'Nitroimid.',mil:'Antileish.',per:'Topical',ivm:'Avermectin',alb:'Benzimid.',meb:'Benzimid.',pyr:'Nicotinic',pzq:'Anthelm.',dec:'Antifilarial'};
+const WHY={
+  'pnv|mssa':'Most S. aureus make penicillinase, which breaks down penicillin.',
+  'amp|mssa':'Most S. aureus make penicillinase, which breaks down ampicillin.',
+  'amox|eco':'Many E. coli make β-lactamase, so amoxicillin alone is unreliable.',
+  'amp|eco':'Many E. coli make β-lactamase, so ampicillin alone is unreliable.',
+  'amox|kpn':'Klebsiella is intrinsically resistant to ampicillin and amoxicillin.',
+  'amp|kpn':'Klebsiella is intrinsically resistant to ampicillin.',
+  'amox|hin':'Many H. influenzae make β-lactamase. Clavulanate fixes that.',
+  'amox|mcat':'Nearly all Moraxella make β-lactamase. Add clavulanate.',
+  'pen|spn':'Penicillin-resistant pneumococci are too common to use penicillin empirically for meningitis.',
+  'amp|spn':'Penicillin-resistant pneumococci are too common to use ampicillin empirically for meningitis.',
+  'nit|kpn':'Many Klebsiella resist nitrofurantoin, so it is unreliable here.',
+  'nit|pmi':'Proteus is intrinsically resistant to nitrofurantoin.',
+  'fof|ssa':'S. saprophyticus is intrinsically resistant to fosfomycin.',
+  'cro|lmo':'Listeria is intrinsically resistant to cephalosporins. That is why ampicillin is added for meningitis in at-risk patients.',
+  'cro|pae':'Ceftriaxone has no Pseudomonas activity. Cefepime or ceftazidime would.',
+  'cfz|pae':'Cefazolin has no Pseudomonas activity.',
+  'cli|bfr':'B. fragilis is now too often clindamycin-resistant to rely on.',
+  'pen|cte':'Metronidazole is preferred for tetanus. Penicillin blocks GABA receptors and can worsen spasms.',
+  'cro|cdi':'Cephalosporins are a classic trigger for C. diff, not a treatment.',
+  'ptz|cdi':'Pip-tazo doesn’t treat C. diff. Broad antibiotics are what let it take over.',
+  'mem|cdi':'Carbapenems are a major cause of C. diff, not a treatment.',
+  'cro|ent':'Enterobacter carries inducible AmpC. Ceftriaxone can fail mid-treatment. Cefepime is stable.',
+  'ptz|ent':'Enterobacter’s inducible AmpC makes pip-tazo unreliable. Cefepime is stable.',
+  'caz|ent':'Enterobacter’s inducible AmpC breaks down ceftazidime. Cefepime is stable.',
+  'cro|ser':'Serratia carries inducible AmpC. Ceftriaxone can fail mid-treatment.',
+  'ptz|ser':'Serratia’s inducible AmpC makes pip-tazo unreliable. Cefepime is stable.',
+  'caz|ser':'Serratia’s inducible AmpC breaks down ceftazidime.',
+  'cro|esbl':'ESBL enzymes destroy ceftriaxone and other third-generation cephalosporins.',
+  'fep|esbl':'ESBLs also break down cefepime. Use a carbapenem.',
+  'ptz|esbl':'Pip-tazo did worse than meropenem for ESBL bloodstream infections in the MERINO trial.',
+  'etp|kpc':'KPC is a carbapenemase. It destroys ertapenem.',
+  'mem|kpc':'KPC is a carbapenemase. It destroys meropenem.',
+  'etp|ndm':'NDM is a carbapenemase. It destroys ertapenem.',
+  'mem|ndm':'NDM is a carbapenemase. It destroys meropenem.',
+  'cza|ndm':'Avibactam can’t block metallo-β-lactamases like NDM.',
+  'col|sma':'Stenotrophomonas is intrinsically resistant to colistin.',
+  'dap|mrsap':'Lung surfactant inactivates daptomycin. Never use it for pneumonia.',
+  'mem|vre':'Carbapenems don’t reliably cover E. faecium.',
+  'azi|spn':'Too many pneumococci are macrolide-resistant to rely on azithromycin alone.',
+  'azi|gbs':'Many GBS strains are macrolide-resistant.',
+  'azi|tpa':'Macrolide resistance makes azithromycin unreliable for syphilis.',
+  'dox|ngo':'Gonorrhea is widely resistant to tetracyclines.',
+  'pen|ngo':'Most gonorrhea now makes penicillinase. Penicillin no longer works.',
+  'pen|noc':'Nocardia doesn’t respond to penicillin. Remember SNAP: Sulfa for Nocardia, Actinomyces gets Penicillin.',
+  'sxt|act':'Actinomyces gets penicillin. Remember SNAP: Sulfa for Nocardia, Actinomyces gets Penicillin.',
+  'rip|ltb':'Latent TB needs one short regimen, like 4 months of rifampin, not the four-drug RIPE.',
+  'rip|mdrtb':'MDR-TB resists isoniazid and rifampin, the core of RIPE.',
+  'rif|mtb':'Rifampin alone breeds resistance in active TB. It needs the full RIPE regimen.',
+  'acy|cmv':'CMV lacks the thymidine kinase that activates acyclovir.',
+  'vacv|cmv':'CMV lacks the thymidine kinase that activates valacyclovir.',
+  'acy|arh':'This HSV lost its thymidine kinase, so acyclovir is never activated.',
+  'vacv|arh':'This HSV lost its thymidine kinase, so valacyclovir is never activated.',
+  'gcv|grc':'A UL97 mutation stops ganciclovir activation.',
+  'vgcv|grc':'A UL97 mutation stops ganciclovir activation.',
+  'let|grc':'Letermovir prevents CMV. It isn’t used to treat resistant disease.',
+  'let|cmv':'Letermovir prevents CMV. It isn’t used to treat active disease.',
+  'pax|covh':'Paxlovid is for outpatients early in illness, not hospitalized patients on oxygen.',
+  'mol|covh':'Molnupiravir is for outpatients, not hospitalized patients on oxygen.',
+  'nir|rsv':'Nirsevimab is for infants. Adults get supportive care, and older adults can get the RSV vaccine.',
+  'tdf|hiv':'Tenofovir alone breeds HIV resistance. HIV needs a full combination regimen.',
+  'cab|hbv':'Cabotegravir-rilpivirine has no hepatitis B activity. HBV needs tenofovir or entecavir.',
+  'sup|rab':'Once rabies symptoms start it is almost always fatal. Post-exposure prophylaxis is what saves lives.',
+  'flc|asp':'Aspergillus is intrinsically resistant to fluconazole.',
+  'flc|kru':'Candida krusei is intrinsically resistant to fluconazole.',
+  'flc|cgl':'C. glabrata is often fluconazole-resistant. Use an echinocandin.',
+  'flc|cau':'Most C. auris resist fluconazole.',
+  'mcf|cry':'Cryptococcus is intrinsically resistant to echinocandins.',
+  'vor|muc':'Mucorales resist voriconazole. Mucor breaking through voriconazole is a classic scenario.',
+  'flc|his':'Fluconazole is much weaker than itraconazole for histoplasmosis.',
+  'flc|bla':'Fluconazole is much weaker than itraconazole for blastomycosis.',
+  'trb|mal':'Oral terbinafine doesn’t work on Malassezia. Use topical ketoconazole or selenium sulfide.',
+  'clq|pfa':'Most P. falciparum is chloroquine-resistant.',
+  'art|pfs':'Severe malaria needs IV artesunate. Oral drugs aren’t enough.',
+  'atp|pfs':'Severe malaria needs IV artesunate. Oral drugs aren’t enough.',
+  'clq|phyp':'Chloroquine clears blood stages but can’t reach dormant liver hypnozoites.',
+  'art|phyp':'Artemisinins clear blood stages but can’t reach dormant liver hypnozoites.',
+  'mtz|ehcy':'Metronidazole doesn’t clear cysts in the bowel lumen. Follow it with paromomycin.',
+  'tnd|ehcy':'Tinidazole doesn’t clear cysts in the bowel lumen. Follow it with paromomycin.',
+  'pmm|ehc':'Paromomycin stays in the gut lumen. Invasive amoebiasis needs metronidazole first.',
+  'dec|onc':'DEC kills Onchocerca microfilariae so fast it causes severe eye and skin reactions (Mazzotti).'
+};
+const WORKS={
+  'vanc|spy':'Vancomycin works, but save it for MRSA. Strep A is penicillin-susceptible.',
+  'cfz|spy':'Cefazolin works, but strep is still universally penicillin-susceptible.',
+  'vanc|mssa':'Vancomycin kills MSSA more slowly than a β-lactam. Use nafcillin or cefazolin.',
+  'dap|mssa':'Daptomycin works, but cefazolin is the better MSSA drug.',
+  'fep|mssa':'Cefepime works, but cefazolin is the narrower MSSA drug.',
+  'amc|spy':'Amox-clav works, but clavulanate adds nothing against strep.',
+  'amc|spn':'Amox-clav works, but pneumococcus doesn’t make β-lactamase. Plain amoxicillin is enough.',
+  'cro|hin':'Ceftriaxone works, but oral amox-clav is the narrower choice for ear and sinus infections.',
+  'cro|mcat':'Ceftriaxone works, but oral amox-clav is the narrower choice for ear and sinus infections.',
+  'nit|efa':'Nitrofurantoin can treat enterococcal cystitis, but amoxicillin is first-line.',
+  'amox|pmi':'Many Proteus are amoxicillin-susceptible, but resistance is common. Ceftriaxone is the reliable pick.',
+  'cro|gbs':'Ceftriaxone works, but GBS is penicillin-susceptible. Use the narrower drug.',
+  'amp|nme':'Penicillins work on susceptible meningococci, but ceftriaxone is the empiric choice.',
+  'dox|tpa':'Doxycycline is an alternative for syphilis, but penicillin G is the drug of choice.',
+  'cro|tpa':'Ceftriaxone is an alternative, but penicillin G is the drug of choice for syphilis.',
+  'cro|bbu':'Ceftriaxone is for Lyme meningitis or carditis. Doxycycline is first-line for most Lyme.',
+  'cro|lep':'Ceftriaxone treats severe leptospirosis, but doxycycline or penicillin is first-line.',
+  'mem|ent':'Meropenem works, but cefepime spares carbapenems for ESBL bugs.',
+  'cza|esbl':'Ceftazidime-avibactam works, but save it for carbapenemase producers.',
+  'fdc|esbl':'Cefiderocol works, but save it for the most resistant bugs.',
+  'fdc|kpc':'Cefiderocol works, but ceftazidime-avibactam is first-line for KPC.',
+  'col|kpc':'Colistin works, but it’s a nephrotoxic last resort.',
+  'col|ndm':'Colistin works, but it’s a nephrotoxic last resort.',
+  'col|mdrpa':'Colistin works, but it’s a nephrotoxic last resort.',
+  'col|acb':'Colistin works, but it’s a nephrotoxic last resort. Sulbactam-based therapy comes first.',
+  'sxt|bps':'TMP-SMX is for the months-long eradication phase, after IV ceftazidime or meropenem.',
+  'clr|hpy':'Clarithromycin triple therapy can work, but resistance now tops 15% in most regions, so bismuth quadruple therapy comes first.',
+  'mtz|cdi':'Metronidazole is no longer recommended for C. diff in adults.',
+  'vanc|cdi':'Oral vancomycin works. Fidaxomicin has fewer relapses when available.',
+  'cli|gva':'Clindamycin is an alternative for bacterial vaginosis, but metronidazole is first-line.',
+  'gcv|hsv':'Ganciclovir works on HSV, but acyclovir is narrower and safer.',
+  'gcv|vzv':'Ganciclovir works on VZV, but acyclovir is narrower and safer.',
+  'gcv|cmvp':'Ganciclovir prevents CMV, but it suppresses the marrow. Letermovir avoids that.',
+  'vgcv|cmvp':'Valganciclovir prevents CMV, but it suppresses the marrow. Letermovir avoids that.',
+  'fsc|cmv':'Foscarnet works, but it’s nephrotoxic. Save it for resistant CMV.',
+  'fsc|hsv':'Foscarnet works, but save it for acyclovir-resistant HSV.',
+  'cdv|grc':'Cidofovir works, but it’s very nephrotoxic. Maribavir or foscarnet first.',
+  'cdv|arh':'Cidofovir works, but foscarnet is the usual choice for acyclovir-resistant HSV.',
+  'rdv|cov':'A 3-day remdesivir course works for outpatients, but oral Paxlovid is first-line.',
+  'mol|cov':'Molnupiravir works, but it’s less effective than Paxlovid.',
+  'bxm|flu':'Baloxavir works as a single dose, but oseltamivir is the standard.',
+  'zan|flu':'Inhaled zanamivir works, but oseltamivir is the standard.',
+  'bik|hbv':'Its tenofovir and emtricitabine treat HBV, but plain tenofovir is enough without HIV.',
+  'vor|can':'Voriconazole works, but fluconazole is narrower and first-line for C. albicans.',
+  'amb|can':'Amphotericin works, but an echinocandin or fluconazole is safer.',
+  'flc|cry':'Fluconazole is for the consolidation phase. Induction needs amphotericin B plus flucytosine.',
+  'amb|cry':'Amphotericin alone works, but adding flucytosine clears the fungus faster and saves lives.',
+  'amb|his':'Amphotericin is for severe histoplasmosis. Itraconazole treats mild-to-moderate disease.',
+  'amb|bla':'Amphotericin is for severe blastomycosis. Itraconazole treats mild-to-moderate disease.',
+  'amb|coc':'Amphotericin is for severe or disseminated Coccidioides. Fluconazole treats most cases.',
+  'amb|spo':'Amphotericin is for disseminated Sporothrix. Itraconazole treats skin disease.',
+  'pos|muc':'Posaconazole works for Mucor, but amphotericin B comes first.',
+  'isa|muc':'Isavuconazole works for Mucor, but amphotericin B comes first.',
+  'mcf|thr':'Micafungin works, but it’s IV. Thrush needs only a topical or oral drug.',
+  'itr|coc':'Itraconazole works, but fluconazole is first-line for Coccidioides.',
+  'art|pviv':'Artemisinin combos work on vivax blood stages, but chloroquine is first-line where it still works.',
+  'asu|pfa':'IV artesunate works, but uncomplicated malaria gets oral artemether-lumefantrine.',
+  'atp|pfa':'Atovaquone-proguanil works, but artemether-lumefantrine is first-line.',
+  'alb|str':'Albendazole is a backup for Strongyloides. Ivermectin cures more.',
+  'pzq|cys':'Praziquantel works, but albendazole is preferred for neurocysticercosis.',
+  'ivm|sca':'Oral ivermectin works and is preferred for crusted scabies. Permethrin cream is first-line for typical scabies.',
+  'ivm|lic':'Ivermectin works, but permethrin is first-line for head lice.',
+  'ivm|wuc':'Ivermectin is part of combination therapy, but DEC is the core filariasis drug.'
+};
+// Supportive care messages for viruses with no routine antiviral
+const SN=t=>MIC[t].sn||'Supportive care is the treatment.';
+// Rounds: chapter, name, vignette, microbes, drugs, optional patient modifier. Patients arrive at the end of each chapter.
+const R_=(ch,name,vig,mic,wpn,mod)=>({ch,name,vig,mic,wpn,mod});
+const LEVELS=[
+  R_('bac','Skin & Throat Clinic','Strep throat, a skin abscess, and MRSA in the locker room. All gram-positive cocci.',['spy','mssa','mrsa'],['pnv','cfz','vanc']),
+  R_('bac','Bloodstream & Valves','Positive blood cultures. Some are staph, some strep, one is a catheter contaminant that isn’t.',['mssa','sepi','vir','efa'],['naf','vanc','amp','cro']),
+  R_('bac','Ear, Sinus & Cough','Ear infections, sinusitis, and a teenager with a months-long cough.',['spn','hin','mcat','bpe'],['amox','amc','azi']),
+  R_('bac','Atypical Pneumonia','Pneumonias with no cell wall, no Gram stain, or no life outside a host cell.',['myc','leg','cpn','psi','cox'],['azi','dox','lvx']),
+  R_('bac','Urinary Tract','Bladder infections. Each uropathogen has a different weak spot.',['eco','ssa','pmi','kpn','efa'],['nit','fof','cro','amox']),
+  R_('bac','Meningitis Unit','Fever, stiff neck, confusion. Think about who is at risk: newborns, older adults, college dorms.',['nme','lmo','gbs','spn'],['cro','amp','pen']),
+  R_('bac','Gut Infections','Diarrhea after antibiotics, after chicken, after travel, and an old ulcer.',['cdi','cam','shi','sty','vch','hpy'],['fdx','azi','bqt','dox']),
+  R_('bac','Anaerobes & Toxins','Abscesses, gas gangrene, tetanus, and a jaw that keeps draining.',['bfr','cpe','cte','act','gva'],['mtz','pen','cli']),
+  R_('bac','Hospital Gram-negatives','ICU cultures growing gram-negative rods. Watch for AmpC.',['pae','ent','ser','kpn','pmi'],['ptz','fep','cro','caz']),
+  R_('bac','ESBL & CRE','Resistance enzymes that eat penicillins, cephalosporins, and even carbapenems.',['esbl','kpc','ndm'],['etp','mem','cza','fdc']),
+  R_('bac','MDR Non-fermenters','The ICU’s most resistant survivors.',['mdrpa','acb','sma'],['ctz','sam','col','sxt']),
+  R_('bac','Resistant Gram-positives','VRE in the blood and MRSA in the lungs.',['vre','mrsap','mrsa'],['dap','lzd','cpt']),
+  R_('bac','Ticks & Spirochetes','Hikers, campers, flood water, and a painless chancre.',['ric','ehr','bbu','lep','tpa','bar'],['dox','pen','azi','cro']),
+  R_('bac','Bites, Farms & Bioterror','Cat bites, fist fights, rabbits, fleas, farm animals and white powder.',['pas','eik','fra','ype','ban','bru'],['amc','gen','cip','rif']),
+  R_('bac','STI Clinic','Discharge, ulcers, and a rash on the palms. Each one needs a different drug.',['ngo','chl','tpa','hdu','gva'],['cro','dox','pen','mtz']),
+  R_('bac','Mycobacteria','Acid-fast rods that need months of combination therapy.',['mtb','mdrtb','ltb','mac'],['rip','bpal','rif','clr']),
+  R_('bac','Rare but Classic','Board-exam favorites: leprosy, diphtheria, melioidosis and Nocardia.',['mle','dip','bps','noc'],['dps','ery','caz','sxt']),
+  R_('bac','Labor & Delivery','A pregnant patient with fever. Protect the baby as well as the mother.',['gbs','lmo','eco','chl'],['amp','cro','azi','dox'],
+    {label:'Pregnant',detail:'32 weeks pregnant.',block:{dox:'Tetracyclines are avoided in pregnancy because they stain fetal teeth and affect bone growth.'}}),
+  R_('bac','Cardiac Step-down','Pneumonia in a patient on an antiarrhythmic.',['leg','myc','cpn','spn'],['azi','lvx','dox','cro'],
+    {label:'Long QT',detail:'QTc 520 ms on dofetilide.',block:{azi:'Macrolides prolong the QT interval. With a QTc of 520, avoid azithromycin.',lvx:'Fluoroquinolones prolong the QT interval. With a QTc of 520, avoid levofloxacin.'}}),
+  R_('bac','ICU Pneumonia','Ventilated patients with hospital-acquired pneumonia.',['pae','kpn','mrsap','leg'],['ptz','azt','lzd','azi'],
+    {label:'Penicillin anaphylaxis',detail:'Throat swelling after penicillin.',block:{ptz:'Pip-tazo is a penicillin, so avoid it after anaphylaxis. Aztreonam is the safe gram-negative option.'}}),
+  R_('bac','Bone & Joint Ward','Osteomyelitis and septic joints, including a nail through a sneaker.',['mrsa','mssa','pae','vre'],['lzd','dap','cfz','fep'],
+    {label:'Takes sertraline',detail:'On an SSRI for depression.',block:{lzd:'Linezolid is a weak MAO inhibitor. With an SSRI it risks serotonin syndrome. Daptomycin is the alternative.'}}),
+  R_('bac','Neuro ICU','Post-craniotomy fevers in a patient with epilepsy.',['esbl','pae','mrsa','spn'],['ipm','mem','vanc','cro'],
+    {label:'Seizure disorder',detail:'Epilepsy with recent breakthrough seizures.',block:{ipm:'Imipenem lowers the seizure threshold more than other carbapenems. Meropenem is safer.'}}),
+  R_('bac','Sepsis Night Shift','Everything at once, in a patient whose gut has already been through a lot.',['mrsa','esbl','pae','bfr','cdi','kpn'],['vanc','mem','mtz','fdx'],
+    {label:'Prior C. diff',detail:'Two C. diff episodes this year. C. diff risk starts at 45%.',risk:45}),
+  R_('vir','Respiratory Viruses','Cough season. Two viruses have antivirals and two need only time.',['flu','cov','rsv','rhv'],['osl','pax','sup']),
+  R_('vir','Hospital & Infant Respiratory','Admitted patients on oxygen and newborns heading into RSV season.',['covh','rsvi','flu','flb'],['rdv','nir','osl','bxm']),
+  R_('vir','Herpesviruses','Cold sores, shingles, a transplant fever, and a teenager with a huge spleen.',['hsv','vzv','cmv','ebv'],['acy','vacv','gcv','sup']),
+  R_('vir','Resistant & Transplant Viruses','Herpesviruses that dodge first-line drugs, and a transplant to protect.',['arh','grc','cmvp','adv'],['fsc','mbv','let','cdv']),
+  R_('vir','Hepatitis Clinic','Three hepatitis viruses: one suppressed, one cured, one that clears on its own.',['hbv','hcv','hav'],['tdf','sof','glp','sup']),
+  R_('vir','HIV, Pox & Travel','Chronic infection, a bite, and travelers home with fever or rash.',['hiv','mpx','mea','rab','noro','den'],['bik','tpx','rpep','sup']),
+  R_('vir','Drug Interaction Clinic','A kidney transplant patient with a respiratory virus.',['cov','flu','flb'],['pax','rdv','mol','osl'],
+    {label:'Takes tacrolimus',detail:'Kidney transplant on tacrolimus.',block:{pax:'Ritonavir in Paxlovid sends tacrolimus levels dangerously high. Use remdesivir or molnupiravir.'}}),
+  R_('vir','Asthma & Kidney Clinic','Flu and hepatitis B in a patient with two organs to protect.',['flu','flb','hbv'],['zan','bxm','tdf','etv'],
+    {label:'Asthma + CKD',detail:'Severe asthma and stage 3 kidney disease.',block:{zan:'Inhaled zanamivir can trigger bronchospasm in asthma.',tdf:'Tenofovir disoproxil can worsen kidney disease. Entecavir is gentler.'}}),
+  R_('vir','Adherence Clinic','Blood-borne viruses in a patient who struggles with daily pills.',['hiv','hbv','hcv'],['bik','cab','tdf','sof'],
+    {label:'Can’t take daily pills',detail:'Wants long-acting HIV treatment.',block:{bik:'This patient can’t keep up with a daily pill. Long-acting cabotegravir-rilpivirine fits, but it doesn’t cover HBV.'}}),
+  R_('vir','Discharge Day','Patients going home who can only take pills.',['cmv','hsv','vzv'],['gcv','vgcv','vacv'],
+    {label:'Going home today',detail:'Needs an oral regimen.',block:{gcv:'Ganciclovir is IV-only. Valganciclovir is its oral prodrug.'}}),
+  R_('vir','Prenatal Clinic','A pregnant patient with respiratory viruses and a herpes flare.',['flu','cov','hsv'],['osl','pax','mol','acy'],
+    {label:'Pregnant',detail:'20 weeks pregnant.',block:{mol:'Molnupiravir is not recommended in pregnancy because of possible fetal harm.'}}),
+  R_('fun','Yeasts','Candida in the blood and the mouth. Not every Candida is the same.',['can','cgl','kru','cau','thr'],['flc','mcf','nys']),
+  R_('fun','Molds','Neutropenic and diabetic patients with invasive molds.',['asp','muc','fus'],['vor','isa','amb','pos']),
+  R_('fun','Endemic Fungi & Crypto','Caves, deserts, rose gardens, and a patient with advanced HIV and a headache.',['his','bla','coc','spo','cry'],['itr','flc','amb','ffc']),
+  R_('fun','Skin & Pneumocystis','Ringworm, scalp infections, a blotchy rash, and a CD4 of 90.',['tin','tcap','mal','pjp'],['trb','gri','ket','sxt']),
+  R_('fun','Transplant Unit','Immunosuppressed patients with yeasts and molds.',['can','asp','muc','cry'],['amb','isa','flc','vor'],
+    {label:'Acute kidney injury',detail:'Creatinine tripled this week.',block:{amb:'Amphotericin B is nephrotoxic. With acute kidney injury, use an azole instead.'}}),
+  R_('fun','Prenatal Clinic','A pregnant patient with fungal infections.',['coc','cry','vvc'],['flc','amb','clt'],
+    {label:'Pregnant',detail:'First trimester.',block:{flc:'High-dose azoles cause birth defects early in pregnancy. Amphotericin B and topical azoles are safe.'}}),
+  R_('fun','HIV Clinic','Advanced HIV with opportunistic and endemic fungi.',['pjp','tin','his','bla'],['sxt','atv','trb','itr'],
+    {label:'Sulfa allergy',detail:'Stevens-Johnson syndrome after TMP-SMX.',block:{sxt:'After Stevens-Johnson syndrome, never give TMP-SMX again. Atovaquone is an option for mild-to-moderate PJP.'}}),
+  R_('par','Malaria','Travelers home with fever. Know the species and the stage.',['pfa','pfs','pviv','phyp'],['art','asu','clq','pq']),
+  R_('par','Gut Protozoa','Diarrhea after camping, travel, and a swimming pool.',['gla','ehc','ehcy','cpo'],['tnd','mtz','pmm','ntz']),
+  R_('par','Blood & Tissue Protozoa','Cats, kissing bugs, tsetse flies and ticks.',['tox','tcr','tbr','bab'],['pys','bnz','fex','aaz']),
+  R_('par','Skin & Sexual Parasites','Itching, discharge, and a fever with a huge spleen.',['lei','tva','sca','lic'],['mil','mtz','per','ivm']),
+  R_('par','Roundworms','Nematodes in the gut, the muscle and the eye.',['pin','asc','hoo','str','tri','txc'],['alb','meb','ivm']),
+  R_('par','Flukes, Tapeworms & Filaria','Snails, undercooked pork and fish, mosquitoes and blackflies.',['sch','clo','tsa','cys','ech','wuc','onc'],['pzq','alb','dec','ivm']),
+  R_('par','Travel Clinic','Malaria and babesiosis in a patient with a red-cell enzyme problem.',['pviv','pfa','bab'],['pq','clq','atp','aaz'],
+    {label:'G6PD deficiency',detail:'Hemolysis after fava beans as a child.',block:{pq:'Primaquine causes severe hemolysis in G6PD deficiency. Test G6PD before every 8-aminoquinoline.'}}),
+  R_('par','Prenatal Clinic','A pregnant patient with worms and malaria.',['pfa','pviv','pin','asc'],['alb','pyr','art','clq'],
+    {label:'Pregnant',detail:'First trimester.',block:{alb:'Benzimidazoles are avoided in the first trimester. Pyrantel is safe.'}}),
+  R_('par','Central Africa Clinic','Filarial worms in a patient also carrying Loa loa.',['onc','wuc','str','hoo'],['ivm','dec','dox','alb'],
+    {label:'Loa loa coinfection',detail:'High Loa loa microfilaria count.',block:{ivm:'Ivermectin can cause fatal encephalopathy with a heavy Loa loa load.',dec:'DEC can cause fatal encephalopathy with a heavy Loa loa load.'}})
+];
+const CH_KEYS=Object.keys(CHAPTERS);
+CH_KEYS.forEach(ch=>{const ls=LEVELS.map((L,i)=>[L,i]).filter(([L])=>L.ch===ch);CHAPTERS[ch].first=ls[0][1];CHAPTERS[ch].last=ls[ls.length-1][1];CHAPTERS[ch].count=ls.length;
+  CHAPTERS[ch].firstMod=(ls.find(([L])=>L.mod)||[])[1];
+  ls.forEach(([L,i],k)=>{const f=ls.length>1?k/(ls.length-1):0;L.idx=k;L.sp=.068+f*.055;L.iv=2-f*.8;L.q=L.mod?(i===CHAPTERS[ch].last?18:14):(k<2?10:12)})});
+// C. diff risk added per dose: broad agents disrupt gut flora most
+const RISK={ptz:14,mem:14,ipm:14,etp:12,cza:12,fdc:12,fep:12,cro:10,caz:10,cpt:10,cli:16,lvx:10,cip:10,amc:6,sam:6,azt:5,amox:4,amp:4,cfz:4,azi:3,clr:3,ery:3,sxt:3,dox:2,pen:2,pnv:2,naf:3,lzd:2,nit:1,fof:1,dap:1,gen:1};
+const contra=(w,lv)=>LEVELS[lv].mod?.block?.[w];
+const covers=(w,t)=>WPN[w].covers.includes(t);
+function bestFor(t,lv){const av=LEVELS[lv].wpn.filter(w=>!contra(w,lv)),p=MIC[t].best.filter(w=>av.includes(w));return p.length?p:av.filter(w=>covers(w,t));}
+const names=a=>a.map(w=>WPN[w].name).join(' or ');
+function why(w,t){
+  const W=WPN[w],m=MIC[t],k=w+'|'+t,bug=['gpos','gneg','none','afb'].includes(m.kind);
+  if(WHY[k])return WHY[k];
+  if(w==='sup')return `${m.short} has a treatment that helps. Supportive care alone isn’t enough.`;
+  if(m.best.includes('sup'))return `No antiviral is routinely used for ${m.short}. ${SN(t)}`;
+  if(t==='pjp')return 'Pneumocystis is a fungus, but standard antifungals miss it. TMP-SMX is the treatment.';
+  if(t==='mtb')return `TB needs a months-long multidrug regimen (RIPE). ${W.name} alone won’t cure it.`;
+  if(w==='nys')return 'Nystatin isn’t absorbed. It only treats thrush on the surface of the mouth.';
+  if(w==='pq')return 'Primaquine targets dormant liver hypnozoites, not this stage.';
+  if(m.kind==='fungus'&&W.cls==='bac')return `Antibacterials don’t kill fungi. ${m.short} needs an antifungal.`;
+  if(bug&&W.cls==='tb')return `${W.name} is built for mycobacteria. ${m.short} needs a different antibiotic.`;
+  if(m.nowall&&(W.bl||w==='vanc'))return `Mycoplasma has no cell wall, so ${W.name} has nothing to attack.`;
+  if(m.intra&&(W.bl||w==='vanc'))return `${m.short} lives inside host cells, out of reach of ${W.name}.`;
+  if((t==='mrsa'||t==='mrsap')&&W.bl)return `MRSA’s PBP2a resists ${W.name} and the other standard β-lactams.`;
+  if(t==='sepi'&&W.bl)return 'Most S. epidermidis carry mecA like MRSA, so β-lactams fail.';
+  if((t==='efa'||t==='vre')&&W.ceph)return 'Enterococci are intrinsically resistant to every cephalosporin.';
+  if(m.kind==='gneg'&&w==='vanc')return 'Vancomycin is too large to cross the gram-negative outer membrane.';
+  if(m.kind==='gneg'&&(w==='lzd'||w==='dap'))return `${W.name} only covers gram-positives.`;
+  if(w==='mtz'&&bug)return `Metronidazole only kills obligate anaerobes. ${m.short} isn’t one.`;
+  const worm=['alb','meb','pyr','pzq','dec','ivm'].includes(w);
+  if(worm&&m.kind==='proto')return `${W.name} treats worms. ${m.short} is a single-celled protozoan.`;
+  if(!worm&&W.cls==='par'&&w!=='per'&&m.kind==='helm')return `${W.name} treats protozoa, not worms like ${m.short}.`;
+  return `${W.name} doesn’t reliably cover ${m.short}. ${W.scope}`;
+}
+
+/* ---------- State ---------- */
+const G={phase:'menu',lv:0,score:0,health:100,streak:0,kills:0,w:null,mobs:[],shots:[],parts:[],texts:[],rings:[],
+  spawnT:0,t:0,hurt:0,shake:0,muzzle:0,aim:-Math.PI/2,endT:0,last:null,lvStart:0,ls:null,ts:null,lessons:new Map(),risk:0,riskWarned:0,holdT:0,tip:null,tipShown:0,
+  card:null,maxLv:0};
+const newStats=()=>({best:0,works:0,wrong:0,esc:0,held:0});
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let bestScore=+store.get('antibiose-best')||0;
+let sound=store.get('antibiose-sound')!=='off';
+const RM=matchMedia('(prefers-reduced-motion: reduce)');
+
+/* ---------- Canvas + sprites ---------- */
+const cv=$('#cv'),ctx=cv.getContext('2d'),fieldEl=$('#field');
+let W=1,H=1,DPR=1,R=22,ESC=1,C={},SPR={},BG=null,LW={},DEBRIS=[];
+const LBL_FONT='600 11px "IBM Plex Mono",ui-monospace,monospace',LBL_FONT_S='600 9.5px "IBM Plex Mono",ui-monospace,monospace';
+const tok=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function readColors(){
+  ['gpos','gneg','virus','fungus','proto','afb','helm','ecto','host','edge','spore','field','muted','ink','danger','ok','warn','accent','line'].forEach(k=>C[k]=tok('--'+k));
+  C.none=tok('--nostain');C.fieldEdge=tok('--field-edge');C.lblBg=tok('--label-bg');C.lblInk=tok('--label-ink');C.bac=tok('--w-bac');C.glow=parseFloat(tok('--glow'))||0;
+}
+const wcol=w=>({bac:C.bac,vir:C.virus,fun:C.fungus,par:C.proto,tb:C.afb,sup:C.muted})[WPN[w].cls];
+function E(x,cx,cy,rx,ry,rot){x.beginPath();x.ellipse(cx,cy,rx,ry,rot||0,0,Math.PI*2)}
+function cap(x,cx,cy,len,r,rot){const c=Math.cos(rot||0),s=Math.sin(rot||0),h=Math.max(0,len/2-r),p=(a,b)=>[cx+a*c-b*s,cy+a*s+b*c];
+  x.beginPath();let q=p(-h,-r);x.moveTo(q[0],q[1]);q=p(h,-r);x.lineTo(q[0],q[1]);q=p(h,0);x.arc(q[0],q[1],r,(rot||0)-Math.PI/2,(rot||0)+Math.PI/2);
+  q=p(-h,r);x.lineTo(q[0],q[1]);q=p(-h,0);x.arc(q[0],q[1],r,(rot||0)+Math.PI/2,(rot||0)+Math.PI*1.5);x.closePath()}
+function poly(x,n,r,rot){x.beginPath();for(let i=0;i<n;i++){const a=rot+i*Math.PI*2/n;x[i?'lineTo':'moveTo'](Math.cos(a)*r,Math.sin(a)*r)}x.closePath()}
+function paint(x,col,a){x.globalAlpha=a==null?.92:a;x.fillStyle=col;x.fill();x.globalAlpha=1;x.lineWidth=Math.max(1,R*.06);x.strokeStyle=C.edge;x.stroke()}
+function dot(x,cx,cy,r,col){E(x,cx,cy,r,r);x.fillStyle=col;x.fill()}
+function halo(x,rx,ry,col){E(x,0,0,rx,ry);x.globalAlpha=.15;x.fillStyle=col;x.fill();x.globalAlpha=.5;x.setLineDash([R*.1,R*.08]);x.lineWidth=R*.05;x.strokeStyle=col;x.stroke();x.setLineDash([]);x.globalAlpha=1}
+function shield(x){poly(x,6,1.02*R,Math.PI/6);x.lineWidth=R*.09;x.strokeStyle=C.danger;x.setLineDash([R*.18,R*.1]);x.stroke();x.setLineDash([])}
+function cell(x){E(x,0,0,.98*R,.9*R);x.fillStyle=C.host;x.fill();x.lineWidth=Math.max(1,R*.06);x.strokeStyle=C.edge;x.stroke()}
+function wave(x,x0,y0,x1,y1,amp,n,col,lw){const dx=x1-x0,dy=y1-y0,L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L;x.beginPath();
+  for(let i=0;i<=24;i++){const f=i/24,o=Math.sin(f*n*Math.PI*2)*amp;x[i?'lineTo':'moveTo'](x0+dx*f+nx*o,y0+dy*f+ny*o)}x.strokeStyle=col;x.lineWidth=lw;x.stroke()}
+function line(x,pts,col,lw){x.beginPath();pts.forEach((p,i)=>x[i?'lineTo':'moveTo'](p[0]*R,p[1]*R));x.strokeStyle=col;x.lineWidth=lw;x.stroke()}
+const CLUSTER=[[0,0],[.5,0],[-.5,0],[.25,.43],[-.25,.43],[.25,-.43],[-.25,-.43]];
+const GOLD=(n,rad,f)=>{for(let i=0;i<n;i++){const a=i*2.399,r=Math.sqrt((i+.5)/n)*rad;f(Math.cos(a)*r,Math.sin(a)*r,i)}};
+function tube(x,pts,col,w){x.lineCap='round';x.lineJoin='round';x.beginPath();pts.forEach((p,i)=>x[i?'lineTo':'moveTo'](p[0]*R,p[1]*R));
+  x.strokeStyle=C.edge;x.lineWidth=w*R+2;x.stroke();x.strokeStyle=col;x.lineWidth=w*R;x.stroke()}
+function sine(x0,x1,amp,waves,n){const p=[];for(let i=0;i<=n;i++){const f=i/n;p.push([x0+(x1-x0)*f,Math.sin(f*Math.PI*2*waves)*amp])}return p}
+// Every drawer takes (ctx, kind colour, options) and draws around (0,0) in units of R
+const DRAW={
+  // ---- bacteria
+  chain(x,c,o){const n=o.n||5;for(let i=0;i<n;i++){E(x,(-.84+i*1.68/(n-1))*R,Math.sin(i*1.2)*.16*R,.22*R,.22*R);paint(x,c)}},
+  pairs(x,c){[[-.8,.2],[-.45,.05],[-.05,-.12],[.3,-.2],[.68,-.05],[.98,.12]].forEach((p,i)=>{E(x,(p[0]-.08)*R,p[1]*R,.18*R,.2*R);paint(x,c,i%2?.8:.95)})},
+  lancet(x,c){halo(x,.92*R,.6*R,c);E(x,-.3*R,0,.3*R,.4*R,.25);paint(x,c);E(x,.3*R,0,.3*R,.4*R,-.25);paint(x,c)},
+  cluster(x,c,o){if(o.ha)halo(x,.95*R,.95*R,c);const s=o.sm?.5:.62,r=o.sm?.2:.24;CLUSTER.forEach(p=>{E(x,p[0]*R*s,p[1]*R*s,r*R,r*R);paint(x,c)})},
+  ovals(x,c){[-.72,-.27,.27,.72].forEach((p,i)=>{E(x,p*R,(i%2?.06:-.06)*R,.21*R,.27*R);paint(x,c)})},
+  vrod(x,c){for(let k=0;k<5;k++){const a=k*1.3;wave(x,Math.cos(a)*.3*R,Math.sin(a)*.3*R,Math.cos(a)*1.05*R,Math.sin(a)*1.05*R,.05*R,2,c,R*.04)}
+    cap(x,-.25*R,0,.85*R,.22*R,.9);paint(x,c);cap(x,.25*R,0,.85*R,.22*R,-.9);paint(x,c)},
+  club(x,c){[[-.28,.9],[.28,-.9]].forEach(([dx,a])=>{cap(x,dx*R,0,.95*R,.15*R,a);paint(x,c);const ex=dx*R+Math.cos(a)*.42*R*Math.sign(-dx),ey=Math.sin(a)*.42*R*Math.sign(-dx);
+    E(x,ex,ey,.21*R,.21*R);paint(x,c);dot(x,dx*R,0,.07*R,C.edge)})},
+  box(x,c,o){if(o.ha)halo(x,1.2*R,.62*R,c);for(let i=-1;i<=1;i++){x.beginPath();x.rect((i*.6-.28)*R,(-.17+i*.1)*R,.56*R,.34*R);paint(x,c)}},
+  spore(x,c){const r=-.35;cap(x,0,0,1.75*R,.25*R,r);paint(x,c);E(x,Math.cos(r)*.55*R,Math.sin(r)*.55*R,.22*R,.2*R,r);paint(x,C.spore,1)},
+  drum(x,c){const r=-.4;cap(x,-.1*R,.05*R,1.4*R,.14*R,r);paint(x,c);E(x,Math.cos(r)*.72*R,Math.sin(r)*.72*R,.27*R,.27*R);paint(x,C.spore,1)},
+  granule(x,c){for(let i=0;i<16;i++){const a=i/16*Math.PI*2,b=a+.25;x.beginPath();x.moveTo(Math.cos(a)*.3*R,Math.sin(a)*.3*R);x.quadraticCurveTo(Math.cos(b)*.65*R,Math.sin(b)*.65*R,Math.cos(a)*.98*R,Math.sin(a)*.98*R);x.strokeStyle=c;x.lineWidth=R*.06;x.stroke()}
+    E(x,0,0,.36*R,.36*R);paint(x,C.fungus,.9)},
+  branch(x,c){const lw=R*.07;line(x,[[-.95,.6],[-.3,.15],[.2,-.1],[.9,-.55]],c,lw);line(x,[[-.3,.15],[-.2,-.6]],c,lw);line(x,[[.2,-.1],[.55,.45]],c,lw);line(x,[[-.6,.4],[-.75,-.05]],c,lw);
+    [[-.95,.6],[-.62,.38],[-.3,.15],[-.05,.02],[.2,-.1],[.55,-.32],[.9,-.55],[-.25,-.22],[-.2,-.6],[.38,.18],[.55,.45],[-.75,-.05]].forEach(p=>dot(x,p[0]*R,p[1]*R,.085*R,c))},
+  rod(x,c,o){const fl=o.fl==null?6:o.fl;if(o.ha)halo(x,1.15*R,.85*R,c);
+    for(let k=0;k<fl;k++){const a=k*(6.28/Math.max(fl,1))+.3;wave(x,Math.cos(a)*.55*R,Math.sin(a)*.28*R,Math.cos(a)*1.22*R,Math.sin(a)*.98*R,.06*R,2,c,R*.05)}
+    cap(x,0,0,1.25*R,.34*R,-.2);paint(x,c);if(o.dots)[[-.2,-.05],[.1,-.1],[.3,-.15]].forEach(p=>dot(x,p[0]*R,p[1]*R,.06*R,C.spore));
+    if(o.red)[[-.25,.05],[.05,-.05],[.3,-.12]].forEach(p=>dot(x,p[0]*R,p[1]*R,.08*R,C.danger))},
+  rodfat(x,c){halo(x,1.1*R,.75*R,c);cap(x,0,0,1.15*R,.38*R,.1);paint(x,c)},
+  swarm(x,c){for(let k=0;k<12;k++){const a=k*.52;wave(x,Math.cos(a)*.5*R,Math.sin(a)*.25*R,Math.cos(a)*1.28*R,Math.sin(a)*1.15*R,.07*R,3,c,R*.035)}cap(x,0,0,1.05*R,.27*R,.3);paint(x,c)},
+  polar(x,c,o){const n=o.tuft?3:1;for(let i=0;i<n;i++)wave(x,.55*R,-.2*R,1.25*R,(-.45+i*.25)*R,.08*R,2.5,c,R*.06);cap(x,0,0,1.25*R,.27*R,-.35);paint(x,c)},
+  cocco(x,c,o){const s=o.tiny?.7:1;let P=[[-.5,-.3,.4],[.1,-.45,-.2],[.5,.05,.7],[-.2,.2,-.6],[.25,.5,.1],[-.6,.45,1.2]];
+    if(o.big)P=P.concat([[.65,-.45,.3],[-.75,-.05,-.4],[0,-.05,1]]);
+    if(o.fish){P=[];for(let r=-1;r<=1;r++)for(let k=-1;k<=1;k++)P.push([k*.5+r*.12,r*.35,0])}
+    P.forEach(p=>{cap(x,p[0]*R,p[1]*R,.4*R*s,.14*R*s,p[2]);paint(x,c)})},
+  bipolar(x,c,o){const P=o.big?[[-.4,-.35,.5],[.3,-.25,-.4],[-.1,.3,.2],[.5,.4,1],[-.65,.35,-.8]]:[[-.35,-.25,.5],[.3,-.1,-.4],[-.05,.35,.2],[.5,.45,1]];
+    P.forEach(p=>{cap(x,p[0]*R,p[1]*R,.5*R,.16*R,p[2]);paint(x,c,.55);[-1,1].forEach(sg=>dot(x,p[0]*R+Math.cos(p[2])*.15*R*sg,p[1]*R+Math.sin(p[2])*.15*R*sg,.09*R,c))})},
+  small(x,c,o){const w=o.slim?.14:.2;cap(x,-.32*R,-.25*R,.64*R,w*R,.6);paint(x,c,.75);cap(x,.36*R,.2*R,.6*R,w*R,-.5);paint(x,c,.75);E(x,-.12*R,.45*R,.18*R,.15*R);paint(x,c,.75)},
+  diplo(x,c,o){if(o.ha)halo(x,.9*R,.72*R,c);if(o.round){E(x,-.27*R,0,.28*R,.3*R);paint(x,c);E(x,.27*R,0,.28*R,.3*R);paint(x,c)}
+    else{E(x,-.29*R,0,.25*R,.4*R);paint(x,c);E(x,.29*R,0,.25*R,.4*R);paint(x,c)}},
+  gull(x,c){tube(x,[[-.95,.2],[-.6,-.25],[-.25,-.25],[0,.05],[.25,-.25],[.6,-.25],[.95,.2]],c,.18)},
+  comma(x,c){const P=[];for(let i=0;i<=12;i++){const a=-2.3+i/12*1.5;P.push([Math.cos(a)*.75,.55+Math.sin(a)*.75])}tube(x,P,c,.26);
+    const e=P[P.length-1];wave(x,e[0]*R,e[1]*R,(e[0]+.55)*R,(e[1]+.35)*R,.06*R,2,c,R*.05)},
+  helix(x,c){tube(x,sine(-.75,.65,.22,2.2,30),c,.18);for(let i=0;i<4;i++)wave(x,.65*R,0,1.2*R,(-.35+i*.23)*R,.05*R,2,c,R*.04)},
+  intra(x,c,o){cell(x);E(x,-.5*R,-.32*R,.22*R,.16*R);x.globalAlpha=.35;x.fillStyle=C.edge;x.fill();x.globalAlpha=1;
+    if(o.in==='incl'){const s=o.sm?.75:1;E(x,.16*R,.12*R,.48*R*s,.44*R*s);x.globalAlpha=.22;x.fillStyle=c;x.fill();x.globalAlpha=1;GOLD(14,.36*R*s,(a,b)=>dot(x,.16*R+a,.12*R+b,.07*R,c))}
+    else if(o.in==='scatter'){for(let i=1;i<16;i++){const a=i*2.399,rr=(.35+.45*((i*7)%10)/10)*R;cap(x,Math.cos(a)*rr,Math.sin(a)*rr*.9,.18*R,.05*R,a);x.fillStyle=c;x.fill()}}
+    else if(o.in==='morula'){GOLD(11,.3*R,(a,b)=>{E(x,.2*R+a,.15*R+b,.1*R,.1*R);paint(x,c)})}
+    else if(o.in==='globi'){GOLD(7,.4*R,(a,b,i)=>{cap(x,.15*R+a,.15*R+b,.3*R,.06*R,i);x.fillStyle=c;x.fill()})}
+    else[[-.3,-.25,.5],[.25,-.1,-.3],[-.05,.3,.1],[.42,.38,.8]].forEach(p=>{cap(x,p[0]*R,p[1]*R,.55*R,.11*R,p[2]);paint(x,c,.8)})},
+  clue(x,c){poly(x,7,.95*R,.2);x.fillStyle=C.host;x.fill();x.lineWidth=Math.max(1,R*.06);x.strokeStyle=C.edge;x.stroke();dot(x,0,0,.15*R,C.edge);
+    GOLD(40,.85*R,(a,b)=>dot(x,a,b,.045*R,c))},
+  blob(x,c){x.beginPath();for(let i=0;i<=48;i++){const a=i/48*Math.PI*2,rr=.62*R*(1+.13*Math.sin(5*a)+.07*Math.sin(3*a+1));x[i?'lineTo':'moveTo'](Math.cos(a)*rr,Math.sin(a)*rr*.9)}
+    x.closePath();paint(x,c,.55);E(x,.75*R,-.15*R,.12*R,.1*R);paint(x,c,.55)},
+  spiro(x,c,o){x.beginPath();for(let i=0;i<=90;i++){const f=i/90,px=(-1.1+2.2*f)*R,py=o.loose?Math.sin(f*Math.PI*6)*.32*R:Math.sin(f*Math.PI*16)*.13*R+Math.sin(f*Math.PI*2)*.14*R;x[i?'lineTo':'moveTo'](px,py)}
+    x.strokeStyle=c;x.lineWidth=R*(o.loose?.13:.1);x.stroke();
+    if(o.hook)[[-1.1,1],[1.1,-1]].forEach(([ex,sg])=>{x.beginPath();x.arc(ex*R+sg*.12*R,-.1*R*sg,.14*R,0,Math.PI*1.3);x.stroke()})},
+  cord(x,c){[[-.55,-.4],[-.15,-.22],[.25,-.04],[-.4,.1],[0,.28],[.45,.44]].forEach(p=>{cap(x,p[0]*R,p[1]*R,.62*R,.1*R,.45);paint(x,c)})},
+  clump(x,c){GOLD(16,.7*R,(a,b,i)=>{cap(x,a,b,.32*R,.08*R,i*1.7);paint(x,c)})},
+  // ---- viruses
+  spiky(x,c,o){const n=o.n||16;x.strokeStyle=c;x.lineWidth=R*.06;for(let i=0;i<n;i++){const a=i/n*Math.PI*2,cs=Math.cos(a),s=Math.sin(a);
+    x.beginPath();x.moveTo(cs*.5*R,s*.5*R);x.lineTo(cs*.8*R,s*.8*R);x.stroke();dot(x,cs*.82*R,s*.82*R,.07*R,c)}E(x,0,0,.52*R,.52*R);paint(x,c)},
+  crown(x,c,o){if(o.ha)halo(x,1.15*R,1.15*R,c);x.strokeStyle=c;x.lineWidth=R*.1;for(let i=0;i<11;i++){const a=i/11*Math.PI*2,cs=Math.cos(a),s=Math.sin(a);
+    x.beginPath();x.moveTo(cs*.45*R,s*.45*R);x.lineTo(cs*.7*R,s*.7*R);x.stroke();E(x,cs*.8*R,s*.8*R,.13*R,.09*R,a+Math.PI/2);paint(x,c)}
+    E(x,0,0,.47*R,.47*R);paint(x,c);[[-.15,-.1],[.15,.12],[.05,-.22]].forEach(p=>dot(x,p[0]*R,p[1]*R,.06*R,C.spore))},
+  pleo(x,c,o){const r=(o.big?.72:.6)*R;if(o.ha)halo(x,1.12*R,1.12*R,c);x.strokeStyle=c;x.lineWidth=R*.05;
+    for(let i=0;i<26;i++){const a=i/26*Math.PI*2,rr=r*(1+.1*Math.sin(3*a));x.beginPath();x.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);x.lineTo(Math.cos(a)*(rr+.14*R),Math.sin(a)*(rr+.14*R));x.stroke()}
+    x.beginPath();for(let i=0;i<=40;i++){const a=i/40*Math.PI*2,rr=r*(1+.1*Math.sin(3*a));x[i?'lineTo':'moveTo'](Math.cos(a)*rr,Math.sin(a)*rr)}x.closePath();paint(x,c,.45);
+    wave(x,-.4*R,0,.4*R,0,.12*R,3,C.spore,R*.06)},
+  vsmall(x,c,o){const st=o.st;
+    if(st==='knob'){poly(x,6,.5*R,0);paint(x,c);for(let i=0;i<6;i++){const a=i*Math.PI/3;dot(x,Math.cos(a)*.55*R,Math.sin(a)*.55*R,.1*R,c)}}
+    else if(st==='cup'){E(x,0,0,.55*R,.55*R);paint(x,c);GOLD(7,.35*R,(a,b)=>{E(x,a,b,.09*R,.09*R);x.fillStyle=C.field;x.fill()})}
+    else if(st==='star'){E(x,0,0,.55*R,.55*R);paint(x,c,.8);x.beginPath();for(let i=0;i<10;i++){const a=i/10*Math.PI*2,rr=i%2?.18*R:.42*R;x[i?'lineTo':'moveTo'](Math.cos(a)*rr,Math.sin(a)*rr)}x.closePath();x.fillStyle=C.spore;x.fill()}
+    else if(st==='ring'){E(x,0,0,.68*R,.68*R);x.setLineDash([R*.1,R*.07]);x.lineWidth=R*.06;x.strokeStyle=c;x.stroke();x.setLineDash([]);E(x,0,0,.5*R,.5*R);paint(x,c,.85);E(x,0,0,.26*R,.26*R);x.lineWidth=R*.06;x.strokeStyle=C.spore;x.stroke()}
+    else{poly(x,6,.5*R,Math.PI/6);paint(x,c);poly(x,6,.3*R,Math.PI/6);x.lineWidth=R*.05;x.strokeStyle=C.spore;x.stroke()}},
+  lymph(x,c){x.beginPath();for(let i=0;i<=40;i++){const a=i/40*Math.PI*2,rr=.95*R*(1+.05*Math.sin(7*a));x[i?'lineTo':'moveTo'](Math.cos(a)*rr,Math.sin(a)*rr)}x.closePath();x.fillStyle=C.host;x.fill();x.lineWidth=Math.max(1,R*.06);x.strokeStyle=C.edge;x.stroke();
+    x.beginPath();x.arc(-.1*R,0,.5*R,.6,Math.PI*2-.6);x.quadraticCurveTo(.1*R,0,-.1*R+Math.cos(.6)*.5*R,Math.sin(.6)*.5*R);x.closePath();paint(x,c,.6)},
+  hex(x,c,o){E(x,0,0,.88*R,.88*R);x.globalAlpha=.15;x.fillStyle=c;x.fill();x.globalAlpha=1;x.setLineDash([R*.12,R*.08]);x.lineWidth=R*.06;x.strokeStyle=c;x.stroke();x.setLineDash([]);
+    poly(x,6,.55*R,0);paint(x,c);poly(x,6,.3*R,0);x.strokeStyle=C.edge;x.stroke();if(o.dots)for(let i=0;i<8;i++){const a=i/8*Math.PI*2;dot(x,Math.cos(a)*.72*R,Math.sin(a)*.72*R,.06*R,c)}},
+  owl(x,c,o){E(x,0,0,1.0*R,.92*R);x.fillStyle=C.host;x.fill();x.lineWidth=Math.max(1,R*.06);x.strokeStyle=C.edge;if(o.faint)x.setLineDash([R*.12,R*.08]);x.stroke();x.setLineDash([]);
+    x.globalAlpha=o.faint?.5:1;E(x,0,0,.55*R,.55*R);x.globalAlpha*=.25;x.fillStyle=c;x.fill();x.globalAlpha=1;E(x,0,0,.42*R,.42*R);x.fillStyle=C.host;x.fill();E(x,0,0,.3*R,.3*R);paint(x,c,o.faint?.5:1)},
+  icosa(x,c){for(let i=0;i<6;i++){const a=i*Math.PI/3;line(x,[[Math.cos(a)*.55,Math.sin(a)*.55],[Math.cos(a)*.88,Math.sin(a)*.88]],c,R*.05);dot(x,Math.cos(a)*.9*R,Math.sin(a)*.9*R,.08*R,c)}
+    poly(x,6,.58*R,0);paint(x,c);for(let i=0;i<3;i++){const a=i*Math.PI/3;line(x,[[Math.cos(a)*.58,Math.sin(a)*.58],[-Math.cos(a)*.58,-Math.sin(a)*.58]],C.spore,R*.03)}},
+  dane(x,c){E(x,0,0,.62*R,.62*R);paint(x,c,.3);poly(x,6,.34*R,0);paint(x,c);[[.85,-.3],[-.8,.45],[.55,.75]].forEach(p=>{E(x,p[0]*R,p[1]*R,.13*R,.13*R);paint(x,c,.6)});cap(x,-.6*R,-.72*R,.5*R,.1*R,.3);paint(x,c,.6)},
+  cone(x,c){x.strokeStyle=c;x.lineWidth=R*.07;for(let i=0;i<10;i++){const a=i/10*Math.PI*2,cs=Math.cos(a),s=Math.sin(a);x.beginPath();x.moveTo(cs*.6*R,s*.6*R);x.lineTo(cs*.76*R,s*.76*R);x.stroke();dot(x,cs*.8*R,s*.8*R,.08*R,c)}
+    E(x,0,0,.6*R,.6*R);paint(x,c,.35);x.beginPath();x.moveTo(-.12*R,-.34*R);x.lineTo(.12*R,-.34*R);x.lineTo(.26*R,.32*R);x.lineTo(-.26*R,.32*R);x.closePath();paint(x,c)},
+  brick(x,c){x.beginPath();x.roundRect?x.roundRect(-.75*R,-.55*R,1.5*R,1.1*R,.3*R):x.rect(-.75*R,-.55*R,1.5*R,1.1*R);paint(x,c,.45);
+    E(x,-.3*R,0,.18*R,.25*R);paint(x,c);E(x,.3*R,0,.18*R,.25*R);paint(x,c);x.beginPath();x.rect(-.3*R,-.08*R,.6*R,.16*R);paint(x,c)},
+  bullet(x,c){x.strokeStyle=c;x.lineWidth=R*.05;for(let i=0;i<7;i++){const px=(-.7+i*.18)*R;x.beginPath();x.moveTo(px,-.36*R);x.lineTo(px,-.5*R);x.moveTo(px,.36*R);x.lineTo(px,.5*R);x.stroke()}
+    x.beginPath();x.moveTo(-.8*R,-.36*R);x.lineTo(.4*R,-.36*R);x.arc(.4*R,0,.36*R,-Math.PI/2,Math.PI/2);x.lineTo(-.8*R,.36*R);x.closePath();paint(x,c);
+    for(let i=0;i<5;i++)line(x,[[-.65+i*.22,-.25],[-.65+i*.22,.25]],C.spore,R*.04)},
+  // ---- fungi
+  pseudo(x,c,o){const s=o.sm?.8:1;cap(x,-.5*R*s,.55*R*s,.72*R*s,.16*R*s,.9);paint(x,c,.8);E(x,-.05*R*s,-.02*R*s,.42*R*s,.5*R*s,-.3);paint(x,c);E(x,.45*R*s,-.5*R*s,.22*R*s,.24*R*s);paint(x,c)},
+  tinyyeast(x,c){GOLD(7,.6*R,(a,b,i)=>{E(x,a,b,.17*R,.21*R,i);paint(x,c)})},
+  rice(x,c){[[-.58,.32,-.6],[0,0,-.35],[.58,-.25,-.1]].forEach(p=>{cap(x,p[0]*R,p[1]*R,.72*R,.18*R,p[2]);paint(x,c)})},
+  capsule(x,c){E(x,0,0,.95*R,.95*R);x.globalAlpha=.12;x.fillStyle=c;x.fill();x.globalAlpha=.6;x.lineWidth=R*.05;x.strokeStyle=c;x.stroke();x.globalAlpha=1;
+    E(x,-.05*R,.05*R,.42*R,.42*R);paint(x,c);E(x,.38*R,-.35*R,.15*R,.15*R);paint(x,c)},
+  acute(x,c){x.strokeStyle=c;x.lineWidth=R*.15;x.lineCap='round';x.beginPath();x.moveTo(-.95*R,.95*R);x.lineTo(-.25*R,.25*R);x.lineTo(.12*R,-.4*R);
+    x.moveTo(-.25*R,.25*R);x.lineTo(.6*R,.45*R);x.moveTo(-.6*R,.6*R);x.lineTo(-.95*R,.05*R);x.stroke();
+    E(x,.12*R,-.6*R,.22*R,.22*R);paint(x,c);for(let i=0;i<9;i++){const a=-Math.PI+i*Math.PI/8;dot(x,.12*R+Math.cos(a)*.4*R,-.6*R+Math.sin(a)*.4*R,.075*R,c)}},
+  ribbon(x,c){tube(x,[[-.95,.55],[0,.55],[0,-.45]],c,.3);tube(x,[[0,.1],[.85,.1]],c,.3);E(x,0,-.68*R,.26*R,.26*R);paint(x,c,.7);GOLD(6,.17*R,(a,b)=>dot(x,a,-.68*R+b,.05*R,C.edge))},
+  banana(x,c){line(x,[[-.95,.7],[.9,.7]],c,R*.08);[[-.5,-.1,.5],[.1,-.35,.3],[.5,.15,.8]].forEach(p=>{x.beginPath();x.arc(p[0]*R,p[1]*R+.45*R,.5*R,-Math.PI*.8+p[2]*.2,-Math.PI*.25+p[2]*.2);x.lineWidth=R*.2;x.strokeStyle=C.edge;x.stroke();x.lineWidth=R*.15;x.strokeStyle=c;x.stroke()})},
+  macro(x,c,o){x.beginPath();for(let i=0;i<=40;i++){const a=i/40*Math.PI*2,rr=.97*R*(1+.06*Math.sin(5*a));x[i?'lineTo':'moveTo'](Math.cos(a)*rr,Math.sin(a)*rr)}x.closePath();x.fillStyle=C.host;x.fill();x.lineWidth=Math.max(1,R*.06);x.strokeStyle=C.edge;x.stroke();
+    E(x,-.45*R,-.35*R,.25*R,.18*R);x.globalAlpha=.35;x.fillStyle=C.edge;x.fill();x.globalAlpha=1;
+    GOLD(11,.62*R,(a,b)=>{E(x,.1*R+a,.12*R+b,.09*R,.09*R);paint(x,c);if(o.kin)dot(x,.1*R+a+.05*R,.12*R+b,.03*R,C.edge)})},
+  bbb(x,c){E(x,-.22*R,0,.48*R,.48*R);x.lineWidth=R*.12;x.strokeStyle=c;x.fillStyle=c;x.globalAlpha=.4;x.fill();x.globalAlpha=1;x.stroke();
+    E(x,.5*R,0,.32*R,.36*R);x.globalAlpha=.4;x.fill();x.globalAlpha=1;x.stroke()},
+  spherule(x,c){E(x,0,0,.88*R,.88*R);x.globalAlpha=.15;x.fillStyle=c;x.fill();x.globalAlpha=1;x.lineWidth=R*.1;x.strokeStyle=c;x.stroke();GOLD(18,.68*R,(a,b)=>{E(x,a,b,.09*R,.09*R);paint(x,c)})},
+  cigar(x,c){[[-.45,-.3,.6],[.3,-.35,-.3],[0,.25,.1],[.55,.4,.9]].forEach(p=>{cap(x,p[0]*R,p[1]*R,.62*R,.14*R,p[2]);paint(x,c)});E(x,-.75*R,.35*R,.14*R,.14*R);paint(x,c)},
+  cup(x,c){[[-.4,-.3],[.4,-.25],[0,.4]].forEach(p=>{E(x,p[0]*R,p[1]*R,.34*R,.34*R);paint(x,c,.55);x.beginPath();x.arc(p[0]*R,p[1]*R+.06*R,.2*R,Math.PI*1.1,Math.PI*1.9);x.strokeStyle=C.edge;x.lineWidth=R*.07;x.stroke()})},
+  derm(x,c,o){if(o.hair){tube(x,[[-.2,-1],[.15,1]],C.edge,.28)}tube(x,[[-.95,.4],[-.3,.2],[.3,.3],[.95,.05]],c,.1);tube(x,[[-.3,.2],[-.1,-.55]],c,.1);
+    [[-.7,.33],[-.5,.27],[.05,.26],[.55,.22],[-.2,-.15],[-.14,-.4]].forEach(p=>{x.beginPath();x.rect((p[0]-.07)*R,(p[1]-.07)*R,.14*R,.14*R);paint(x,c)})},
+  spag(x,c){[[-.7,-.4,.3],[.2,-.55,-.5],[-.3,.45,.9],[.55,.3,-1.2]].forEach(p=>{x.beginPath();x.arc(p[0]*R,p[1]*R,.35*R,p[2],p[2]+1.6);x.lineWidth=R*.1;x.strokeStyle=c;x.stroke()});
+    [[0,0],[-.35,-.05],[.3,-.15],[.1,.3],[-.55,.15]].forEach(p=>{E(x,p[0]*R,p[1]*R,.13*R,.13*R);paint(x,c)})},
+  // ---- parasites
+  rbc(x,c,o){const big=o.f==='schuff';E(x,0,0,(big?1:.9)*R,(big?1:.9)*R);paint(x,C.host,1);E(x,0,0,.4*R,.4*R);x.globalAlpha=.4;x.fillStyle=C.field;x.fill();x.globalAlpha=1;
+    const ring=(px,py,r)=>{E(x,px*R,py*R,r*R,r*R);x.lineWidth=R*.07;x.strokeStyle=c;x.stroke();dot(x,(px+r*.75)*R,(py-r*.65)*R,.08*R,c)};
+    if(o.f==='ring'){ring(.3,-.25,.22);ring(-.35,.35,.17);ring(-.2,-.4,.14)}
+    else if(o.f==='banana'){x.beginPath();x.arc(0,.55*R,.75*R,-Math.PI*.78,-Math.PI*.22);x.lineWidth=R*.32;x.strokeStyle=C.edge;x.stroke();x.lineWidth=R*.26;x.strokeStyle=c;x.stroke();dot(x,0,-.2*R,.09*R,C.edge)}
+    else if(o.f==='schuff'){GOLD(22,.85*R,(a,b)=>dot(x,a,b,.035*R,C.danger));x.beginPath();x.moveTo(-.3*R,0);x.quadraticCurveTo(-.1*R,-.5*R,.3*R,-.2*R);x.quadraticCurveTo(.5*R,.2*R,.1*R,.3*R);x.quadraticCurveTo(-.4*R,.4*R,-.3*R,0);paint(x,c,.7)}
+    else if(o.f==='maltese')[[0,-.3],[0,.3],[-.3,0],[.3,0]].forEach(p=>{E(x,p[0]*R,p[1]*R,.12*R,.12*R);x.lineWidth=R*.06;x.strokeStyle=c;x.stroke();dot(x,p[0]*R,p[1]*R,.05*R,c)})},
+  hepato(x,c){poly(x,6,.95*R,.3);x.fillStyle=C.host;x.fill();x.lineWidth=Math.max(1,R*.06);x.strokeStyle=C.edge;x.stroke();dot(x,-.2*R,-.1*R,.25*R,C.edge);x.globalAlpha=1;
+    E(x,.35*R,.3*R,.14*R,.14*R);paint(x,c,1)},
+  pear(x,c){for(let k=0;k<4;k++){const y=(-.2+k*.13)*R;wave(x,.4*R,y,1.2*R,y+(k-1.5)*.18*R,.05*R,2,c,R*.04)}
+    x.beginPath();x.moveTo(-.85*R,0);x.bezierCurveTo(-.85*R,-.75*R,.25*R,-.6*R,.55*R,-.1*R);x.quadraticCurveTo(.65*R,0,.55*R,.1*R);x.bezierCurveTo(.25*R,.6*R,-.85*R,.75*R,-.85*R,0);x.closePath();paint(x,c,.85);
+    dot(x,-.4*R,-.2*R,.12*R,C.spore);dot(x,-.4*R,.2*R,.12*R,C.spore);dot(x,-.4*R,-.2*R,.05*R,C.edge);dot(x,-.4*R,.2*R,.05*R,C.edge)},
+  amoeba(x,c){x.beginPath();for(let i=0;i<=48;i++){const a=i/48*Math.PI*2,rr=.75*R*(1+.18*Math.sin(3*a)+.08*Math.sin(7*a+1));x[i?'lineTo':'moveTo'](Math.cos(a)*rr,Math.sin(a)*rr)}x.closePath();paint(x,c,.55);
+    [[.2,-.2],[-.25,.25],[.3,.3]].forEach(p=>{E(x,p[0]*R,p[1]*R,.14*R,.14*R);paint(x,C.danger,.75)});E(x,-.25*R,-.2*R,.14*R,.14*R);x.lineWidth=R*.05;x.strokeStyle=C.edge;x.stroke()},
+  cyst4(x,c){E(x,0,0,.6*R,.6*R);paint(x,c,.4);[[-.2,-.2],[.2,-.2],[-.2,.2],[.2,.2]].forEach(p=>{E(x,p[0]*R,p[1]*R,.1*R,.1*R);x.lineWidth=R*.05;x.strokeStyle=C.edge;x.stroke()})},
+  oocyst(x,c){[[-.4,-.3],[.35,-.35],[-.1,.35],[.5,.35]].forEach(p=>{E(x,p[0]*R,p[1]*R,.24*R,.24*R);paint(x,c,.8);GOLD(4,.12*R,(a,b)=>dot(x,p[0]*R+a,p[1]*R+b,.04*R,C.spore))})},
+  trich(x,c){for(let k=0;k<4;k++){const y=(-.25+k*.16)*R;wave(x,-.6*R,y,-1.25*R,y+(k-1.5)*.25*R,.05*R,2,c,R*.04)}
+    x.beginPath();x.moveTo(-.65*R,0);x.bezierCurveTo(-.65*R,-.7*R,.4*R,-.55*R,.7*R,0);x.bezierCurveTo(.4*R,.55*R,-.65*R,.7*R,-.65*R,0);x.closePath();paint(x,c,.85);
+    wave(x,-.4*R,-.45*R,.5*R,-.3*R,.06*R,3,C.spore,R*.05);line(x,[[.6,0],[1.15,.15]],c,R*.06);E(x,-.3*R,0,.16*R,.12*R);x.fillStyle=C.spore;x.fill()},
+  crescent(x,c){cell(x);for(let i=0;i<5;i++){const a=i/5*Math.PI*2;x.save();x.rotate(a);x.beginPath();x.arc(.45*R,0,.28*R,-1.2,1.2);x.lineWidth=R*.13;x.strokeStyle=c;x.stroke();x.restore()}},
+  trypo(x,c,o){const P=o.slim?sine(-1,.9,.22,1,24):[...Array(25)].map((_,i)=>{const a=Math.PI*(.15+1.2*i/24);return[Math.cos(a)*.8,Math.sin(a)*.55-.15]});
+    tube(x,P,c,o.slim?.13:.18);x.beginPath();P.forEach((p,i)=>x[i?'lineTo':'moveTo'](p[0]*R,(p[1]-.15+Math.sin(i*1.4)*.05)*R));x.lineWidth=R*.04;x.strokeStyle=C.spore;x.stroke();
+    const e=P[P.length-1],s=P[0];line(x,[e,[e[0]+.25,e[1]-.05]],c,R*.04);dot(x,s[0]*R,s[1]*R,.08*R,C.edge)},
+  mite(x,c){for(let i=0;i<4;i++){const y=(-.35+i*.23)*R;line(x,[[-.45,y/R],[-.85,y/R+(i<2?-.15:.15)]],c,R*.06);line(x,[[.45,y/R],[.85,y/R+(i<2?-.15:.15)]],c,R*.06)}
+    E(x,0,.05*R,.55*R,.45*R);paint(x,c,.85);E(x,0,-.5*R,.14*R,.12*R);paint(x,c);GOLD(6,.3*R,(a,b)=>dot(x,a,.05*R+b,.04*R,C.spore))},
+  louse(x,c){for(let i=0;i<3;i++){const y=(-.1+i*.18)*R;line(x,[[-.25,y/R],[-.65,y/R+.2]],c,R*.06);line(x,[[.25,y/R],[.65,y/R+.2]],c,R*.06)}
+    E(x,0,-.55*R,.15*R,.18*R);paint(x,c);E(x,0,-.15*R,.22*R,.2*R);paint(x,c);E(x,0,.45*R,.32*R,.45*R);paint(x,c,.8);for(let i=0;i<3;i++)line(x,[[-.25,.25+i*.15],[.25,.25+i*.15]],C.edge,R*.03)},
+  worm(x,c,o){const L=o.len||1.4,w=o.w||.12,P=sine(-L/2,L/2,o.larva?.15:.22,o.larva?2:1.2,30);tube(x,P,c,w*2);
+    if(o.pin){const e=P[P.length-1];line(x,[e,[e[0]+.25,e[1]+.08]],c,R*.04)}
+    if(o.hook){const s=P[0];x.beginPath();x.arc(s[0]*R+.08*R,s[1]*R-.08*R,.1*R,Math.PI*.5,Math.PI*1.6);x.lineWidth=w*R*1.6;x.strokeStyle=c;x.stroke()}},
+  musc(x,c){x.beginPath();x.rect(-.95*R,-.55*R,1.9*R,1.1*R);x.fillStyle=C.host;x.fill();x.lineWidth=Math.max(1,R*.05);x.strokeStyle=C.edge;x.stroke();
+    for(let i=-4;i<=4;i++)line(x,[[i*.2,-.55],[i*.2,.55]],C.edge,R*.015);E(x,0,0,.45*R,.3*R);x.globalAlpha=.2;x.fillStyle=c;x.fill();x.globalAlpha=1;
+    const P=[];for(let i=0;i<=40;i++){const a=i/40*Math.PI*4,r=.08+.25*i/40;P.push([Math.cos(a)*r*1.3,Math.sin(a)*r*.8])}tube(x,P,c,.06)},
+  egg(x,c){E(x,0,0,.6*R,.38*R);paint(x,c,.45);x.beginPath();x.moveTo(.1*R,.36*R);x.lineTo(.0*R,.75*R);x.lineTo(-.1*R,.37*R);paint(x,c);wave(x,-.35*R,0,.35*R,0,.08*R,2,c,R*.05)},
+  fluke(x,c){E(x,0,0,.95*R,.4*R,-.2);paint(x,c,.65);dot(x,-.72*R,.14*R,.1*R,c);dot(x,-.25*R,.05*R,.09*R,c);
+    [[.35,-.15],[.55,.1],[.25,.15]].forEach(p=>line(x,[[.4,0],p],C.edge,R*.04))},
+  tape(x,c){for(let i=0;i<6;i++){const w=.14+i*.04,px=-.85+i*.33;x.beginPath();x.rect((px-w*.5)*R,-(w*.9)*R,(w*1.05)*R,w*1.8*R);paint(x,c,.8)}
+    E(x,-1.0*R,0,.1*R,.1*R);paint(x,c)},
+  cysti(x,c){E(x,0,0,.85*R,.75*R);x.globalAlpha=.12;x.fillStyle=c;x.fill();x.globalAlpha=1;x.lineWidth=R*.06;x.strokeStyle=c;x.stroke();
+    E(x,.15*R,.1*R,.25*R,.22*R);paint(x,c);for(let i=0;i<8;i++){const a=i/8*Math.PI*2;line(x,[[.15+Math.cos(a)*.25,.1+Math.sin(a)*.22],[.15+Math.cos(a)*.34,.1+Math.sin(a)*.3]],c,R*.03)}},
+  hydatid(x,c){E(x,0,0,.95*R,.95*R);x.lineWidth=R*.12;x.strokeStyle=c;x.stroke();E(x,0,0,.82*R,.82*R);x.globalAlpha=.12;x.fillStyle=c;x.fill();x.globalAlpha=1;
+    [[-.35,-.3],[.3,-.25],[0,.35]].forEach(p=>{E(x,p[0]*R,p[1]*R,.22*R,.22*R);x.lineWidth=R*.04;x.strokeStyle=c;x.stroke();GOLD(4,.12*R,(a,b)=>dot(x,p[0]*R+a,p[1]*R+b,.04*R,c))})},
+  mf(x,c,o){if(o.sheath){x.globalAlpha=.3;x.beginPath();sine(-1.1,1.1,.25,1.5,40).forEach((p,i)=>x[i?'lineTo':'moveTo'](p[0]*R,p[1]*R));x.lineWidth=R*.2;x.strokeStyle=c;x.stroke();x.globalAlpha=1}
+    x.beginPath();sine(-.95,.95,.25,1.5,40).forEach((p,i)=>x[i?'lineTo':'moveTo'](p[0]*R,p[1]*R));x.lineWidth=R*.08;x.strokeStyle=c;x.stroke();GOLD(0,0,()=>{})}
+};
+function makeSprite(t,r,dpr){
+  const prevR=R;R=r;const half=R*1.4,c=document.createElement('canvas');c.width=c.height=Math.ceil(half*2*dpr);
+  const x=c.getContext('2d');x.scale(dpr,dpr);x.translate(half,half);x.lineJoin='round';x.lineCap='round';
+  const m=MIC[t],col=C[m.kind],o=m.o||{};if(C.glow){x.shadowColor=col;x.shadowBlur=R*.5}
+  DRAW[m.d](x,col,o);if(o.sh)shield(x);R=prevR;return{c,half};
+}
+function rebuild(){
+  readColors();SPR={};for(const t in MIC)SPR[t]=makeSprite(t,R,DPR);
+  BG=document.createElement('canvas');BG.width=cv.width;BG.height=cv.height;const b=BG.getContext('2d');b.scale(DPR,DPR);
+  const cx=W/2,cy=H*.44,rad=Math.max(W,H)*.72,g=b.createRadialGradient(cx,cy,0,cx,cy,rad);
+  g.addColorStop(0,C.field);g.addColorStop(.7,C.field);g.addColorStop(1,C.fieldEdge);b.fillStyle=g;b.fillRect(0,0,W,H);
+  // eyepiece reticle
+  b.strokeStyle=C.muted;b.globalAlpha=.16;b.lineWidth=1;const er=Math.min(W,H*.9)*.47;
+  b.beginPath();b.arc(cx,cy,er,0,Math.PI*2);b.stroke();b.setLineDash([2,6]);b.beginPath();b.arc(cx,cy,er*.62,0,Math.PI*2);b.stroke();b.setLineDash([]);
+  b.beginPath();b.moveTo(cx-er,cy);b.lineTo(cx+er,cy);b.moveTo(cx,cy-er);b.lineTo(cx,cy+er);b.stroke();
+  for(let i=-10;i<=10;i++){const tl=i%5?3:7;b.beginPath();b.moveTo(cx+i*er/10,cy-tl);b.lineTo(cx+i*er/10,cy+tl);b.moveTo(cx-tl,cy+i*er/10);b.lineTo(cx+tl,cy+i*er/10);b.stroke()}
+  b.globalAlpha=.09;b.fillStyle=C.danger;b.fillRect(0,ESC,W,H-ESC);b.globalAlpha=1;
+  b.setLineDash([6,6]);b.strokeStyle=C.danger;b.lineWidth=1.5;b.globalAlpha=.65;b.beginPath();b.moveTo(0,ESC);b.lineTo(W,ESC);b.stroke();b.setLineDash([]);b.globalAlpha=1;
+  b.font='600 10px "IBM Plex Mono",ui-monospace,monospace';b.fillStyle=C.danger;b.textBaseline='bottom';b.fillText('BLOODSTREAM',10,ESC-4);
+  const sb=R*1.6;b.strokeStyle=C.muted;b.lineWidth=2;b.beginPath();b.moveTo(W-12-sb,16);b.lineTo(W-12,16);b.stroke();
+  b.fillStyle=C.muted;b.textAlign='right';b.textBaseline='top';b.fillText('2 µm',W-12,21);b.fillText('×1000 OIL',W-12,34);b.textAlign='left';
+  // label widths: long names drop to the small font so labels stay near the microbe's width
+  LW={};for(const t in MIC){ctx.font=LBL_FONT;let w=ctx.measureText(MIC[t].short).width,f=LBL_FONT;if(w>R*3.2){ctx.font=LBL_FONT_S;w=ctx.measureText(MIC[t].short).width;f=LBL_FONT_S}LW[t]={w,f}}
+  DEBRIS=Array.from({length:14},()=>({x:Math.random()*W,y:Math.random()*H,r:R*(.6+Math.random()*1.6),vx:(Math.random()-.5)*6,vy:3+Math.random()*6}));
+  draw();
+}
+function resize(){
+  const r=fieldEl.getBoundingClientRect();if(r.width<10||r.height<10)return;
+  const oldW=W,oldH=H;W=r.width;H=r.height;DPR=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);R=Math.max(17,Math.min(28,W*.055));ESC=H-Math.max(58,R*2.6);
+  G.mobs.forEach(m=>{m.x0*=W/oldW;m.x*=W/oldW;m.y*=H/oldH});rebuild();
+}
+new ResizeObserver(resize).observe(fieldEl);
+addEventListener('resize',()=>{resize();sizeEcg()});
+const retheme=()=>{rebuild();renderMicChips();buildWeapons()};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',retheme);
+new MutationObserver(retheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* ---------- ECG monitor ---------- */
+const ecg=$('#ecg'),ex=ecg.getContext('2d');let EW=1,EH=22,EBUF=[],ePh=0;
+function sizeEcg(){const r=ecg.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1);EW=Math.max(20,r.width);EH=r.height||22;ecg.width=Math.round(EW*d);ecg.height=Math.round(EH*d);EBUF=new Array(Math.ceil(EW)).fill(0)}
+new ResizeObserver(sizeEcg).observe(ecg);
+function ecgShape(p){if(p<.1)return .12*Math.sin(p/.1*Math.PI);if(p<.16)return 0;if(p<.18)return -.18;if(p<.21)return 1;if(p<.24)return -.32;if(p<.4)return 0;if(p<.55)return .26*Math.sin((p-.4)/.15*Math.PI);return 0}
+function ecgStep(dt){
+  const h=Math.max(0,G.health),bpm=h<=0?0:68+(100-h)*.9,d=ecg.width/EW;ePh+=dt*bpm/60;const n=Math.max(1,Math.round(dt*70));
+  for(let i=0;i<n;i++){EBUF.shift();EBUF.push(bpm?ecgShape(ePh%1):0)}
+  ex.setTransform(d,0,0,d,0,0);ex.clearRect(0,0,EW,EH);ex.beginPath();
+  EBUF.forEach((v,i)=>ex[i?'lineTo':'moveTo'](i,EH*.62-v*EH*.5));ex.strokeStyle=h<35?C.danger:C.ok;ex.lineWidth=1.6;
+  if(C.glow){ex.shadowColor=ex.strokeStyle;ex.shadowBlur=6}ex.stroke();ex.shadowBlur=0;
+}
+
+/* ---------- Audio ---------- */
+let ac=null;
+function beep(f,d,type,v,delay){if(!sound)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const t0=ac.currentTime+(delay||0),o=ac.createOscillator(),g=ac.createGain();
+  o.type=type||'sine';o.frequency.setValueAtTime(f,t0);g.gain.setValueAtTime(v||.05,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(g).connect(ac.destination);o.start(t0);o.stop(t0+d+.02)}catch(e){}}
+const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+/* ---------- Music: a small synth loop scheduled ahead on the shared AudioContext (Am–F–C–G at 100 BPM) ---------- */
+const MUS={on:store.get('antibiose-music')!=='off',playing:false,gain:null,next:0,step:0,timer:null,noise:null};
+const PROG=[[57,60,64],[53,57,60],[48,52,55],[55,59,62]],ARP=[0,1,2,1,0,2,1,2],LEAD=[76,74,72,71,72,74,76,79];
+const hz=m=>440*2**((m-69)/12);
+// menus get the full mix; during play the loop drops back so sound effects stay clear
+const musLevel=()=>G.phase==='play'?.045:.085;
+function musLevelSet(){if(MUS.playing&&MUS.gain)MUS.gain.gain.setTargetAtTime(musLevel(),ac.currentTime,.3)}
+function voice(type,freq,t,dur,vol,cut,atk){const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+(atk||.01));g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  let n=o;if(cut){const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.value=cut;o.connect(f);n=f}n.connect(g).connect(MUS.gain);o.start(t);o.stop(t+dur+.05)}
+function hat(t){if(!MUS.noise){const b=ac.createBuffer(1,ac.sampleRate*.1,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;MUS.noise=b}
+  const s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();s.buffer=MUS.noise;f.type='highpass';f.frequency.value=7000;
+  g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.0001,t+.05);s.connect(f).connect(g).connect(MUS.gain);s.start(t);s.stop(t+.06)}
+function kick(t){const o=ac.createOscillator(),g=ac.createGain();o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);
+  g.gain.setValueAtTime(.9,t);g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.connect(g).connect(MUS.gain);o.start(t);o.stop(t+.3)}
+function musNote(s,t){const bar=(s>>4)%4,b=s&15,ch=PROG[bar];
+  if(b===0)ch.forEach(m=>voice('sawtooth',hz(m),t,2.4,.07,800,.5));
+  if([0,6,8,11,14].includes(b))voice('triangle',hz(ch[0]-12),t,.3,.55);
+  if(b%2===0)voice('square',hz(ch[ARP[b>>1]]+12),t,.16,.09,1600);
+  if(b===0||b===8)kick(t);if(b%4===2)hat(t);
+  // a short lead phrase on every other pass through the progression
+  if(s>=64&&b%4===0&&bar%2===0)voice('triangle',hz(LEAD[(bar*2+(b>>2))%LEAD.length]),t,.5,.14,2400)}
+function musTick(){const spb=60/100/4;while(MUS.next<ac.currentTime+.15){musNote(MUS.step,MUS.next);MUS.next+=spb;MUS.step=(MUS.step+1)%128}MUS.timer=setTimeout(musTick,30)}
+function musStart(){if(!MUS.on||MUS.playing||document.hidden)return;
+  try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();
+    if(!MUS.gain){MUS.gain=ac.createGain();MUS.gain.gain.value=0;MUS.gain.connect(ac.destination)}
+    MUS.gain.gain.cancelScheduledValues(ac.currentTime);MUS.gain.gain.setTargetAtTime(musLevel(),ac.currentTime,.5);
+    MUS.playing=true;MUS.next=ac.currentTime+.08;MUS.step=0;musTick()}catch(e){MUS.playing=false}musUI()}
+function musStop(){if(!MUS.playing)return;MUS.playing=false;clearTimeout(MUS.timer);try{MUS.gain.gain.setTargetAtTime(0,ac.currentTime,.15)}catch(e){}musUI()}
+function musUI(){document.querySelectorAll('.eq').forEach(e=>e.classList.toggle('on',MUS.playing));const h=$('#musHint');if(h)h.hidden=MUS.playing||!MUS.on}
+// browsers only allow audio after a tap or key press, so the first one starts the music
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{if(MUS.on&&!MUS.playing)musStart()},true));
+
+
+/* ---------- Text fitting: shrink a box's font until its content fits, never below min ---------- */
+function fit(el,max,min){el.style.fontSize=max+'px';let fs=max;
+  while(fs>min&&(el.scrollWidth>el.clientWidth+1||el.scrollHeight>el.clientHeight+1)){fs-=.5;el.style.fontSize=fs+'px'}}
+
+/* ---------- HUD ---------- */
+const el={score:$('#score'),combo:$('#combo'),lvl:$('#lvl'),lvlLbl:$('#lvlLbl'),vt:$('#vitalTxt'),pf:$('#progFill'),pt:$('#progTxt'),rf:$('#riskFill'),rt:$('#riskTxt'),ptBox:$('#pt'),gauges:$('.gauges'),lesson:$('#lesson'),weapons:$('#weapons')};
+const mult=()=>Math.min(3,1+Math.floor(G.streak/3));
+let lastScore=0;
+function hud(){
+  const L=LEVELS[G.lv];el.score.textContent=G.score;
+  if(G.score!==lastScore&&!RM.matches){el.score.classList.remove('bump');void el.score.offsetWidth;el.score.classList.add('bump')}lastScore=G.score;
+  el.combo.textContent='×'+mult();el.combo.classList.toggle('hot',mult()>1);
+  el.lvlLbl.textContent=L.spec?'Mode':'Round';el.lvl.textContent=L.spec?'Single':(L.idx+1)+'/'+CHAPTERS[L.ch].count;const h=Math.max(0,G.health);el.vt.textContent=Math.round(h)+'%';el.vt.classList.toggle('low',h<35);
+  el.pt.textContent=Math.min(G.kills,L.q)+'/'+L.q;el.pf.style.transform=`scaleX(${Math.min(1,G.kills/L.q)})`;
+  riskHud();
+}
+function riskHud(){const r=Math.min(100,G.risk);el.rt.textContent=Math.round(r)+'%';el.rf.style.transform=`scaleX(${r/100})`;el.rf.classList.toggle('hi',r>=70)}
+function lesson(chip,cls,text,soft){el.lesson.innerHTML=`<p>${chip?`<span class="chip ${cls}">${chip}</span>`:''}${text}</p>`;fit(el.lesson.firstChild,13.5,10.5);
+  if(!soft){G.holdT=performance.now()+1800;G.tipShown=0}}
+function buildWeapons(){
+  if(!C.bac)return;const L=LEVELS[G.lv];el.weapons.style.setProperty('--cols',L.wpn.length===4?2:L.wpn.length);
+  el.weapons.innerHTML=L.wpn.map((w,i)=>{const s=WPN[w].sp;return `<button class="wbtn" data-w="${w}" aria-pressed="${w===G.w}" style="--dc:${wcol(w)}"><span class="loaded">LOADED</span>
+    <span class="wn">${HY[WPN[w].name]||WPN[w].name}</span><span class="wt" data-full="${WPN[w].tag}" data-short="${TG[w]}">${WPN[w].tag}</span>
+    <span class="pips" title="Spectrum ${s} of 4">${[1,2,3,4].map(k=>`<i class="${k<=s?'on':''}"></i>`).join('')}</span><kbd>${i+1}</kbd></button>`}).join('');
+  fitWeapons();
+}
+function fitWeapons(){
+  el.weapons.querySelectorAll('.wn').forEach(n=>fit(n,15,11));
+  el.weapons.querySelectorAll('.wt').forEach(t=>{t.hidden=false;t.textContent=t.dataset.full;if(t.scrollWidth>t.clientWidth+1)t.textContent=t.dataset.short;fit(t,10.5,9)});
+  // a two-line name plus its tag can outgrow a short button: shrink the name, then drop the tag
+  el.weapons.querySelectorAll('.wbtn').forEach(b=>{const n=b.querySelector('.wn'),t=b.querySelector('.wt');let fs=parseFloat(n.style.fontSize)||15;
+    while(b.scrollHeight>b.clientHeight+1&&fs>10.5){fs-=.5;n.style.fontSize=fs+'px'}
+    if(b.scrollHeight>b.clientHeight+1)t.hidden=true});
+}
+new ResizeObserver(fitWeapons).observe(el.weapons);
+function selectW(w,quiet){
+  if(!LEVELS[G.lv].wpn.includes(w))return;G.w=w;el.weapons.querySelectorAll('.wbtn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.w===w));
+  if(!quiet){lesson(WPN[w].name,'c-acc',WPN[w].scope);beep(520,.05,'triangle',.025)}
+}
+el.weapons.addEventListener('click',e=>{const b=e.target.closest('.wbtn');if(b)selectW(b.dataset.w)});
+
+/* ---------- Game flow ---------- */
+function startLevel(lv){
+  G.lv=lv;const L=LEVELS[lv];G.mobs=[];G.shots=[];G.parts=[];G.texts=[];G.rings=[];G.kills=0;G.streak=0;G.t=0;G.spawnT=.5;G.hurt=0;G.shake=0;
+  G.ls=newStats();G.lvStart=G.score;G.w=L.wpn.find(w=>!contra(w,lv));G.risk=L.mod?.risk||0;G.riskWarned=0;G.tip=null;buildWeapons();
+  G.maxLv=Math.max(G.maxLv,lv);el.gauges.classList.toggle('no-risk',L.ch!=='bac');
+  el.ptBox.hidden=!L.mod;if(L.mod)el.ptBox.innerHTML=`<span class="lbl">Patient</span>${L.mod.label}`;
+  lesson('',null,L.spec?`Shoot only what <b>${WPN[L.drug].name}</b> kills. Let resistant microbes drift past.`:L.idx===0?'Tap a microbe to fire the loaded drug. Follow the green tips for your first few shots.':
+    L.mod?`<b>${L.mod.label}:</b> ${L.mod.detail} Choose drugs with that in mind.`:`Tap a microbe to fire <b>${WPN[G.w].name}</b>. Switch drugs with the buttons below.`);
+  hud();G.phase='play';hideOverlay();G.last=null;
+}
+function spawn(force){
+  if(H<10)resize();const L=LEVELS[G.lv];let t=force;
+  if(!t){const a=!L.spec?L.mic:(Math.random()<.55||!L.dec.length?L.cov:L.dec);t=a[Math.random()*a.length|0]}
+  const recent=G.mobs.slice(-2).map(m=>m.t);if(!force&&recent.length===2&&recent[0]===t&&recent[1]===t)t=L.mic[(L.mic.indexOf(t)+1)%L.mic.length];
+  const prog=G.kills/L.q,margin=Math.max(R*1.4,(LW[t]?.w||40)/2+8)+22;
+  G.mobs.push({t,x0:margin+Math.random()*Math.max(1,W-2*margin),x:0,y:-R*1.3,v:L.sp*H*(.85+Math.random()*.3)*(1+.25*prog),
+    amp:6+Math.random()*16,fr:.6+Math.random()*.9,ph:Math.random()*6.28,rot:Math.random()*6.28,spin:(Math.random()-.5)*.8,shake:0,flash:0,dead:0,die:0});
+}
+function fire(px,py){
+  let tgt=null,bd=1e9;for(const m of G.mobs){if(m.dead)continue;const d=Math.hypot(m.x-px,m.y-py);if(d<R*1.3+12&&d<bd){bd=d;tgt=m}}
+  const sx=W/2,sy=H-22;G.aim=Math.atan2((tgt?tgt.y:py)-sy,(tgt?tgt.x:px)-sx);G.muzzle=1;
+  G.shots.push({x:sx+Math.cos(G.aim)*30,y:sy+Math.sin(G.aim)*30,tx:px,ty:py,tgt,w:G.w,trail:[]});beep(700,.05,'triangle',.025);
+}
+function addText(x,y,s,col){G.texts.push({x,y:Math.max(y,R+18),s,col,life:1})}
+function burst(x,y,col,n){const k=RM.matches?4:n;for(let i=0;i<k;i++){const a=Math.random()*6.28,s=60+Math.random()*180;G.parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,col,r:1.5+Math.random()*3})}
+  if(!RM.matches)G.rings.push({x,y,r:R*.6,life:1,col})}
+function resolve(p){
+  const m=p.tgt;if(!m||m.dead){burst(p.x,p.y,C.muted,4);return}
+  const t=m.t,w=p.w,mm=MIC[t],ci=contra(w,G.lv);
+  if(LEVELS[G.lv].ch==='bac')G.risk+=RISK[w]||0;
+  m.tried=m.tried||new Set();const repeat=m.tried.has(w);m.tried.add(w);
+  if(ci){
+    G.streak=0;m.shake=.4;m.flash=1;const hint=`Use ${names(bestFor(t,G.lv))}.`;
+    if(repeat)lesson('⊘ Still contraindicated','c-bad',`${ci} ${hint}`);
+    else{G.score=Math.max(0,G.score-15);G.ls.wrong++;G.ts.wrong++;addText(m.x,m.y,'−15',C.danger);
+      G.lessons.set(w+'|pt'+G.lv,`<b>${WPN[w].name}, ${LEVELS[G.lv].mod.label.toLowerCase()}:</b> ${ci}`);
+      lesson('⊘ Contraindicated −15','c-bad',`${ci} ${hint}`)}
+    beep(150,.22,'sawtooth',.035);buzz(35);
+  }else if(covers(w,t)){
+    const bf=bestFor(t,G.lv),isBest=bf.includes(w);m.dead=1;G.kills++;burst(m.x,m.y,C[mm.kind],14);
+    if(LEVELS[G.lv].spec){const first=mm.best.includes(w);G.streak++;const pts=(first?15:10)*mult();G.score+=pts;G.ls[first?'best':'works']++;G.ts[first?'best':'works']++;addText(m.x,m.y,`+${pts}`,first?C.ok:C.warn);
+      lesson(first?`★ +${pts}`:`✓ Covered +${pts}`,first?'c-ok':'c-warn',first?`<b>${mm.short}:</b> ${mm.fact}`:`${WPN[w].name} covers ${mm.short}. First-line is ${names(mm.best)}.`);beep(880,.09,'sine',.05);beep(1320,.12,'sine',.04,.07)}
+    else     if(isBest){G.streak++;const pts=15*mult();G.score+=pts;G.ls.best++;G.ts.best++;addText(m.x,m.y,`+${pts}`,C.ok);
+      lesson(mult()>1?`★ +${pts} ×${mult()}`:'★ First-line',mult()>1?'c-acc':'c-ok',`<b>${mm.short}:</b> ${mm.fact}`);beep(880,.09,'sine',.05);beep(1320,.12,'sine',.04,.07)}
+    else{G.streak=0;G.score+=5;G.ls.works++;G.ts.works++;addText(m.x,m.y,'+5',C.warn);
+      lesson('✓ Works +5','c-warn',WORKS[w+'|'+t]||`${WPN[w].name} works, but ${names(bf)} is first-line for ${mm.short}.`);beep(620,.1,'sine',.04)}
+  }else{
+    G.streak=0;m.shake=.4;m.flash=1;const txt=why(w,t),hint=LEVELS[G.lv].spec?'Hold fire on this one.':`Use ${names(bestFor(t,G.lv))}.`;
+    if(repeat)lesson('✗ Still resistant','c-bad',`${txt} ${hint}`);
+    else{G.score=Math.max(0,G.score-10);G.ls.wrong++;G.ts.wrong++;addText(m.x,m.y,'−10',C.danger);
+      G.lessons.set(w+'|'+t,`<b>${WPN[w].name} → ${mm.short}:</b> ${txt}`);lesson('✗ Resistant −10','c-bad',`${txt} ${hint}`)}
+    beep(150,.22,'sawtooth',.035);buzz(35);
+  }
+  if(G.risk>=100)cdiffEvent();
+  else if(G.risk>=70&&!G.riskWarned){G.riskWarned=1;G.lessons.set('risk'+G.lv,'<b>C. diff risk:</b> broad drugs like pip-tazo, meropenem and ceftriaxone wipe out protective gut flora.')}
+  hud();
+  if(G.kills>=LEVELS[G.lv].q)endLevel(true);
+}
+function cdiffEvent(){
+  G.risk=0;G.riskWarned=0;const L=LEVELS[G.lv];
+  if(L.wpn.some(w=>covers(w,'cdi')&&!contra(w,G.lv))){
+    spawn('cdi');lesson('C. diff!','c-bad','Broad antibiotics wiped out the gut flora and C. difficile took over. Treat it.');
+  }else{
+    G.health-=15;G.hurt=.6;G.shake=.3;lesson('C. diff −15% vitals','c-bad','Broad antibiotics wiped out the gut flora and the patient developed C. diff colitis. Narrower drugs prevent this.');
+    if(G.health<=0)endLevel(false);
+  }
+  G.lessons.set('cdi-event','<b>C. diff:</b> every dose of a broad-spectrum drug raises the risk. Pick the narrowest drug that works.');
+  beep(110,.3,'square',.035);buzz(60);
+}
+function escape(m){
+  const L=LEVELS[G.lv];if(L.spec&&!covers(L.drug,m.t)){m.dead=1;m.escaped=1;G.ls.held++;addText(m.x,ESC-R,'✓',C.muted);
+    lesson('✓ Held fire','c-ok',`${WPN[L.drug].name} doesn’t cover ${MIC[m.t].short}, so letting it pass was right.`,1);return}
+  m.dead=1;m.escaped=1;G.health-=12;G.score=Math.max(0,G.score-5);G.streak=0;G.ls.esc++;G.ts.esc++;G.hurt=.6;G.shake=.3;
+  lesson('Escaped −5','c-bad',L.spec?`${MIC[m.t].short} escaped. ${WPN[L.drug].name} covers it, so it was a target.`:`${MIC[m.t].short} reached the bloodstream. Treat it with ${names(bestFor(m.t,G.lv))}.`);
+  beep(110,.3,'square',.035);buzz(60);hud();
+  if(G.health<=0)endLevel(false);
+}
+function endLevel(won){
+  G.phase='ending';G.endT=won?1:.9;G.won=won;G.shots=[];G.tip=null;el.weapons.querySelectorAll('.wbtn.tip').forEach(b=>b.classList.remove('tip'));
+  if(won)G.mobs.forEach(m=>{if(!m.dead){m.dead=1;burst(m.x,m.y,C[MIC[m.t].kind],8)}});
+  if(won){beep(660,.12,'sine',.05);beep(880,.12,'sine',.05,.12);beep(1180,.2,'sine',.05,.24)}
+}
+function saveBest(){if(G.score>bestScore){bestScore=G.score;store.set('antibiose-best',bestScore)}}
+
+// Guided first round: point at the lowest microbe and its first-line drug until 3 first-line kills
+function tutorial(){
+  const on=!LEVELS[G.lv].spec&&LEVELS[G.lv].idx===0&&G.ls.best<3;let tip=null;
+  if(on)for(const m of G.mobs)if(!m.dead&&(!tip||m.y>tip.y))tip=m;
+  const w=tip?bestFor(tip.t,G.lv)[0]:null;
+  if(tip!==G.tip){
+    G.tip=tip;G.tipShown=0;el.weapons.querySelectorAll('.wbtn.tip').forEach(b=>b.classList.remove('tip'));
+    if(tip)el.weapons.querySelector(`.wbtn[data-w="${w}"]`)?.classList.add('tip');
+  }
+  if(tip&&!G.tipShown&&performance.now()>G.holdT){G.tipShown=1;
+    lesson('Tip','c-ok',`Tap <b>${MIC[tip.t].short}</b> with <b>${WPN[w].name}</b>${w===G.w?'':'. Load it below first'}.`,1)}
+}
+
+/* ---------- Loop ---------- */
+function update(dt){
+  const L=LEVELS[G.lv];G.t+=dt;
+  if(G.phase==='play'){
+    G.spawnT-=dt;const alive=G.mobs.filter(m=>!m.dead).length;
+    if(G.spawnT<=0&&alive<4+Math.floor(G.lv*.4)){spawn();G.spawnT=L.iv*(1-.35*Math.min(1,G.kills/L.q))*(.8+Math.random()*.4)}
+    for(const m of G.mobs){if(m.dead)continue;m.y+=m.v*dt;if(m.y-R*.3>ESC)escape(m);if(G.phase!=='play')break}
+    if(G.risk>0){const before=Math.round(G.risk);G.risk=Math.max(0,G.risk-1.5*dt);if(Math.round(G.risk)!==before)riskHud()}
+    tutorial();
+  }else if(G.phase==='menu'||G.phase==='over'){ // attract mode behind cards
+    for(const m of G.mobs){if(m.dead)continue;m.y+=m.v*dt*.5;if(m.y>ESC-R)m.y=-R}
+  }
+  for(const m of G.mobs){m.x=m.x0+Math.sin(m.ph+G.t*m.fr)*m.amp;m.rot+=m.spin*dt;if(m.shake>0)m.shake-=dt;if(m.flash>0)m.flash-=dt*2;if(m.dead)m.die+=dt*3}
+  G.mobs=G.mobs.filter(m=>!(m.dead&&(m.die>=1||m.escaped)));
+  for(const p of G.shots){const tx=p.tgt&&!p.tgt.dead?p.tgt.x:p.tx,ty=p.tgt&&!p.tgt.dead?p.tgt.y:p.ty,dx=tx-p.x,dy=ty-p.y,d=Math.hypot(dx,dy),s=1300*dt;
+    p.trail.push([p.x,p.y]);if(p.trail.length>7)p.trail.shift();
+    p.a=Math.atan2(dy,dx);if(d<=s){p.done=1;if(G.phase==='play')resolve(p)}else{p.x+=dx/d*s;p.y+=dy/d*s}}
+  G.shots=G.shots.filter(p=>!p.done);
+  for(const p of G.parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.92;p.vy*=.92;p.life-=dt*1.8}G.parts=G.parts.filter(p=>p.life>0);
+  for(const r of G.rings){r.r+=R*4*dt;r.life-=dt*2.5}G.rings=G.rings.filter(r=>r.life>0);
+  for(const t of G.texts){t.y-=42*dt;t.life-=dt*1.2}G.texts=G.texts.filter(t=>t.life>0);
+  for(const d of DEBRIS){d.x+=d.vx*dt;d.y+=d.vy*dt;if(d.y-d.r>H){d.y=-d.r;d.x=Math.random()*W}}
+  if(G.hurt>0)G.hurt-=dt;if(G.shake>0)G.shake-=dt;if(G.muzzle>0)G.muzzle-=dt*5;
+  if(G.phase==='ending'){G.endT-=dt;if(G.endT<=0){saveBest();LEVELS[G.lv].spec?showSpecEnd(G.won):G.won?(G.lv===CHAPTERS[LEVELS[G.lv].ch].last?showWin():showClear()):showOver()}}
+}
+const rr=(x,y,w,h,r)=>{ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h)};
+// Labels go in their own pass, on top of every sprite, clamped to the slide and nudged apart so none overlap
+function drawLabels(){
+  const placed=[],items=G.mobs.filter(m=>!m.dead&&SPR[m.t]).sort((a,b)=>b.y-a.y);
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  for(const m of items){
+    const L=LW[m.t],w=L.w+12,h=16;let cx=Math.min(W-w/2-4,Math.max(w/2+4,m.x)),cy=m.y+R*1.15;
+    for(const dy of [0,-h-4-R*2.3,h+3,-(h+3)]){const y=m.y+R*1.15+dy;if(!placed.some(p=>Math.abs(p.x-cx)<(p.w+w)/2+2&&Math.abs(p.y-y)<h+2)){cy=y;break}}
+    placed.push({x:cx,y:cy,w});
+    ctx.globalAlpha=1;ctx.fillStyle=C.lblBg;rr(cx-w/2,cy-h/2,w,h,8);ctx.fill();ctx.font=L.f;ctx.fillStyle=C.lblInk;ctx.fillText(MIC[m.t].short,cx,cy+.5);
+  }
+}
+function draw(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  if(G.shake>0&&!RM.matches)ctx.translate((Math.random()-.5)*8*G.shake/.3,(Math.random()-.5)*8*G.shake/.3);
+  if(BG)ctx.drawImage(BG,0,0,W,H);else{ctx.fillStyle=C.field;ctx.fillRect(0,0,W,H)}
+  // out-of-focus debris for depth
+  ctx.fillStyle=C.muted;for(const d of DEBRIS){ctx.globalAlpha=.05;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,6.28);ctx.fill()}ctx.globalAlpha=1;
+  for(const m of G.mobs){
+    const s=SPR[m.t];if(!s)continue;const sh=m.shake>0&&!RM.matches?Math.sin(m.shake*60)*5:0,k=m.dead?Math.min(1,m.die):0,br=RM.matches?1:1+.035*Math.sin(G.t*3+m.ph);
+    ctx.save();ctx.translate(m.x+sh,m.y);ctx.globalAlpha=1-k;
+    if(m===G.tip&&!m.dead){ctx.beginPath();ctx.arc(0,0,R*1.4+(RM.matches?0:Math.sin(G.t*6)*3),0,6.28);ctx.lineWidth=2.5;ctx.setLineDash([6,5]);ctx.strokeStyle=C.ok;ctx.stroke();ctx.setLineDash([])}
+    if(m.flash>0){ctx.beginPath();ctx.arc(0,0,R*1.2,0,6.28);ctx.lineWidth=3;ctx.strokeStyle=C.danger;ctx.globalAlpha=Math.max(0,m.flash);ctx.stroke();ctx.globalAlpha=1-k}
+    ctx.rotate(m.rot*.25);ctx.scale((1+k*.5)*br,(1+k*.5)*br);ctx.drawImage(s.c,-s.half,-s.half,s.half*2,s.half*2);
+    ctx.restore();
+  }
+  drawLabels();
+  for(const r of G.rings){ctx.globalAlpha=Math.max(0,r.life)*.8;ctx.strokeStyle=r.col;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,6.28);ctx.stroke()}ctx.globalAlpha=1;
+  for(const p of G.shots){const c=wcol(p.w);
+    if(p.trail.length>1){ctx.strokeStyle=c;ctx.lineCap='round';for(let i=1;i<p.trail.length;i++){ctx.globalAlpha=i/p.trail.length*.5;ctx.lineWidth=i*.9;ctx.beginPath();ctx.moveTo(p.trail[i-1][0],p.trail[i-1][1]);ctx.lineTo(p.trail[i][0],p.trail[i][1]);ctx.stroke()}ctx.globalAlpha=1}
+    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a||G.aim);if(C.glow){ctx.shadowColor=c;ctx.shadowBlur=10}
+    ctx.fillStyle=c;ctx.beginPath();ctx.arc(-4,0,4.5,Math.PI/2,Math.PI*1.5);ctx.lineTo(0,-4.5);ctx.lineTo(0,4.5);ctx.fill();
+    ctx.fillStyle=C.spore;ctx.beginPath();ctx.moveTo(0,-4.5);ctx.arc(4,0,4.5,-Math.PI/2,Math.PI/2);ctx.lineTo(0,4.5);ctx.fill();ctx.restore()}
+  for(const p of G.parts){ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.28);ctx.fill()}ctx.globalAlpha=1;
+  ctx.font='800 17px "Unbounded","IBM Plex Sans",system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  for(const t of G.texts){const x=Math.min(W-28,Math.max(28,t.x));ctx.globalAlpha=Math.max(0,Math.min(1,t.life*1.5));ctx.lineWidth=4;ctx.strokeStyle=C.lblBg;ctx.strokeText(t.s,x,t.y-R);ctx.fillStyle=t.col;ctx.fillText(t.s,x,t.y-R)}ctx.globalAlpha=1;
+  // syringe launcher
+  if(G.w&&G.phase!=='menu'&&G.phase!=='over'){const sx=W/2,sy=H-22,c=wcol(G.w);ctx.save();ctx.translate(sx,sy);ctx.rotate(G.aim+Math.PI/2);
+    if(G.muzzle>0){ctx.globalAlpha=G.muzzle;ctx.fillStyle=c;ctx.beginPath();ctx.arc(0,-32,6+8*(1-G.muzzle),0,6.28);ctx.fill();ctx.globalAlpha=1}
+    if(C.glow){ctx.shadowColor=c;ctx.shadowBlur=12}
+    ctx.fillStyle=C.lblBg;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.beginPath();ctx.rect(-8,-14,16,30);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+    ctx.fillStyle=c;ctx.fillRect(-6.5,-6,13,20);ctx.fillStyle=C.ink;ctx.fillRect(-11,15,22,3);ctx.fillRect(-2,18,4,8);
+    for(let i=0;i<3;i++)ctx.fillRect(-8,-8+i*7,4,1.2);
+    ctx.beginPath();ctx.moveTo(-1.2,-14);ctx.lineTo(0,-30);ctx.lineTo(1.2,-14);ctx.fill();ctx.restore()}
+  if(G.hurt>0){const g=ctx.createLinearGradient(0,H,0,H*.5);g.addColorStop(0,C.danger);g.addColorStop(1,'transparent');ctx.globalAlpha=Math.min(.4,G.hurt*.7);ctx.fillStyle=g;ctx.fillRect(-10,-10,W+20,H+20);ctx.globalAlpha=1}
+}
+function frame(ts){
+  if(G.last==null)G.last=ts;const dt=Math.min(.05,(ts-G.last)/1000);G.last=ts;
+  if(G.phase!=='paused'){update(dt);draw()}
+  if(G.phase==='play'||G.phase==='ending')ecgStep(dt);
+  requestAnimationFrame(frame);
+}
+cv.addEventListener('pointerdown',e=>{if(G.phase!=='play')return;e.preventDefault();const r=cv.getBoundingClientRect();fire(e.clientX-r.left,e.clientY-r.top)});
+
+/* ---------- Overlays ---------- */
+const ov=$('#overlay'),card=$('#card');
+// every card is a function so the feedback form can return to whatever was open before it
+function show(fn,html){G.card=fn;setTimeout(musLevelSet);card.innerHTML=html;ov.hidden=false;card.scrollTop=0;renderMicChips();const b=card.querySelector('.btn');b&&b.focus({preventScroll:true})}
+function hideOverlay(){ov.hidden=true;setTimeout(musLevelSet)}
+function renderMicChips(){card.querySelectorAll('canvas[data-m]').forEach(c=>{const s=SPR[c.dataset.m];if(!s)return;const d=Math.min(2,window.devicePixelRatio||1);
+  c.width=c.height=44*d;const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.drawImage(s.c,c.width*.04,c.width*.04,c.width*.92,c.width*.92)})}
+function chartHTML(lv,open){const L=LEVELS[lv],h=open?'':' hidden';
+  if(L.spec)return `<div class="chart" id="chart"${h}><table><thead><tr><th>Microbe</th><th>${WPN[L.drug].name}</th></tr></thead><tbody>${L.mic.map(t=>`<tr><td>${MIC[t].short}</td>${covers(L.drug,t)?(MIC[t].best.includes(L.drug)?'<td class="s">★ first-line</td>':'<td class="y">✓ covers</td>'):'<td class="n">– resistant</td>'}</tr>`).join('')}</tbody></table></div><p class="fine" id="chartKey"${h}>★ first-line · ✓ covers it · – resistant</p>`;
+  return `<div class="chart" id="chart"${h}><table><thead><tr><th>Drug</th>${L.mic.map(t=>`<th>${MIC[t].short}</th>`).join('')}</tr></thead><tbody>${
+    L.wpn.map(w=>contra(w,lv)?`<tr><td>${WPN[w].name} <span class="c-bad">⊘</span></td>${L.mic.map(()=>'<td class="c-bad">⊘</td>').join('')}</tr>`:`<tr><td>${WPN[w].name}</td>${L.mic.map(t=>{const c=covers(w,t);return c?(bestFor(t,lv).includes(w)?'<td class="s">★</td>':'<td class="y">✓</td>'):'<td class="n">–</td>'}).join('')}</tr>`).join('')
+  }</tbody></table></div><p class="fine" id="chartKey"${h}>★ first-line · ✓ covers it, not first-line · – won’t work${LEVELS[lv].mod?.block?' · ⊘ not for this patient':''}</p>`}
+const pct=s=>{const n=s.best+s.works+s.wrong;return n?Math.round(s.best/n*100):0};
+function statsHTML(s,score){return `<div class="stats"><div><span class="lbl">Score</span><b>${score}</b></div><div><span class="lbl">First-line</span><b>${pct(s)}%</b></div><div><span class="lbl">Wrong drugs</span><b>${s.wrong}</b></div><div><span class="lbl">Escaped</span><b>${s.esc}</b></div></div>`}
+function reviewHTML(limit){const a=[...G.lessons.values()].slice(-limit);return a.length?`<h3>Review</h3><ul class="review">${a.map(t=>`<li>${t}</li>`).join('')}</ul>`:''}
+const soundBtn=()=>`<button class="btn ghost" data-act="sound">Effects: ${sound?'on':'off'}</button>`;
+const fbBtn=()=>`<button class="btn ghost" data-act="feedback">Send feedback</button>`;
+const rl=lv=>{const L=LEVELS[lv];if(L.spec)return 'Single-drug mode';return `${CHAPTERS[L.ch].name} · Round ${L.idx+1} of ${CHAPTERS[L.ch].count}`};
+const CH_SW={bac:'gpos',vir:'virus',fun:'fungus',par:'proto'};
+const musicBtn=()=>`<button class="btn ghost" data-act="music">Music: ${MUS.on?'on':'off'}</button>`;
+function showStart(){
+  G.phase='menu';
+  show(showStart,`<div class="home-top"><p class="eyebrow">Antimicrobial spectrum trainer</p><span class="eq${MUS.playing?' on':''}" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <h1>Antibiose</h1>
+  <p class="lede">Shoot microbes with the antimicrobials that really kill them.</p>
+  <h3>Choose game mode</h3>
+  <div class="modes">
+    <button class="mode" data-act="multi" style="--c:var(--gpos)"><span class="mode-n">Multi-drug mode</span><span class="mode-d">Each round loads 3 or 4 drugs. Match every microbe to its first-line drug.</span><span class="mode-m">4 chapters · ${SPEC_IX} rounds · ${Object.keys(MIC).length} microbes</span></button>
+    <button class="mode" data-act="specmode" style="--c:var(--virus)"><span class="mode-n">Single-drug mode</span><span class="mode-d">Pick one drug and shoot only the microbes it covers. Resistant hits cost points.</span><span class="mode-m">${Object.keys(WPN).length} drugs to master</span></button>
+  </div>
+  <div class="btns"><button class="btn ghost" data-act="howto">How to play</button></div>
+  <div class="btn-row">${musicBtn()}${soundBtn()}</div>
+  <div class="btns">${fbBtn()}${BACK?`<a class="btn ghost" href="${BACK}">More games</a>`:''}</div>
+  <p class="fine" id="musHint"${MUS.playing||!MUS.on?' hidden':''}>Tap anywhere to start the music.</p>
+  <p class="fine">${bestScore?`Best score ${bestScore}. `:''}Simplified for teaching. Real prescribing depends on the site of infection, local resistance, allergies and patient factors.</p>`);
+}
+// Pages that embed the game (the club website) name a "More games" page in <meta name="game-back">
+const BACK=document.querySelector('meta[name="game-back"]')?.content||'';
+function showHowTo(){
+  show(showHowTo,`<p class="eyebrow">How to play</p><h2>Shoot what the drug kills</h2>
+  <p>Microbes drift down the microscope slide. Load a drug with the buttons at the bottom, then tap a microbe to fire it. Stop them before they cross the red bloodstream line.</p>
+  <h3>Multi-drug mode</h3>
+  <dl class="rules"><dt class="c-ok">★ +15</dt><dd>The first-line drug for that microbe. Three in a row builds a combo, up to ×3.</dd>
+  <dt class="c-warn">✓ +5</dt><dd>The drug works, but a narrower or preferred one exists.</dd>
+  <dt class="c-bad">✗ −10</dt><dd>The microbe is resistant. The message strip explains why.</dd>
+  <dt class="c-bad">⊘ −15</dt><dd>Late rounds add a patient condition, like an allergy or pregnancy, that rules out a drug.</dd>
+  <dt class="c-warn">C. diff</dt><dd>In the bacteria chapter, broad drugs fill a risk meter. At 100%, C. diff strikes.</dd></dl>
+  <h3>Single-drug mode</h3>
+  <dl class="rules"><dt class="c-ok">+10–15</dt><dd>Hit a microbe your drug covers. First-line hits score more.</dd>
+  <dt class="c-bad">−10</dt><dd>Hit a resistant microbe.</dd>
+  <dt class="c-ok">✓</dt><dd>Let resistant microbes drift past. Only covered ones that escape hurt the patient.</dd></dl>
+  <h3>Tips</h3>
+  <ul class="review"><li>Pause to see the coverage chart for the round.</li><li>Each round’s intro lists every microbe and drug before you start.</li><li>On a keyboard, number keys switch drugs and P pauses.</li></ul>
+  <div class="btns"><button class="btn" data-act="home">Back to the menu</button></div>`);
+}
+function showMulti(){
+  G.phase='menu';
+  show(showMulti,`<p class="eyebrow">Multi-drug mode</p><h2>Choose a chapter</h2>
+  <div class="chapters">${CH_KEYS.map(ch=>{const c=CHAPTERS[ch],mic=new Set(),dr=new Set();LEVELS.filter(L=>L.ch===ch).forEach(L=>{L.mic.forEach(t=>mic.add(t));L.wpn.forEach(w=>dr.add(w))});
+    return `<button class="chap" data-act="chapter" data-ch="${ch}" style="--c:var(--${CH_SW[ch]})"><span class="chap-n">${c.name}</span><span class="chap-d">${c.blurb}</span><span class="chap-m">${c.count} rounds · ${mic.size} microbes · ${dr.size} drugs</span></button>`}).join('')}</div>
+  <dl class="rules"><dt class="c-ok">★ +15</dt><dd>First-line drug. Three in a row raises your combo, up to ×3.</dd>
+  <dt class="c-warn">✓ +5</dt><dd>The drug works, but a narrower or preferred one exists.</dd>
+  <dt class="c-bad">✗ −10</dt><dd>Wrong drug. The microbe is resistant.</dd>
+  <dt class="c-bad">−5</dt><dd>A microbe reaches the bloodstream and your patient’s vitals drop.</dd>
+  <dt class="c-warn">C. diff</dt><dd>In the bacteria chapter, broad drugs fill the risk meter. At 100%, C. diff strikes.</dd></dl>
+  <p class="fine">The last rounds of each chapter add a patient condition that rules out a drug.</p>
+  <div class="btns"><button class="btn ghost" data-act="rounds">Jump to any round</button><button class="btn ghost" data-act="home">Back</button></div>`);
+}
+function showRounds(){
+  show(showRounds,`<p class="eyebrow">All rounds</p><h2>Jump to a round</h2>
+  ${CH_KEYS.map(ch=>`<h3>${CHAPTERS[ch].name}</h3><div class="rounds">${LEVELS.map((L,i)=>L.ch!==ch?'':`<button data-act="pick" data-lv="${i}" class="${L.mod?'mod':''}" aria-label="${CHAPTERS[ch].name} round ${L.idx+1}: ${L.name}">${L.idx+1}</button>`).join('')}</div>`).join('')}
+  <p class="fine">Red-edged rounds have a patient condition. Starting a round resets your score to 0.</p>
+  <div class="btns"><button class="btn ghost" data-act="multi">Back</button></div>`);
+}
+function showIntro(lv){
+  if(LEVELS[lv].spec)return showSpecIntro();
+  G.phase='menu';G.lv=lv;const L=LEVELS[lv],first=CHAPTERS[L.ch].firstMod===lv;
+  if(first)G.lessons.set('mods','<b>From here on</b>, each patient has a condition that rules out a drug. A contraindicated drug costs −15 even if it would work.');
+  show(()=>showIntro(lv),`<p class="eyebrow">${rl(lv)}</p><h2>${L.name}</h2><p>${L.vig}</p>
+  ${L.mod?`<h3>Patient</h3><p class="ptcard"><b>${L.mod.label}.</b> ${L.mod.detail}${first?' From this round on, a drug this patient shouldn’t get costs −15.':''}</p>`:''}
+  <h3>On the slide</h3><div class="mics">${L.mic.map(t=>`<div class="mic"><canvas data-m="${t}" aria-hidden="true"></canvas><div><b>${MIC[t].short}</b><small>${KIND[MIC[t].kind]}</small></div></div>`).join('')}</div>
+  <h3>Your drugs</h3><ul class="drugs">${L.wpn.map(w=>`<li><b>${WPN[w].full||WPN[w].name}</b> <span class="wt">${WPN[w].tag}</span><br>${WPN[w].scope}</li>`).join('')}</ul>
+  ${chartHTML(lv)}
+  <div class="btns"><button class="btn" data-act="begin">Start round ${L.idx+1}</button><button class="btn ghost" data-act="chart">Show coverage chart</button></div>
+  <p class="fine">Cure ${L.q} microbes. Speed goes up as you go.</p>`);
+}
+function showClear(){
+  G.phase='menu';const nx=LEVELS[G.lv+1],next=Math.min(100,G.health+35);
+  show(showClear,`<p class="eyebrow">${rl(G.lv)} cleared</p><h2>Infection controlled</h2>${statsHTML(G.ls,G.score)}${reviewHTML(3)}
+  <p class="fine">Vitals recover to ${Math.round(next)}% before the next round.</p>
+  <div class="btns"><button class="btn" data-act="next">Next: ${nx.name}</button></div>`);
+}
+function grade(){const p=pct(G.ts);return p>=85?'A':p>=70?'B':p>=55?'C':'D'}
+function showOver(){
+  G.phase='over';
+  show(showOver,`<p class="eyebrow">${rl(G.lv)}: ${LEVELS[G.lv].name}</p><h2 class="c-bad">Patient crashed</h2>
+  <p>Too many microbes reached the bloodstream. Look over the misses, then try again.</p>${statsHTML(G.ts,G.score)}${reviewHTML(5)}
+  <div class="btns"><button class="btn" data-act="retry">Retry this round</button><button class="btn ghost" data-act="restart">Restart the chapter</button><button class="btn ghost" data-act="home">Main menu</button>${fbBtn()}</div>`);
+}
+function showWin(){
+  G.phase='over';const g=grade(),ch=LEVELS[G.lv].ch,nx=CH_KEYS[CH_KEYS.indexOf(ch)+1];
+  show(showWin,`<p class="eyebrow">${CHAPTERS[ch].name} chapter complete</p><h2 class="c-ok">Patients discharged</h2>
+  <div style="display:flex;align-items:center;gap:16px"><span class="grade">${g}</span><p>Stewardship grade, based on how often you chose the first-line drug.</p></div>
+  ${statsHTML(G.ts,G.score)}${reviewHTML(6)}
+  <p class="fine">${G.score>=bestScore?'New best score.':`Best score ${bestScore}.`}</p>
+  <div class="btns">${nx?`<button class="btn" data-act="chapter" data-ch="${nx}">Next chapter: ${CHAPTERS[nx].name}</button>`:''}<button class="btn${nx?' ghost':''}" data-act="restart">Replay ${CHAPTERS[ch].name}</button><button class="btn ghost" data-act="home">Main menu</button>${fbBtn()}</div>`);
+}
+function showPause(){
+  show(showPause,`<p class="eyebrow">${rl(G.lv)}: ${LEVELS[G.lv].name}</p><h2>Paused</h2>${chartHTML(G.lv,1)}
+  <div class="btns"><button class="btn" data-act="resume">Resume</button><div class="btn-row">${musicBtn()}${soundBtn()}</div>${fbBtn()}<button class="btn ghost" data-act="askRestart">Restart</button></div>`)}
+function pause(){if(G.phase!=='play')return;G.phase='paused';showPause()}
+function resume(){G.phase='play';G.last=null;hideOverlay()}
+function askRestart(){const was=G.phase;if(was==='play')G.phase='paused';G.prev=was;
+  show(askRestart,(LEVELS[G.lv].spec?`<h2>Start over with ${WPN[LEVELS[G.lv].drug].name}?</h2><p>Your score resets to 0.</p>`:`<h2>Restart this chapter?</h2><p>You go back to round 1 of the chapter and your score resets to 0.</p>`)+`<div class="btns"><button class="btn" data-act="restart">Restart</button><button class="btn ghost" data-act="${was==='play'||was==='paused'?'resume':'close'}">Keep playing</button></div>`)}
+function resetRun(lv){G.score=0;G.health=100;G.ts=newStats();G.lessons=new Map();G.maxLv=lv;showIntro(lv)}
+
+/* ---------- Single-drug mode: one drug loaded, a slide mixing microbes it does and doesn't cover ---------- */
+const SPEC_IX=LEVELS.length;
+LEVELS.push({ch:'spec',name:'',vig:'',mic:[],wpn:[],idx:0,sp:.075,iv:1.55,q:15,spec:1,cov:[],dec:[],covAll:[]});
+CHAPTERS.spec={name:'Single-drug mode',count:1,first:SPEC_IX,last:SPEC_IX};
+const chOf=t=>CH_KEYS.find(ch=>KIND_CH[ch].includes(MIC[t].kind));
+// a drug belongs to the chapter where most of what it covers lives
+function drugChapter(w){const n={};WPN[w].covers.forEach(t=>{const c=chOf(t);n[c]=(n[c]||0)+1});return Object.keys(n).sort((a,b)=>n[b]-n[a])[0]}
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function makeSpec(w){
+  const ch=drugChapter(w),pool=Object.keys(MIC).filter(t=>chOf(t)===ch),covAll=pool.filter(t=>covers(w,t));
+  const cov=shuffle([...covAll]).slice(0,8);
+  // decoys: microbes that share a round with this drug first, then look-alikes of what it covers, then the rest of the chapter
+  const together=new Set();LEVELS.forEach(L=>{if(!L.spec&&L.wpn.includes(w))L.mic.forEach(t=>together.add(t))});
+  const kinds=new Set(cov.map(t=>MIC[t].kind)),rank=t=>(together.has(t)?0:kinds.has(MIC[t].kind)?1:2)+Math.random()*.9;
+  const dec=pool.filter(t=>!covers(w,t)).sort((a,b)=>rank(a)-rank(b)).slice(0,Math.max(4,Math.min(8,cov.length+2)));
+  Object.assign(LEVELS[SPEC_IX],{name:WPN[w].name,drug:w,dch:ch,cov,dec,covAll,mic:[...cov,...dec],wpn:[w],
+    vig:`Only ${WPN[w].name} is loaded. Shoot the microbes it kills and let the resistant ones drift past.`});
+}
+function showDrugs(){
+  G.phase='menu';
+  show(showDrugs,`<p class="eyebrow">Single-drug mode</p><h2>Pick your drug</h2>
+  <p>One drug, a slide full of microbes. Shoot only what it kills. Hitting a resistant microbe costs points.</p>
+  <div class="form"><label for="drugSearch">Search drugs<input id="drugSearch" type="search" placeholder="Name or class, like azole or macrolide" autocomplete="off"></label></div>
+  <div class="btns"><button class="btn" data-act="specrand">Random drug</button></div>
+  ${CH_KEYS.map(ch=>{const ws=Object.keys(WPN).filter(w=>drugChapter(w)===ch);
+    return `<h3>${CHAPTERS[ch].drugs}</h3><div class="drugpick">${ws.map(w=>`<button class="dchip" data-act="specpick" data-w="${w}" data-q="${(WPN[w].name+' '+(WPN[w].full||'')+' '+WPN[w].tag).toLowerCase()}" style="--dc:${wcol(w)}"><b>${WPN[w].name}</b><small>${WPN[w].tag}</small></button>`).join('')}</div>`}).join('')}
+  <p class="fine" id="drugNone" hidden>No drug matches that search.</p>
+  <div class="btns"><button class="btn ghost" data-act="home">Back</button></div>`);
+}
+card.addEventListener('input',e=>{if(e.target.id!=='drugSearch')return;const q=e.target.value.trim().toLowerCase();let any=0;
+  card.querySelectorAll('.drugpick').forEach(g=>{let n=0;g.querySelectorAll('.dchip').forEach(c=>{const ok=!q||c.dataset.q.includes(q);c.hidden=!ok;if(ok)n++});g.hidden=!n;g.previousElementSibling.hidden=!n;any+=n});
+  $('#drugNone').hidden=!!any});
+function showSpecIntro(){
+  G.phase='menu';G.lv=SPEC_IX;const L=LEVELS[SPEC_IX],W=WPN[L.drug];
+  show(showSpecIntro,`<p class="eyebrow">Single-drug mode · ${CHAPTERS[L.dch].name}</p><h2>${W.full||W.name}</h2>
+  <p><span class="wt">${W.tag}</span></p><p>${W.scope}</p>
+  <h3>On the slide</h3><p class="fine">Some of these are covered and some are resistant. Shoot only the ones ${W.name} kills.</p>
+  <div class="mics">${shuffle([...L.mic]).map(t=>`<div class="mic"><canvas data-m="${t}" aria-hidden="true"></canvas><div><b>${MIC[t].short}</b><small>${KIND[MIC[t].kind]}</small></div></div>`).join('')}</div>
+  ${chartHTML(SPEC_IX)}
+  <div class="btns"><button class="btn" data-act="begin">Start</button><button class="btn ghost" data-act="chart">Show coverage chart</button><button class="btn ghost" data-act="specdrugs">Pick a different drug</button></div>
+  <p class="fine">Cure ${L.q} covered microbes. A resistant hit costs 10 points. A covered microbe that escapes hurts the patient.</p>`);
+}
+function showSpecEnd(won){
+  G.phase='over';const L=LEVELS[SPEC_IX],w=L.drug,W=WPN[w],s=G.ls,n=s.best+s.works+s.wrong,acc=n?Math.round((s.best+s.works)/n*100):0;
+  show(()=>showSpecEnd(won),`<p class="eyebrow">Single-drug mode · ${W.name}</p><h2 class="${won?'c-ok':'c-bad'}">${won?'Spectrum mastered':'Patient crashed'}</h2>
+  <div class="stats"><div><span class="lbl">Score</span><b>${G.score}</b></div><div><span class="lbl">Accuracy</span><b>${acc}%</b></div><div><span class="lbl">Resistant hits</span><b>${s.wrong}</b></div><div><span class="lbl">Escaped</span><b>${s.esc}</b></div></div>
+  <h3>${W.name} covers</h3><p>${L.covAll.map(t=>(MIC[t].best.includes(w)?'★ ':'')+MIC[t].short).join(', ')}</p>
+  <h3>Resistant on this slide</h3><p>${L.dec.map(t=>MIC[t].short).join(', ')}</p>
+  <p class="fine">★ marks microbes where ${W.name} is first-line.</p>${reviewHTML(4)}
+  <div class="btns"><button class="btn" data-act="specagain">Play ${W.name} again</button><button class="btn ghost" data-act="specdrugs">Pick another drug</button><button class="btn ghost" data-act="home">Main menu</button>${fbBtn()}</div>`);
+}
+
+/* ---------- Feedback: saved to the artifact's database when this viewer may write, otherwise copied out ---------- */
+const FB={db:null,user:null,can:null};
+(async()=>{try{if(!window.claude?.use)return;const [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);FB.db=db;FB.user=user;
+  if(user)FB.can=await user.can('data.write')}catch(e){}})();
+const fbState={rating:0,back:null};
+function showFeedback(){
+  if(G.card!==showFeedback&&G.card!==showFeedbackCopy)fbState.back=G.card;
+  show(showFeedback,`<p class="eyebrow">Help improve Antibiose</p><h2>Send feedback</h2>
+  <form class="form" id="fbForm">
+    <div><span class="lbl">Overall rating</span><div class="stars" role="group" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-star="${n}" aria-label="${n} star${n>1?'s':''}" aria-pressed="${n<=fbState.rating}" class="${n<=fbState.rating?'on':''}">★</button>`).join('')}</div></div>
+    <label for="fbRole">Your background<select id="fbRole"><option value="">Choose one</option><option>Medical student</option><option>Resident or physician</option><option>Nurse, PA or NP</option><option>Pharmacist or pharmacy student</option><option>Other health professional</option><option>Not in healthcare</option></select></label>
+    <label for="fbGood">What worked well?<textarea id="fbGood" maxlength="1000"></textarea></label>
+    <label for="fbBad">What was confusing, wrong or hard to read?<textarea id="fbBad" maxlength="1000" placeholder="Say which round or microbe if you can"></textarea></label>
+    <label for="fbName">Name (optional)<input id="fbName" maxlength="80" autocomplete="name"></label>
+    <p class="fine" id="fbMsg" aria-live="polite"></p>
+    <div class="btns"><button class="btn" type="submit" id="fbSend">Send feedback</button><button class="btn ghost" type="button" data-act="fbBack">Cancel</button></div>
+  </form>`);
+}
+function fbEntry(){
+  return {rating:fbState.rating,role:$('#fbRole').value,good:$('#fbGood').value.trim(),bad:$('#fbBad').value.trim(),name:$('#fbName').value.trim(),
+    chapter:CHAPTERS[LEVELS[G.lv].ch].name,round:LEVELS[G.lv].idx+1,roundName:LEVELS[G.lv].name,score:G.score,firstLinePct:pct(G.ts||newStats()),screen:`${innerWidth}x${innerHeight}`,at:new Date().toISOString()}}
+function fbText(e){return `Antibiose feedback\nRating: ${e.rating||'-'}/5\nBackground: ${e.role||'-'}\nWorked well: ${e.good||'-'}\nConfusing or wrong: ${e.bad||'-'}\nName: ${e.name||'-'}\n${e.chapter} round ${e.round} (${e.roundName}), score ${e.score}, screen ${e.screen}`}
+async function sendFeedback(){
+  const msg=$('#fbMsg'),btn=$('#fbSend'),e=fbEntry();
+  if(!e.rating&&!e.good&&!e.bad){msg.textContent='Add a rating or a comment first.';msg.className='fine c-bad';return}
+  btn.disabled=true;msg.className='fine';msg.textContent='Sending…';
+  try{
+    if(!FB.db||!FB.user||FB.can===false)throw 0;
+    const id=await FB.user.id();if(!id)throw 0;
+    const ref=FB.db.doc('feedback/'+id),snap=await ref.get(),prev=snap.exists?{...snap.data()}:{},entries={...(prev.entries||{})};
+    entries['e'+Date.now()]=e;const keys=Object.keys(entries).sort();while(keys.length>20)delete entries[keys.shift()];
+    await ref.set({entries,updatedAt:e.at});
+    fbState.rating=0;
+    show(showFeedback,`<p class="eyebrow">Feedback</p><h2 class="c-ok">Thanks, it’s sent</h2><p>Your notes went straight to the person who shared this game.</p>
+      <div class="btns"><button class="btn" data-act="fbBack">Back to the game</button></div>`);
+  }catch(err){fbState.copy=fbText(e);showFeedbackCopy()}
+}
+function showFeedbackCopy(){
+  show(showFeedbackCopy,`<p class="eyebrow">Feedback</p><h2>Copy and send it</h2>
+  <p>This page can’t save feedback directly. Copy your notes and send them to the AI Medicine Collective, for example as a message to @aimedicinecollective on Instagram.</p>
+  <div class="form"><label for="fbCopy">Your feedback<textarea id="fbCopy" class="copybox" readonly>${fbState.copy.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea></label></div>
+  <p class="fine" id="fbMsg" aria-live="polite"></p>
+  <div class="btns"><button class="btn" data-act="fbCopy">Copy feedback</button><button class="btn ghost" data-act="fbBack">Back to the game</button></div>`);
+}
+card.addEventListener('submit',e=>{if(e.target.id==='fbForm'){e.preventDefault();sendFeedback()}});
+
+card.addEventListener('click',e=>{
+  const star=e.target.closest('[data-star]');if(star){fbState.rating=+star.dataset.star;card.querySelectorAll('[data-star]').forEach(s=>{const on=+s.dataset.star<=fbState.rating;s.classList.toggle('on',on);s.setAttribute('aria-pressed',on)});return}
+  const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+  if(a==='chapter')resetRun(CHAPTERS[b.dataset.ch].first);
+  else if(a==='restart')resetRun(CHAPTERS[LEVELS[G.lv].ch].first);
+  else if(a==='rounds')showRounds();
+  else if(a==='pick')resetRun(+b.dataset.lv);
+  else if(a==='specmode'||a==='specdrugs')showDrugs();
+  else if(a==='multi')showMulti();
+  else if(a==='howto')showHowTo();
+  else if(a==='music'){MUS.on=!MUS.on;store.set('antibiose-music',MUS.on?'on':'off');b.textContent=`Music: ${MUS.on?'on':'off'}`;MUS.on?musStart():musStop();musUI()}
+  else if(a==='specpick'){makeSpec(b.dataset.w);resetRun(SPEC_IX)}
+  else if(a==='specrand'){const ks=Object.keys(WPN);makeSpec(ks[Math.random()*ks.length|0]);resetRun(SPEC_IX)}
+  else if(a==='specagain'){makeSpec(LEVELS[SPEC_IX].drug);resetRun(SPEC_IX)}
+  else if(a==='home')showStart();
+  else if(a==='begin')startLevel(G.lv);
+  else if(a==='next'){G.health=Math.min(100,G.health+35);showIntro(G.lv+1)}
+  else if(a==='retry'){G.score=G.lvStart;G.health=100;startLevel(G.lv)}
+  else if(a==='resume')resume();
+  else if(a==='close'){G.prev==='menu'?showStart():hideOverlay()}
+  else if(a==='askRestart')askRestart();
+  else if(a==='feedback')showFeedback();
+  else if(a==='fbBack'){(fbState.back||showStart)()}
+  else if(a==='fbCopy'){const t=$('#fbCopy'),m=$('#fbMsg');const done=()=>{m.textContent='Copied. Paste it into a text or email.';m.className='fine c-ok'};
+    try{navigator.clipboard.writeText(fbState.copy).then(done,()=>{t.focus();t.select();m.textContent='Select the text above and copy it.'})}catch(err){t.focus();t.select();m.textContent='Select the text above and copy it.'}}
+  else if(a==='chart'){const c=$('#chart'),k=$('#chartKey');c.hidden=!c.hidden;k.hidden=c.hidden;b.textContent=c.hidden?'Show coverage chart':'Hide coverage chart'}
+  else if(a==='sound'){sound=!sound;store.set('antibiose-sound',sound?'on':'off');b.textContent=`Effects: ${sound?'on':'off'}`;beep(660,.06,'triangle',.03)}
+});
+$('#btnPause').addEventListener('click',()=>G.phase==='play'?pause():G.phase==='paused'&&resume());
+$('#btnRestart').addEventListener('click',()=>{if(G.phase==='play'||G.phase==='paused')askRestart();else resetRun(CHAPTERS[LEVELS[G.lv].ch].first)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();musStop()}else musStart()});
+document.addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('input,textarea,select'))return;
+  if(G.phase==='play'&&/^[1-6]$/.test(e.key)){const w=LEVELS[G.lv].wpn[+e.key-1];w&&selectW(w)}
+  else if(e.key==='Escape'||e.key==='p'){G.phase==='play'?pause():G.phase==='paused'&&resume()}
+});
+
+/* ---------- Boot ---------- */
+function boot(){
+  G.ts=newStats();G.ls=newStats();resize();readColors();G.w=LEVELS[0].wpn[0];buildWeapons();hud();
+  // attract-mode microbes drifting behind the start card
+  ['spy','mrsa','eco','flu','can','tpa','gla','hiv'].forEach((t,i)=>G.mobs.push({t,x0:(.15+(i*.37)%0.7)*W,x:0,y:(i/8)*ESC,v:H*.05,amp:12,fr:.7,ph:i,rot:i,spin:.2,shake:0,flash:0,dead:0,die:0}));
+  showStart();requestAnimationFrame(frame);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{rebuild();renderMicChips();buildWeapons();const p=el.lesson.firstChild;p&&fit(p,13.5,10.5)});
+}
+window.claude?.hot?.ready?window.claude.hot.ready(boot):boot();
+})();
+</script>
+
+</body>
+</html>

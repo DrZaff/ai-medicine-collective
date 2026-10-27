@@ -57,6 +57,12 @@
   --teal: #00ffd5;           /* the Med/Peds tag */
   --teal-rgb: 0 255 213;
 
+  /* Game icons (Games page): two-colour line art on a dark tile */
+  --icon-bg: #000;
+  --icon-a: #00ff66;
+  --icon-b: #00cc55;
+  --icon-a-rgb: 0 255 102;
+
   /* The AI vs Physician chart: which way each study went */
   --v-up: var(--text);       /* in AI's favour */
   --v-even: var(--cyan);     /* no difference */
@@ -4673,9 +4679,138 @@ button.meeting-undo {
   color: var(--muted);
 }
 
-/* The paper's tally: one row per kind of study */
+/* The paper's tally: one row per kind of study */
 @media (prefers-reduced-motion: reduce) {
   .verdict-dots .verdict-dot {
     animation: none;
+  }
+}
+
+
+/* === GAMES PAGE ============================================== */
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0 8px;
+}
+
+/* The whole card is the link */
+.game-card,
+.game-card:visited {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px var(--rule-style) var(--line);
+  background: var(--panel);
+  color: var(--text);
+  font-weight: normal;
+  transition: 0.15s ease-out;
+}
+
+.game-card:hover {
+  color: var(--text);
+  text-shadow: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+  transform: translateY(-2px);
+}
+
+/* The app icon: line art in --icon-a and --icon-b on --icon-bg */
+.game-icon {
+  display: grid;
+  flex: none;
+  width: 88px;
+  height: 88px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  background: var(--icon-bg);
+  transition: transform 0.2s ease-out;
+}
+
+.game-icon svg {
+  width: 74%;
+  height: 74%;
+  overflow: visible;
+}
+
+.game-icon svg * {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.game-icon .a { stroke: var(--icon-a); }
+.game-icon .b { stroke: var(--icon-b); }
+.game-icon .soft { fill: rgb(var(--icon-a-rgb) / 0.16); }
+.game-icon .fa { fill: var(--icon-a); stroke: none; }
+
+.game-card:hover .game-icon {
+  transform: rotate(-4deg) scale(1.04);
+}
+
+.game-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.game-title {
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.game-text {
+  font-family: var(--font-read);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--body);
+}
+
+.game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.game-meta .tile-tag {
+  margin-left: 0;
+}
+
+.game-play {
+  margin-top: auto;
+  padding-top: 4px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+@media (max-width: 720px) {
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* On a phone each game is a row: icon on the left, words on the right */
+  .game-card {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .game-icon {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-card:hover .game-icon {
+    transform: none;
   }
 }
