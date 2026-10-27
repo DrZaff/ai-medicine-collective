@@ -1649,10 +1649,6 @@
   color: var(--muted);
 }
 
-.modern .blog-archive-list a[aria-current="page"] {
-  color: var(--ink);
-  text-decoration: none;
-}
 
 
 /* === LATE FIXES ============================================== */
@@ -2429,32 +2425,6 @@ html.terminal::view-transition-new(root) {
   vertical-align: 0.25em;
 }
 
-.modern .review-tally {
-  overflow: hidden;
-  margin-top: 26px;
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
-
-.modern .review-tally-cell {
-  padding: 20px 10px 18px;
-}
-
-.modern .review-tally dt {
-  color: var(--brand);
-  font-family: var(--font-serif);
-  font-size: 2.3rem;
-  font-weight: 500;
-}
-
-.modern .review-tally dd {
-  margin-top: 8px;
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
 .modern .review-findings {
   margin-top: 32px;
   padding: 26px 28px 14px;
@@ -2792,10 +2762,6 @@ html.terminal::view-transition-new(root) {
 .modern .review-meta,
 .modern .dash-title,
 .modern .home-door-step,
-.modern .review-tally dd {
-  font-size: 0.75rem;
-}
-
 /* small print */
 .modern .blog-date,
 .modern .blog-source,
@@ -3106,19 +3072,321 @@ html.terminal::view-transition-new(root) {
   font-style: italic;
   letter-spacing: 0;
 }
+
 
-.modern .review-tallies {
-  gap: 20px;
-  margin-top: 26px;
+/* === VISUAL POLISH (2026-10-26) ===============================
+   The AI vs Physician chart, the blog archive as covers, the home page's
+   bottom row, small movement, and a footer that carries the menu. */
+
+.modern {
+  --v-up: #10b981;
+  --v-even: #0ea5e9;
+  --v-down: #d97706;
+  --v-mixed: #94a3b8;
 }
 
-.modern .review-tally-heading {
+/* --- the chart --- */
+.modern .verdict-chart {
+  gap: 18px;
+  margin: 22px 0 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.7);
+}
+
+.modern .verdict-row-label {
+  color: var(--ink);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modern .verdict-dots {
+  gap: 8px;
+}
+
+.modern .verdict-dot {
+  width: 26px;
+  height: 26px;
+  border-width: 3px;
+}
+
+.modern a.verdict-dot:hover,
+.modern a.verdict-dot:focus-visible {
+  box-shadow: 0 4px 12px rgb(15 23 42 / 0.2);
+}
+
+.modern .verdict-key .verdict-dot {
+  width: 11px;
+  height: 11px;
+  border-width: 2px;
+}
+
+.modern .verdict-legend {
+  font-size: 0.875rem;
+}
+
+.modern .verdict-key b {
+  color: var(--ink);
+}
+
+/* --- the archive: covers in the style of the Instagram posts --- */
+.modern .blog-archive-month {
+  margin: 28px 0 12px;
   color: var(--brand);
   font-family: var(--font-label);
   font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modern .blog-archive-list {
+  gap: 18px;
+}
+
+.modern .archive-cover {
+  position: relative;
+  gap: 14px;
+  padding: 20px 20px 52px;
+  border: 0;
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 70% at 50% -10%, rgb(16 185 129 / 0.38), transparent 60%),
+    linear-gradient(180deg, #073b2f 0%, var(--night) 100%);
+  box-shadow: var(--shadow);
+}
+
+/* the logo in the corner, as on the Instagram covers */
+.modern .archive-cover::after {
+  content: "";
+  position: absolute;
+  bottom: 18px;
+  left: 20px;
+  width: 22px;
+  height: 22px;
+  background: url("images/logo.svg") center / contain no-repeat;
+  opacity: 0.9;
+}
+
+.modern .archive-kicker {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border: 1px solid rgb(110 231 183 / 0.35);
+  border-radius: 999px;
+  color: var(--spark-soft);
+  font-family: var(--font-label);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.modern .archive-headline {
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.modern .archive-card:hover .archive-cover,
+.modern .archive-card:focus-visible .archive-cover {
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-3px);
+}
+
+.modern .archive-card[aria-current="page"] .archive-cover {
+  outline: 3px solid var(--spark);
+  outline-offset: 3px;
+}
+
+.modern .archive-labels .blog-verdict {
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* the cards rise in, one after another */
+.modern .blog-archive-list li {
+  animation: fadeInSoft 0.5s ease-out backwards;
+}
+
+.modern .blog-archive-list li:nth-child(2) { animation-delay: 0.05s; }
+.modern .blog-archive-list li:nth-child(3) { animation-delay: 0.1s; }
+.modern .blog-archive-list li:nth-child(4) { animation-delay: 0.15s; }
+.modern .blog-archive-list li:nth-child(n + 5) { animation-delay: 0.2s; }
+
+/* --- the home page's bottom row --- */
+.modern .home-panel--tools .bento-apps {
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  gap: 14px;
+}
+
+.modern .bento-more,
+.modern .bento-more:visited {
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-family: var(--font-display);
+  font-size: 1rem;
   font-weight: 700;
 }
 
-.modern .review-tallies .review-tally {
-  margin-top: 0;
+.modern .bento-more:hover {
+  background: var(--brand);
+  color: #fff;
+  text-decoration: none;
+}
+
+.modern .bento-apps img {
+  transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.modern .bento-apps img:hover {
+  transform: translateY(-3px) rotate(-4deg);
+}
+
+.modern .meet-week {
+  gap: 6px;
+  margin: 0 0 18px;
+}
+
+.modern .meet-week li {
+  padding: 8px 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* --- the footer: name, menu and Instagram in the dark band --- */
+.modern .footer {
+  flex-direction: column;
+  gap: 18px;
+  padding: 44px 0 30px;
+}
+
+.modern .footer-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+}
+
+.modern .footer-brand,
+.modern .footer-brand:visited {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.modern .footer-brand::before {
+  content: "";
+  width: 30px;
+  height: 30px;
+  background: url("images/logo.svg") center / contain no-repeat;
+}
+
+.modern .footer-brand:hover {
+  color: var(--spark-soft);
+  text-decoration: none;
+}
+
+.modern .footer-links {
+  justify-content: center;
+  gap: 6px 22px;
+}
+
+.modern .footer-links a,
+.modern .footer-links a:visited {
+  display: inline-block;
+  color: rgb(255 255 255 / 0.75);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  text-transform: lowercase;
+}
+
+/* the menu text is written in capitals; show it as "Tools" */
+.modern .footer-links a::first-letter {
+  text-transform: uppercase;
+}
+
+.modern .footer-links a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Instagram is in the footer now, and so is Home */
+.modern .site-social {
+  display: none;
+}
+
+.modern .site-social + .site-note {
+  margin-top: 56px;
+}
+
+.modern p:has(> .back-link[href="index.html"]:only-child) {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .modern .home-panel--tools .bento-apps {
+    grid-template-columns: repeat(6, 56px);
+  }
+}
+
+@media (max-width: 600px) {
+  .modern .home-panel--tools .bento-apps {
+    grid-template-columns: repeat(3, 56px);
+  }
+
+  .modern .verdict-chart {
+    padding: 16px;
+  }
+
+  .modern .archive-cover {
+    padding: 14px 14px 44px;
+  }
+
+  .modern .archive-cover::after {
+    bottom: 14px;
+    left: 14px;
+  }
+
+  .modern .archive-headline {
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modern .blog-archive-list li {
+    animation: none;
+  }
+}
+
+.modern .footer::after {
+  content: "Building intelligent healthcare together";
+}
+
+@media (min-width: 601px) {
+  .modern .archive-headline {
+    font-size: 1.3rem;
+  }
 }

@@ -33,6 +33,8 @@ def main() -> None:
             "headline": post.get("headline", ""),
             "items": len(post.get("items", [])),
             "tags": post.get("tags", []),
+            # the head-to-head verdicts, shown on the archive cards
+            "verdicts": [item["verdict"] for item in post.get("items", []) if item.get("verdict")],
         })
 
     entries.sort(key=lambda e: e["date"], reverse=True)

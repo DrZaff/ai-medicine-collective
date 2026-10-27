@@ -147,6 +147,45 @@ function initThemeToggle() {
 
 document.addEventListener("DOMContentLoaded", initThemeToggle);
 
+// The footer repeats the menu (the header's own links, so the paths are right
+// on every page), with the Collective's name and Instagram in the light design
+function initFooterNav() {
+  const footer = document.querySelector(".terminal-frame .footer");
+  const links = [...document.querySelectorAll(".terminal-frame header .nav a")]
+    .filter((link) => !link.matches(".nav-cta, .nav-account"));
+  if (!footer || !links.length || footer.querySelector(".footer-nav")) return;
+  const nav = document.createElement("nav");
+  nav.className = "footer-nav";
+  nav.setAttribute("aria-label", "Site");
+  const brand = document.querySelector(".terminal-frame .headline a");
+  if (brand) {
+    const name = document.createElement("a");
+    name.className = "footer-brand m-only";
+    name.href = brand.getAttribute("href");
+    name.textContent = "AI Medicine Collective";
+    nav.append(name);
+  }
+  const row = document.createElement("div");
+  row.className = "footer-links";
+  links.forEach((link) => {
+    const copy = document.createElement("a");
+    copy.href = link.getAttribute("href");
+    copy.textContent = link.textContent.trim();
+    row.append(copy);
+  });
+  const instagram = document.createElement("a");
+  instagram.className = "m-only";
+  instagram.href = "https://www.instagram.com/aimedicinecollective/";
+  instagram.target = "_blank";
+  instagram.rel = "noopener noreferrer";
+  instagram.textContent = "Instagram";
+  row.append(instagram);
+  nav.append(row);
+  footer.prepend(nav);
+}
+
+document.addEventListener("DOMContentLoaded", initFooterNav);
+
 // The terminal voice puts "// " before captions, "> " before prompts and
 // "< " before back links, and wraps the site name in "::". Those marks are
 // part of the text all over the pages and scripts. This wraps each one in a
@@ -486,6 +525,9 @@ function initHome() {
       const total = parseInt((response.headers.get("content-range") || "").split("/")[1], 10);
       const counter = document.getElementById("home-project-count");
       if (counter && total > 0) counter.textContent = String(total);
+      // The Tools panel shows five icons and "+N" for the rest
+      const more = document.getElementById("home-more-tools");
+      if (more && total > 5) more.textContent = `+${total - 5}`;
     } catch {
       // keep the plain text
     }
@@ -609,6 +651,12 @@ function initBlog() {
     app.replaceChildren(el("p", "blog-status", text));
   };
 
+  const VERDICT_NAMES = {
+    ai_ahead: "AI outperformed physicians", humans_ahead: "Physicians outperformed AI", comparable: "Comparable",
+    mixed: "Mixed results",
+    ai_help_improved: "AI helped improve", ai_help_no_benefit: "AI help: no difference", ai_help_harmed: "AI help made it worse",
+  };
+
   function renderPost(post) {
     const article = el("article", "blog-post");
     article.append(
@@ -623,11 +671,6 @@ function initBlog() {
       // Newer posts have two reviews, each labelled by section; older ones
       // carry only a category.
       const SECTION_NAMES = { med_ed: "Med-ed review", ai_vs_human: "AI vs physician" };
-      const VERDICT_NAMES = {
-        ai_ahead: "AI outperformed physicians", humans_ahead: "Physicians outperformed AI", comparable: "Comparable",
-        mixed: "Mixed results",
-        ai_help_improved: "AI helped improve", ai_help_no_benefit: "AI help: no difference", ai_help_harmed: "AI help made it worse",
-      };
       const head = el("div", "blog-item-head");
       const labels = el("div", "blog-item-labels");
       labels.append(el("span", "blog-cat", SECTION_NAMES[item.section] || item.category));
@@ -671,20 +714,37 @@ function initBlog() {
     return article;
   }
 
+  // The archive is a grid of small covers (drawn in CSS, in the style of the
+  // Instagram covers), grouped by month, each with its head-to-head verdict
   function renderArchive(index, currentDate) {
     const section = el("section", "blog-archive");
     section.append(el("h3", "subsection-title", "// Archive"));
-    const list = el("ul", "blog-archive-list");
+    let month = "";
+    let list = null;
     for (const entry of index.slice(0, 60)) {
+      const name = new Date(`${entry.date}T12:00:00Z`).toLocaleDateString("en-US",
+        { timeZone: "UTC", year: "numeric", month: "long" });
+      if (name !== month) {
+        month = name;
+        list = el("ul", "blog-archive-list");
+        section.append(el("p", "blog-archive-month", `// ${month}`), list);
+      }
       const li = el("li");
-      li.append(el("span", "blog-archive-date", niceDate(entry.date)));
-      const link = el("a", null, entry.headline);
+      const link = el("a", "archive-card");
       link.href = `blog.html?date=${encodeURIComponent(entry.date)}`;
       if (entry.date === currentDate) link.setAttribute("aria-current", "page");
+      const cover = el("span", "archive-cover");
+      cover.append(el("span", "archive-kicker", niceDate(entry.date)), el("span", "archive-headline", entry.headline));
+      link.append(cover);
+      const verdicts = (entry.verdicts || []).filter((verdict) => VERDICT_NAMES[verdict]);
+      if (verdicts.length) {
+        const labels = el("span", "archive-labels");
+        verdicts.forEach((verdict) => labels.append(el("span", `blog-cat blog-verdict blog-verdict--${verdict}`, VERDICT_NAMES[verdict])));
+        link.append(labels);
+      }
       li.append(link);
       list.append(li);
     }
-    section.append(list);
     return section;
   }
 
@@ -748,6 +808,50 @@ function initLivingReview() {
   const longDate = (iso) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US",
     { timeZone: "UTC", year: "numeric", month: "long", day: "numeric" });
 
+  // One dot per study, in two rows (one per kind of comparison), coloured by
+  // which way the result went; each dot links to the study in the paper.
+  // Under each row, the verdicts in words with their counts.
+  const DIRECTION = {
+    ai_help_improved: "up", ai_ahead: "up", ai_help_no_benefit: "even", comparable: "even",
+    ai_help_harmed: "down", humans_ahead: "down", mixed: "mixed",
+  };
+  function verdictChart(studies) {
+    const ROWS = [
+      ["Physicians with vs without AI", ["ai_help_improved", "ai_help_no_benefit", "ai_help_harmed", "mixed"]],
+      ["AI alone vs physicians", ["ai_ahead", "comparable", "humans_ahead", "mixed"]],
+    ];
+    const alone = (study) => ["ai_ahead", "humans_ahead", "comparable"].includes(study.verdict) ||
+      (study.verdict === "mixed" && study.comparison === "ai_alone");
+    const figure = el("figure", "verdict-chart");
+    let n = 0;
+    ROWS.forEach(([heading, order], row) => {
+      const mine = studies.filter((study) => VERDICTS[study.verdict] && alone(study) === (row === 1));
+      if (!mine.length) return;
+      const block = el("div", "verdict-row");
+      const dots = el("div", "verdict-dots");
+      const legend = el("p", "verdict-legend");
+      order.forEach((verdict) => {
+        const these = mine.filter((study) => study.verdict === verdict);
+        these.forEach((study) => {
+          const dot = el("a", `verdict-dot verdict-dot--${DIRECTION[verdict]}`);
+          dot.href = `ai-vs-physician.html#study-${encodeURIComponent(study.id)}`;
+          dot.title = `${study.title} (${VERDICTS[verdict]})`;
+          dot.setAttribute("aria-label", dot.title);
+          dot.style.setProperty("--i", String(n++));
+          dots.append(dot);
+        });
+        if (these.length) {
+          const key = el("span", "verdict-key");
+          key.append(el("i", `verdict-dot verdict-dot--${DIRECTION[verdict]}`), `${VERDICTS[verdict]} `, el("b", null, String(these.length)));
+          legend.append(key);
+        }
+      });
+      block.append(el("p", "verdict-row-label", heading), dots, legend);
+      figure.append(block);
+    });
+    return figure;
+  }
+
   fetch("evidence/ai-vs-human.json", { cache: "no-cache" })
     .then((response) => (response.ok ? response.json() : null))
     .catch(() => null)
@@ -761,8 +865,8 @@ function initLivingReview() {
         title.href = "ai-vs-physician.html";
         const summary = el("p", "home-panel-text", plain(review.summary).split(/(?<=\.)\s+/).slice(0, 2).join(" "));
         const findings = el("ul", "home-findings");
-        (review.key_findings || []).slice(0, 3).forEach((finding) => findings.append(el("li", null, plain(finding))));
-        feature.replaceChildren(meta, title, summary, findings);
+        (review.key_findings || []).slice(0, 1).forEach((finding) => findings.append(el("li", null, plain(finding))));
+        feature.replaceChildren(meta, title, summary, verdictChart(review.studies), findings);
       }
       if (!app) return;
       if (!ready) {
@@ -800,31 +904,9 @@ function initLivingReview() {
         cited("p", "review-summary", review.summary)
       );
 
-      // How the studies came out, in two rows, one per kind of study
+      // How the studies came out: one dot per study, a row per kind of study
       const count = (...verdicts) => studies.filter((study) => verdicts.includes(study.verdict)).length;
-      const tallies = el("div", "review-tallies");
-      [
-        ["When physicians used AI", [
-          [count("ai_help_improved"), "AI helped improve"],
-          [count("ai_help_no_benefit"), "AI help: no difference"],
-          [count("ai_help_harmed"), "AI help made it worse"],
-        ]],
-        ["When AI worked alone", [
-          [count("ai_ahead"), "AI outperformed physicians"],
-          [count("humans_ahead"), "Physicians outperformed AI"],
-          [count("comparable"), "Comparable"],
-        ]],
-      ].forEach(([heading, cells]) => {
-        const group = el("div", "review-tally-group");
-        const tally = el("dl", "review-tally");
-        cells.forEach(([value, label]) => {
-          const cell = el("div", "review-tally-cell");
-          cell.append(el("dt", null, String(value)), el("dd", null, label));
-          tally.append(cell);
-        });
-        group.append(el("p", "review-tally-heading", heading), tally);
-        tallies.append(group);
-      });
+      const tallies = verdictChart(studies);
       const mixed = count("mixed");
       article.append(tallies, el("p", "note", `// ${mixed ? `Mixed results: ${mixed} ${mixed === 1 ? "study" : "studies"}. ` : ""}` +
         "A count of studies, not a score: they differ in size, design and how close they are to real practice."));
