@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hospital Tycoon – AI Medicine Collective</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Build a hospital floor by floor, hire specialists, balance RVUs and patient care, and survive five years of crises." />
+  <meta name="theme-color" content="#0A7266" />
+  <meta name="game-back" content="../games.html" />
+  <link rel="apple-touch-icon" href="../images/icon-192.png" />
+  <link rel="icon" type="image/png" href="../images/icon-192.png" />
+  <meta property="og:site_name" content="AI Medicine Collective" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Hospital Tycoon" />
+  <meta property="og:description" content="Design the floors. Staff the units. Keep the RVUs flowing." />
+  <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <!-- Built from the Claude Artifact version of this game (source and build_site.py are kept outside this repo). This copy uses the site's own font, follows the site's theme switch and keeps scores on the device. -->
+  <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("amc-theme")==="terminal"?"dark":"light")}catch(e){}</script>
+<style>
+@font-face{font-family:"Inter";font-style:normal;font-weight:400 800;font-display:swap;src:url("../fonts/inter.woff2") format("woff2")}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+</style>
+<style>
+/* Layout: a drawn cutaway of your hospital tower (sky, roof sign, floors, street) between a compact HUD and thumb-reach tabs. Light theme is daytime, dark theme is night shift. */
+:root{
+  --bg:#E6EDEB; --panel:#FFFFFF; --panel2:#F1F6F4; --ink:#10201D; --muted:#556964; --line:#C4D3CF;
+  --accent:#0A7266; --on-accent:#FFFFFF; --good:#1C8649; --warn:#B26F08; --bad:#C2322C; --shadow:rgba(12,38,34,.16);
+  --ed:#CF3A33; --ms:#2D66C6; --icu:#7347C4; --or:#0C887C; --cath:#B4386F; --img:#C47C0E; --lab:#378B35; --ph:#63722A; --clin:#1B84A6; --ld:#C2509A; --cafe:#CC6228; --gard:#47815A;
+  --cv-sky1:#8CC6E2; --cv-sky2:#DDF0F1; --cv-facade:#C3CDCA; --cv-wall:#EEF3F2; --cv-wall2:#DCE5E3; --cv-slab:#83928F; --cv-road:#4B5452; --cv-walk:#B7C1BE; --cv-glass:#B9E1EE; --cv-shaft:#56625F; --cv-night:0;
+  --f-disp:'Barlow Condensed','Arial Narrow',sans-serif; --f-body:'Barlow',system-ui,-apple-system,sans-serif; --f-num:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1311; --panel:#131D1B; --panel2:#18241F; --ink:#E0EBE8; --muted:#8DA29D; --line:#2A3B37;
+  --accent:#2DB3A1; --on-accent:#05201B; --good:#43C27B; --warn:#E3A13A; --bad:#F05D54; --shadow:rgba(0,0,0,.45);
+  --cv-sky1:#060D1C; --cv-sky2:#17283A; --cv-facade:#37433F; --cv-wall:#3E4A44; --cv-wall2:#323D39; --cv-slab:#55635F; --cv-road:#191E1D; --cv-walk:#363F3C; --cv-glass:#22394A; --cv-shaft:#1A2220; --cv-night:1;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0B1311; --panel:#131D1B; --panel2:#18241F; --ink:#E0EBE8; --muted:#8DA29D; --line:#2A3B37;
+  --accent:#2DB3A1; --on-accent:#05201B; --good:#43C27B; --warn:#E3A13A; --bad:#F05D54; --shadow:rgba(0,0,0,.45);
+  --cv-sky1:#060D1C; --cv-sky2:#17283A; --cv-facade:#37433F; --cv-wall:#3E4A44; --cv-wall2:#323D39; --cv-slab:#55635F; --cv-road:#191E1D; --cv-walk:#363F3C; --cv-glass:#22394A; --cv-shaft:#1A2220; --cv-night:1;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+#app{height:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:7px;padding-block:8px 0}
+
+/* HUD */
+#hud{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:9px 12px;display:grid;gap:7px;box-shadow:0 2px 10px var(--shadow)}
+.r1{display:flex;align-items:center;gap:12px}
+.stat{display:flex;flex-direction:column;min-width:0}
+.stat .lbl{white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stat b{font-family:var(--f-num);font-size:19px;font-weight:600;line-height:1.15;white-space:nowrap}
+#cash.neg{color:var(--bad)}
+.ctrls{margin-left:auto;display:flex;gap:6px}
+.cb{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;font-family:var(--f-disp);font-weight:700;font-size:18px}
+.cb svg{width:20px;height:20px;fill:currentColor}
+.cb.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.r2{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;align-items:center}
+.stars{position:relative;display:inline-block;font-size:17px;letter-spacing:1px;color:var(--line);line-height:1}
+.stars .on{position:absolute;inset:0 auto 0 0;overflow:hidden;white-space:nowrap;color:var(--img)}
+.meter{display:grid;gap:3px;min-width:0}
+.meter span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;display:flex;justify-content:space-between}
+.meter i{display:block;height:7px;border-radius:4px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.meter i b{display:block;height:100%;background:var(--accent);transition:width .5s}
+.board{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;border-top:1px dashed var(--line);padding-top:6px}
+.board b{color:var(--ink);font-family:var(--f-num);font-weight:600}
+.board .ok{color:var(--good)} .board .no{color:var(--bad)}
+.wk{height:3px;background:var(--panel2);border-radius:2px;overflow:hidden;margin-top:-4px}
+.wk b{display:block;height:100%;background:var(--accent);width:0}
+
+#advisor{display:flex;gap:8px;align-items:center;text-align:left;border-radius:12px;padding:8px 12px;background:var(--panel2);border:1px solid var(--line);font-size:14px;line-height:1.3;min-height:46px}
+#advisor .tag{flex:none;font-family:var(--f-disp);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:var(--accent);color:var(--on-accent)}
+#advisor.bad .tag{background:var(--bad);color:#fff}
+#advisor.warn .tag{background:var(--warn);color:#fff}
+#advisor .txt{min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+/* Tower */
+#bldg{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;border-radius:14px;border:1px solid var(--line);background:var(--cv-sky1);position:relative}
+#tower{position:relative;width:100%}
+#cv{display:block;width:100%}
+#ov{position:absolute;inset:0}
+.slot{position:absolute;background:transparent;border:0;border-radius:8px;padding:0}
+.slot:active{background:rgba(255,255,255,.22)}
+.addfl{position:absolute;left:50%;transform:translateX(-50%);border:2px dashed rgba(255,255,255,.75);background:rgba(10,30,40,.28);color:#fff;border-radius:12px;min-height:44px;padding:4px 16px;font-family:var(--f-disp);font-weight:700;font-size:16px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;backdrop-filter:blur(2px)}
+.addfl small{display:block;font-family:var(--f-num);font-size:11.5px;letter-spacing:0;text-transform:none;font-weight:500}
+.addfl:disabled{opacity:.55}
+
+/* Nav */
+#nav{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding-bottom:8px}
+#nav button{min-height:54px;border-radius:12px;border:1px solid var(--line);background:var(--panel);font-family:var(--f-disp);font-weight:700;font-size:16px;letter-spacing:.05em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0 2px;min-width:0}
+#nav button small{font-family:var(--f-body);font-weight:500;font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* FX */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.flt{position:absolute;font-family:var(--f-num);font-weight:600;font-size:13px;color:var(--good);background:var(--panel);border:1px solid var(--line);padding:1px 6px;border-radius:8px;animation:rise 1.2s ease-out forwards;white-space:nowrap}
+.flt.neg{color:var(--bad)}
+.toast{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);width:min(92vw,420px);display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:0 10px 30px var(--shadow);animation:toast 3.6s ease forwards}
+.toast .medal{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--c,var(--img));color:#fff;font-family:var(--f-disp);font-weight:800;font-size:18px}
+.toast b{display:block;font-size:15px}
+.toast span{font-size:13px;color:var(--muted)}
+.shake{animation:shake .45s}
+
+/* Sheet + modal */
+#scrim{position:fixed;inset:0;background:rgba(5,15,13,.45);z-index:40}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-width:560px;margin:0 auto;max-height:84%;display:flex;flex-direction:column;background:var(--panel);border-radius:18px 18px 0 0;border:1px solid var(--line);box-shadow:0 -10px 30px var(--shadow);animation:up .22s ease-out;padding-bottom:env(safe-area-inset-bottom,0px)}
+.sh-head{display:flex;align-items:center;gap:10px;padding:12px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.sh-head h2{margin:0;font-family:var(--f-disp);font-weight:800;font-size:24px;letter-spacing:.02em;text-transform:uppercase;text-wrap:balance;min-width:0}
+.sh-head .sub{font-size:13px;color:var(--muted)}
+.sh-head button{margin-left:auto;flex:none;min-width:84px;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);font-weight:600}
+#shBody{overflow-y:auto;padding:12px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:10px;min-height:0;user-select:text;-webkit-user-select:text}
+#shBody>*{flex-shrink:0}
+.hint{margin:0;font-size:13px;color:var(--muted);line-height:1.4}
+.opt{display:grid;grid-template-columns:54px 1fr;gap:10px;align-items:start;text-align:left;border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:10px;min-height:64px}
+.opt:disabled{opacity:.45}
+.chip{display:grid;place-items:center;height:54px;border-radius:9px;background:var(--c);color:#fff;font-family:var(--f-disp);font-weight:800;font-size:19px}
+.opt h3{margin:0;font-size:16px;font-weight:700}
+.opt p{margin:3px 0 0;font-size:13px;color:var(--muted);line-height:1.35}
+.opt .meta{font-family:var(--f-num);font-size:12px;color:var(--ink);margin-top:5px;display:flex;flex-wrap:wrap;gap:4px 10px}
+.row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--panel2)}
+.row h3{margin:0;font-size:15px;font-weight:700}
+.row p{margin:2px 0 0;font-size:12.5px;color:var(--muted);line-height:1.35}
+.need{font-size:12.5px;font-weight:600;margin-top:3px}
+.need.bad{color:var(--bad)} .need.ok{color:var(--good)} .need.warn{color:var(--warn)}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:48px;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--panel);font-size:24px;font-weight:600;line-height:1}
+.step button.plus,.hire{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.hire{min-height:48px;border-radius:12px;border:1px solid var(--accent);font-weight:700;padding:0 14px;font-size:15px}
+.step button:disabled,.hire:disabled{opacity:.35}
+.step .n{min-width:34px;text-align:center;font-family:var(--f-num);font-weight:600;font-size:18px}
+.docs{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+.doc{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--panel);border-radius:22px;padding:4px 10px 4px 4px;min-height:40px;text-align:left;font-size:13px;line-height:1.15;max-width:100%}
+.doc .av{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;background:var(--c)}
+.doc em{display:block;font-style:normal;font-size:11.5px;color:var(--muted)}
+.doc.pend{opacity:.6;border-style:dashed}
+.doc.star{border-color:var(--img);box-shadow:inset 0 0 0 1px var(--img)}
+.doc.armed{background:var(--bad);color:#fff;border-color:var(--bad)}
+.doc.armed em{color:#fff}
+.cand{display:grid;grid-template-columns:44px 1fr;gap:10px;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--panel2)}
+.cand .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;background:var(--c)}
+.cand h3{margin:0;font-size:16px}
+.cand p{margin:3px 0 0;font-size:13px;color:var(--muted);line-height:1.35}
+.cand .tr{display:inline-block;margin-top:5px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--panel);border:1px solid var(--line)}
+.cand .tr.star{background:var(--img);color:#fff;border-color:var(--img)}
+.cand .act{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.grp{font-family:var(--f-disp);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;color:var(--muted);margin:6px 0 -2px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.grp .mb{flex:0 0 110px;height:7px;border-radius:4px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.grp .mb b{display:block;height:100%}
+.big{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.kpi{border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--panel2);min-width:0}
+.kpi span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kpi b{display:block;font-family:var(--f-num);font-size:22px;font-weight:600;margin-top:2px}
+.kpi small{font-size:12px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.r,th.r{text-align:right;font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.tot td{font-weight:700;border-bottom:0}
+tr.me td{background:var(--panel2);font-weight:700}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.note{font-size:13.5px;line-height:1.4;padding:8px 10px;border-radius:10px;background:var(--panel2);border-left:4px solid var(--accent)}
+.note.bad{border-left-color:var(--bad)} .note.warn{border-left-color:var(--warn)} .note.good{border-left-color:var(--good)}
+.note .w{font-family:var(--f-num);font-size:11px;color:var(--muted);margin-right:6px}
+.quote{font-size:14px;line-height:1.35;padding:8px 12px;border-radius:14px 14px 14px 4px;background:var(--panel2);border:1px solid var(--line);align-self:flex-start;max-width:92%}
+.quote.bad{border-color:var(--bad)} .quote.good{border-color:var(--good)}
+.quote small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{min-height:52px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);font-weight:700;font-size:15px;padding:8px 12px}
+.btn.pri{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.dng{color:var(--bad)}
+.btn.armed{background:var(--bad);color:#fff;border-color:var(--bad)}
+.btn:disabled{opacity:.45}
+a.btn{display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit}
+.wide{grid-column:1/-1}
+.scroll{overflow-x:auto}
+.cert{border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--panel2);display:grid;gap:6px}
+.cert h3{margin:0;font-size:15px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.cert h3 span{font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--panel);border:1px solid var(--line);white-space:nowrap}
+.cert h3 span.on{background:var(--good);color:#fff;border-color:var(--good)}
+.cert h3 span.lapsed{background:var(--warn);color:#fff;border-color:var(--warn)}
+.cert p{margin:0;font-size:12.5px;color:var(--muted)}
+.cert ul{margin:0;padding:0;list-style:none;display:grid;gap:2px;font-size:13px}
+.cert li::before{content:"✗ ";color:var(--bad);font-weight:700}
+.cert li.y::before{content:"✓ ";color:var(--good)}
+.cert .pb{height:6px;border-radius:3px;background:var(--panel);border:1px solid var(--line);overflow:hidden}
+.cert .pb b{display:block;height:100%;background:var(--good)}
+.ach{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ach div{border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--panel2);font-size:12.5px;color:var(--muted);line-height:1.3}
+.ach div b{display:block;font-size:14px;color:var(--ink)}
+.ach div.got{border-color:var(--img);background:var(--panel)}
+.ach div.got b::before{content:"★ ";color:var(--img)}
+.ach div:not(.got){opacity:.7}
+
+#modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:rgba(5,15,13,.55);padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.card{width:100%;max-width:460px;max-height:100%;overflow-y:auto;background:var(--panel);border-radius:18px;border:1px solid var(--line);padding:18px;display:grid;gap:12px;animation:pop .25s ease-out;box-shadow:0 20px 50px var(--shadow);user-select:text;-webkit-user-select:text}
+.card .eyebrow{font-family:var(--f-disp);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;color:var(--c,var(--accent))}
+.card h2{margin:0;font-family:var(--f-disp);font-weight:800;font-size:30px;line-height:1.02;text-wrap:balance}
+.card h4{margin:6px 0 -4px;font-family:var(--f-disp);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;color:var(--muted)}
+.card p{margin:0;line-height:1.45;font-size:15px}
+.card ul{margin:0;padding-left:18px;line-height:1.45;font-size:14.5px;display:grid;gap:5px}
+.choice{display:block;width:100%;text-align:left;min-height:56px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);padding:10px 12px}
+.choice b{display:block;font-size:16px}
+.choice span{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35}
+.choice.pri{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.choice.pri span{color:inherit;opacity:.85}
+.logo{font-family:var(--f-disp);font-weight:800;font-size:52px;line-height:.9;letter-spacing:.01em;text-transform:uppercase}
+.logo em{font-style:normal;display:inline-block;background:var(--ed);color:#fff;padding:0 8px;border-radius:6px;margin-right:6px}
+.signs{display:flex;flex-wrap:wrap;gap:5px}
+.signs span{font-family:var(--f-disp);font-weight:800;color:#fff;background:var(--c);padding:3px 8px;border-radius:5px;font-size:15px}
+.endscore{font-family:var(--f-num);font-size:40px;font-weight:600}
+.field{display:grid;gap:6px}
+.field input{min-height:50px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);padding:0 14px;font-size:18px;font-weight:600}
+.seg{display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:6px}
+.seg button{min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);font-weight:700;font-size:14px;padding:4px 6px;line-height:1.15}
+.seg button small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.seg button[aria-pressed="true"] small{color:inherit;opacity:.85}
+.scens{display:grid;gap:8px}
+.scen{text-align:left;border:1px solid var(--line);background:var(--panel2);border-radius:14px;padding:10px 12px;display:grid;gap:3px}
+.scen b{font-size:16px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.scen b em{font-style:normal;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.scen span{font-size:13px;color:var(--muted);line-height:1.35}
+.scen[aria-pressed="true"]{border:2px solid var(--accent);background:var(--panel);padding:9px 11px}
+.scen[aria-pressed="true"] b em{color:var(--accent)}
+.deck{display:flex;flex-wrap:wrap;gap:6px}
+.deck button{min-height:40px;border-radius:20px;border:1px solid var(--line);background:var(--panel2);padding:4px 12px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:line-through}
+.deck button[aria-pressed="true"]{background:var(--panel);color:var(--ink);border-color:var(--accent);text-decoration:none}
+
+@keyframes rise{from{transform:translateY(0);opacity:1}to{transform:translateY(-38px);opacity:0}}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-20px)}8%,85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-10px)}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition:none!important}}
+@media (max-width:370px){.stat b{font-size:16px}.cb{width:42px;height:42px}#nav button{font-size:14px}}
+</style>
+<style>
+:root{--f-disp:"Inter",system-ui,-apple-system,sans-serif;--f-body:"Inter",system-ui,-apple-system,sans-serif;--f-num:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.logo{font-size:42px;letter-spacing:-.01em}
+.card h2,.sh-head h2{letter-spacing:-.01em}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header id="hud">
+    <div class="r1">
+      <div class="stat"><span class="lbl">Cash</span><b id="cash" class="num">$0</b></div>
+      <div class="stat"><span class="lbl">Score</span><b id="score" class="num">0</b></div>
+      <div class="ctrls">
+        <button class="cb" id="bPlay" aria-label="Pause"></button>
+        <button class="cb" id="bSpeed" aria-label="Game speed">1×</button>
+        <button class="cb" id="bMenu" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M3 6h18v2.5H3zM3 11h18v2.5H3zM3 16h18v2.5H3z"/></svg></button>
+      </div>
+    </div>
+    <div class="r2">
+      <div class="stars" id="stars" aria-label="Patient star rating"><span class="on">★★★★★</span>★★★★★</div>
+      <div class="meter"><span>Reputation<em id="repN" class="num"></em></span><i><b id="repB"></b></i></div>
+      <div class="meter"><span>Quality<em id="qN" class="num"></em></span><i><b id="qB"></b></i></div>
+    </div>
+    <div class="board" id="board"></div>
+    <div class="wk"><b id="wkB"></b></div>
+  </header>
+  <button id="advisor"><span class="tag">Advisor</span><span class="txt" id="advTxt"></span></button>
+  <main id="bldg" aria-label="Hospital tower: tap a room to build or manage it">
+    <div id="tower"><canvas id="cv" aria-hidden="true"></canvas><div id="ov"></div></div>
+  </main>
+  <nav id="nav">
+    <button data-s="staff">Staff<small id="navStaff">0 FTE</small></button>
+    <button data-s="money">Money<small id="navMoney">P&amp;L</small></button>
+    <button data-s="quality">Care<small id="navQ">Flow</small></button>
+    <button data-s="goals">Goals<small id="navGoals">0 earned</small></button>
+    <button data-s="log">News<small id="navLog">Log</small></button>
+  </nav>
+</div>
+<div id="fx"></div>
+<div id="scrim" hidden></div>
+<section id="sheet" hidden aria-modal="true" role="dialog">
+  <div class="sh-head"><div><h2 id="shTitle"></h2><div class="sub" id="shSub"></div></div><button id="shClose">Close</button></div>
+  <div id="shBody"></div>
+</section>
+<div id="modal" hidden><div class="card" id="mCard"></div></div>
+
+<script>
+'use strict';
+/* ================= Data ================= */
+const UNITS={
+  ED:{n:'Emergency Department',sn:'Emergency',ab:'ED',col:'--ed',c:3e6,up:25e3,rn:12,evs:3,cap:120,cu:'visits/wk',bw:4,d:'The front door. About 1 in 6 visits becomes an admission. Needs Emergency Physicians. Best on Floor 1, on the same floor as Imaging.'},
+  MS:{n:'Med-Surg Ward',sn:'Med-Surg',ab:'MS',col:'--ms',c:2.5e6,up:15e3,rn:18,evs:3,cap:24,cu:'beds',bw:3,d:'24 inpatient beds for medical admissions and post-op recovery. Hospitalists round here; a safe load is about 7 patients per FTE.'},
+  ICU:{n:'Intensive Care Unit',sn:'Critical Care',ab:'ICU',col:'--icu',c:4e6,up:30e3,rn:22,evs:2,cap:12,cu:'beds',bw:5,d:'12 beds at 1:2 nursing. Without an ICU, critical patients are transferred out and surgeons avoid high-risk cases. Keep it near the ORs.'},
+  OR:{n:'Operating Suites',sn:'Surgery',ab:'OR',col:'--or',c:5e6,up:40e3,rn:8,evs:2,cap:30,cu:'cases/wk',bw:6,d:'Two ORs and PACU. The biggest revenue per case, but it needs surgeons, anesthesiologists, recovery beds and hospitalists for post-op co-management.'},
+  CATH:{n:'Cardiac Cath Lab',sn:'Cardiology',ab:'CATH',col:'--cath',c:4.5e6,up:35e3,rn:5,evs:1,cap:20,cu:'procedures/wk',bw:5,d:'Diagnostic caths, PCI and stents. Interventional cardiologists post the highest wRVUs of any specialty. Works best near the ICU or ED.'},
+  IMG:{n:'Imaging: CT, MRI, X-ray',sn:'Imaging',ab:'CT',col:'--img',c:3.5e6,up:20e3,rn:2,evs:1,cap:300,cu:'studies/wk',bw:4,d:'Most ED patients need a scan. A backlog slows the whole hospital. Needs radiologists (about 200 reads a week each).'},
+  LAB:{n:'Clinical Laboratory',sn:'Laboratory',ab:'LAB',col:'--lab',c:1.5e6,up:12e3,rn:0,evs:1,cap:700,cu:'test runs/wk',bw:2,d:'Without a lab, every department runs at 70% speed while specimens are sent out.'},
+  PH:{n:'Inpatient Pharmacy',sn:'Pharmacy',ab:'RX',col:'--ph',c:1.2e6,up:10e3,rn:0,evs:1,cap:60,cu:'inpatients',bw:2,d:'Verifies inpatient orders. Without it, medication errors rise and beds turn over more slowly.'},
+  CLIN:{n:'Primary Care Clinic',sn:'Primary Care',ab:'PCP',col:'--clin',c:1.2e6,up:8e3,rn:4,evs:1,cap:220,cu:'visits/wk',bw:2,d:'Loses a little money on its own, but its referrals feed surgery, the cath lab and imaging. Best on Floor 1.'},
+  LD:{n:'Labor & Delivery',sn:'Maternity',ab:'L&D',col:'--ld',c:3e6,up:18e3,rn:12,evs:2,cap:20,cu:'births/wk',bw:4,d:'Thin margins from a heavy Medicaid mix, but families remember where their babies were born. Needs OB/GYNs. Share a floor with the ORs for C-sections.'},
+  CAFE:{n:'Cafeteria',sn:'Food',ab:'CAFE',col:'--cafe',c:8e5,up:6e3,rn:0,evs:1,cap:0,cu:'',bw:2,d:'Food is one of the biggest drivers of patient satisfaction. Upgrade from tray line to fresh kitchen to a chef-led menu.'},
+  GARD:{n:'Healing Garden',sn:'Garden',ab:'GDN',col:'--gard',c:6e5,up:2e3,rn:0,evs:1,cap:0,cu:'',bw:1,d:'Daylight and green space. Raises patient satisfaction and staff morale.'}
+};
+const ORDER=['ED','MS','IMG','LAB','OR','ICU','CATH','CLIN','PH','LD','CAFE','GARD'];
+const FOOD=['None','Tray line','Fresh kitchen','Chef-led menu'];
+const ROLES={
+  em:{n:'Emergency Physician',s:400e3,w:6800,cap:50,cu:'ED visits/wk',g:'em'},
+  hosp:{n:'Hospitalist',s:340e3,w:4400,cap:7,cu:'inpatients each',g:'hosp'},
+  gs:{n:'General Surgeon',s:520e3,w:6900,cap:6,cu:'cases/wk',g:'surg'},
+  ortho:{n:'Orthopedic Surgeon',s:650e3,w:8900,cap:7,cu:'cases/wk',g:'surg'},
+  card:{n:'Interventional Cardiologist',s:750e3,w:10500,cap:6,cu:'procedures/wk',g:'surg'},
+  anes:{n:'Anesthesiologist',s:500e3,w:7400,cap:16,cu:'OR cases/wk',g:'oth'},
+  intens:{n:'Intensivist',s:450e3,w:5500,cap:4,cu:'ICU patients each',g:'oth'},
+  rad:{n:'Radiologist',s:550e3,w:9800,cap:200,cu:'reads/wk',g:'oth'},
+  pcp:{n:'Primary Care Physician',s:290e3,w:4900,cap:55,cu:'visits/wk',g:'oth'},
+  ob:{n:'OB/GYN',s:410e3,w:6800,cap:5,cu:'deliveries/wk',g:'oth'},
+  rn:{n:'Registered Nurses',s:98e3,b:5,g:'rn'},
+  evs:{n:'EVS / Cleaning Techs',s:42e3,b:5,g:null}
+};
+const DOCROLES=['em','hosp','gs','ortho','card','anes','intens','rad','pcp','ob'];
+const GROUPS=[['em','Emergency',['em']],['hosp','Hospital Medicine',['hosp']],['surg','Proceduralists',['gs','ortho','card']],['oth','Specialists & Primary Care',['anes','intens','rad','pcp','ob']],['rn','Nursing & Support',['rn','evs']]];
+const TRAITS={
+  steady:{n:'Steady',d:'Reliable, no drama, slightly cheaper.',cap:0,sal:.97,w:1.6},
+  work:{n:'Workhorse',d:'+15% capacity.',cap:.15,sal:1.05,w:1},
+  fast:{n:'Fast hands',d:'+20% cases.',cap:.2,sal:1.1,w:1,roles:['gs','ortho','card','anes']},
+  night:{n:'Night owl',d:'Happily covers nights: +10% capacity.',cap:.1,sal:1,w:1,roles:['em','hosp','intens','anes','ob']},
+  nurses:{n:'Beloved by nurses',d:'Nurse morale +3.',cap:0,sal:1.03,w:1,rnMor:3},
+  whisper:{n:'Patient whisperer',d:'Patient satisfaction +2.',cap:0,sal:1.03,w:1,sat:2},
+  rain:{n:'Rainmaker',d:'Brings 2 extra referrals a week.',cap:0,sal:1.12,w:.9,ref:2,roles:['gs','ortho','card','pcp','ob']},
+  teach:{n:'Born teacher',d:'Their whole group gets +4 morale.',cap:0,sal:1.02,w:.9,gm:4},
+  diva:{n:'Prima donna',d:'+25% output, but colleagues −8 morale and nurses −3.',cap:.25,sal:1.15,w:.8,gm:-8,rnMor:-3},
+  burn:{n:'Burnout risk',d:'15% cheaper, but twice as likely to quit.',cap:0,sal:.85,w:.9,quit:2},
+  star:{n:'Star',d:'+30% output, colleagues +3 morale, and reputation grows every week.',cap:.3,sal:1.4,w:.25,gm:3,rep:.03}
+};
+const FIRST=['Amara','Wei','Priya','Mateo','Fatima','Jonah','Sofia','Kwame','Elena','Hiro','Aisha','Diego','Noor','Liam','Mei','Tariq','Grace','Ravi','Ingrid','Malik','Yuki','Camila','Omar','Hannah','Sanjay','Leila','Marcus','Ana','Tomas','Zara','Ifeoma','Pablo','Rosa','Dmitri','Esther','Kofi'];
+const LAST=['Okafor','Chen','Patel','Alvarez','Haddad','Nguyen','Kowalski','Mensah','Rossi','Tanaka','Khan','Ortiz','Lindqvist','Abara','Park','Silva','Cohen','Iyer','Novak','Bello','Sato','Moreau','Farah','Brennan','Gupta','Reyes','Adeyemi','Fischer','Hassan','Kim','Dubois','Achebe','Morales','Varga','Osei','Lund'];
+const SCEN={
+  community:{n:'Suburban Community',tag:'Balanced',d:'A 24-bed hospital in a growing suburb with a balanced payer mix. The classic start.',cash:15e6,pop:1,ed:1,clin:1,payer:1,dsh:0,oh:0,tm:1,maxF:6,rep:50,prod:1,recruit:1,cred:4,
+    floors:[[['ED',1],['IMG',1],['LAB',1],null],[['MS',1],null,null,null]],staff:{em:2,hosp:2,rad:1},rn:35,evs:8},
+  rural:{n:'Rural Critical Access',tag:'Hard recruiting',d:'A small-town hospital 90 miles from the nearest trauma center. Cost-based Medicare helps, but recruiting costs double and the tower tops out at 3 floors.',cash:9e6,pop:.6,ed:1,clin:1.2,payer:1.06,dsh:0,cp:.35,oh:-25e3,tm:.5,maxF:3,rep:55,prod:1,recruit:2,cred:6,
+    floors:[[['ED',1],['IMG',1],['LAB',1],null],[['MS',1],null,null,null]],staff:{em:2,hosp:1,rad:1},rn:32,evs:8},
+  urban:{n:'Urban Safety-Net',tag:'High volume',d:'A downtown hospital that never turns anyone away: a huge ED, a heavy Medicaid mix, and supplemental DSH payments to keep the lights on.',cash:12e6,pop:1.2,ed:1.7,clin:1.3,payer:.85,dsh:90e3,oh:10e3,tm:1.2,maxF:6,rep:45,prod:1,recruit:1,cred:4,
+    floors:[[['ED',2],['IMG',1],['LAB',1],null],[['MS',1],null,null,null]],staff:{em:4,hosp:3,rad:1},rn:46,evs:12},
+  academic:{n:'Academic Medical Center',tag:'High stakes',d:'A teaching hospital with residents, research overhead and the best payer contracts in the region. The board expects big numbers.',cash:35e6,pop:1.2,ed:1.1,clin:1,payer:1.12,dsh:0,oh:140e3,tm:2,maxF:6,rep:65,prod:1.1,recruit:1,cred:4,
+    floors:[[['ED',1],['IMG',1],['LAB',1],['PH',1]],[['OR',1],['ICU',1],['MS',1],null]],staff:{em:3,hosp:3,rad:1,gs:2,anes:1,intens:2},rn:64,evs:14}
+};
+const DIFF={intern:{n:'Intern',d:'Forgiving board',cash:5e6,add:-1.5e6,ev:.6,grow:.10},attending:{n:'Attending',d:'The real deal',cash:0,add:0,ev:1,grow:.12},chief:{n:'Chief',d:'Brutal board',cash:-3e6,add:1.5e6,ev:1.4,grow:.14}};
+const FREQ={off:0,low:.5,normal:1,high:1.7};
+const BASE_T=[-2e6,0,2.5e6,4e6,5.5e6];
+const LV=[0,1,1.6,2.2];
+const TICK=1500, AGENCY=10e3, RECRUIT=60e3, REROLL=15e3;
+const CERTS=[
+  {id:'trauma',n:'Level II Trauma Center',need:8,fx:'+12% ED volume, +15% general surgery, more ICU referrals, reputation grows',
+    req:()=>[['ED on Floor 1',layout().edF1],['Operating suites',has('OR')],['ICU',has('ICU')],['2+ general surgeons',N('gs')>=2],['1+ orthopedic surgeon',N('ortho')>=1],['2+ anesthesiologists',N('anes')>=2],['2+ intensivists',N('intens')>=2]]},
+  {id:'stroke',n:'Primary Stroke Center',need:8,fx:'+5% ED volume, quality +2',
+    req:()=>[['CT on the ED floor',layout().imgEd],['ICU',has('ICU')],['1+ radiologist',N('rad')>=1],['Imaging keeps up',(S.last?S.last.imgF:0)>=.95]]},
+  {id:'stemi',n:'Chest Pain Center',need:8,fx:'+30% cardiac procedures',
+    req:()=>[['Cath lab',has('CATH')],['Cath lab on the ED or ICU floor',layout().cathNear],['2+ interventional cardiologists',N('card')>=2],['ICU',has('ICU')]]},
+  {id:'magnet',n:'Magnet Nursing',need:12,fx:'Nurse morale +8, quality +3, satisfaction +2',
+    req:()=>[['Nurse staffing at 100%',(S.last?S.last.nF:0)>=.999],['Nurse morale 70+',S.morale.rn>=70],['Quality 75+',S.Q>=75]]},
+  {id:'baby',n:'Baby-Friendly Hospital',need:8,fx:'+25% births, reputation',
+    req:()=>[['Labor & Delivery',has('LD')],['2+ OB/GYNs',N('ob')>=2],['Patient experience 55+',S.sat>=55]]},
+  {id:'leapfrog',n:'Safety Grade A',need:12,fx:'+1% payer rates, steady reputation gains',
+    req:()=>[['Quality 85+',S.Q>=85],['Complications under 5%',(S.last?S.last.compRate:1)<.05],['Infections under 1.5 per 1,000 days',(S.last?S.last.hai:9)<1.5]]}
+];
+const PROJ=[
+  {id:'robot',n:'Surgical Robot',c:2.5e6,wk:4,need:()=>has('OR'),nt:'Needs operating suites',fx:'+15% surgical capacity and demand; implants cost 3% more'},
+  {id:'helipad',n:'Rooftop Helipad',c:1.8e6,wk:5,need:()=>has('ED')&&S.floors.length>=3,nt:'Needs an ED and 3+ floors',fx:'Air transfers: +20% ICU admissions, +5% ED volume'},
+  {id:'tele',n:'Telehealth Hub',c:8e5,wk:3,need:()=>has('CLIN'),nt:'Needs a primary care clinic',fx:'Clinic capacity +30%, satisfaction +2'},
+  {id:'ehr',n:'EHR Optimization',c:1.5e6,wk:6,need:()=>true,fx:'Physician productivity +5%; ransomware hits half as hard'},
+  {id:'solar',n:'Rooftop Solar',c:1.2e6,wk:3,need:()=>true,fx:'Overhead −$15k a week'},
+  {id:'garage',n:'Parking Garage',c:2e6,wk:6,need:()=>true,fx:'+5% patient demand, satisfaction +3'}
+];
+const ACH=[
+  ['firstcut','First Cut','Perform your first surgery.'],['black','In the Black','Finish a year with positive operating income.'],['five','Five Stars','Reach a 5-star patient rating.'],
+  ['chef',"Chef's Kiss",'Run a chef-led cafeteria.'],['tower','Skyline','Build a 6-floor tower.'],['full','No Vacancy','Fill every room in a tower of 3+ floors.'],
+  ['eco','Ecosystem','Operate all 12 unit types at once.'],['zero','Zero Harm','13 straight weeks with complications under 4% and infections under 1.0.'],['mci','Nobody Left Behind','Get through a mass casualty with under 5% leaving unseen.'],
+  ['star','Dream Team','Hire a Star physician.'],['rvu','RVU Machine','Generate 100,000 wRVUs in one game.'],['cash','War Chest','Hold $50M in cash.'],
+  ['certs','Triple Crown','Hold 3 designations at once.'],['tjc','Survey Ready','Pass a Joint Commission survey with zero findings.'],['peace','Peacemaker','Settle a nurses’ strike.'],
+  ['legion','Clean Water','Handle a Legionella alert with no outbreak.'],['win','Mission Accomplished','Win a career game.'],['chief','Chief of Chiefs','Win on Chief difficulty.']
+];
+const EVNAMES={mci:'Mass casualty',legion:'Legionella',strike:'Nurse strike',ransom:'Ransomware',flu:'Flu surge',tjc:'Joint Commission',poach:'Surgeon poaching',payer:'Payer dispute',food:'Viral food post',shortage:'Supply shortage',gift:'Donor gift',walkout:'Hospitalist walkout'};
+
+/* ================= Helpers ================= */
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rnd=Math.random, pick=a=>a[Math.floor(rnd()*a.length)];
+const pos0=v=>Math.max(0,v);
+const BACK=(document.querySelector('meta[name="game-back"]')||{}).content||'';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function money(v,dp){if(!isFinite(v))return'—';const a=Math.abs(v),s=v<0?'−':'';if(a>=1e6)return s+'$'+(a/1e6).toFixed(dp??(a>=1e7?1:2))+'M';if(a>=1e3)return s+'$'+Math.round(a/1e3)+'k';return s+'$'+Math.round(a);}
+const int=v=>Math.round(v).toLocaleString('en-US');
+const pct=v=>Math.round(v*100)+'%';
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}},del(k){try{localStorage.removeItem(k);}catch(e){}}};
+const hueOf=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h;};
+const avColor=s=>`hsl(${hueOf(s)} 45% 42%)`;
+const initials=nm=>nm.replace('Dr. ','').split(' ').map(w=>w[0]).join('').slice(0,2);
+
+let S, started=false, sheet=null, sheetArg=null, modalOpen=false, acc=0, armed={};
+let soundOn=store.get('ht-sound',true);
+const DEFAULT_CFG={name:'Mercy General',scen:'community',diff:'attending',len:5,sandbox:false,freq:'normal',deck:Object.keys(EVNAMES)};
+
+function u(t,l){return{t,lvl:l||1,build:0,upg:0,off:0,spent:UNITS[t].c*(l>1?1.6:1)};}
+function makeDoc(r,tr){const t=tr||pickTrait(r);return{id:'d'+(S.seq++),r,nm:'Dr. '+pick(FIRST)+' '+pick(LAST),tr:t,sal:Math.round(ROLES[r].s*TRAITS[t].sal*(.94+rnd()*.12)/5e3)*5e3};}
+function pickTrait(r){const ks=Object.keys(TRAITS).filter(k=>!TRAITS[k].roles||TRAITS[k].roles.includes(r));let t=ks.reduce((a,k)=>a+TRAITS[k].w,0)*rnd();return ks.find(k=>(t-=TRAITS[k].w)<0)||'steady';}
+function newGame(cfg){
+  cfg=Object.assign({},DEFAULT_CFG,cfg);const sc=SCEN[cfg.scen],df=DIFF[cfg.diff];
+  S={cfg,cash:cfg.sandbox?1e9:sc.cash+df.cash,week:1,year:1,abs:0,score:0,rep:sc.rep,Q:76,sat:58,stars:3,flow:60,seq:1,
+    floors:sc.floors.map(fl=>fl.map(x=>x?u(x[0],x[1]):null)),
+    staff:{rn:sc.rn,evs:sc.evs},docs:[],pending:[],cands:{},morale:{em:72,hosp:72,surg:72,oth:72,rn:72},
+    wage:1,rnWage:1,surgWage:1,payer:sc.payer,cf:52,eff:[],cert:{},proj:{},
+    ytd:{op:0,rev:0,pts:0,w:{}},tot:{pts:0,w:0},sup:{imgF:1,labF:1,bedF:1},last:null,log:[],voices:[],warn:0,cool:8,over:null,paused:false,speed:1,hist:[],
+    zero:0,mciWorst:-1,surgeries:0};
+  for(const r in sc.staff)for(let i=0;i<sc.staff[r];i++)S.docs.push(makeDoc(r,rnd()<.5?'steady':null));
+  S.docs.forEach(d=>{if(d.tr==='star'||d.tr==='diva')d.tr='steady';});
+  CERTS.forEach(c=>S.cert[c.id]={held:0,earned:false,on:false});
+  return S;
+}
+function sc(){return SCEN[S.cfg.scen];}
+function maxFloors(){return sc().maxF;}
+function target(y){const b=y<=5?BASE_T[y-1]:BASE_T[4]+1e6*(y-5);return (b<0&&sc().tm>1?b:b*sc().tm)+DIFF[S.cfg.diff].add;}
+function eachUnit(fn){S.floors.forEach((fl,f)=>fl.forEach((x,s)=>{if(x)fn(x,f,s);}));}
+function live(x){return x&&!x.build&&!x.off;}
+function capOf(t){let c=0;eachUnit(x=>{if(x.t===t&&live(x))c+=UNITS[t].cap*LV[x.lvl];});return c;}
+function has(t){let h=false;eachUnit(x=>{if(x.t===t&&live(x))h=true;});return h;}
+function lvlOf(t){let l=0;eachUnit(x=>{if(x.t===t&&live(x))l=Math.max(l,x.lvl);});return l;}
+function N(r){return r==='rn'||r==='evs'?S.staff[r]:S.docs.filter(d=>d.r===r).length;}
+function own(id){return!!(S.proj[id]&&S.proj[id].done);}
+function certOn(id){return!!(S.cert[id]&&S.cert[id].on);}
+function eff(k){return S.eff.reduce((m,e)=>e.k===k&&e.m?m*e.m:m,1);}
+function effAdd(k){return S.eff.reduce((m,e)=>e.k===k&&e.a?m+e.a:m,0);}
+function addEff(k,v,w,add,extra){S.eff.push(Object.assign(add?{k,a:v,w}:{k,m:v,w},extra||{}));}
+function note(t,kind){S.log.unshift({t,kind:kind||'',y:S.year,wk:S.week});if(S.log.length>60)S.log.pop();}
+function fte(){return S.docs.length+S.staff.rn+S.staff.evs;}
+function cashTxt(){return S.cfg.sandbox?'Unlimited':money(S.cash);}
+function canPay(c){return S.cfg.sandbox||S.cash>=c;}
+function pay(c){if(!S.cfg.sandbox)S.cash-=c;}
+function recruitFee(){return RECRUIT*sc().recruit;}
+
+function roster(){
+  const R={n:{},e:{},sal:0,rnMor:0,sat:0,ref:{},gm:{em:0,hosp:0,surg:0,oth:0},rep:0};
+  for(const r of DOCROLES){R.n[r]=0;R.e[r]=0;R.ref[r]=0;}
+  for(const d of S.docs){const t=TRAITS[d.tr];R.n[d.r]++;R.e[d.r]+=1+t.cap;R.sal+=d.sal*S.wage*(ROLES[d.r].g==='surg'?S.surgWage:1);R.rnMor+=t.rnMor||0;R.sat+=t.sat||0;R.ref[d.r]+=t.ref||0;R.gm[ROLES[d.r].g]+=t.gm||0;R.rep+=t.rep||0;}
+  R.sal+=S.staff.rn*ROLES.rn.s*S.wage*S.rnWage*eff('rnCost')+S.staff.evs*ROLES.evs.s*S.wage;
+  return R;
+}
+
+/* ================= Layout / flow ================= */
+function layout(){
+  const at={};let s=60,noise=0;const notes=[];
+  eachUnit((x,f,i)=>{(at[x.t]=at[x.t]||[]).push([f,i]);});
+  const on=t=>at[t]||[], fl=t=>on(t).map(p=>p[0]);
+  const edF1=on('ED').some(p=>p[0]===0);
+  if(on('ED').length){if(edF1){s+=10;notes.push(['+','ED sits at street level for ambulances.']);}else{s-=25;notes.push(['−','No ED on Floor 1: ambulance hand-offs are slow (ED −30%).']);}}
+  const imgEd=on('IMG').some(p=>fl('ED').includes(p[0]));
+  if(on('ED').length&&on('IMG').length){if(imgEd){s+=10;notes.push(['+','Imaging shares the ED floor: faster trauma and stroke workups (+8% ED).']);}else{s-=4;notes.push(['−','Imaging is on a different floor from the ED.']);}}
+  if(on('OR').length&&on('ICU').length){const d=Math.min(...fl('OR').flatMap(a=>fl('ICU').map(b=>Math.abs(a-b))));
+    if(d===0){s+=10;notes.push(['+','ORs and ICU share a floor: short post-op transport.']);}else if(d===1){s+=5;notes.push(['+','ICU is one floor from the ORs.']);}else{s-=6;notes.push(['−','ICU is far from the ORs: risky transports.']);}}
+  const cathNear=fl('CATH').some(f=>fl('ED').includes(f)||fl('ICU').includes(f));
+  if(on('CATH').length&&cathNear){s+=5;notes.push(['+','Cath lab near the ED or ICU: faster door-to-balloon times.']);}
+  if(on('LD').length&&on('OR').length){if(fl('LD').some(f=>fl('OR').includes(f))){s+=5;notes.push(['+','L&D shares a floor with the ORs for emergency C-sections.']);}else{s-=3;notes.push(['−','L&D is away from the ORs.']);}}
+  if(on('CLIN').length){if(fl('CLIN').includes(0)){s+=5;notes.push(['+','Clinic is on Floor 1 for easy outpatient access.']);}else{s-=4;notes.push(['−','Outpatients have to ride elevators to the clinic.']);}}
+  if(on('CAFE').length&&fl('CAFE').includes(0)){s+=3;notes.push(['+','Cafeteria by the lobby.']);}
+  for(const [f,i] of on('ED'))for(const j of [i-1,i+1]){const n=S.floors[f][j];if(n&&['MS','ICU','LD'].includes(n.t)){s-=6;noise++;notes.push(['−',UNITS[n.t].sn+' is right next to the ED: noise and traffic hurt sleep and satisfaction.']);}}
+  return{score:clamp(s,0,100),notes,edF1,imgEd,cathNear,noise};
+}
+
+/* ================= Simulation (one week) ================= */
+function sim(){
+  const L=layout(),sp=S.sup,SC=sc(),RS=roster(),E=RS.e;
+  let needRn=0,needEvs=0,upkeep=0;
+  eachUnit(x=>{const d=UNITS[x.t];if(!x.build)upkeep+=d.up*LV[x.lvl];if(live(x)){needRn+=d.rn*LV[x.lvl];needEvs+=d.evs*LV[x.lvl];}});
+  const nF=needRn?Math.min(1,S.staff.rn*eff('rn')/needRn):1, evsF=needEvs?Math.min(1,S.staff.evs/needEvs):1;
+  const capM=eff('cap'), pf=SC.pop*(1+DIFF[S.cfg.diff].grow*(S.year-1))*(own('garage')?1.05:1), rf=.6+.8*S.rep/100;
+  const labF=has('LAB')?sp.labF:.6, opF=nF*Math.sqrt(evsF)*capM*(.7+.3*labF);
+  const pm=SC.prod*(own('ehr')?1.05:1);
+  const pr=g=>(.8+.2*Math.min(1,S.morale[g]/60))*pm;
+  const icuOn=has('ICU'), rob=own('robot')?1.15:1;
+
+  const edArr=has('ED')?90*SC.ed*pf*rf*eff('edDemand')*(certOn('trauma')?1.12:1)*(certOn('stroke')?1.05:1)*(own('helipad')?1.05:1):0;
+  const edCap=capOf('ED')*opF*(L.edF1?1:.7)*(L.imgEd?1.08:1)*(.75+.25*sp.bedF);
+  const edDoc=E.em*50*pr('em');
+  const ed=Math.min(edArr,edCap,edDoc)*(has('IMG')?.6+.4*sp.imgF:.6);
+  const clinDem=has('CLIN')?200*SC.clin*pf*rf:0;
+  const clin=Math.min(clinDem,capOf('CLIN')*opF*(own('tele')?1.3:1),E.pcp*55*pr('oth')*(own('tele')?1.2:1));
+  const gsDem=(.04*ed+.015*clin+(4*N('gs')+RS.ref.gs)*rf)*(icuOn?1:.85)*eff('surg')*(certOn('trauma')?1.15:1)*rob;
+  const orDem=(.015*ed+.02*clin+(5*N('ortho')+RS.ref.ortho)*rf)*eff('surg')*rob;
+  const cdDem=(.03*ed+.01*clin+(3*N('card')+RS.ref.card)*rf)*(icuOn?1:.5)*(certOn('stemi')?1.3:1);
+  let gsC=Math.min(gsDem,E.gs*6*pr('surg')*rob), orC=Math.min(orDem,E.ortho*7*pr('surg')*rob);
+  const surgWant=gsC+orC;
+  const orCap=capOf('OR')*opF*eff('orCap')*rob, anCap=E.anes*16*pr('oth');
+  const orScale=surgWant>0?Math.min(1,orCap/surgWant,anCap/surgWant):1;
+  gsC*=orScale;orC*=orScale;
+  let cath=Math.min(cdDem,E.card*6*pr('surg'),capOf('CATH')*opF*eff('orCap'));
+  const medAdm=(.16*ed+.01*clin)*eff('inpt');
+  const msBeds=capOf('MS')*nF*Math.sqrt(evsF)*capM*(has('PH')?1:.9)*eff('beds');
+  const postNeed=(.7*(gsC+orC)*3.5+.4*cath*1.5)/7, medNeed=medAdm*4.5/7;
+  const bedF=(postNeed+medNeed)>0?Math.min(1,msBeds/(postNeed+medNeed)):1;
+  gsC*=.4+.6*bedF;orC*=.4+.6*bedF;cath*=.6+.4*bedF;
+  const surg=gsC+orC, medS=medAdm*bedF;
+  const census=medS*4.5/7+(.7*surg*3.5+.4*cath*1.5)/7;
+  const hospCap=E.hosp*7*pr('hosp');
+  const hospLoad=census>0?(hospCap>0?census/hospCap:3):0;
+  const icuAdm=(.03*ed+.12*surg+.25*cath)*eff('icu')*(certOn('trauma')?1.1:1)*(own('helipad')?1.2:1);
+  const icuNeed=icuAdm*3.5/7, icuBeds=capOf('ICU')*nF*Math.sqrt(evsF)*capM;
+  const icuF=icuNeed>0?Math.min(1,icuBeds/icuNeed):1;
+  const icuCen=icuNeed*icuF, icuS=icuAdm*icuF, transfers=icuAdm-icuS;
+  const intCap=E.intens*4*pr('oth');
+  const icuLoad=icuCen>0?(intCap>0?icuCen/intCap:2.5):0;
+  const ldDem=has('LD')?(14*pf*rf+RS.ref.ob)*(certOn('baby')?1.25:1):0;
+  const deliv=Math.min(ldDem,capOf('LD')*opF,E.ob*5*pr('oth'));
+  const studNeed=.9*ed+2*medS+surg+.5*cath+.15*clin+.3*deliv;
+  const imgCap=Math.min(capOf('IMG')*capM*eff('img'),E.rad*200*pr('oth'));
+  const studies=Math.min(studNeed,imgCap), imgF=studNeed>0?studies/studNeed:1;
+  const labNeed=ed+.4*clin+(census+icuCen)*3+surg+cath+deliv, labCap=capOf('LAB')*capM;
+  const labF2=labNeed>0?Math.min(1,labCap/labNeed):1;
+  const inpt=census+icuCen, phCap=capOf('PH');
+  const phF=inpt>0?(phCap>0?Math.min(1,phCap/inpt):0):1;
+  S.sup={imgF,labF:labF2,bedF};
+
+  const procs=surg+cath;
+  const compRate=.03+.16*pos0(hospLoad-1)+.08*(1-nF)+.05*(1-evsF)+(procs>0?.05*(1-icuF):0)+.04*pos0(icuLoad-1)+.03*(1-phF)+effAdd('comp');
+  const comps=procs*compRate+medS*compRate*.5;
+  const hai=.8+5*(1-evsF)+effAdd('hai');
+  const lwbs=edArr>0?(edArr-ed)/edArr:0;
+
+  const fac={ed:ed*1100,adm:medS*11000,gs:gsC*16000,ortho:orC*17000,cath:cath*22000,icu:icuS*20000,img:studies*280,clin:clin*90,ld:deliv*7500};
+  const supF={ed:.15,adm:.2,gs:.28+(own('robot')?.03:0),ortho:.45+(own('robot')?.03:0),cath:.38,icu:.25,img:.1,clin:.05,ld:.15};
+  const wr={em:ed*2.6,hosp:census*7*1.5,gs:gsC*22,ortho:orC*24,card:cath*34,anes:surg*8.9,intens:icuCen*7*3.8,rad:studies*.94,pcp:clin*1.7,ob:deliv*26};
+  let facT=0,supplies=0,wT=0;for(const k in fac){facT+=fac[k];supplies+=fac[k]*supF[k];}for(const k in wr)wT+=wr[k];
+  const vbp=1+(S.stars-3)*.01, payM=S.payer*vbp*eff('pay')*(certOn('leapfrog')?1.01:1);
+  const facRev=facT*payM, proRev=wT*S.cf*payM, rev=facRev+proRev+SC.dsh;
+  const compCost=comps*15000;
+  const wages=RS.sal/52+effAdd('wage');
+  const overhead=60e3+10e3*S.floors.length+SC.oh-(own('solar')?15e3:0);
+  const costPlus=(SC.cp||0)*(wages+upkeep+overhead);
+  const op=rev+costPlus-supplies-compCost-wages-upkeep-overhead;
+  if(!S.cfg.sandbox)S.cash+=op;
+
+  const cafe=lvlOf('CAFE'), gard=has('GARD');
+  const qT=84-45*(1-nF)-30*(1-evsF)-50*pos0(hospLoad-1)-25*pos0(icuLoad-1)-(icuNeed>0?8*(1-icuF):0)-(inpt>0?10*(1-phF):0)-10*(1-bedF)-8*(1-imgF)-8*(1-labF2)+(L.score-60)/5+(certOn('stroke')?2:0)+(certOn('magnet')?3:0)+effAdd('q');
+  S.Q=clamp(S.Q+(qT-S.Q)*.25,0,100);
+  const food=[-8,0,8,14][cafe];
+  const sT=52+food+(gard?6:0)-25*(1-evsF)-25*(1-nF)-30*lwbs-5*L.noise-12*(1-bedF)+(S.Q-70)/3+(deliv>0?3:0)+clamp(RS.sat,-8,8)+(certOn('magnet')?2:0)+(own('tele')?2:0)+(own('garage')?3:0)+effAdd('sat');
+  S.sat=clamp(S.sat+(sT-S.sat)*.25,0,100);
+  S.stars=clamp(Math.round((1+4*S.sat/100)*2)/2,1,5);
+  S.rep=clamp(S.rep+((S.Q-65)+(S.sat-55))/120-.03*transfers-(lwbs>.15?.3:0)+RS.rep+(certOn('trauma')?.02:0)+(certOn('leapfrog')?.03:0),0,100);
+  S.flow=L.score;
+
+  const amen=(cafe>=2?4:0)+(gard?3:0);
+  const edLoad=edDoc>0?Math.min(edArr,edCap)/edDoc:0;
+  const anLoad=anCap>0?surgWant/anCap:(surgWant>0?2:0);
+  const othLoad=Math.max(anLoad,icuLoad,E.rad?studNeed/(E.rad*200):0,E.pcp?clinDem/(E.pcp*55):0,E.ob?ldDem/(E.ob*5):0);
+  const surgN=N('gs')+N('ortho')+N('card');
+  const orShort=surgWant>0?1-orScale:0;
+  const gm=g=>clamp(RS.gm[g],-15,10);
+  const tgt={
+    em:76+amen-40*pos0(edLoad-1)-15*(1-bedF)+gm('em'),
+    hosp:76+amen-90*pos0(hospLoad-1)-12*(1-bedF)+gm('hosp'),
+    surg:76+amen-80*pos0(hospLoad-1)-30*(1-bedF)-30*orShort-(icuOn?0:8)+gm('surg'),
+    oth:76+amen-40*pos0(othLoad-1)+gm('oth'),
+    rn:76+amen-80*(1-nF)+clamp(RS.rnMor,-15,15)+(certOn('magnet')?8:0)+effAdd('rnMor')
+  };
+  for(const g in tgt)S.morale[g]=clamp(S.morale[g]+(tgt[g]-S.morale[g])*.2,0,100);
+  const why={em:'the ED is understaffed',hosp:'patient loads are unsafe',surg:hospLoad>1.05?'post-op patients lack hospitalist coverage':bedF<.95?'cases keep getting cancelled for lack of beds':orShort>.05?'they cannot get OR or anesthesia time':'working conditions',oth:'the workload is unsustainable'};
+  if(S.morale.rn<40&&S.staff.rn>5&&rnd()<.3){const n=Math.min(S.staff.rn-5,3);S.staff.rn-=n;note(`${n} nurses resigned: short staffing is burning them out.`,'bad');}
+  for(const [g] of GROUPS){
+    if(g==='rn')continue;
+    if(S.morale[g]<35){const pool=S.docs.filter(d=>ROLES[d.r].g===g);for(const d of pool){if(rnd()<.035*(TRAITS[d.tr].quit||1)){S.docs.splice(S.docs.indexOf(d),1);note(`${d.nm} (${ROLES[d.r].n.toLowerCase()}) resigned because ${why[g]}.`,'bad');shake();snd('bad');break;}}}
+  }
+  if(surgN===0)S.morale.surg=Math.max(S.morale.surg,60);
+
+  const pts=ed+clin+medS+surg+cath+deliv+icuS;
+  S.score+=Math.round(pts*(S.Q/75)*.5+pos0(op)/2500);
+  S.ytd.op+=op;S.ytd.rev+=rev;S.ytd.pts+=pts;S.tot.pts+=pts;S.tot.w+=wT;S.surgeries+=surg;
+  for(const k in wr)S.ytd.w[k]=(S.ytd.w[k]||0)+wr[k];
+
+  const load={},flag={},set=(t,l,f)=>{load[t]=l;if(f)flag[t]=f;};
+  const sw=nF<.95?'Short on nurses':null;
+  set('ED',edCap>0?Math.min(edArr,edCap)/edCap:0,!L.edF1?'Move the ED to Floor 1':edDoc<Math.min(edArr,edCap)*.97?'Short on emergency physicians':edCap<edArr*.97?'ED at capacity: upgrade or add another':sw);
+  set('MS',msBeds>0?Math.min(1,(postNeed+medNeed)/msBeds):0,bedF<.97?'Beds full: patients boarding in the ED':hospLoad>1.05?(N('hosp')?'Hospitalists overloaded':'No hospitalists'):sw);
+  set('ICU',icuBeds>0?icuCen/icuBeds:0,icuF<.97?'ICU full: transfers out':icuLoad>1.05?(N('intens')?'Intensivists overloaded':'No intensivist coverage'):sw);
+  set('OR',orCap>0?surg/orCap:0,(N('gs')+N('ortho'))===0?'No surgeons on staff':anCap<surgWant*.97?(N('anes')?'Anesthesia is the bottleneck':'No anesthesiologists'):orCap<surgWant*.97?'OR time is the bottleneck':bedF<.97?'Cases cancelled: no post-op beds':sw);
+  const cathCap=capOf('CATH');
+  set('CATH',cathCap>0?cath/cathCap:0,N('card')===0?'No interventional cardiologists':!icuOn?'No ICU backup: high-risk cases sent away':sw);
+  set('IMG',capOf('IMG')>0?Math.min(1,studNeed/capOf('IMG')):0,N('rad')===0?'No radiologists':imgF<.97?'Imaging backlog':null);
+  set('LAB',labCap>0?Math.min(1,labNeed/labCap):0,labF2<.97?'Lab overloaded: upgrade it':null);
+  set('PH',phCap>0?Math.min(1,inpt/phCap):0,phF<.99&&phCap>0?'Pharmacy overloaded':null);
+  const clCap=capOf('CLIN');set('CLIN',clCap>0?clin/clCap:0,N('pcp')===0?'No primary care physicians':sw);
+  const ldCap=capOf('LD');set('LD',ldCap>0?deliv/ldCap:0,N('ob')===0?'No OB/GYNs':sw);
+  set('CAFE',cafe/3,null);set('GARD',gard?.6:0,null);
+  const unitRev={ED:fac.ed+wr.em*S.cf,MS:fac.adm+wr.hosp*S.cf,OR:fac.gs+fac.ortho+(wr.gs+wr.ortho+wr.anes)*S.cf,CATH:fac.cath+wr.card*S.cf,ICU:fac.icu+wr.intens*S.cf,IMG:fac.img+wr.rad*S.cf,CLIN:fac.clin+wr.pcp*S.cf,LD:fac.ld+wr.ob*S.cf};
+
+  return{edArr,ed,edCap,edDoc,clin,clinDem,gsC,orC,cath,surgWant,orCap,anCap,orScale,medAdm,medS,msBeds,bedF,census,hospLoad,icuAdm,icuS,icuCen,icuNeed,icuF,icuLoad,transfers,
+    ldDem,deliv,studNeed,studies,imgF,labNeed,labF:labF2,phF,inpt,nF,evsF,needRn,needEvs,compRate,comps,hai,lwbs,
+    facRev,proRev,dsh:SC.dsh,costPlus,rev,supplies,compCost,wages,upkeep,overhead,op,wT,pts,load,flag,unitRev,L,cafe};
+}
+
+/* ================= Advisor + patient voices ================= */
+function issues(r){
+  const a=[];if(!r)return a;
+  const p=(sev,t)=>a.push({sev,t});
+  if(r.nF<.95)p(3,`Nursing is at ${pct(r.nF)} of need (${S.staff.rn} of ${Math.ceil(r.needRn)} RNs). Short-staffed units run slower and less safely.`);
+  if(r.hospLoad>1.05)p(3,N('hosp')?`Each hospitalist is covering ${(r.census/N('hosp')).toFixed(1)} patients (safe is about 7). Surgeons are unhappy and post-op complications are climbing.`:`No hospitalists: ${Math.round(r.census)} inpatients have no attending.`);
+  if(r.bedF<.95)p(3,`Med-Surg beds are full. Admissions are boarding in the ED and ${pct(1-(.4+.6*r.bedF))} of surgeries are being cancelled.`);
+  if(r.evsF<.95)p(2,`Cleaning crew is at ${pct(r.evsF)} of need. Hospital-acquired infections are rising.`);
+  if(r.edArr>0&&r.lwbs>.08)p(2,`${Math.round(r.edArr-r.ed)} ED patients a week leave without being seen (${pct(r.lwbs)}). ${r.edDoc<r.edCap?'Hire emergency physicians.':'Expand the ED or fix the bottleneck behind it.'}`);
+  if(r.icuNeed>0&&r.icuF<.95)p(2,has('ICU')?`ICU is full: ${r.transfers.toFixed(1)} critical patients transferred out each week.`:`No ICU: ${r.transfers.toFixed(1)} critical patients a week are transferred out, and surgeons avoid high-risk cases.`);
+  if(r.icuLoad>1.05)p(2,N('intens')?`Intensivists are stretched (${(r.icuCen/N('intens')).toFixed(1)} ICU patients each, safe is 4).`:'ICU has no intensivist coverage. Quality is suffering.');
+  if(r.surgWant>0&&r.orScale<.95)p(2,r.anCap<r.orCap?'Surgeons are waiting on anesthesia. Hire anesthesiologists.':'Surgeons cannot get OR time. Upgrade or add operating suites.');
+  if(r.imgF<.95)p(2,'Imaging backlog is slowing the ED and wards. Add radiologists or imaging capacity.');
+  if(!has('IMG'))p(2,'No imaging: CT and X-rays are sent out, so the ED runs at 60%.');
+  if(!has('LAB'))p(2,'No lab: specimens are sent out, so every unit runs at 70%.');
+  if(r.labF<.95)p(1,'The lab is overloaded. Upgrade it.');
+  if(r.inpt>0&&r.phF<.95)p(1,has('PH')?'Pharmacy cannot keep up with inpatient orders.':'No inpatient pharmacy: medication errors are rising.');
+  if(r.cafe===0)p(1,'No cafeteria. Patients are rating the food poorly.');
+  r.L.notes.filter(n=>n[0]==='−').forEach(n=>p(1,'Layout: '+n[1]));
+  if(N('gs')+N('ortho')>0&&!has('OR'))p(2,'You have surgeons but no operating suites.');
+  if(N('card')>0&&!has('CATH'))p(2,'You have interventional cardiologists but no cath lab.');
+  if(r.op<0&&!S.cfg.sandbox)p(1,`Losing ${money(-r.op)} a week. Surgery, cardiology and clinic referrals drive the most RVUs.`);
+  a.sort((x,y)=>y.sev-x.sev);
+  if(!a.length)a.push({sev:0,t:r.op>0?`Running smoothly at ${money(r.op)} a week. Check Goals for designations and projects to chase next.`:'Stable. Grow volume with procedural service lines.'});
+  return a;
+}
+function voices(r){
+  const v=[],p=(t,tone,k)=>v.push({t,tone,k:k||'pt'});
+  if(r.cafe===0)p('Is there anywhere to eat in this place?','bad');
+  if(r.cafe===1)p('Mystery meatloaf again…','bad');
+  if(r.cafe===2)p('The soup actually tastes fresh!','good');
+  if(r.cafe===3)p('Best salmon I’ve had. In a hospital!','good');
+  if(r.lwbs>.08)p(`${Math.round(4+r.lwbs*20)} hours in the waiting room…`,'bad');
+  if(r.evsF<.9)p('Something sticky is on my bed rail.','bad');
+  if(r.nF<.9){p('I pressed my call light 40 min ago.','bad');p('We need more hands up here!','bad','rn');}
+  if(r.L.noise)p('ED sirens kept me up all night.','bad');
+  if(has('GARD'))p('Sitting in the garden made my day.','good');
+  if(r.hospLoad>1.1){p('I never see the same doctor twice.','bad');p('14 patients and 6 admits pending…','bad','md');}
+  if(r.bedF<.95)p('Day two on a hallway stretcher.','bad');
+  if(r.transfers>.5)p('They’re sending Dad to another hospital?','bad');
+  if(S.Q>80)p('My nurse was an absolute angel.','good');
+  if(r.orC>.5)p('My new knee already feels great.','good');
+  if(r.gsC>.5)p('Gallbladder out, home tomorrow!','good');
+  if(r.cath>.5)p('Stent in. Chest pain gone.','good');
+  if(r.deliv>.5)p('Welcome to the world, little one!','good');
+  if(r.clin>0)p('My doctor actually listened to me.','good');
+  if(r.imgF<.95)p('Still waiting on my CT results…','bad');
+  if(S.morale.surg<45&&N('gs')+N('ortho')>0)p('My post-op patients need a hospitalist!','bad','md');
+  const fav=S.docs.find(d=>d.tr==='star'||d.tr==='whisper');if(fav)p(`${fav.nm} explained everything so clearly.`,'good');
+  if(r.ed>0&&r.lwbs<.03)p('In and out of the ER in two hours!','good');
+  if(!v.length)p('Nice place. Very clean.','good');
+  return v;
+}
+
+/* ================= Events ================= */
+function sev(){return 1+.25*(S.year-1);}
+function topFloor(){return S.floors.length-1;}
+const ENDS={
+  payer(){if(rnd()<.55){S.payer*=1.04;note('The insurer came back to the table: rates up 4%.','good');}else{S.payer*=.97;note('The insurer held firm. You re-signed at a 3% cut.','bad');}},
+  locum(){const ls=S.docs.filter(d=>d.locum);ls.forEach(d=>S.docs.splice(S.docs.indexOf(d),1));note('Locum hospitalists finished their contract.');},
+  mci(){if(S.mciWorst>=0&&S.mciWorst<.05)unlock('mci');S.mciWorst=-1;}
+};
+const EVENTS=[
+ {id:'mci',w:()=>has('ED')?1.3:0,make(v){const n=Math.round(40*v),tr=certOn('trauma');return{c:'--ed',tag:'Mass casualty incident',title:`Highway pileup: ${n} casualties inbound`,body:`A multi-vehicle crash is sending about ${n} trauma patients to your ED over the next two weeks. Expect spillover into surgery and the ICU.${tr?' As a designated trauma center, your surge plan is drilled and cheaper.':''}`,ch:[
+   {l:'Activate the surge plan',d:`Call in off-duty staff: ${money(350e3*v*(tr?.5:1))}, +35% capacity for 2 weeks.`,f(){pay(350e3*v*(tr?.5:1));addEff('cap',1.35,2);surge(v);S.rep+=tr?6:3;return`Off-duty staff answered the page. The community watched you step up (+${tr?6:3} reputation).`;}},
+   {l:'Divert ambulances',d:'Send critical patients elsewhere. No cost, reputation −8.',f(){S.rep-=8;return'EMS was diverted to the trauma center across town. The local news noticed.';}},
+   {l:'Absorb it with current staff',d:'No extra cost. Overflow patients will wait or leave.',f(){surge(v);addEff('q',-8,2,true);return'Your teams brace for impact.';}}]};}},
+ {id:'legion',w:()=>S.floors.length>1?1:0,make(v){const f=topFloor()+1;return{c:'--clin',tag:'Water safety',title:'Legionella found in the hot water system',body:`Routine cultures from Floor ${f} came back positive for Legionella pneumophila. Immunocompromised patients are at risk of Legionnaires' disease.`,ch:[
+   {l:`Hyperchlorinate and close Floor ${f}`,d:`${money(600e3*v)} and Floor ${f} closes for 3 weeks. The safe option.`,f(){pay(600e3*v);S.floors[topFloor()].forEach(x=>{if(x)x.off=4;});S.rep+=2;unlock('legion');return`Floor ${f} is closed for remediation. Infection control signed off on your response.`;}},
+   {l:'Install point-of-use filters',d:`${money(250e3*v)}. Usually enough, not always.`,f(){pay(250e3*v);if(rnd()<.4){outbreak(v,.6);return'Two patients developed Legionnaires’ disease before the filters went in. The state health department fined you.';}unlock('legion');return'Filters went in fast. Follow-up cultures are negative.';}},
+   {l:'Keep monitoring',d:'No cost today. A gamble.',f(){if(rnd()<.75){outbreak(v,1);return'An outbreak followed: several patients sickened and the story went statewide. Fines and lawsuits are coming.';}return'Lucky this time. Repeat cultures were negative.';}}]};}},
+ {id:'strike',w:()=>S.staff.rn>10?(S.morale.rn<45?3:.4):0,make(){return{c:'--ms',tag:'Labor action',title:'The nurses’ union calls a strike',body:`Citing unsafe ratios and pay, your RNs have issued a 10-day strike notice. Nurse morale is ${Math.round(S.morale.rn)}/100.`,ch:[
+   {l:'Settle: 6% raise',d:'Permanent RN wage increase. Morale jumps.',f(){S.rnWage*=1.06;S.morale.rn=clamp(S.morale.rn+25,0,100);unlock('peace');return'Contract ratified. Nurses are back, and happier.';}},
+   {l:'Bring in travel nurses',d:'No disruption, but RN costs run 2.6× for 4 weeks.',f(){addEff('rnCost',2.6,4);addEff('rnMor',-10,4,true);return'Agency nurses arrive by bus. Your staff watch from the picket line.';}},
+   {l:'Hold firm',d:'Only 35% of RNs work for 4 weeks. Reputation −5.',f(){addEff('rn',.35,4);S.rep-=5;S.rnWage*=1.03;return'Wards run at a skeleton crew until a 3% deal is struck.';}}]};}},
+ {id:'ransom',w:()=>S.year>=2?1:.3,make(v){const e=own('ehr'),c=1.5e6*v*(e?.5:1);return{c:'--icu',tag:'Cybersecurity',title:'Ransomware locks the EHR',body:`Screens across the hospital show a ransom note. Orders, results and the MAR are offline.${e?' Your EHR optimization project left you with clean backups.':''}`,ch:[
+   {l:`Pay the ransom (${money(c)})`,d:'The FBI advises against it. Systems back in about a week.',f(){pay(c);addEff('cap',e?.8:.6,1);S.rep-=2;return'Keys arrived. Systems came back after a long week.';}},
+   {l:'Run downtime procedures',d:`Paper charts and runners: ${e?85:70}% capacity for ${e?2:4} weeks.`,f(){addEff('cap',e?.85:.7,e?2:4);S.rep-=e?2:4;return'Paper charts it is. IT rebuilds from backups.';}}]};}},
+ {id:'flu',w:()=>1,make(v){return{c:'--ms',tag:'Respiratory season',title:'Flu and RSV surge',body:'Admissions for respiratory illness are climbing fast. Expect about 50% more medical admissions for 6 weeks.',ch:[
+   {l:'Open hallway surge beds',d:'+25% bed capacity; patient satisfaction drops.',f(){addEff('inpt',1.3+.2*v,6);addEff('edDemand',1.15,6);addEff('beds',1.25,6);addEff('sat',-8,6,true);return'Stretchers line the halls. Nobody loves it, but patients get beds.';}},
+   {l:'Postpone elective surgery',d:'Frees beds; surgeons lose half their cases.',f(){addEff('inpt',1.3+.2*v,6);addEff('edDemand',1.15,6);addEff('surg',.5,6);S.morale.surg-=10;return'Elective cases are on hold. Surgeons are not pleased.';}},
+   {l:'Business as usual',d:'See how far your beds stretch.',f(){addEff('inpt',1.3+.2*v,6);addEff('edDemand',1.15,6);return'Hold on tight.';}}]};}},
+ {id:'tjc',w:()=>S.week>10?.9:0,make(){return{c:'--accent',tag:'Accreditation',title:'Surprise Joint Commission survey',body:'Surveyors are in the lobby. They will trace patients, inspect cleanliness and audit your medication process.',ch:[
+   {l:'Welcome the surveyors',d:'Results depend on quality, cleaning staff and pharmacy.',f(){const r=S.last;const ok=S.Q>=65&&(!r||r.evsF>=.9)&&(!r||r.phF>=.9);if(ok){S.rep+=6;unlock('tjc');return'Full accreditation with zero findings. The board is thrilled (+6 reputation).';}pay(500e3);S.rep-=10;addEff('q',-4,6,true);return'Conditional accreditation. Findings in infection control and medication management. $500k remediation, reputation −10.';}}]};}},
+ {id:'poach',w:()=>(N('gs')+N('ortho')+N('card'))>0?1:0,make(){const d=S.docs.filter(x=>ROLES[x.r].g==='surg').sort((a,b)=>b.sal-a.sal)[0];return{c:'--or',tag:'Recruiting war',title:`A rival is poaching ${d.nm}`,body:`The new system across town offered your ${ROLES[d.r].n.toLowerCase()} a big raise and a signing bonus.`,ch:[
+   {l:'Counter-offer',d:'All proceduralist pay rises 12%.',f(){S.surgWage*=1.12;S.morale.surg=clamp(S.morale.surg+10,0,100);return`${d.nm} stayed. So did everyone who heard about the raise.`;}},
+   {l:'Let them go',d:'Lose them and their referral base.',f(){const i=S.docs.indexOf(d);if(i>=0)S.docs.splice(i,1);S.morale.surg-=6;return`${d.nm} cleaned out their locker.`;}}]};}},
+ {id:'payer',w:()=>S.year>=2?1:.4,make(){return{c:'--warn',tag:'Payer contract',title:'Largest insurer demands a rate cut',body:'Your biggest commercial payer wants a 4% cut at renewal or they will take you out of network.',ch:[
+   {l:'Accept the 4% cut',d:'Permanent revenue hit, no disruption.',f(){S.payer*=.96;return'Signed. Finance is quietly redoing the budget.';}},
+   {l:'Go out of network',d:'Lose about 20% of volume for 8 weeks. Then they may cave.',f(){addEff('edDemand',.82,8);addEff('surg',.8,8);S.eff.push({k:'_payer',m:1,w:8,end:'payer'});return'Members are being redirected. The standoff begins.';}}]};}},
+ {id:'food',w:()=>1,make(){const good=lvlOf('CAFE')>=2;return{c:'--cafe',tag:'Social media',title:good?'Your kitchen goes viral, for the right reasons':'Your tray food goes viral',body:good?'A patient’s video of fresh salmon and a hand-written get-well card has a million views.':'A photo of grey meatloaf and canned peas is everywhere. The comments are brutal.',ch:[
+   {l:'Continue',d:good?'Reputation +5':'Reputation −6, satisfaction dips. A better cafeteria prevents this.',f(){if(good){S.rep+=5;addEff('sat',5,4,true);return'Admissions are asking for the salmon.';}S.rep-=6;addEff('sat',-10,4,true);return'Tap the cafeteria to upgrade its menu.';}}]};}},
+ {id:'shortage',w:()=>has('IMG')||has('OR')?1:0,make(v){return{c:'--img',tag:'Supply chain',title:'IV contrast and saline shortage',body:'A plant shutdown has cut national supply. Your distributor can fill only part of your order.',ch:[
+   {l:`Pay the gray market (${money(400e3*v)})`,d:'No disruption.',f(){pay(400e3*v);return'Supplies secured at four times the usual price.';}},
+   {l:'Ration supplies',d:'Imaging at 60% and ORs at 75% for 4 weeks.',f(){addEff('img',.6,4);addEff('orCap',.75,4);return'Non-urgent CTs are switched to ultrasound and elective cases are trimmed.';}}]};}},
+ {id:'gift',w:()=>S.rep>55?.8:.15,make(){const g=1.5e6+S.rep*20e3;return{c:'--gard',tag:'Philanthropy',title:'A grateful family makes a gift',body:`After their father’s care at ${esc(S.cfg.name)}, a local family has pledged ${money(g)}.`,ch:[
+   {l:'Accept with thanks',d:`+${money(g)} cash, reputation +2.`,f(){if(!S.cfg.sandbox)S.cash+=g;S.rep+=2;return'The plaque goes up in the lobby next month.';}}]};}},
+ {id:'walkout',w:()=>S.last&&S.last.hospLoad>1.2&&N('hosp')>0?2.5:0,make(){return{c:'--ms',tag:'Physician burnout',title:'Hospitalists threaten to walk out',body:`Your hospitalists are covering ${(S.last.census/Math.max(1,N('hosp'))).toFixed(1)} patients each. Their group says they will leave unless something changes.`,ch:[
+   {l:'Hire 2 locum hospitalists',d:'They start now for 8 weeks at about 2× normal pay.',f(){for(let i=0;i<2;i++){const d=makeDoc('hosp','steady');d.nm+=' (locum)';d.sal=680e3;d.locum=true;S.docs.push(d);}S.eff.push({k:'_locum',m:1,w:8,end:'locum'});S.morale.hosp+=12;return'Locums are on the wards. Use the time to recruit permanent hospitalists.';}},
+   {l:'Promise to recruit',d:'Morale +8 for now. Words are cheap.',f(){S.morale.hosp+=8;return'They agreed to wait. Better start hiring.';}},
+   {l:'Ignore it',d:'One hospitalist leaves; morale drops.',f(){const d=S.docs.find(x=>x.r==='hosp');if(d)S.docs.splice(S.docs.indexOf(d),1);S.morale.hosp-=10;return d?`${d.nm} quit.`:'Morale sinks further.';}}]};}}
+];
+function surge(v){addEff('edDemand',1+.7*v,2);addEff('surg',1.4,2);addEff('icu',1.6,2);S.eff.push({k:'_mci',m:1,w:2,end:'mci'});S.mciWorst=0;snd('siren');}
+function outbreak(v,k){pay(2.5e6*v*k);S.rep-=18*k;addEff('q',-28*k,8,true);addEff('comp',.04*k,8,true);addEff('hai',4*k,8,true);shake();snd('bad');}
+function maybeEvent(){
+  if(S.cool>0){S.cool--;return;}
+  const m=FREQ[S.cfg.freq]*DIFF[S.cfg.diff].ev;if(!m)return;
+  if(rnd()>(.035+.015*(S.year-1))*m)return;
+  const pool=EVENTS.filter(e=>S.cfg.deck.includes(e.id)).map(e=>({e,w:e.w()})).filter(o=>o.w>0);
+  let t=pool.reduce((a,o)=>a+o.w,0)*rnd();
+  const pk=pool.find(o=>(t-=o.w)<0);if(!pk)return;
+  S.cool=6;const ev=pk.e.make(sev());
+  if(['mci','legion','strike','ransom'].includes(pk.e.id))shake();
+  note(ev.title,'warn');snd('page');
+  showModal(ev);
+}
+
+/* ================= Certifications, projects, achievements ================= */
+function weeklyGoals(){
+  for(const c of CERTS){
+    const st=S.cert[c.id],ok=c.req().every(x=>x[1]);
+    if(!st.earned){st.held=ok?st.held+1:0;if(st.held>=c.need){st.earned=true;st.on=true;S.rep+=5;S.score+=1000;note(`${c.n} designation earned.`,'good');toast(c.n,'Designation earned · '+c.fx,'--good','✓');snd('fanfare');}}
+    else{const was=st.on;st.on=ok;if(was&&!ok)note(`${c.n} lapsed: requirements no longer met.`,'bad');if(!was&&ok)note(`${c.n} reinstated.`,'good');}
+  }
+  for(const p of PROJ){const st=S.proj[p.id];if(st&&!st.done&&--st.wk<=0){st.done=true;note(`${p.n} is complete.`,'good');snd('coin');}}
+  const r=S.last;if(!r)return;
+  if(S.surgeries>0)unlock('firstcut');
+  if(S.stars>=5)unlock('five');
+  if(lvlOf('CAFE')>=3)unlock('chef');
+  if(S.floors.length>=6)unlock('tower');
+  if(S.floors.length>=3&&S.floors.every(fl=>fl.every(x=>x)))unlock('full');
+  if(ORDER.every(t=>has(t)))unlock('eco');
+  S.zero=(r.compRate<.04&&r.hai<1&&r.gsC+r.orC+r.cath>=3)?S.zero+1:0;if(S.zero>=13)unlock('zero');
+  if(S.mciWorst>=0)S.mciWorst=Math.max(S.mciWorst,r.lwbs);
+  if(S.docs.some(d=>d.tr==='star'))unlock('star');
+  if(S.tot.w>=1e5)unlock('rvu');
+  if(!S.cfg.sandbox&&S.cash>=50e6)unlock('cash');
+  if(CERTS.filter(c=>certOn(c.id)).length>=3)unlock('certs');
+}
+function achGot(){return store.get('ht-ach',[]);}
+function unlock(id){
+  if(S.cfg.sandbox)return;const got=achGot();if(got.includes(id))return;
+  got.push(id);store.set('ht-ach',got);
+  const a=ACH.find(x=>x[0]===id);if(!a)return;
+  S.score+=500;
+  note(`Achievement: ${a[1]}.`,'good');toast(a[1],'Achievement unlocked · '+a[2],'--img','★');snd('fanfare');
+}
+function toast(title,sub,col,mark){
+  const d=document.createElement('div');d.className='toast';d.style.setProperty('--c',`var(${col})`);
+  d.innerHTML=`<div class="medal">${mark}</div><div><b>${esc(title)}</b><span>${esc(sub)}</span></div>`;
+  $('#fx').appendChild(d);setTimeout(()=>d.remove(),3700);
+}
+
+/* ================= Sound ================= */
+let AC=null;
+function tone(f,dur,type,vol,f2,delay){
+  const t0=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();
+  o.type=type||'sine';o.frequency.setValueAtTime(f,t0);if(f2)o.frequency.linearRampToValueAtTime(f2,t0+dur);
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+.01);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+  o.connect(g).connect(AC.destination);o.start(t0);o.stop(t0+dur+.02);
+}
+function snd(k){
+  if(!soundOn)return;
+  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();}catch(e){return;}
+  try{({
+    tap(){tone(660,.05,'square',.025);},
+    build(){tone(140,.18,'triangle',.18,70);tone(220,.08,'square',.03,null,.05);},
+    coin(){tone(988,.08,'triangle',.08);tone(1319,.18,'triangle',.08,null,.08);},
+    page(){tone(784,.35,'sine',.12);tone(622,.5,'sine',.12,null,.36);},
+    siren(){for(let i=0;i<3;i++){tone(620,.35,'sawtooth',.025,920,i*.7);tone(920,.35,'sawtooth',.025,620,i*.7+.35);}},
+    fanfare(){[523,659,784,1047].forEach((f,i)=>tone(f,.16,'triangle',.08,null,i*.09));},
+    bad(){tone(220,.35,'sawtooth',.04,150);}
+  })[k]();}catch(e){}
+}
+
+/* ================= Turn loop + save ================= */
+function running(){return started&&!S.over&&!S.paused&&!sheet&&!modalOpen;}
+setInterval(()=>{if(!S||!running())return;acc+=100*S.speed;$('#wkB').style.width=Math.min(100,acc/TICK*100)+'%';if(acc>=TICK){acc=0;tick();}},100);
+function saveGame(){if(S&&started&&!S.over)store.set('ht-save',S);}
+
+function tick(){
+  S.abs++;
+  S.pending.forEach(p=>p.wk--);
+  S.pending=S.pending.filter(p=>{if(p.wk>0)return true;
+    if(p.doc){S.docs.push(p.doc);note(`${p.doc.nm} finished credentialing and started as ${ROLES[p.r].n.toLowerCase()}.`,'good');}
+    else{S.staff[p.r]+=p.n;note(`${p.n} ${ROLES[p.r].n.toLowerCase()} started work.`,'good');}return false;});
+  eachUnit(x=>{if(x.build>0&&--x.build===0){note(UNITS[x.t].n+' is open.','good');snd('coin');}if(x.upg>0&&--x.upg===0){x.lvl++;note(`${UNITS[x.t].n} upgraded to level ${x.lvl}.`,'good');}if(x.off>0)x.off--;});
+  const r=sim();S.last=r;
+  const vs=voices(r),bad=vs.filter(v=>v.tone==='bad');
+  const vv=(bad.length&&rnd()<.6)?pick(bad):pick(vs);
+  S.voices.unshift({...vv,y:S.year,wk:S.week});if(S.voices.length>10)S.voices.pop();say(vv);
+  if(r.ed>0)spawnAmbulance(S.eff.some(e=>e.k==='_mci')?2:1);
+  weeklyGoals();
+  S.eff.forEach(e=>e.w--);S.eff.filter(e=>e.w<=0&&e.end).forEach(e=>ENDS[e.end]());S.eff=S.eff.filter(e=>e.w>0);
+  render();fx(r);
+  if(!S.cfg.sandbox){if(S.cash<-10e6)return end('bankrupt');if(S.rep<=2)return end('rep');}
+  S.week++;
+  if(S.week>52)return yearEnd();
+  maybeEvent();saveGame();
+}
+
+function yearEnd(){
+  const y=S.year,op=S.ytd.op;
+  S.week=52;
+  if(op>0)unlock('black');
+  if(S.cfg.sandbox){newYear();note(`Sandbox: Year ${y} closed at ${money(op)} operating income.`);render();saveGame();return;}
+  const tgt=target(y),pass=op>=tgt,last=y>=S.cfg.len;
+  if(pass){S.score+=1500*y;snd('coin');}else{S.warn++;snd('bad');}
+  S.hist.push({y,op,tgt,pass,pts:S.ytd.pts});
+  const fired=!pass&&(S.warn>=2||last);
+  const body=`<p>Operating income <b class="num ${op>=0?'pos':'neg'}">${money(op)}</b> against a target of <b class="num">${money(tgt)}</b>. ${int(S.ytd.pts)} patient encounters and ${int(Object.values(S.ytd.w).reduce((a,b)=>a+b,0))} wRVUs this year.</p>`+
+    (pass?`<p>The board approves your plan. +${int(1500*y)} bonus points.</p>`:fired?'<p>The board has seen enough.</p>':'<p>The board puts you on probation. Miss another target and you are out.</p>')+
+    (!fired&&!last?`<p><b>Year ${y+1}:</b> Medicare cuts the conversion factor 2.8%, wages rise 3%, demand grows and crises come more often. Target: ${money(target(y+1))}.</p>`:'');
+  showModal({c:pass?'--good':'--bad',tag:`Year ${y} board review`,title:pass?'Target met':'Target missed',body,ch:[{l:fired||last?'See results':`Start Year ${y+1}`,f(){
+    if(fired){end('fired');return null;}
+    if(last){end('win');return null;}
+    newYear();render();saveGame();return null;}}]});
+}
+function newYear(){S.year++;S.week=1;S.cf*=.972;S.wage*=1.03;S.payer*=.985;S.ytd={op:0,rev:0,pts:0,w:{}};S.cool=4;note(`Year ${S.year} begins. Medicare conversion factor cut 2.8%.`,'warn');}
+
+function end(kind){
+  S.over=kind;store.del('ht-save');
+  if(kind==='win'){S.score+=Math.round(S.cash/1e4)+Math.round(S.rep*50);unlock('win');if(S.cfg.diff==='chief')unlock('chief');}
+  const best=store.get('ht-best',0);if(S.score>best)store.set('ht-best',S.score);
+  const T={win:['Mission accomplished',`${esc(S.cfg.name)} is a regional anchor: in the black and trusted by its community.`,'--good'],
+    bankrupt:['Bankrupt','The line of credit is exhausted and the system is selling your hospital.','--bad'],
+    fired:['The board let you go','Missed operating targets cost you the job.','--bad'],
+    rep:['CMS pulls your certification','Quality and patient experience collapsed. Medicare terminated your provider agreement.','--bad']}[kind];
+  postScore(kind);
+  const rows=S.hist.map(h=>`<tr><td>Year ${h.y}</td><td class="r ${h.op>=0?'pos':'neg'}">${money(h.op)}</td><td class="r">${money(h.tgt)}</td><td class="r">${h.pass?'Met':'Missed'}</td></tr>`).join('');
+  showModal({c:T[2],tag:kind==='win'?'You win':'Game over',title:T[0],body:`<p>${T[1]}</p><div class="kpi"><span>Final score</span><b class="endscore">${int(S.score)}</b><small>${S.score>best?'New best score':'Best: '+int(best)} · ${esc(SCEN[S.cfg.scen].n)}, ${DIFF[S.cfg.diff].n}</small></div>`+
+    `<div class="scroll"><table><tr><th></th><th class="r">Op. income</th><th class="r">Target</th><th class="r">Board</th></tr>${rows||'<tr><td colspan="4">No completed years.</td></tr>'}</table></div><p class="num" style="font-size:13px;color:var(--muted)">${int(S.tot.pts)} patients · ${int(S.tot.w)} wRVUs · ${S.stars.toFixed(1)}★ · ${CERTS.filter(c=>S.cert[c.id].earned).length} designations</p>`,
+    ch:[{l:'Play again',d:'Same hospital, same settings.',pri:true,f(){startGame(S.cfg);return null;}},{l:'New hospital',d:'Change the name, scenario or rules.',f(){showSetup();return null;}},{l:'Hall of fame',f(){showLeaders(true);return null;}}]});
+}
+
+/* ================= Leaderboard ================= */
+let DB=null,USER=null,UID=null,shared=[],sharedOk=null;
+(async()=>{
+  if(!window.claude||!window.claude.use)return;
+  try{
+    [DB,USER]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);
+    if(USER)UID=await USER.id();
+    if(DB)DB.collection('scores').orderBy('best','desc').limit(15).onSnapshot(s=>{
+      shared=s.docs.map(d=>{const x=d.data()||{};return{id:d.id,best:+x.best||0,hospital:String(x.hospital||'').slice(0,40),scen:SCEN[x.scen]?x.scen:'community',diff:DIFF[x.diff]?x.diff:'attending',result:String(x.result||'')};}).filter(x=>isFinite(x.best));
+      refreshLeaders();
+    },()=>{DB=null;refreshLeaders();});
+  }catch(e){DB=null;}
+})();
+async function postScore(kind){
+  if(S.cfg.sandbox)return;
+  const entry={score:S.score,hospital:S.cfg.name,scen:S.cfg.scen,diff:S.cfg.diff,len:S.cfg.len,result:kind,date:Date.now()};
+  const loc=store.get('ht-scores',[]);loc.push(entry);loc.sort((a,b)=>b.score-a.score);store.set('ht-scores',loc.slice(0,10));
+  if(!DB||!UID)return;
+  try{const ref=DB.doc('scores/'+UID);const cur=await ref.get();const prev=cur.exists?+(cur.data().best||0):0;
+    if(S.score>prev){await ref.set({best:S.score,hospital:S.cfg.name.slice(0,40),scen:S.cfg.scen,diff:S.cfg.diff,len:S.cfg.len,result:kind,at:Date.now()});}
+    sharedOk=true;}catch(e){sharedOk=false;}
+  refreshLeaders();
+}
+function leadersHTML(){
+  const loc=store.get('ht-scores',[]);
+  let h='';
+  if(DB){h+=`<h4>Shared leaderboard</h4><div class="scroll"><table id="sharedLb"><tr><th>#</th><th>Player</th><th>Hospital</th><th class="r">Score</th></tr>${shared.length?shared.map((x,i)=>`<tr class="${x.id===UID?'me':''}"><td class="num">${i+1}</td><td data-uid="${esc(x.id)}">…</td><td>${esc(x.hospital)}<br><small style="color:var(--muted)">${esc(SCEN[x.scen].n)} · ${esc(DIFF[x.diff].n)}</small></td><td class="r">${int(x.best)}</td></tr>`).join(''):'<tr><td colspan="4">No scores yet. Finish a career game to post the first one.</td></tr>'}</table></div>`;
+    if(sharedOk===false)h+='<p class="hint">Your score could not be posted. Only people with Contributor access or higher can add to the shared board.</p>';}
+  h+=`<h4>On this device</h4><div class="scroll"><table><tr><th>#</th><th>Hospital</th><th>Result</th><th class="r">Score</th></tr>${loc.length?loc.map((x,i)=>`<tr><td class="num">${i+1}</td><td>${esc(String(x.hospital).slice(0,40))}<br><small style="color:var(--muted)">${esc((SCEN[x.scen]||SCEN.community).n)} · ${esc((DIFF[x.diff]||DIFF.attending).n)}</small></td><td>${({win:'Won',fired:'Fired',bankrupt:'Bankrupt',rep:'Decertified'})[x.result]||''}</td><td class="r">${int(x.score)}</td></tr>`).join(''):'<tr><td colspan="4">No finished games yet.</td></tr>'}</table></div>`;
+  return h;
+}
+async function fillNames(root){
+  if(!USER)return;const cells=[...root.querySelectorAll('[data-uid]')];if(!cells.length)return;
+  const ps=await USER.profiles(cells.map(c=>c.dataset.uid));
+  cells.forEach(c=>{const p=ps[c.dataset.uid];c.textContent=p&&p.name?p.name:(c.dataset.uid===UID?'You':'Player');});
+}
+let leadersModal=false;
+function refreshLeaders(){
+  if(sheet==='goals'||sheet==='leaders')renderSheet();
+  if(leadersModal&&modalOpen){const box=$('#lbBox');if(box){box.innerHTML=leadersHTML();fillNames(box);}}
+}
+function showLeaders(fromEnd){
+  leadersModal=true;
+  showModal({c:'--img',tag:'Hall of fame',title:'Top hospitals',html:`<div id="lbBox" style="display:grid;gap:10px">${leadersHTML()}</div>`,ch:[{l:'Back',f(){leadersModal=false;if(fromEnd&&S.over)startGame(S.cfg);else showTitle();return null;}}]});
+  fillNames($('#lbBox'));
+}
+
+/* ================= Rendering (DOM) ================= */
+function render(){
+  const r=S.last;
+  const c=$('#cash');c.textContent=cashTxt();c.classList.toggle('neg',!S.cfg.sandbox&&S.cash<0);
+  $('#score').textContent=int(S.score);
+  $('#stars .on').style.width=(S.stars/5*100)+'%';$('#stars').title=S.stars+' stars';
+  $('#repN').textContent=Math.round(S.rep);$('#repB').style.width=S.rep+'%';
+  $('#qN').textContent=Math.round(S.Q);$('#qB').style.width=S.Q+'%';
+  $('#qB').style.background=S.Q<50?'var(--bad)':S.Q<65?'var(--warn)':'var(--accent)';
+  $('#repB').style.background=S.rep<25?'var(--bad)':S.rep<40?'var(--warn)':'var(--accent)';
+  if(S.cfg.sandbox)$('#board').innerHTML=`<span><b>Y${S.year} · Wk ${S.week}</b> · Sandbox</span><span>Last week <b>${r?money(r.op):'—'}</b></span>`;
+  else{const tgt=target(S.year),wks=Math.max(1,S.week-1),pace=S.week>1?S.ytd.op/wks*52:0,ok=pace>=tgt;
+    $('#board').innerHTML=`<span><b>Y${S.year}/${S.cfg.len} · Wk ${S.week}</b> · Goal <b>${money(tgt)}</b></span><span>Pace <b class="${S.week>1?(ok?'ok':'no'):''}">${S.week>1?money(pace):'—'}</b></span>`;}
+  $('#bPlay').innerHTML=S.paused?'<svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg>':'<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+  $('#bPlay').classList.toggle('on',S.paused);$('#bPlay').setAttribute('aria-label',S.paused?'Play':'Pause');
+  $('#bSpeed').textContent=S.speed+'×';
+  const top=issues(r)[0]||{sev:0,t:'Tap an empty room in the tower to build. Tap Staff to hire.'};
+  $('#advisor').className=top.sev>=3?'bad':top.sev>=2?'warn':'';$('#advTxt').textContent=top.t;
+  $('#navStaff').textContent=fte()+' FTE';
+  $('#navMoney').textContent=r?(r.op>=0?'+':'')+money(r.op)+'/wk':'P&L';
+  $('#navQ').textContent='Flow '+Math.round(S.flow);
+  $('#navGoals').textContent=CERTS.filter(c=>certOn(c.id)).length+' active';
+  $('#navLog').textContent=S.log.length?'Wk '+S.log[0].wk:'Log';
+  syncOverlay();
+  if(sheet)renderSheet();
+}
+function fx(r){
+  const lay=$('#fx');
+  const cand=Object.keys(r.unitRev).filter(t=>r.unitRev[t]>1000&&has(t));
+  for(let i=0;i<2&&cand.length;i++){
+    const t=cand.splice(Math.floor(rnd()*cand.length),1)[0];
+    const els=[...document.querySelectorAll(`.slot[data-t="${t}"]`)];if(!els.length)continue;
+    const b=pick(els).getBoundingClientRect(),box=$('#bldg').getBoundingClientRect();
+    if(b.bottom<box.top||b.top>box.bottom)continue;
+    const d=document.createElement('div');d.className='flt';d.textContent='+'+money(r.unitRev[t]);
+    d.style.left=(b.left+4)+'px';d.style.top=(b.top+b.height*.45)+'px';lay.appendChild(d);setTimeout(()=>d.remove(),1250);
+  }
+  if(r.op<0&&!S.cfg.sandbox&&rnd()<.5){const b=$('#cash').getBoundingClientRect();const d=document.createElement('div');d.className='flt neg';d.textContent=money(r.op);d.style.left=b.left+'px';d.style.top=(b.bottom+2)+'px';lay.appendChild(d);setTimeout(()=>d.remove(),1250);}
+}
+function shake(){const a=$('#app');a.classList.remove('shake');void a.offsetWidth;a.classList.add('shake');}
+
+/* ================= Tower canvas ================= */
+const cv=$('#cv'),cx=cv.getContext('2d');
+const G={W:0,H:0,FH:106,SKY:56,ROOF:60,ST:100,shW:22,gap:4};
+let P={},dpr=1,ovKey='',agents=[],vehicles=[],cars=[],stars=[],heli={t:-1};
+const SKIN=['#F1C9A5','#D9A47C','#B07A52','#8A5A3C','#5E3B26','#E8B992'];
+function readPal(){
+  const cs=getComputedStyle(document.documentElement),g=k=>cs.getPropertyValue(k).trim();
+  P={sky1:g('--cv-sky1'),sky2:g('--cv-sky2'),facade:g('--cv-facade'),wall:g('--cv-wall'),wall2:g('--cv-wall2'),slab:g('--cv-slab'),road:g('--cv-road'),walk:g('--cv-walk'),glass:g('--cv-glass'),shaft:g('--cv-shaft'),night:g('--cv-night')==='1',bad:g('--bad'),ink:g('--ink'),fd:g('--f-disp'),fb:g('--f-body')};
+  for(const t in UNITS)P[t]=g(UNITS[t].col);
+}
+function geom(){
+  const box=$('#bldg'),n=S.floors.length,W=box.clientWidth;
+  const content=G.SKY+G.ROOF+G.FH*n+G.ST;
+  G.W=W;G.H=Math.max(box.clientHeight,content);G.top=G.H-content;
+  G.x0=8;G.x1=W-8;G.shX=G.x0+6;G.rx=G.shX+G.shW+4;G.rw=(G.x1-6-G.rx-3*G.gap)/4;
+  G.roofY=G.top+G.SKY;G.f0=G.roofY+G.ROOF;G.streetY=G.f0+G.FH*n;
+}
+const floorY=f=>G.streetY-(f+1)*G.FH;
+const floorLine=f=>floorY(f)+G.FH-6;
+function roomRect(f,s){return{x:G.rx+s*(G.rw+G.gap),y:floorY(f)+4,w:G.rw,h:G.FH-10};}
+function resize(){
+  if(!S)return;geom();dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(G.W*dpr);cv.height=Math.round(G.H*dpr);cv.style.height=G.H+'px';$('#tower').style.height=G.H+'px';
+  ovKey='';syncOverlay();
+  if(!stars.length)for(let i=0;i<40;i++)stars.push([rnd(),rnd()*.5,rnd()]);
+}
+function syncOverlay(){
+  if(!G.W)return;
+  if(G.H!==Math.max($('#bldg').clientHeight,G.SKY+G.ROOF+G.FH*S.floors.length+G.ST)||G.W!==$('#bldg').clientWidth){resize();return;}
+  const key=G.W+'|'+G.H+'|'+S.floors.map(fl=>fl.map(x=>x?x.t:'_').join(',')).join(';');
+  if(key!==ovKey){ovKey=key;let h='';
+    S.floors.forEach((fl,f)=>fl.forEach((x,s)=>{const r=roomRect(f,s);h+=`<button class="slot" data-f="${f}" data-s="${s}" data-t="${x?x.t:''}" style="left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px" aria-label="${x?UNITS[x.t].n+', floor '+(f+1):'Empty room on floor '+(f+1)+': build'}"></button>`;}));
+    h+=`<button id="addFloor" class="addfl" style="top:${G.top+6}px"></button>`;
+    $('#ov').innerHTML=h;}
+  const b=$('#addFloor'),n=S.floors.length,c=floorCost();
+  if(n>=maxFloors()){b.disabled=true;b.innerHTML=`Tower complete<small>${n} floors</small>`;}
+  else{b.disabled=!canPay(c);b.innerHTML=`+ Add Floor ${n+1}<small>${S.cfg.sandbox?'Free in sandbox':money(c)} · +$10k/wk overhead</small>`;}
+}
+function floorCost(){return 2e6+1.5e6*S.floors.length;}
+
+const R=(x,y,w,h,c)=>{cx.fillStyle=c;cx.fillRect(x,y,w,h);};
+const C=(x,y,r,c)=>{cx.fillStyle=c;cx.beginPath();cx.arc(x,y,r,0,Math.PI*2);cx.fill();};
+function RR(x,y,w,h,r,c){cx.fillStyle=c;cx.beginPath();if(cx.roundRect)cx.roundRect(x,y,w,h,r);else cx.rect(x,y,w,h);cx.fill();}
+function txt(s,x,y,size,col,align,weight,font){cx.font=`${weight||700} ${size}px ${font||P.fd}`;cx.fillStyle=col;cx.textAlign=align||'left';cx.textBaseline='middle';cx.fillText(s,x,y);}
+const KCOL={pt:'#8EC5E8',rn:'#2E5A8C',md:'#F4F6F5',sg:'#2A9D8F',evs:'#7D8B88',vis:'#C9824B',wk:'#E2A72E',ob:'#D97FB4'};
+function person(x,y,k,ph,skin){
+  const bob=ph!=null&&!REDUCED?Math.abs(Math.sin(ph))*1.2:0;
+  R(x-2.2,y-4.5,1.8,4.5,'#33403d');R(x+.4,y-4.5,1.8,4.5,'#33403d');
+  RR(x-3.2,y-11-bob,6.4,7.5,2,KCOL[k]);
+  if(k==='md'){cx.strokeStyle='#9AA8A5';cx.lineWidth=.8;cx.strokeRect(x-3.2,y-11-bob,6.4,7.5);R(x-.4,y-10.5-bob,.8,6,'#7FB7D8');}
+  C(x,y-13.6-bob,2.7,skin||SKIN[0]);
+  if(k==='wk'){cx.fillStyle='#F2C230';cx.beginPath();cx.arc(x,y-14.3-bob,3,Math.PI,0);cx.fill();}
+  if(k==='sg'){cx.fillStyle='#4FB3A6';cx.beginPath();cx.arc(x,y-14.4-bob,2.9,Math.PI,0);cx.fill();}
+}
+function bed(x,fl,w,occ,blanket,skin){
+  R(x-1.5,fl-19,2.2,12,'#8D9997');R(x+1,fl-8,1.6,8,'#8D9997');R(x+w-2.6,fl-8,1.6,8,'#8D9997');
+  R(x,fl-10,w,2.5,'#9AA6A4');RR(x,fl-13.5,w,4.2,1.5,'#F3F6F5');RR(x+1.2,fl-16,6.5,3.2,1.5,'#FFFFFF');
+  if(occ){C(x+4.4,fl-16.8,2.7,skin);RR(x+7.5,fl-15.6,w-8.5,3.6,1.6,blanket);}
+}
+const REDUCED=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function drawRoom(x,f,s,t){
+  const r=roomRect(f,s),X=r.x,Y=r.y,W=r.w,H=r.h,fl=Y+H,iy=Y+14,load=S.last&&S.last.load[x?x.t:'']!=null?clamp(S.last.load[x.t],0,1):0;
+  if(!x){
+    R(X,Y,W,H,P.wall2);cx.setLineDash([4,4]);cx.strokeStyle=P.night?'rgba(255,255,255,.25)':'rgba(0,0,0,.22)';cx.lineWidth=1.5;cx.strokeRect(X+3.5,Y+3.5,W-7,H-7);cx.setLineDash([]);
+    txt('+',X+W/2,Y+H/2-6,24,P.night?'rgba(255,255,255,.45)':'rgba(0,0,0,.35)','center',600);
+    txt('BUILD',X+W/2,Y+H/2+13,11,P.night?'rgba(255,255,255,.45)':'rgba(0,0,0,.4)','center',700);return;
+  }
+  const col=P[x.t];
+  if(x.build){
+    R(X,Y,W,H,P.night?'#4A4537':'#E3DCCB');
+    cx.strokeStyle='#A08C5B';cx.lineWidth=1.6;
+    for(let i=0;i<=3;i++){const px=X+4+i*(W-8)/3;cx.beginPath();cx.moveTo(px,iy);cx.lineTo(px,fl);cx.stroke();}
+    for(let j=0;j<3;j++){const py=iy+6+j*(H-20)/3;cx.beginPath();cx.moveTo(X+2,py);cx.lineTo(X+W-2,py);cx.stroke();}
+    cx.beginPath();cx.moveTo(X+4,fl);cx.lineTo(X+W-4,iy+6);cx.stroke();
+    const ph=t*6;person(X+W*.3,fl-1,'wk',ph,SKIN[1]);person(X+W*.68,iy+6+(H-20)/3-1,'wk',ph+1,SKIN[3]);
+    R(X+W*.68+3,iy+(H-20)/3-6+Math.sin(t*10)*2,4,1.5,'#555');
+    for(let i=0;i<W;i+=10){R(X+i,Y,5,5,'#F2C230');R(X+i+5,Y,5,5,'#222');}
+    const tot=UNITS[x.t].bw,p=1-x.build/tot;R(X+4,fl-5,W-8,3,'rgba(0,0,0,.25)');R(X+4,fl-5,(W-8)*p,3,col);
+    RR(X+4,Y+8,W-8,13,3,col);txt(UNITS[x.t].ab,X+8,Y+14.5,11,'#fff','left',800);txt(x.build+' wk',X+W-7,Y+14.5,10,'#fff','right',700);
+    return;
+  }
+  R(X,Y,W,H,P.wall);R(X,fl-3,W,3,P.wall2);
+  const gl=P.night?'rgba(255,214,140,.10)':'rgba(255,255,255,0)';R(X,iy,W,H-14,gl);
+  const occ=i=>load>(i+.5)/3, sk=i=>SKIN[(f*4+s+i)%SKIN.length];
+  const cxm=X+W/2;
+  switch(x.t){
+    case 'ED':{const n=2,bw=(W-6)/n;for(let i=0;i<n;i++){const bx=X+3+i*bw;R(bx,iy+5,bw-2,1.2,'#99A6A3');RR(bx+bw-12,iy+6,9,26,2,'#8FD0CB');bed(bx+3,fl,bw-16,occ(i)||load>.15,'#C7E6F2',sk(i));}
+      if(load>.8){C(X+W-6,iy+3,2.5,Math.sin(t*12)>0?'#FF4D4D':'#5C1E1E');}break;}
+    case 'MS':{RR(cxm-13,iy+6,26,17,2,P.glass);R(cxm-.6,iy+6,1.2,17,'#fff');R(cxm-13,iy+14,26,1.2,'#fff');
+      bed(X+4,fl,W/2-8,occ(0)||load>.2,'#9DB8E8',sk(0));bed(X+W/2+2,fl,W/2-8,occ(1),'#E8C39D',sk(1));
+      if(occ(0)||load>.2){R(X+W/2-4,iy+12,1.2,fl-iy-12,'#9AA6A4');RR(X+W/2-6,iy+12,5,7,2,'#CFE9F7');}break;}
+    case 'ICU':{for(let i=0;i<2;i++){const bx=X+3+i*(W/2-1);bed(bx+2,fl,W/2-10,occ(i)||(i===0&&load>.15),'#C9B9EE',sk(i));
+        RR(bx+W/2-12,iy+5,12,9,1.5,'#14201E');cx.strokeStyle='#3EE07A';cx.lineWidth=1;cx.beginPath();for(let k=0;k<11;k++){const yy=iy+10-(((k+Math.floor(t*8))%5===0)?3.5:0);k?cx.lineTo(bx+W/2-11+k,yy):cx.moveTo(bx+W/2-11,yy);}cx.stroke();}break;}
+    case 'OR':{R(X,fl-3,W,3,'#7CC7BE');R(cxm-.6,iy,1.2,8,'#9AA6A4');C(cxm,iy+10,7,'#FFF4C2');cx.fillStyle='rgba(255,244,194,.22)';cx.beginPath();cx.moveTo(cxm-7,iy+11);cx.lineTo(cxm-16,fl-12);cx.lineTo(cxm+16,fl-12);cx.lineTo(cxm+7,iy+11);cx.fill();
+      R(cxm-1.5,fl-11,3,11,'#8D9997');RR(cxm-13,fl-14,26,4,1.5,'#B7C3C1');if(load>.05){C(cxm-9,fl-16,2.5,sk(0));RR(cxm-6,fl-16.5,17,3.5,1.5,'#5FBFB2');}
+      person(cxm-17,fl,'sg',null,sk(1));person(cxm+17,fl,'sg',null,sk(2));RR(X+W-12,iy+4,9,7,1,'#14201E');R(X+W-11,iy+7,7,1,'#3EE07A');break;}
+    case 'CATH':{R(cxm-1.5,fl-11,3,11,'#8D9997');RR(cxm-14,fl-14,28,4,1.5,'#B7C3C1');if(load>.05){C(cxm-10,fl-16,2.5,sk(0));RR(cxm-7,fl-16.5,17,3.5,1.5,'#E7A9C6');}
+      cx.strokeStyle='#D3DAD8';cx.lineWidth=4;cx.beginPath();cx.arc(cxm+2,fl-14,17,Math.PI*1.05,Math.PI*1.95);cx.stroke();
+      for(let i=0;i<3;i++){RR(X+5+i*9,iy+3,8,6,1,'#14201E');R(X+6+i*9,iy+6,6,.8,i===1?'#FF6B8B':'#6BB8FF');}person(X+W-8,fl,'md',null,sk(2));break;}
+    case 'IMG':{const gx=X+W*.38;C(gx,fl-17,15,'#E6ECEB');C(gx,fl-17,6.5,P.wall);cx.strokeStyle='#C8D1CF';cx.lineWidth=1;cx.beginPath();cx.arc(gx,fl-17,15,0,Math.PI*2);cx.stroke();
+      const sl=REDUCED?0:Math.sin(t*.8)*6;R(gx+4,fl-8,2,8,'#8D9997');RR(gx-6+sl,fl-19,W*.55,3.5,1.5,'#B7C3C1');if(load>.05)C(gx-2+sl,fl-21,2.5,sk(0));
+      R(X+W-12,iy+4,8,6,'#14201E');C(gx,fl-31,1.6,load>.05&&Math.sin(t*4)>0?'#FFB547':'#7A5A20');break;}
+    case 'LAB':{R(X+3,fl-15,W-6,3,'#C2CCCA');R(X+5,fl-12,2,12,'#9AA6A4');R(X+W-7,fl-12,2,12,'#9AA6A4');
+      ['#E05252','#5B8DEF','#F2C230','#7BC67B','#B07CE0'].forEach((c,i)=>R(X+7+i*3.5,fl-21,2.3,6,c));
+      R(X+W*.55,fl-22,2,7,'#556');C(X+W*.55+1,fl-23,2.5,'#556');R(X+W*.55-3,fl-16,8,1.5,'#556');
+      RR(X+W-17,iy+4,12,fl-iy-19,1.5,'#DDE6EA');R(X+W-15,iy+7,8,6,P.glass);
+      const a=t*9;C(X+W*.35,fl-18+Math.sin(a)*0,3.5,'#9AA6A4');C(X+W*.35+Math.cos(a)*2.2,fl-18+Math.sin(a)*2.2,1,'#fff');person(X+W*.3,fl,'md',null,sk(1));break;}
+    case 'PH':{const cols=['#E05252','#5B8DEF','#F2C230','#7BC67B','#F29E4C','#B07CE0'];for(let j=0;j<3;j++){R(X+4,iy+5+j*11,W-8,1.3,'#9AA6A4');for(let i=0;i<Math.floor((W-10)/6);i++)R(X+5+i*6,iy+j*11+.5,4.5,4.5,cols[(i+j*2)%6]);}
+      R(X+3,fl-14,W-6,4,'#C2CCCA');R(X+3,fl-10,W-6,10,'#AEBAB8');person(X+W*.6,fl-10,'md',null,sk(0));break;}
+    case 'CLIN':{const seats=3;for(let i=0;i<seats;i++){const sx=X+5+i*9;R(sx,fl-9,7,2,'#7D8B88');R(sx,fl-14,1.5,7,'#7D8B88');R(sx+1,fl-7,1.2,7,'#7D8B88');if(load>(i+.3)/seats){C(sx+3.5,fl-17,2.4,sk(i));RR(sx+1.2,fl-14.5,5,6,1.5,i%2?'#C9824B':'#7FA7C9');}}
+      RR(X+W-26,fl-13,20,4,1.5,'#B7C3C1');R(X+W-25,fl-9,2,9,'#8D9997');R(X+W-9,fl-9,2,9,'#8D9997');R(X+W-25,fl-13.5,6,1.6,'#F6F8F7');
+      R(X+W-4,iy+8,1,fl-iy-8,'#9AA6A4');C(X+3+30,fl-20,4,'#5E9B5E');break;}
+    case 'LD':{RR(X+4,iy+3,W*.32,24,3,'#F3C2DD');bed(X+5,fl,W*.55,occ(0)||load>.2,'#F29BC6',sk(0));
+      RR(X+W-19,fl-11,14,6,3,'#F7E3EF');R(X+W-17,fl-5,1.5,5,'#C9A5B8');R(X+W-8,fl-5,1.5,5,'#C9A5B8');if(load>.1)C(X+W-11,fl-12,2,sk(2));
+      R(X+W-12,iy+2,1,5,'#C9A5B8');const mb=REDUCED?0:Math.sin(t*1.5)*3;C(X+W-12+mb,iy+8,1.8,'#F2C230');C(X+W-16-mb,iy+9,1.6,'#8EC5E8');break;}
+    case 'CAFE':{R(X+3,iy+4,W-6,2,'#B7C3C1');R(X+3,fl-22,W-6,8,'#D4B48C');R(X+3,fl-24,W-6,2,'#B9C9CE');for(let i=0;i<4;i++)RR(X+6+i*((W-12)/4),fl-27,8,2.4,1,['#E05252','#F2C230','#7BC67B','#F29E4C'][i]);
+      const lv=x.lvl;if(lv>=2&&!REDUCED)for(let i=0;i<2;i++){cx.strokeStyle='rgba(200,210,210,.6)';cx.lineWidth=1;cx.beginPath();const sx=X+12+i*14;cx.moveTo(sx,fl-28);cx.quadraticCurveTo(sx+3+Math.sin(t*3+i)*2,fl-32,sx,fl-37);cx.stroke();}
+      R(X+W*.25,fl-9,10,1.6,'#9C7A55');R(X+W*.25+4,fl-8,1.6,8,'#9C7A55');R(X+W*.62,fl-9,10,1.6,'#9C7A55');R(X+W*.62+4,fl-8,1.6,8,'#9C7A55');
+      person(X+W*.25-2,fl,'vis',null,sk(1));if(load>.5)person(X+W*.62+12,fl,'pt',null,sk(2));
+      if(lv>=3){person(X+W-10,fl-14,'md',null,sk(3));RR(X+W-13,fl-35,6,4,1.5,'#FFFFFF');}break;}
+    case 'GARD':{R(X,Y,W,4,P.glass);cx.fillStyle=P.night?'rgba(160,190,255,.08)':'rgba(255,240,170,.35)';cx.beginPath();cx.moveTo(X+8,Y+4);cx.lineTo(X+W*.4,fl);cx.lineTo(X+W*.8,fl);cx.lineTo(X+W*.45,Y+4);cx.fill();
+      R(X,fl-4,W,4,'#7AA868');for(const [tx,sz] of [[X+W*.25,11],[X+W*.72,9]]){R(tx-1.5,fl-18,3,15,'#7A5A3C');C(tx,fl-22,sz,'#4E8B5A');C(tx-sz*.5,fl-18,sz*.65,'#5FA16A');}
+      R(X+W*.42,fl-9,14,2,'#9C7A55');R(X+W*.42+1,fl-7,1.5,7,'#9C7A55');R(X+W*.42+11,fl-7,1.5,7,'#9C7A55');
+      ['#F28FB0','#F2C230','#E05252','#B07CE0'].forEach((c,i)=>C(X+6+i*6,fl-5,1.6,c));break;}
+  }
+  // wayfinding sign band
+  R(X,Y,W,13,col);txt(UNITS[x.t].ab,X+5,Y+7,11.5,'#fff','left',800);
+  for(let i=0;i<3;i++)C(X+W-6-i*5,Y+6.5,1.6,i<x.lvl?'#fff':'rgba(255,255,255,.35)');
+  if(UNITS[x.t].cap){R(X,Y+12,W,1.5,'rgba(0,0,0,.25)');R(X,Y+12,W*load,1.5,'#fff');}
+  if(x.upg){cx.strokeStyle='#A08C5B';cx.lineWidth=1.5;for(let j=0;j<3;j++){cx.beginPath();cx.moveTo(X+W-12,iy+j*18);cx.lineTo(X+W-2,iy+j*18+18);cx.stroke();}RR(X+3,iy+2,44,10,2,'#F2C230');txt('UPGRADING',X+6,iy+7,8.5,'#222','left',800);}
+  if(x.off){R(X,Y,W,H,'rgba(0,0,0,.5)');cx.save();cx.translate(cxm,Y+H/2);cx.rotate(-.35);R(-W*.6,-6,W*1.2,12,'#F2C230');txt('CLOSED',0,0,10,'#222','center',800);cx.restore();}
+  const flag=S.last&&S.last.flag[x.t];
+  if(flag&&!x.off){const a=REDUCED?1:.55+.45*Math.sin(t*5);cx.strokeStyle=P.bad;cx.globalAlpha=a;cx.lineWidth=2.5;cx.strokeRect(X+1.25,Y+1.25,W-2.5,H-2.5);cx.globalAlpha=1;C(X+W-8,iy+8,6.5,'#fff');txt('!',X+W-8,iy+8.5,11,P.bad,'center',800);}
+}
+function drawTower(t){
+  const W=G.W,n=S.floors.length;
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  const sky=cx.createLinearGradient(0,0,0,G.streetY);sky.addColorStop(0,P.sky1);sky.addColorStop(1,P.sky2);cx.fillStyle=sky;cx.fillRect(0,0,W,G.H);
+  if(P.night){for(const [sx,sy,ph] of stars)C(sx*W,sy*G.H,.9+.5*Math.sin(t*2+ph*6),'rgba(255,255,255,.75)');C(W-40,26,11,'#F4EFD8');C(W-35,22,10,P.sky1);}
+  else{C(W-40,30,13,'#FFE08A');cx.fillStyle='rgba(255,224,138,.25)';cx.beginPath();cx.arc(W-40,30,22,0,7);cx.fill();}
+  for(let i=0;i<3;i++){const cxp=((t*6*(i+1)*.4+i*170)%(W+120))-60,cy=18+i*22+G.top*.2;cx.fillStyle=P.night?'rgba(70,90,110,.55)':'rgba(255,255,255,.85)';cx.beginPath();cx.ellipse(cxp,cy,22,7,0,0,7);cx.ellipse(cxp+14,cy-4,14,7,0,0,7);cx.fill();}
+  // roof
+  const ry=G.f0;
+  R(G.x0-3,ry-9,G.x1-G.x0+6,9,P.slab);
+  RR(G.x0+10,ry-20,16,11,1.5,P.facade);RR(G.x0+30,ry-16,10,7,1.5,P.facade);
+  const name=(S.cfg.name||'Hospital').toUpperCase();cx.font=`800 15px ${P.fd}`;
+  const tw=Math.min(cx.measureText(name).width,W*.5),sx=G.x0+48,sw=tw+34;
+  R(sx+6,ry-24,2,15,'#5A6664');R(sx+sw-8,ry-24,2,15,'#5A6664');
+  RR(sx,ry-48,sw,24,3,'#173A44');RR(sx+4,ry-44,16,16,2,'#CF3A33');txt('H',sx+12,ry-35.5,14,'#fff','center',800);
+  cx.save();cx.beginPath();cx.rect(sx+22,ry-48,tw+10,24);cx.clip();txt(name,sx+24,ry-35.5,15,P.night?'#FFF3D0':'#FFFFFF','left',800);cx.restore();
+  if(P.night){cx.fillStyle='rgba(255,243,208,.12)';cx.fillRect(sx-4,ry-52,sw+8,32);}
+  if(own('solar'))for(let i=0;i<3;i++){cx.save();cx.translate(sx+sw+14+i*16,ry-14);cx.transform(1,0,-.4,1,0,0);R(0,0,13,6,'#2C4E86');R(.5,.5,12,.6,'#7FA7D8');cx.restore();}
+  if(own('helipad')){const hx=G.x1-30;R(hx-24,ry-13,48,4,'#5A6664');cx.fillStyle='#3A4644';cx.beginPath();cx.ellipse(hx,ry-14,22,4,0,0,7);cx.fill();txt('H',hx,ry-14,7,'#F2C230','center',800);drawHeli(t,hx,ry-18);}
+  const building=S.floors.some(fl=>fl.some(x=>x&&x.build))||PROJ.some(p=>S.proj[p.id]&&!S.proj[p.id].done);
+  if(building){const mx=G.x1-14,top=G.top+12;cx.strokeStyle='#D99A1E';cx.lineWidth=1.2;R(mx-3,top,6,ry-9-top,'rgba(0,0,0,0)');
+    for(let y=top;y<ry-9;y+=8){cx.beginPath();cx.moveTo(mx-3,y);cx.lineTo(mx+3,y+8);cx.moveTo(mx+3,y);cx.lineTo(mx-3,y+8);cx.stroke();}
+    R(mx-3,top,1.5,ry-9-top,'#E2A72E');R(mx+1.5,top,1.5,ry-9-top,'#E2A72E');R(G.x0+20,top,mx-G.x0-12,3,'#E2A72E');R(mx+3,top-1,10,8,'#6C6F6A');
+    let tgx=G.x1-60;S.floors.forEach((fl,f)=>fl.forEach((x,s)=>{if(x&&x.build)tgx=roomRect(f,s).x+G.rw/2;}));
+    const sw2=REDUCED?0:Math.sin(t*1.3)*3;cx.strokeStyle='#333';cx.lineWidth=.8;cx.beginPath();cx.moveTo(tgx,top+3);cx.lineTo(tgx+sw2,ry-22);cx.stroke();R(tgx-3,top+1,6,4,'#6C6F6A');R(tgx+sw2-4,ry-22,8,5,'#C2502E');}
+  // facade
+  R(G.x0,G.f0,G.x1-G.x0,G.streetY-G.f0,P.facade);
+  R(G.shX,G.f0,G.shW,G.streetY-G.f0,P.shaft);
+  for(let f=0;f<n;f++){const fy=floorY(f),fl=floorLine(f);
+    R(G.shX+3,fl-26,G.shW-6,26,'#8E9B98');R(G.shX+G.shW/2-.5,fl-26,1,26,'#5E6A68');txt(String(f+1),G.shX+G.shW/2,fy+10,10,'#fff','center',800);
+    for(let s=0;s<4;s++)drawRoom(S.floors[f][s],f,s,t);
+    R(G.x0,fl,G.x1-G.x0,6,P.slab);}
+  // elevator car
+  lift.y+=(lift.ty-lift.y)*.08;if(!isFinite(lift.y))lift.y=floorLine(0);
+  R(G.shX+G.shW/2-.4,G.f0,.8,lift.y-28-G.f0,'#222');RR(G.shX+2,lift.y-28,G.shW-4,27,2,'#C9D2D0');R(G.shX+4,lift.y-25,G.shW-8,8,P.glass);
+  // street
+  const st=G.streetY;
+  R(0,st,W,12,P.walk);R(0,st+12,W,48,P.road);for(let x=-((t*0)%30);x<W;x+=30)R(x,st+35,16,2,'rgba(255,255,255,.5)');
+  R(0,st+60,W,G.H-st-60,P.walk);
+  const edS=S.floors[0].findIndex(x=>x&&x.t==='ED'&&!x.build);
+  if(edS>=0){const er=roomRect(0,edS);RR(er.x-2,st+1,er.w+4,9,2,'#CF3A33');txt('EMERGENCY',er.x+er.w/2,st+5.8,8,'#fff','center',800);}
+  const nc=Math.round(clamp((S.last?S.last.pts:20)/45,2,10)*(own('garage')?1.3:1));
+  while(cars.length<nc)cars.push({c:pick(['#C2502E','#2D66C6','#E6E6E2','#3B3F3E','#7FA7C9','#B4386F','#5E8E5E']),x:0});
+  for(let i=0;i<Math.min(nc,cars.length);i++){const x=10+i*((W-20)/Math.max(nc,6)),y=st+68;RR(x,y,24,10,3,cars[i].c);R(x+4,y-4,14,5,cars[i].c);R(x+6,y-3,10,3,P.glass);C(x+5,y+10,2.5,'#222');C(x+19,y+10,2.5,'#222');}
+  for(let i=0;i<4;i++){const tx=W*(.12+i*.26)+18;R(tx-1,st+80,2,12,'#7A5A3C');C(tx,st+78,6,P.night?'#2F5A3A':'#5FA16A');}
+  if(P.night)for(let i=0;i<3;i++){const lx=W*(.25+i*.3);R(lx,st-2,1.5,14,'#5A6664');cx.fillStyle='rgba(255,220,150,.25)';cx.beginPath();cx.arc(lx,st-2,9,0,7);cx.fill();}
+  for(const v of vehicles)drawAmb(v,t);
+  for(const a of agents)if(!a.hide)person(a.x,floorLine(a.f),a.k,a.st==='stay'?null:a.ph,a.skin);
+  for(const a of agents)if(a.say&&!a.hide)bubble(a,t);
+}
+function drawAmb(v,t){
+  const y=G.streetY+16;RR(v.x,y,40,16,2,'#F4F4F1');R(v.x,y+5,40,3,'#CF3A33');R(v.x-8,y+6,10,10,'#F4F4F1');R(v.x-7,y+7,6,4,P.glass);
+  R(v.x+18,y+2,2,8,'#CF3A33');R(v.x+15,y+5,8,2,'#CF3A33');C(v.x+2,y+16,3,'#222');C(v.x+32,y+16,3,'#222');
+  const on=v.st!=='park'&&Math.sin(t*20)>0;R(v.x+2,y-3,5,3,on?'#FF3B3B':'#7A1E1E');R(v.x+8,y-3,5,3,on?'#3B7BFF':'#1E2E7A');
+}
+function drawHeli(t,hx,hy){
+  const cyc=(t%30)/30;if(cyc>.6)return;let x=hx,y=hy,k=0;
+  if(cyc<.15){k=1-cyc/.15;x=hx+k*120;y=hy-k*60;}else if(cyc>.45){k=(cyc-.45)/.15;x=hx-k*140;y=hy-k*70;}
+  cx.fillStyle='#E9EDEC';cx.beginPath();cx.ellipse(x,y,9,4.5,0,0,7);cx.fill();R(x+6,y-1,12,2,'#E9EDEC');R(x-6,y+4,12,1,'#333');R(x-1,y-5,2,2,'#333');R(x-8,y-1,5,1.5,'#CF3A33');
+  const rl=REDUCED?12:12*Math.abs(Math.cos(t*30));R(x-rl,y-6,rl*2,1,'#333');
+}
+function bubble(a,t){
+  if(performance.now()>a.say.until){a.say=null;return;}
+  const fy=floorLine(a.f)-20,s=a.say.t;cx.font=`600 10.5px ${P.fb}`;
+  const words=s.split(' '),lines=[];let cur='';for(const w of words){const tst=cur?cur+' '+w:w;if(cx.measureText(tst).width>118&&cur){lines.push(cur);cur=w;}else cur=tst;}lines.push(cur);
+  const bw=Math.max(...lines.map(l=>cx.measureText(l).width))+12,bh=lines.length*12+8;
+  let bx=clamp(a.x-bw/2,4,G.W-bw-4);const by=fy-bh-4;
+  RR(bx,by,bw,bh,7,'#FFFFFF');cx.strokeStyle=a.say.tone==='bad'?'#C2322C':'#1C8649';cx.lineWidth=1.5;cx.beginPath();if(cx.roundRect)cx.roundRect(bx,by,bw,bh,7);else cx.rect(bx,by,bw,bh);cx.stroke();
+  cx.fillStyle='#FFFFFF';cx.beginPath();cx.moveTo(a.x-4,by+bh-1);cx.lineTo(a.x,by+bh+5);cx.lineTo(a.x+4,by+bh-1);cx.fill();
+  lines.forEach((l,i)=>txt(l,bx+6,by+10+i*12,10.5,'#10201D','left',600,P.fb));
+}
+/* agents */
+const lift={y:NaN,ty:NaN};
+function shaftC(){return G.shX+G.shW/2;}
+function liveRooms(){const a=[];S.floors.forEach((fl,f)=>fl.forEach((x,s)=>{if(live(x))a.push({f,s,t:x.t});}));return a;}
+function spawnAgent(force){
+  const rooms=liveRooms();if(!rooms.length)return;
+  const rm=force||pick(rooms),rr=roomRect(rm.f,rm.s);
+  const clinical=!['CAFE','GARD','LAB','PH'].includes(rm.t);
+  const k=rm.t==='OR'||rm.t==='CATH'?pick(['sg','rn','md']):rm.t==='LAB'||rm.t==='PH'?'md':rm.t==='LD'&&rnd()<.5?'ob':clinical?pick(['pt','pt','pt','rn','md','evs']):pick(['vis','pt','rn','md','evs']);
+  agents.push({k,skin:pick(SKIN),f:0,x:force?force.x:G.x0+4,tf:rm.f,tx:rr.x+8+rnd()*(rr.w-16),st:'in',ph:rnd()*6,tm:0});
+}
+function spawnAmbulance(n){
+  const edS=S.floors[0].findIndex(x=>live(x)&&x.t==='ED');if(edS<0)return;
+  for(let i=0;i<n;i++){if(vehicles.length>3)return;const er=roomRect(0,edS);vehicles.push({x:G.W+30+i*60,stop:er.x+er.w/2-10,st:'in',tm:0,s:edS});}
+}
+function moveTo(a,x,dt){const d=x-a.x,sp=24*dt;if(Math.abs(d)<=sp){a.x=x;return true;}a.x+=Math.sign(d)*sp;a.ph+=dt*10;return false;}
+function updAgents(dt){
+  const pts=S.last?S.last.pts:15,want=Math.round(clamp(4+pts/30,4,30));
+  if(agents.length<want&&rnd()<dt*2.2)spawnAgent();
+  const sc0=shaftC();
+  for(const a of agents){
+    switch(a.st){
+      case 'in':if(moveTo(a,a.tf===0?a.tx:sc0,dt)){if(a.tf===0){a.st='stay';a.tm=3+rnd()*5;}else{a.st='ride';a.hide=true;a.tm=.4+a.tf*.45;lift.ty=floorLine(a.tf);}}break;
+      case 'ride':if((a.tm-=dt)<=0){a.f=a.tf;a.x=sc0;a.hide=false;a.st='go';}break;
+      case 'go':if(moveTo(a,a.tx,dt)){a.st='stay';a.tm=3+rnd()*5;}break;
+      case 'stay':if(!a.say&&(a.tm-=dt)<=0)a.st='back';break;
+      case 'back':if(moveTo(a,a.f===0?G.x0-6:sc0,dt)){if(a.f===0)a.dead=true;else{a.st='down';a.hide=true;a.tm=.4+a.f*.45;lift.ty=floorLine(0);}}break;
+      case 'down':if((a.tm-=dt)<=0){a.f=0;a.x=sc0;a.hide=false;a.st='out';}break;
+      case 'out':if(moveTo(a,G.x0-6,dt))a.dead=true;break;
+    }
+    if(a.f>=S.floors.length||a.tf>=S.floors.length)a.dead=true;
+  }
+  agents=agents.filter(a=>!a.dead);
+  for(const v of vehicles){
+    if(v.st==='in'){v.x-=60*dt;if(v.x<=v.stop){v.x=v.stop;v.st='park';v.tm=2;const rr=roomRect(0,v.s);spawnAgent({f:0,s:v.s,t:'ED',x:v.x+10});const a=agents[agents.length-1];if(a){a.tx=rr.x+8+rnd()*(rr.w-16);a.k='pt';}}}
+    else if(v.st==='park'){if((v.tm-=dt)<=0)v.st='out';}
+    else{v.x-=70*dt;if(v.x<-60)v.dead=true;}
+  }
+  vehicles=vehicles.filter(v=>!v.dead);
+}
+function say(v){
+  const cand=agents.filter(a=>!a.hide&&!a.say&&(a.st==='stay'||a.st==='go')&&(v.k==='pt'?a.k==='pt'||a.k==='vis':v.k==='md'?a.k==='md'||a.k==='sg':a.k==='rn'));
+  const a=cand.length?pick(cand):null;if(a){a.say={t:v.t,tone:v.tone,until:performance.now()+3600};if(a.st==='stay')a.tm=Math.max(a.tm,3.6);}
+}
+let lastFrame=0,palAt=0;
+function frame(now){
+  requestAnimationFrame(frame);
+  if(!S||document.hidden||!G.W)return;
+  if(now-lastFrame<33)return;
+  const dt=Math.min(.1,(now-lastFrame)/1000);lastFrame=now;
+  if(now-palAt>800){readPal();palAt=now;}
+  if(running())updAgents(dt);
+  drawTower(now/1000);
+}
+
+/* ================= Sheets ================= */
+function openSheet(kind,arg){sheet=kind;sheetArg=arg;armed={};$('#sheet').hidden=false;$('#scrim').hidden=false;renderSheet();$('#shBody').scrollTop=0;}
+function closeSheet(){sheet=null;$('#sheet').hidden=true;$('#scrim').hidden=true;saveGame();}
+function renderSheet(){
+  const B=$('#shBody'),T=$('#shTitle'),sub=$('#shSub'),y=B.scrollTop;
+  ({slot:sheetSlot,staff:sheetStaff,hire:sheetHire,money:sheetMoney,quality:sheetQuality,goals:sheetGoals,log:sheetLog,menu:sheetMenu,leaders:sheetLeaders})[sheet](B,T,sub);
+  B.scrollTop=y;
+}
+function sheetSlot(B,T,sub){
+  const [f,s]=sheetArg,x=S.floors[f][s];
+  if(!x){
+    T.textContent='Build a unit';sub.textContent=`Floor ${f+1}, room ${s+1} · Cash ${cashTxt()}`;
+    B.innerHTML=ORDER.map(t=>{const d=UNITS[t];const sn=[d.rn?d.rn+' RN':'',d.evs+' EVS'].filter(Boolean).join(' · ');
+      return`<button class="opt" data-act="build" data-t="${t}" ${canPay(d.c)?'':'disabled'}><span class="chip" style="--c:var(${d.col})">${d.ab}</span><span><h3>${d.n}</h3><p>${d.d}</p><span class="meta"><span>${money(d.c)}</span><span>${money(d.up)}/wk upkeep</span>${d.cap?`<span>${d.cap} ${d.cu}</span>`:''}<span>${sn}</span><span>${d.bw} wk to build</span></span></span></button>`;}).join('');
+    return;
+  }
+  const d=UNITS[x.t],r=S.last;
+  T.textContent=d.n;sub.textContent=`Floor ${f+1} · Level ${x.lvl}${x.t==='CAFE'?' · '+FOOD[x.lvl]:''}${x.build?' · under construction':''}${x.off?' · closed':''}`;
+  const maxed=x.lvl>=3||x.upg>0||x.build>0, uc=d.c*.6*x.lvl;
+  const l=r&&r.load[x.t]!=null?r.load[x.t]:0, fl=r&&r.flag[x.t];
+  let stat='';
+  if(x.build)stat=`<div class="kpi"><span>Under construction</span><b style="font-size:18px">${x.build} week${x.build>1?'s':''} to go</b><small>Crews are on site. Hire staff now so they are credentialed when it opens.</small></div>`;
+  else if(r){
+    const m={ED:`${int(r.ed)} of ${int(r.edArr)} arrivals seen · capacity ${int(r.edCap)}/wk · physicians can see ${int(r.edDoc)}`,
+      MS:`${r.census.toFixed(1)} patients in ${int(r.msBeds)} staffed beds · hospitalists cover ${int(roster().e.hosp*7)}`,
+      ICU:`${r.icuCen.toFixed(1)} of ${int(capOf('ICU'))} beds filled · ${r.transfers.toFixed(1)} transfers out/wk`,
+      OR:`${(r.gsC+r.orC).toFixed(1)} cases/wk (${r.gsC.toFixed(1)} general, ${r.orC.toFixed(1)} ortho) · room for ${int(r.orCap)} · anesthesia for ${int(r.anCap)}`,
+      CATH:`${r.cath.toFixed(1)} procedures/wk`,IMG:`${int(r.studies)} of ${int(r.studNeed)} studies read/wk`,LAB:`${int(r.labNeed)} test runs/wk of ${int(capOf('LAB'))}`,
+      PH:`${r.inpt.toFixed(1)} inpatients of ${int(capOf('PH'))} capacity`,CLIN:`${int(r.clin)} of ${int(r.clinDem)} visits/wk`,LD:`${r.deliv.toFixed(1)} births of ${r.ldDem.toFixed(1)} expected/wk`,
+      CAFE:`Food rating: ${FOOD[r.cafe]}`,GARD:'Patients and staff love it.'}[x.t];
+    stat=`<div class="kpi"><span>Last week</span><b style="font-size:18px">${d.cap?pct(l)+' utilized':'Open'}</b><small>${m}</small></div>`;
+    if(r.unitRev[x.t])stat+=`<div class="note good">Gross revenue from this service line: <b class="num">${money(r.unitRev[x.t])}/wk</b></div>`;
+    if(fl)stat+=`<div class="note bad">${fl}</div>`;
+  }
+  const refund=x.spent*.3;
+  B.innerHTML=`${stat}<p class="hint" style="font-size:14px">${d.d}</p>
+   <div class="kpi"><span>Running cost</span><b style="font-size:18px">${money(d.up*LV[x.lvl])}/wk</b><small>Staffing need at this level: ${Math.round(d.rn*LV[x.lvl])} RN · ${Math.round(d.evs*LV[x.lvl])} EVS${d.cap?` · capacity ${int(d.cap*LV[x.lvl])} ${d.cu}`:''}</small></div>
+   <div class="acts">
+    <button class="btn pri" data-act="upg" ${maxed||!canPay(uc)?'disabled':''}>${x.lvl>=3?'Max level':x.upg?`Upgrading (${x.upg} wk)`:x.build?'Building…':`Upgrade · ${money(uc)}`}<br><small style="font-weight:500">${x.lvl<3&&!x.upg&&!x.build?(x.t==='CAFE'?FOOD[x.lvl+1]:`+${Math.round((LV[x.lvl+1]/LV[x.lvl]-1)*100)}% capacity`)+' · 3 wk':''}</small></button>
+    <button class="btn dng${armed.demo?' armed':''}" data-act="demo">${armed.demo?'Tap again to demolish':'Demolish'}<br><small style="font-weight:500">Refund ${money(refund)}</small></button>
+   </div>`;
+}
+function need(r){
+  const L=S.last;if(!L)return null;
+  return{em:L.edArr/50,hosp:L.census/7,anes:L.surgWant/16,intens:L.icuCen/4,rad:L.studNeed/200,pcp:L.clinDem/55,ob:L.ldDem/5,rn:L.needRn,evs:L.needEvs}[r];
+}
+function docChip(d,pend){
+  const t=TRAITS[d.tr],a=armed['f'+d.id];
+  return`<button class="doc${pend?' pend':''}${d.tr==='star'?' star':''}${a?' armed':''}" ${pend?'disabled':''} data-act="fireDoc" data-id="${d.id}" aria-label="${esc(d.nm)}, ${t.n}"><span class="av" style="--c:${avColor(d.nm)}">${esc(initials(d.nm))}</span><span>${a?`Let go? Severance ${money(d.sal/13)}`:esc(d.nm)}<em>${pend?`Credentialing · ${pend} wk`:esc(t.n)}${d.locum?'':' · '+money(d.sal)}</em></span></button>`;
+}
+function sheetStaff(B,T,sub){
+  T.textContent='Medical staff';const RS=roster(),SC=sc();
+  sub.textContent=`${fte()} FTE · payroll ${money(RS.sal)}/yr · Cash ${cashTxt()}`;
+  let h=`<p class="hint">Tap <b>Hire</b> to interview candidates. Each physician has a trait that changes how they work. Recruiting costs ${money(recruitFee())} and credentialing takes ${SC.cred} weeks${SC.recruit>1?' (rural recruiting is hard)':''}. Tap a physician to let them go.</p>`;
+  for(const [g,label,roles] of GROUPS){
+    const m=S.morale[g];
+    h+=`<div class="grp"><span>${label}</span><span class="mb" title="Morale ${Math.round(m)}"><b style="width:${m}%;background:${m<35?'var(--bad)':m<55?'var(--warn)':'var(--good)'}"></b></span></div>`;
+    for(const r of roles){
+      const Rr=ROLES[r],n=N(r),pend=S.pending.filter(p=>p.r===r);
+      const pn=pend.reduce((a,p)=>a+(p.doc?1:p.n),0);
+      const nd=need(r);let nt='';
+      if(nd!=null&&(nd>0||n>0)){const want=Rr.b?Math.ceil(nd):Math.ceil(nd/(n?RS.e[r]/n:1)-.15);const diff=n+pn-want;nt=`<div class="need ${diff<0?'bad':diff>1&&!Rr.b?'warn':'ok'}">Need ≈ ${want}${diff<0?` · short ${-diff}`:diff>1&&!Rr.b?' · some idle':' · covered'}</div>`;}
+      if(['gs','ortho','card'].includes(r)){const un=r==='card'?'CATH':'OR';nt=`<div class="need ${n>0&&!has(un)?'bad':'ok'}">${n>0&&!has(un)?'Needs '+(un==='OR'?'operating suites':'a cath lab'):'Brings ~'+(r==='gs'?4:r==='ortho'?5:3)+' referrals/wk of their own'}</div>`;}
+      if(Rr.b){
+        h+=`<div class="row"><div style="min-width:0"><h3>${Rr.n}</h3><p>${money(Rr.s*S.wage*(r==='rn'?S.rnWage:1))}/yr each · agency batches of 5${pn?` · <b>+${pn} arriving</b>`:''}</p>${nt}</div>
+          <div class="step"><button data-act="fire" data-r="${r}" ${n<=0?'disabled':''} aria-label="Let 5 go">−</button><span class="n">${n}</span><button class="plus" data-act="hire" data-r="${r}" ${canPay(AGENCY)?'':'disabled'} aria-label="Hire 5">+</button></div></div>`;
+      }else{
+        const docs=S.docs.filter(d=>d.r===r);
+        h+=`<div class="row"><div style="min-width:0"><h3>${Rr.n} <span class="num" style="color:var(--muted);font-weight:600">· ${n}</span></h3><p>~${money(Rr.s*S.wage)}/yr · ${int(Rr.w)} wRVU/yr median · ${Rr.cap} ${Rr.cu}</p>${nt}</div>
+          <button class="hire" data-act="cands" data-r="${r}">Hire</button>
+          ${docs.length||pend.length?`<div class="docs">${docs.map(d=>docChip(d)).join('')}${pend.map(p=>docChip(p.doc,p.wk)).join('')}</div>`:''}</div>`;
+      }
+    }
+  }
+  B.innerHTML=h;
+}
+function cands(r){
+  const c=S.cands[r];
+  if(!c||c.until<S.abs){S.cands[r]={until:S.abs+8,list:[makeDoc(r),makeDoc(r),makeDoc(r)]};}
+  return S.cands[r];
+}
+function sheetHire(B,T,sub){
+  const r=sheetArg,Rr=ROLES[r],c=cands(r),fee=recruitFee();
+  T.textContent='Hire: '+Rr.n;sub.textContent=`Recruiting fee ${money(fee)} · starts in ${sc().cred} weeks · Cash ${cashTxt()}`;
+  B.innerHTML=c.list.map((d,i)=>{const t=TRAITS[d.tr];return`<div class="cand"><span class="av" style="--c:${avColor(d.nm)}">${esc(initials(d.nm))}</span><div><h3>${esc(d.nm)}</h3><span class="tr${d.tr==='star'?' star':''}">${t.n}</span><p>${t.d}</p></div>
+    <div class="act"><span class="num" style="font-weight:600">${money(d.sal)}/yr</span><button class="hire" data-act="hireDoc" data-i="${i}" ${canPay(fee)?'':'disabled'}>Hire · ${money(fee)}</button></div></div>`;}).join('')+
+    `<div class="acts"><button class="btn" data-act="reroll" ${canPay(REROLL)?'':'disabled'}>New candidates<br><small style="font-weight:500">${money(REROLL)} search fee</small></button><button class="btn" data-act="toStaff">Back to staff</button></div>
+    <p class="hint">This shortlist refreshes on its own in ${Math.max(0,c.until-S.abs)} weeks.</p>`;
+}
+function sheetMoney(B,T,sub){
+  const r=S.last;T.textContent='Finance';sub.textContent=`Year ${S.year} · Payer index ${S.payer.toFixed(3)} · $${S.cf.toFixed(2)} per wRVU`;
+  if(!r){B.innerHTML='<p class="hint">Run a week to see your P&amp;L.</p>';return;}
+  const row=(a,v,c)=>`<tr${c?` class="${c}"`:''}><td>${a}</td><td class="r ${v<0?'neg':''}">${money(v)}</td></tr>`;
+  const wk=Math.max(1,S.week-1);
+  let wt='';for(const k of DOCROLES){const n=N(k),y=S.ytd.w[k]||0;if(!n&&!y)continue;const ann=n?y/wk*52/n:0,b=ROLES[k].w;
+    wt+=`<tr><td>${ROLES[k].n}</td><td class="r">${n}</td><td class="r">${int(y)}</td><td class="r ${n?(ann>=b*.9?'pos':ann<b*.6?'neg':''):''}">${n?int(ann):'—'}</td><td class="r">${int(b)}</td></tr>`;}
+  B.innerHTML=`<div class="big"><div class="kpi"><span>Operating income YTD</span><b class="${S.ytd.op<0?'neg':'pos'}">${money(S.ytd.op)}</b><small>${S.cfg.sandbox?'Sandbox: no board':`Board target ${money(target(S.year))} · credit line to −$10M`}</small></div><div class="kpi"><span>Margin last week</span><b>${r.rev>0?(r.op/r.rev*100).toFixed(1):'0'}%</b><small>US hospital median is about 2–5%</small></div></div>
+   <div class="scroll"><table><tr><th>Last week</th><th class="r">Amount</th></tr>
+    ${row('Facility revenue (DRGs, procedures, visits)',r.facRev)}${row(`Professional fees (${int(r.wT)} wRVUs)`,r.proRev)}${r.dsh?row('DSH supplemental payments',r.dsh):''}${r.costPlus?row('Critical Access cost-based Medicare',r.costPlus):''}
+    ${row('Supplies, implants and drugs',-r.supplies)}${row(`Complications (${r.comps.toFixed(1)} unreimbursed)`,-r.compCost)}
+    ${row('Salaries and benefits',-r.wages)}${row('Unit upkeep',-r.upkeep)}${row('Overhead: admin, IT, utilities, debt',-r.overhead)}
+    ${row('Operating income',r.op,'tot')}</table></div>
+   <div class="grp"><span>Physician productivity</span></div>
+   <div class="scroll"><table><tr><th>Specialty</th><th class="r">FTE</th><th class="r">wRVU YTD</th><th class="r">Pace/FTE</th><th class="r">Median</th></tr>${wt||'<tr><td colspan="5">No physicians yet.</td></tr>'}</table></div>
+   <p class="hint">Medians are approximate annual work RVUs per full-time physician from national compensation surveys. Procedural specialties generate the most RVUs, but they only pay off when beds, anesthesia, nursing and hospitalists keep up.</p>`;
+}
+function sheetQuality(B,T,sub){
+  const r=S.last;T.textContent='Quality & patients';sub.textContent=`${S.stars.toFixed(1)}★ patient experience · reputation ${Math.round(S.rep)}`;
+  const L=r?r.L:layout();
+  let h=`<div class="big"><div class="kpi"><span>Quality index</span><b>${Math.round(S.Q)}</b><small>Safety, staffing, coverage</small></div><div class="kpi"><span>Patient experience</span><b>${Math.round(S.sat)}</b><small>${S.stars.toFixed(1)} stars (HCAHPS)</small></div><div class="kpi"><span>Reputation</span><b>${Math.round(S.rep)}</b><small>Drives patient demand</small></div><div class="kpi"><span>Layout flow</span><b>${Math.round(L.score)}</b><small>Adjacency and access</small></div></div>`;
+  if(S.voices.length)h+='<div class="grp"><span>What people are saying</span></div>'+S.voices.slice(0,6).map(v=>`<div class="quote ${v.tone}">“${esc(v.t)}”<small>${({pt:'A patient',rn:'A nurse',md:'A physician'})[v.k]||'A visitor'} · Y${v.y} W${v.wk}</small></div>`).join('');
+  if(r){h+=`<div class="scroll"><table><tr><th>Metric (last week)</th><th class="r">Value</th></tr>
+    <tr><td>Post-procedure complication rate</td><td class="r ${r.compRate>.06?'neg':''}">${(r.compRate*100).toFixed(1)}%</td></tr>
+    <tr><td>Infections per 1,000 patient-days</td><td class="r ${r.hai>2?'neg':''}">${r.hai.toFixed(1)}</td></tr>
+    <tr><td>ED left without being seen</td><td class="r ${r.lwbs>.08?'neg':''}">${pct(r.lwbs)}</td></tr>
+    <tr><td>Hospitalist census per FTE</td><td class="r ${r.hospLoad>1.05?'neg':''}">${N('hosp')?(r.census/N('hosp')).toFixed(1):'—'}</td></tr>
+    <tr><td>Critical-care transfers out</td><td class="r ${r.transfers>.5?'neg':''}">${r.transfers.toFixed(1)}/wk</td></tr>
+    <tr><td>Nurse staffing vs need</td><td class="r ${r.nF<.95?'neg':''}">${pct(r.nF)}</td></tr>
+    <tr><td>Cleaning staff vs need</td><td class="r ${r.evsF<.95?'neg':''}">${pct(r.evsF)}</td></tr>
+    <tr><td>Food</td><td class="r">${FOOD[r.cafe]}</td></tr></table></div>`;}
+  h+='<div class="grp"><span>Advisor</span></div>'+issues(r).map(i=>`<div class="note ${i.sev>=3?'bad':i.sev>=2?'warn':''}">${esc(i.t)}</div>`).join('');
+  h+='<div class="grp"><span>Layout review</span></div>'+(L.notes.length?L.notes.map(n=>`<div class="note ${n[0]==='+'?'good':'bad'}">${n[1]}</div>`).join(''):'<div class="note">Build more units to see adjacency effects.</div>');
+  h+='<div class="note">Layout tips: ED on Floor 1 with Imaging (but not right beside a ward) · ORs and ICU on the same floor · Cath lab near the ED or ICU · L&amp;D with the ORs · Clinic and cafeteria on Floor 1.</div>';
+  B.innerHTML=h;
+}
+function sheetGoals(B,T,sub){
+  T.textContent='Goals';const got=achGot();sub.textContent=`${CERTS.filter(c=>S.cert[c.id].earned).length}/${CERTS.length} designations · ${got.length}/${ACH.length} achievements`;
+  let h='<div class="grp"><span>Designations</span></div><p class="hint">Meet every requirement for the weeks shown to earn a designation. If you later drop below a requirement, it lapses until you fix it.</p>';
+  for(const c of CERTS){const st=S.cert[c.id],rq=c.req(),ok=rq.every(x=>x[1]);
+    const badge=st.earned?(st.on?'<span class="on">Active</span>':'<span class="lapsed">Lapsed</span>'):`<span>${st.held}/${c.need} wk</span>`;
+    h+=`<div class="cert"><h3>${c.n}${badge}</h3><p>${c.fx}</p><ul>${rq.map(x=>`<li class="${x[1]?'y':''}">${x[0]}</li>`).join('')}</ul>${st.earned?'':`<div class="pb"><b style="width:${st.held/c.need*100}%"></b></div>`}</div>`;}
+  h+='<div class="grp"><span>Capital projects</span></div>';
+  for(const p of PROJ){const st=S.proj[p.id],ok=p.need();
+    h+=`<div class="row"><div style="min-width:0"><h3>${p.n}</h3><p>${p.fx}</p>${!ok&&!st?`<div class="need bad">${p.nt}</div>`:''}</div>${st?(st.done?'<span class="need ok">Built</span>':`<span class="need warn">${st.wk} wk</span>`):`<button class="hire" data-act="proj" data-id="${p.id}" ${ok&&canPay(p.c)?'':'disabled'}>${money(p.c)}</button>`}</div>`;}
+  h+=`<div class="grp"><span>Achievements</span><span>${got.length}/${ACH.length}</span></div><div class="ach">${ACH.map(a=>`<div class="${got.includes(a[0])?'got':''}"><b>${a[1]}</b>${a[2]}</div>`).join('')}</div>`;
+  h+=`<button class="btn" data-act="leaders">Hall of fame</button>`;
+  B.innerHTML=h;
+}
+function sheetLeaders(B,T,sub){T.textContent='Hall of fame';sub.textContent=DB?'Shared with everyone who can open this game':'Scores saved in this browser';B.innerHTML=leadersHTML();fillNames(B);}
+function sheetLog(B,T,sub){
+  T.textContent='Hospital news';sub.textContent=S.eff.filter(e=>e.k[0]!=='_').length?`Active: ${S.eff.filter(e=>e.k[0]!=='_').length} temporary effects`:'No active crises';
+  B.innerHTML=S.log.map(l=>`<div class="note ${l.kind}"><span class="w">Y${l.y} W${l.wk}</span>${esc(l.t)}</div>`).join('')||'<p class="hint">Nothing yet.</p>';
+}
+function sheetMenu(B,T,sub){
+  T.textContent=S.cfg.name;sub.textContent=`${SCEN[S.cfg.scen].n} · ${DIFF[S.cfg.diff].n} · ${S.cfg.sandbox?'Sandbox':S.cfg.len+' years'}`;
+  B.innerHTML=`<button class="btn pri" data-act="close">Resume</button>
+    <button class="btn" data-act="sound">Sound: ${soundOn?'On':'Off'}</button>
+    <button class="btn" data-act="leaders">Hall of fame</button>
+    <button class="btn" data-act="howto">How to play</button>
+    <button class="btn${armed.restart?' armed':''}" data-act="restart">${armed.restart?'Tap again: restart with the same settings':'Restart this hospital'}</button>
+    <button class="btn${armed.newh?' armed':''}" data-act="newh">${armed.newh?'Tap again: abandon this game':'New hospital'}</button>
+    ${BACK?`<a class="btn" href="${esc(BACK)}">More games</a>`:''}
+    <p class="hint">Your game saves automatically in this browser after every week.</p>`;
+}
+
+/* ================= Actions ================= */
+function arm(k){armed[k]=true;renderSheet();setTimeout(()=>{if(armed[k]){armed[k]=false;if(sheet)renderSheet();}},3000);}
+function act(a,el){
+  if(sheet==='slot'){
+    const [f,s]=sheetArg,x=S.floors[f][s];
+    if(a==='build'){const t=el.dataset.t,d=UNITS[t];if(!canPay(d.c))return;pay(d.c);const n=u(t);n.build=d.bw;S.floors[f][s]=n;note(`Construction started: ${d.n} on Floor ${f+1}.`);snd('build');closeSheet();render();return;}
+    if(a==='upg'&&x){const c=UNITS[x.t].c*.6*x.lvl;if(!canPay(c)||x.lvl>=3||x.upg||x.build)return;pay(c);x.spent+=c;x.upg=3;note(`${UNITS[x.t].n} upgrade under way.`);snd('build');render();return;}
+    if(a==='demo'&&x){if(!armed.demo)return arm('demo');if(!S.cfg.sandbox)S.cash+=x.spent*.3;S.floors[f][s]=null;note(`${UNITS[x.t].n} demolished.`);snd('bad');closeSheet();render();return;}
+  }
+  if(a==='hire'){const r=el.dataset.r,Rr=ROLES[r];if(!canPay(AGENCY))return;pay(AGENCY);S.pending.push({r,n:Rr.b,wk:1});snd('tap');render();return;}
+  if(a==='fire'){const r=el.dataset.r,Rr=ROLES[r],n=Math.min(Rr.b,S.staff[r]);if(n<=0)return;S.staff[r]-=n;pay(n*Rr.s/52*4*S.wage);if(Rr.g==='rn')S.morale.rn=clamp(S.morale.rn-4,0,100);render();return;}
+  if(a==='cands'){openSheet('hire',el.dataset.r);return;}
+  if(a==='hireDoc'){const r=sheetArg,c=cands(r),i=+el.dataset.i,d=c.list[i],fee=recruitFee();if(!d||!canPay(fee))return;pay(fee);S.pending.push({r,doc:d,wk:sc().cred});c.list.splice(i,1,makeDoc(r));note(`Offer accepted: ${d.nm} (${TRAITS[d.tr].n}) is credentialing.`);snd('coin');openSheet('staff');render();return;}
+  if(a==='reroll'){if(!canPay(REROLL))return;pay(REROLL);S.cands[sheetArg]={until:S.abs+8,list:[makeDoc(sheetArg),makeDoc(sheetArg),makeDoc(sheetArg)]};snd('tap');render();return;}
+  if(a==='toStaff'){openSheet('staff');return;}
+  if(a==='fireDoc'){const id=el.dataset.id,d=S.docs.find(x=>x.id===id);if(!d)return;if(!armed['f'+id])return arm('f'+id);
+    S.docs.splice(S.docs.indexOf(d),1);pay(d.sal/13);const g=ROLES[d.r].g;S.morale[g]=clamp(S.morale[g]-4,0,100);note(`${d.nm} was let go.`);armed={};render();return;}
+  if(a==='proj'){const p=PROJ.find(x=>x.id===el.dataset.id);if(!p||S.proj[p.id]||!p.need()||!canPay(p.c))return;pay(p.c);S.proj[p.id]={wk:p.wk,done:false};note(`${p.n} project started.`);snd('build');render();return;}
+  if(a==='leaders'){openSheet('leaders');return;}
+  if(a==='close'){closeSheet();render();return;}
+  if(a==='sound'){soundOn=!soundOn;store.set('ht-sound',soundOn);snd('tap');renderSheet();return;}
+  if(a==='howto'){closeSheet();showHowTo();return;}
+  if(a==='restart'){if(!armed.restart)return arm('restart');closeSheet();startGame(S.cfg);return;}
+  if(a==='newh'){if(!armed.newh)return arm('newh');closeSheet();store.del('ht-save');showSetup();return;}
+}
+
+/* ================= Modals: title, setup, how-to ================= */
+let mChoices=[],mOpenedAt=0,draft=null;
+function showModal(m){
+  modalOpen=true;mChoices=m.ch||[];mOpenedAt=Date.now();
+  const card=$('#mCard');card.style.setProperty('--c',m.c?`var(${m.c})`:'var(--accent)');
+  card.innerHTML=`${m.tag?`<div class="eyebrow">${m.tag}</div>`:''}${m.title?`<h2>${m.title}</h2>`:''}${m.html||''}${m.body?(m.body.startsWith('<')?m.body:`<p>${m.body}</p>`):''}${mChoices.length?`<div style="display:grid;gap:8px">${mChoices.map((c,i)=>`<button class="choice${c.pri||mChoices.length===1?' pri':''}" data-i="${i}"><b>${c.l}</b>${c.d?`<span>${c.d}</span>`:''}</button>`).join('')}</div>`:''}`;
+  $('#modal').hidden=false;card.scrollTop=0;
+}
+function hideModal(){modalOpen=false;$('#modal').hidden=true;}
+$('#modal').addEventListener('click',e=>{
+  if(draft&&setupClick(e))return;
+  const b=e.target.closest('.choice');if(!b||Date.now()-mOpenedAt<600)return;
+  const c=mChoices[+b.dataset.i];if(!c)return;hideModal();
+  const res=c.f();S.rep=clamp(S.rep,0,100);
+  if(res){note(res);showModal({tag:'Outcome',body:res,ch:[{l:'Back to work',f(){return null;}}]});}
+  render();saveGame();
+});
+
+function showTitle(){
+  draft=null;leadersModal=false;
+  const sv=store.get('ht-save',null),best=store.get('ht-best',0),got=achGot().length;
+  const ch=[];
+  if(sv&&sv.cfg&&!sv.over)ch.push({l:`Resume ${esc(sv.cfg.name)}`,d:`Year ${sv.year} · Week ${sv.week} · ${sv.cfg.sandbox?'Sandbox':money(sv.cash)}`,pri:true,f(){resumeGame(sv);return null;}});
+  ch.push({l:'New hospital',d:'Name it, pick a scenario, set the rules.',pri:!ch.length,f(){showSetup();return null;}});
+  ch.push({l:'Hall of fame',d:`Best score ${int(best)} · ${got}/${ACH.length} achievements`,f(){showLeaders(false);return null;}});
+  if(BACK)ch.push({l:'More games',d:'Back to the games page.',f(){location.href=BACK;return null;}});
+  showModal({c:'--ed',html:`<div class="logo"><em>H</em>Hospital<br>Tycoon</div>
+    <div class="signs"><span style="--c:var(--ed)">ED</span><span style="--c:var(--or)">OR</span><span style="--c:var(--icu)">ICU</span><span style="--c:var(--ms)">MS</span><span style="--c:var(--cath)">CATH</span><span style="--c:var(--img)">CT</span><span style="--c:var(--ld)">L&amp;D</span><span style="--c:var(--cafe)">CAFE</span></div>
+    <p>Build a hospital tower floor by floor, hire the physicians who run it, and keep the whole care ecosystem in balance through crises, payment cuts and a demanding board.</p>`,ch});
+}
+function showHowTo(){
+  showModal({c:'--accent',tag:'How to play',title:'Running a hospital',html:`<ul>
+    <li><b>Build:</b> tap an empty room in the tower. Put the ED on Floor 1 with Imaging; keep the ORs near the ICU. Tap a built unit to upgrade it.</li>
+    <li><b>Hire:</b> open Staff and interview candidates. Traits matter: a Star lifts everyone, a Prima donna produces but sours the team.</li>
+    <li><b>Balance:</b> surgeons need anesthesia, beds, nurses and hospitalists for post-op care. Too few and outcomes, morale and money all fall.</li>
+    <li><b>Listen:</b> patients and staff say what’s wrong in speech bubbles. The Care tab keeps the latest quotes.</li>
+    <li><b>Grow:</b> earn designations like Trauma Center and Magnet Nursing, and buy projects like a surgical robot or helipad in Goals.</li>
+    <li><b>Survive:</b> meet each year’s board target for operating income. One miss puts you on probation; two and you’re out.</li></ul>`,ch:[{l:'Got it',f(){return null;}}]});
+}
+function showSetup(){
+  draft=Object.assign({},DEFAULT_CFG,store.get('ht-cfg',{}));if(!Array.isArray(draft.deck))draft.deck=[...DEFAULT_CFG.deck];
+  modalOpen=true;mChoices=[];mOpenedAt=Date.now();renderSetup();$('#modal').hidden=false;$('#mCard').scrollTop=0;
+}
+function renderSetup(){
+  const d=draft,card=$('#mCard'),y=card.scrollTop;card.style.setProperty('--c','var(--accent)');
+  const seg=(k,opts,n)=>`<div class="seg" style="--n:${n||opts.length}">${opts.map(([v,l,s])=>`<button data-k="${k}" data-v="${v}" aria-pressed="${String(d[k])===String(v)}">${l}${s?`<small>${s}</small>`:''}</button>`).join('')}</div>`;
+  card.innerHTML=`<div class="eyebrow">New hospital</div><h2>Break ground</h2>
+    <div class="field"><h4>Hospital name</h4><input id="hName" maxlength="28" value="${esc(d.name)}" autocomplete="off" aria-label="Hospital name"></div>
+    <h4>Scenario</h4><div class="scens">${Object.entries(SCEN).map(([k,s])=>`<button class="scen" data-k="scen" data-v="${k}" aria-pressed="${d.scen===k}"><b>${s.n}<em>${s.tag}</em></b><span>${s.d}</span><span class="num">Start ${money(s.cash)} · max ${s.maxF} floors</span></button>`).join('')}</div>
+    <h4>Difficulty</h4>${seg('diff',Object.entries(DIFF).map(([k,v])=>[k,v.n,v.d]))}
+    <h4>Mode</h4>${seg('sandbox',[['false','Career','Board targets, score'],['true','Sandbox','Unlimited money']],2)}
+    ${d.sandbox?'':`<h4>Length</h4>${seg('len',[[3,'3 years','Quick'],[5,'5 years','Standard'],[10,'10 years','Marathon']])}`}
+    <h4>Crises</h4>${seg('freq',[['off','Off'],['low','Low'],['normal','Normal'],['high','High']],4)}
+    ${d.freq==='off'?'':`<p class="hint">Tap to include or remove crisis types.</p><div class="deck">${Object.entries(EVNAMES).map(([k,n])=>`<button data-deck="${k}" aria-pressed="${d.deck.includes(k)}">${n}</button>`).join('')}</div>`}
+    <h4>Sound</h4>${seg('sound',[['true','On'],['false','Off']],2)}
+    <div style="display:grid;gap:8px;margin-top:4px"><button class="choice pri" data-start="1"><b>Break ground</b><span>${esc(SCEN[d.scen].n)} · ${DIFF[d.diff].n} · ${d.sandbox?'Sandbox':d.len+' years'}</span></button><button class="choice" data-cancel="1"><b>Back</b></button></div>`;
+  card.scrollTop=y;
+}
+function setupClick(e){
+  const d=draft;if(Date.now()-mOpenedAt<300)return true;
+  const nm=$('#hName');if(nm)d.name=nm.value;
+  const k=e.target.closest('[data-k]'),dk=e.target.closest('[data-deck]');
+  if(k){let v=k.dataset.v;if(k.dataset.k==='len')v=+v;if(k.dataset.k==='sandbox')v=v==='true';
+    if(k.dataset.k==='sound'){soundOn=v==='true';store.set('ht-sound',soundOn);d.sound=soundOn;}else d[k.dataset.k]=v;renderSetup();snd('tap');return true;}
+  if(dk){const id=dk.dataset.deck,i=d.deck.indexOf(id);if(i>=0)d.deck.splice(i,1);else d.deck.push(id);renderSetup();return true;}
+  if(e.target.closest('[data-start]')){d.name=(d.name||'').trim().slice(0,28)||'Mercy General';const cfg={name:d.name,scen:d.scen,diff:d.diff,len:d.len,sandbox:d.sandbox,freq:d.freq,deck:[...d.deck]};store.set('ht-cfg',cfg);draft=null;hideModal();startGame(cfg);return true;}
+  if(e.target.closest('[data-cancel]')){draft=null;hideModal();showTitle();return true;}
+  return !!e.target.closest('input');
+}
+$('#mCard').addEventListener('input',e=>{if(draft&&e.target.id==='hName')draft.name=e.target.value;});
+$('#mCard').addEventListener('keydown',e=>{if(draft&&e.key==='Enter'&&e.target.id==='hName')e.target.blur();});
+
+function startGame(cfg){
+  newGame(cfg);started=true;acc=0;agents=[];vehicles=[];cars=[];lift.y=NaN;closeSheet();hideModal();
+  note(`Welcome to ${S.cfg.name}. ${SCEN[S.cfg.scen].d}`);resize();render();scrollGround();snd('build');saveGame();
+}
+function resumeGame(sv){
+  S=sv;S.over=null;started=true;acc=0;agents=[];vehicles=[];cars=[];lift.y=NaN;
+  CERTS.forEach(c=>{if(!S.cert[c.id])S.cert[c.id]={held:0,earned:false,on:false};});
+  hideModal();resize();render();scrollGround();
+}
+function scrollGround(){const b=$('#bldg');b.scrollTop=b.scrollHeight;}
+
+/* ================= Wiring ================= */
+$('#ov').addEventListener('click',e=>{
+  if(e.target.closest('#addFloor')){const c=floorCost();if(!canPay(c)||S.floors.length>=maxFloors())return;pay(c);S.floors.push([null,null,null,null]);note(`Floor ${S.floors.length} added to the tower.`,'good');snd('build');resize();render();$('#bldg').scrollTo({top:0,behavior:REDUCED?'auto':'smooth'});saveGame();return;}
+  const t=e.target.closest('[data-f]');if(t){snd('tap');openSheet('slot',[+t.dataset.f,+t.dataset.s]);}
+});
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)openSheet(b.dataset.s);});
+$('#advisor').addEventListener('click',()=>openSheet('quality'));
+$('#shClose').addEventListener('click',()=>{closeSheet();render();});
+$('#scrim').addEventListener('click',()=>{closeSheet();render();});
+$('#shBody').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b&&!b.disabled)act(b.dataset.act,b);});
+$('#bPlay').addEventListener('click',()=>{S.paused=!S.paused;render();});
+$('#bSpeed').addEventListener('click',()=>{S.speed=S.speed===1?2:S.speed===2?4:1;render();});
+$('#bMenu').addEventListener('click',()=>{if(started&&!S.over)openSheet('menu');else if(!modalOpen)showTitle();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheet){closeSheet();render();}if(e.key===' '&&!sheet&&!modalOpen&&started&&e.target.tagName!=='INPUT'){e.preventDefault();S.paused=!S.paused;render();}});
+document.addEventListener('visibilitychange',()=>{if(!S)return;if(document.hidden&&started&&!S.over){S.paused=true;saveGame();}render();});
+if(window.ResizeObserver)new ResizeObserver(()=>{if(S){resize();}}).observe($('#bldg'));else window.addEventListener('resize',()=>S&&resize());
+
+function boot(data){
+  readPal();
+  if(data&&data.S){S=data.S;started=!!data.started;resize();render();scrollGround();if(!started)showTitle();}
+  else{newGame(store.get('ht-cfg',{}));started=false;resize();render();scrollGround();showTitle();}
+  requestAnimationFrame(frame);
+}
+if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(()=>({S,started}));
+const H=window.claude&&window.claude.hot;
+H&&H.ready?H.ready(boot):boot(H&&H.data?H.data:{});
+</script>
+
+</body>
+</html>
