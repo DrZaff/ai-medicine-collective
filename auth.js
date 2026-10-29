@@ -1805,3 +1805,64 @@ function initDigestSender() {
 document.addEventListener("DOMContentLoaded", initDigestSender);
 document.addEventListener("DOMContentLoaded", initAccountPage);
 document.addEventListener("DOMContentLoaded", initModerationPage);
+
+// Bearcat Pinball's public high-score board (migration 020): moderators see
+// every entry and can remove one, such as an offensive nickname or an obviously
+// fake score. Shows nothing for anyone else, or before 020 has run.
+function initPinballModeration() {
+  const app = document.getElementById("moderate-pinball");
+  if (!app) return;
+
+  async function load(message) {
+    const { data, error } = await db.rpc("pinball_scores_for_moderators");
+    if (error || !Array.isArray(data)) {
+      app.replaceChildren();
+      return;
+    }
+    const fold = el("details", "resource-group mod-section mod-fold");
+    fold.open = Boolean(message);
+    const body = el("div", "resource-body");
+    const status = el("p", "account-status", message || "");
+    body.append(
+      el("p", "note", "// The public board on the Bearcat Pinball page. Remove a nickname that is offensive or a score that is clearly fake."),
+      status
+    );
+    if (!data.length) {
+      body.append(el("p", "note", "No scores yet."));
+    } else {
+      const list = el("ul", "mod-list");
+      data.forEach((row, i) => {
+        const item = el("li", "mod-row");
+        const who = el("div", "account-who");
+        who.append(
+          el("span", "account-name", `${i + 1}. ${row.name}`),
+          el("span", "note", `// ${Number(row.score).toLocaleString()} points · ${formatDate(row.updated_at)}`)
+        );
+        const actions = el("div", "mod-actions");
+        actions.append(
+          button("REMOVE", "mod-decline", async () => {
+            if (!window.confirm(`Remove ${row.name} (${Number(row.score).toLocaleString()} points) from the board?`)) return;
+            status.textContent = "> Removing...";
+            status.classList.remove("is-error");
+            const { error: removeError } = await db.rpc("remove_pinball_score", { p_id: row.id });
+            if (removeError) {
+              status.textContent = `> FAILED: ${removeError.message}`;
+              status.classList.add("is-error");
+              return;
+            }
+            await load(`> DONE: removed ${row.name}`);
+          })
+        );
+        item.append(who, actions);
+        list.append(item);
+      });
+      body.append(list);
+    }
+    fold.append(el("summary", "resource-summary", `// Pinball high scores (${data.length})`), body);
+    app.replaceChildren(fold);
+  }
+
+  load();
+}
+
+document.addEventListener("DOMContentLoaded", initPinballModeration);

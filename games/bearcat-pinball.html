@@ -14,7 +14,34 @@
   <meta property="og:description" content="Night shift pinball: ride the Medevac ramp, admit to the ICU, and work your way up to Attending." />
   <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <!-- Built from the Claude Artifact version of this game (source and build_site.py are kept outside this repo). This copy uses fonts hosted on this site and keeps high scores on the device. -->
+  <!-- Built from the Claude Artifact version of this game (source and build_site.py are kept outside this repo). This copy uses fonts hosted on this site and shares high scores through the site's database. -->
+<script>
+// Shared high scores for this copy of the game: the Supabase functions from
+// supabase/migrations/020_pinball_scores.sql, called with the site's public key.
+// The game falls back to the board on this device if they can't be reached.
+window.pinballRemoteBoard = (() => {
+  const API = 'https://ahwnarhmuzxgjindreuz.supabase.co/rest/v1/rpc/';
+  const KEY = 'sb_publishable_3C4xXn0j3GiunX-t6cd0HQ_ze_yTErT';
+  let device = null;
+  try { device = localStorage.getItem('bearcatPinballDevice'); } catch (e) {}
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(device || '')) {
+    device = crypto.randomUUID();
+    try { localStorage.setItem('bearcatPinballDevice', device); } catch (e) {}
+  }
+  async function call(fn, body) {
+    const res = await fetch(API + fn, {method: 'POST', headers: {apikey: KEY, 'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+    if (!res.ok) throw new Error(fn + ' ' + res.status);
+    return res.json();
+  }
+  return {
+    list: n => call('pinball_leaderboard', {p_device: device, p_limit: n}),
+    submit: async e => {
+      const rows = await call('submit_pinball_score', {p_device: device, p_name: e.name, p_score: e.score, p_rank: e.rank});
+      return Array.isArray(rows) ? rows[0] : rows;
+    }
+  };
+})();
+</script>
 <style>
 @font-face{font-family:"Bungee";font-style:normal;font-weight:400;font-display:swap;src:url("../fonts/bungee.woff2") format("woff2")}
 @font-face{font-family:"VT323";font-style:normal;font-weight:400;font-display:swap;src:url("../fonts/vt323.woff2") format("woff2")}
@@ -97,6 +124,7 @@ body{margin:0;height:100%;overflow:hidden;color:var(--ink);font-family:var(--fon
 <style>
 .more-games{color:inherit;text-decoration:underline;text-underline-offset:3px}
 .more-games:focus-visible{outline:3px solid #ffc76a;outline-offset:2px}
+.return-site{display:grid;place-items:center;box-sizing:border-box;text-decoration:none}
 </style>
 </head>
 <body>
@@ -132,6 +160,7 @@ body{margin:0;height:100%;overflow:hidden;color:var(--ink);font-family:var(--fon
           <input id="playerName" type="text" maxlength="12" autocomplete="nickname" autocapitalize="characters" spellcheck="false" enterkeyhint="go" placeholder="ENTER YOUR NAME" aria-describedby="nameHint">
         </label>
         <span class="nameHint" id="nameHint" role="alert"></span>
+        <span class="fine">Your name appears on the public high-score board. No patient information, please.</span>
         <button class="cta" id="btnPlay">Start shift</button>
         <div class="row">
           <button class="cta ghost" id="btnScores">High scores</button>
@@ -157,6 +186,7 @@ body{margin:0;height:100%;overflow:hidden;color:var(--ink);font-family:var(--fon
           <button class="cta" id="btnAgain">Play again</button>
           <button class="cta ghost" id="btnChange">Change player</button>
         </div>
+        <a class="cta ghost return-site" href="../index.html">Return to site</a>
       </div>
     </div>
 
@@ -260,6 +290,7 @@ const COPY = {
     place:n=>n===1?'New high score! #1':`On the board! #${n}`,
     noPlace:'Not on the board this time',
     kept:'Your personal best still stands',
+    offline:'Couldn’t reach the high-score board; saved on this device',
     needName:'Enter a player name to start',
     reached:(name,rank)=>`${name} reached ${rank}.`
   },
@@ -1080,8 +1111,13 @@ function unlockAudio(){
    ENGINE: PLAYER + LEADERBOARD
    One best score per player on a shared board (the artifact's db) when
    this viewer can use it; otherwise a top-10 board kept in this browser.
-   A website build can replace `board` with any object of the same shape:
-   rows, mode, canPost, init(), submit(entry), isMine(row), onChange(fn).
+   A host page (the website copy) can supply its own shared board before
+   this script runs:
+     window.pinballRemoteBoard = {
+       list(n)      -> Promise<[{name, score, rank, mine}]>   best first
+       submit(entry) -> Promise<{place, kept}>                 entry = {name, score, rank}
+     }
+   If it can't be reached, the game falls back to the device board.
    ================================================================ */
 const NAME_MAX = 12, BOARD_SIZE = 10;
 const cleanName = s => String(s||'').toUpperCase().replace(/[^A-Z0-9 ._-]/g,'').replace(/\s+/g,' ').trim().slice(0,NAME_MAX);
@@ -1096,10 +1132,15 @@ const cleanRow = (id,d) => ({ id:String(id), name:cleanName(d && d.name) || '???
 const byScore = (a,b) => b.score-a.score;
 
 const board = {
-  mode:'local', canPost:true, rows:[], myId:null, lastId:null, ref:null, listeners:[],
+  mode:'local', canPost:true, rows:[], myId:null, lastId:null, ref:null, remote:null, listeners:[],
   onChange(fn){ this.listeners.push(fn); },
   emit(){ this.listeners.forEach(fn=>fn()); },
-  isMine(r){ return this.mode==='shared' ? r.id===this.myId : r.id===this.lastId; },
+  isMine(r){ return this.remote ? !!r.mine : this.mode==='shared' ? r.id===this.myId : r.id===this.lastId; },
+  async refresh(){
+    const rows=await this.remote.list(BOARD_SIZE);
+    this.rows=(Array.isArray(rows) ? rows : []).slice(0,BOARD_SIZE).map((r,i)=>({...cleanRow('r'+i,r), mine:!!(r && r.mine)}));
+    this.emit();
+  },
   readLocal(){
     try { const a=JSON.parse(localStorage.getItem('bearcatPinballBoard')||'[]');
       return Array.isArray(a) ? a.map(r=>cleanRow(r.id,r)).sort(byScore).slice(0,BOARD_SIZE) : []; }
@@ -1113,6 +1154,14 @@ const board = {
   },
   async init(){
     this.rows=this.readLocal(); this.emit();
+    if (window.pinballRemoteBoard){
+      this.remote=window.pinballRemoteBoard;
+      try {
+        this.mode='shared'; await this.refresh();
+        setInterval(()=>{ if (!document.hidden && this.remote) this.refresh().catch(()=>{}); }, 30000);
+      } catch(e) { this.remote=null; this.mode='local'; this.rows=this.readLocal(); this.emit(); }
+      return;
+    }
     if (!window.claude || !window.claude.use) return;
     try {
       const [db,user]=await Promise.all([window.claude.use('db'), window.claude.use('user')]);
@@ -1128,6 +1177,18 @@ const board = {
   },
   // Post a finished game. Resolves {place} (1..10 on the board, 0 = off it), {kept} (an older best stands) or {viewOnly}.
   async submit(entry){
+    if (this.remote){
+      try {
+        const res=await this.remote.submit(entry);
+        await this.refresh().catch(()=>{});
+        if (res && res.kept) return {kept:true};
+        const place=Math.floor(+(res && res.place) || 0);
+        return {place: place>=1 && place<=BOARD_SIZE ? place : 0};
+      } catch(e) {
+        this.saveLocal(entry);
+        return {offline:true};
+      }
+    }
     if (this.mode==='shared'){
       if (this.canPost){
         try {
@@ -1869,7 +1930,7 @@ const ui = {
   },
   place(r){
     const el=$('overPlace');
-    el.textContent = r==='posting' ? COPY.board.posting : !r ? '' : r.viewOnly ? COPY.board.viewOnly : r.kept ? COPY.board.kept : r.place ? COPY.board.place(r.place) : COPY.board.noPlace;
+    el.textContent = r==='posting' ? COPY.board.posting : !r ? '' : r.viewOnly ? COPY.board.viewOnly : r.offline ? COPY.board.offline : r.kept ? COPY.board.kept : r.place ? COPY.board.place(r.place) : COPY.board.noPlace;
     el.classList.toggle('hot', !!(r && r.place));
   },
   boardOpen(){ return !$('ovBoard').hidden; },
