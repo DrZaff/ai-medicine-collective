@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-28",
+  "headline": "Never-skilling, and an ICU study where AI beat trainees but not subspecialists",
+  "intro": "A JAMA viewpoint warns that trainees who lean on AI may never build core clinical skills. This week's study adds evidence: when predicting ICU patient outcomes, experienced subspecialists generally beat an AI model, physicians in training and nurses generally did worse than it, and combining human and AI predictions often worked best.",
+  "items": [
+    {
+      "title": "How AI is changing the training of doctors",
+      "source": "RTÉ News (ERTNews, A European Perspective)",
+      "url": "https://www.rte.ie/news/a-european-perspective/2026/1023/1596627-artificial-intelligence-doctors/",
+      "published": "2026-10-23",
+      "category": "news",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "This news report covers a viewpoint article, not a study, by Jesse Burk-Rafel and Robert Wachter, published in JAMA on 14 October 2026. The authors warn about 'never-skilling', where trainees fail to develop core skills because they lean on AI. They propose strengthening skills that matter more with AI (physical examination, communication, therapeutic reasoning and critical oversight of AI output), building new ones such as calibrated trust in AI and metacognition, and cutting back on encyclopedic memorization. They also call for practice both with and without AI, simulated cases with deliberately planted AI errors, and assessments that separate the trainee's own work from the algorithm's.",
+      "why_it_matters": "Programmes writing AI policies get a concrete framework here: practise with and without AI, and assess what the trainee can do unaided. Learners get a reminder that judging when AI is wrong depends on reasoning skills they still have to build themselves."
+    },
+    {
+      "title": "Clinicians vs. artificial intelligence in patient outcome prediction in the intensive care unit",
+      "source": "npj Digital Medicine",
+      "url": "https://www.nature.com/articles/s41746-026-03132-0",
+      "published": "2026-08-12",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "mixed",
+      "summary": "The task was predicting outcomes for ICU patients: in-hospital and 30-day mortality, acute kidney injury, delirium, and ICU and hospital length of stay. The AI was a set of prediction models trained on 46,631 ICU admissions. In the retrospective arm, seven clinicians predicted outcomes for 990 admissions from patient data alone. In the prospective arm, clinicians made predictions for 238 admissions during active care, while the AI worked from data extracted for the same admissions. The preprint version reports that 75 clinicians made at least one prediction, across 15 adult ICUs in Alberta, Canada. The abstract reports the results as direct comparisons rather than headline numbers. In the retrospective arm, AI generally beat individual clinicians, but the pooled predictions of all seven clinicians beat the AI. In the prospective arm, subspecialised physicians generally beat the AI, while physicians in training and nurses generally did worse than it. Combining clinician and AI predictions often gave the best results. The main limitation is that the real-world prospective arm was small (238 admissions) and confined to one Canadian province's ICUs, and the AI saw extracted data rather than the bedside picture the clinicians had.",
+      "why_it_matters": "How a clinician compared with the AI depended on their experience, which is useful context for the debate over trainees relying on AI. For educators, it supports teaching learners to combine their own judgement with model output instead of deferring to it."
+    }
+  ],
+  "tags": [
+    "ai vs physician",
+    "assessment",
+    "clinical reasoning",
+    "curriculum reform",
+    "human-ai collaboration",
+    "intensive care",
+    "medical education",
+    "never-skilling",
+    "npj digital medicine",
+    "nurses",
+    "opinion",
+    "outcome prediction",
+    "prognosis",
+    "residents and trainees"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
