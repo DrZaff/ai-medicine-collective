@@ -42,16 +42,22 @@
     <main class="section">
       <h2 class="section-title">JOIN</h2>
 
-      <!-- The emblem's black background melts into the panel, so the staff
-           appears to glow out of the terminal itself. -->
       <section class="join-hero" aria-labelledby="join-heading">
-        <img
-          src="images/join-art.jpg"
-          alt="A winged staff with a serpent coiled around it, drawn in points of green light"
-          class="join-emblem"
-          width="480"
-          height="720"
-        />
+        <!-- The rod of Asclepius (one serpent on a staff), drawn as line art in
+             the colours of the Games icons; the serpent traces itself in once -->
+        <figure class="join-emblem" role="img" aria-label="The rod of Asclepius: a serpent coiled around a staff">
+          <svg viewBox="0 0 200 320" aria-hidden="true">
+            <circle class="em-ring" cx="100" cy="160" r="92"/>
+            <circle class="em-ring em-ring--dash" cx="100" cy="160" r="122"/>
+            <path class="em-rod" d="M100 34V300"/>
+            <circle class="em-knob" cx="100" cy="28" r="7"/>
+            <path class="em-snake" d="M100 286C72 278 70 256 100 246C130 236 132 212 100 202C68 192 66 166 100 156C134 146 136 120 100 110C74 102 72 82 96 72"/>
+            <path class="em-rod em-rod--front" d="M100 193V211M100 101V119"/>
+            <path class="em-head" d="M96 72C100 62 114 58 124 64C118 72 106 76 96 72Z"/>
+            <circle class="em-eye" cx="115" cy="66" r="1.8"/>
+            <path class="em-tongue" d="M124 64l7-2m-7 2l6 3"/>
+          </svg>
+        </figure>
 
         <div class="join-content">
           <p class="hero-kicker">// Students &middot; Residents &middot; Faculty &middot; Staff</p>
