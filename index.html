@@ -44,6 +44,8 @@
     <main>
 
       <section class="hero">
+        <!-- A slowly drifting network of points, drawn by script.js (initHeroNet) -->
+        <canvas class="hero-net" aria-hidden="true"></canvas>
         <p class="hero-kicker">// Clinicians building with AI &middot; Est. 2025</p>
         <h2 class="hero-title">
           Grassroots AI<br />
@@ -88,15 +90,20 @@
           </p>
         </div>
         <!-- A drawing of a card, for decoration -->
-        <div class="featured-visual" aria-hidden="true">
-          <div class="jc-card jc-card--behind"></div>
-          <div class="jc-card">
-            <span class="jc-topic">Emergency medicine</span>
-            <p class="jc-cloze">First-line treatment for anaphylaxis is intramuscular <span class="jc-blank">[ &hellip; ]</span>.</p>
-            <p class="jc-answer">epinephrine</p>
-            <div class="jc-grades"><span>Difficult</span><span>Medium</span><span>Easy</span></div>
+        <figure class="featured-visual featured-visual--jungle">
+          <div class="jc-stage" aria-hidden="true">
+            <div class="jc-card jc-card--behind"></div>
+            <div class="jc-card">
+              <span class="jc-topic">Emergency medicine</span>
+              <p class="jc-cloze">First-line treatment for anaphylaxis is intramuscular <span class="jc-blank">[ &hellip; ]</span>.</p>
+              <p class="jc-answer">epinephrine</p>
+              <div class="jc-grades"><span>Difficult</span><span>Medium</span><span>Easy</span></div>
+            </div>
           </div>
-        </div>
+          <!-- The app's own background photo; its licence asks for this credit -->
+          <figcaption class="featured-credit">Background:
+            <a href="https://www.vecteezy.com/free-photos/tropical-jungle-pattern" target="_blank" rel="noopener noreferrer">Tropical Jungle Pattern Stock photos by Vecteezy</a></figcaption>
+        </figure>
       </section>
 
       <!-- Live panels. The briefing and project panels are filled by
@@ -123,23 +130,6 @@
           <a class="home-panel-link" href="blog.html">&gt; OPEN THE BLOG</a>
         </article>
 
-        <article class="home-panel home-panel--members" data-reveal>
-          <h3 class="home-panel-title">// The team</h3>
-          <div class="home-panel-body">
-            <div class="bento-faces">
-              <img src="images/members/brandon-zaffuto.jpg" alt="Brandon Zaffuto" width="48" height="48" loading="lazy" />
-              <img src="images/members/abigail-wilmer.jpg" alt="Abigail Wilmer" width="48" height="48" loading="lazy" />
-              <img src="images/members/billy-phillips.jpg" alt="Billy Phillips" width="48" height="48" loading="lazy" />
-              <img src="images/members/robert-wendroth.jpg" alt="Robert Wendroth" width="48" height="48" loading="lazy" />
-              <img src="images/members/hamza-sultan.jpg" alt="Hamza Sultan" width="48" height="48" loading="lazy" />
-              <img src="images/members/hannah-dempsey.jpg" alt="Hannah Dempsey" width="48" height="48" loading="lazy" />
-              <img src="images/members/kenzo-ichimura.jpg" alt="Kenzo Ichimura" width="48" height="48" loading="lazy" />
-            </div>
-            <p>Founded by resident physicians. The Collective is independent and volunteer-run.</p>
-          </div>
-          <a class="home-panel-link" href="members.html">&gt; MEET THE TEAM</a>
-        </article>
-
         <article class="home-panel home-panel--tools" data-reveal>
           <h3 class="home-panel-title">// Tools</h3>
           <div class="home-panel-body">
@@ -151,6 +141,7 @@
               <img src="images/applogos/NF_logo_512.png" alt="VA Night Float Algorithm" width="56" height="56" loading="lazy" />
               <a class="bento-more" href="hub.html" aria-label="All tools"><span id="home-more-tools">+10</span></a>
             </div>
+            <p class="home-stat"><span id="home-project-count">15</span> tools, free to use</p>
             <p>Clinical calculators and assistants built by members. One tap to open, on a phone or a computer.</p>
           </div>
           <a class="home-panel-link" href="hub.html">&gt; OPEN TOOLS</a>
@@ -222,6 +213,40 @@
             </ul>
           </div>
           <a class="home-panel-link" href="games.html">&gt; ALL GAMES</a>
+        </article>
+
+        <!-- The admin team: an introduction on the left, the people on the right
+             (names and roles as on members.html; update both together) -->
+        <article class="home-panel home-panel--members" data-reveal>
+          <div class="team-intro">
+            <h3 class="home-panel-title">// The team</h3>
+            <p class="team-headline">The people behind the Collective</p>
+            <p class="team-text">Founded by resident physicians. The Collective is independent and volunteer-run.</p>
+            <a class="home-panel-link" href="members.html">&gt; MEET THE TEAM</a>
+          </div>
+          <ul class="team-grid">
+            <li><a class="team-person" href="member/brandon.html">
+              <img src="images/members/brandon-zaffuto.jpg" alt="" width="64" height="64" loading="lazy" />
+              <span class="team-name">Brandon Zaffuto</span><span class="team-role">Founder</span></a></li>
+            <li><a class="team-person" href="member/abigail.html">
+              <img src="images/members/abigail-wilmer.jpg" alt="" width="64" height="64" loading="lazy" />
+              <span class="team-name">Abigail Wilmer</span><span class="team-role">Co-creator</span></a></li>
+            <li><a class="team-person" href="member/billy.html">
+              <img src="images/members/billy-phillips.jpg" alt="" width="64" height="64" loading="lazy" />
+              <span class="team-name">Billy Phillips</span><span class="team-role">Co-creator</span></a></li>
+            <li><a class="team-person" href="member/robert.html">
+              <img src="images/members/robert-wendroth.jpg" alt="" width="64" height="64" loading="lazy" />
+              <span class="team-name">Robert Wendroth</span><span class="team-role">Co-creator</span></a></li>
+            <li><a class="team-person" href="member/hamza.html">
+              <img src="images/members/hamza-sultan.jpg" alt="" width="64" height="64" loading="lazy" />
+              <span class="team-name">Hamza Sultan</span><span class="team-role">Co-creator</span></a></li>
+            <li><a class="team-person" href="member/hannah.html">
+              <img src="images/members/hannah-dempsey.jpg" alt="" width="64" height="64" loading="lazy" />
+              <span class="team-name">Hannah Dempsey</span><span class="team-role">Admin</span></a></li>
+            <li><a class="team-person" href="member/kenzo.html">
+              <img src="images/members/kenzo-ichimura.jpg" alt="" width="64" height="64" loading="lazy" />
+              <span class="team-name">Kenzo Ichimura</span><span class="team-role">Admin</span></a></li>
+          </ul>
         </article>
 
       </section>

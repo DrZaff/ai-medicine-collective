@@ -3870,23 +3870,18 @@ html.terminal::view-transition-new(root) {
   grid-row: 3;
 }
 
-/* "Members" tags in the menu and footer */
+/* "(members only)" in the menu and footer: quiet, so it reads as a note */
 .modern .nav-members-tag {
-  margin-left: 6px;
-  padding: 1px 8px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--brand-soft);
-  color: var(--brand);
-  font-size: 0.6875rem;
-  font-weight: 600;
+  margin-left: 2px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
 }
 
 .modern .footer-links .nav-members-tag {
-  background: rgb(255 255 255 / 0.1);
-  color: var(--spark-soft);
+  color: rgb(255 255 255 / 0.45);
 }
 
 /* the disclaimer, closing the footer band */
@@ -3936,5 +3931,377 @@ html.terminal::view-transition-new(root) {
 @media (prefers-reduced-motion: reduce) {
   .modern .jc-card {
     animation: none;
+  }
+}
+
+
+/* === HOME, SECOND PASS (2026-10-29) ===========================
+   A grander hero (a drifting network of points, a slow aurora, a shimmer on
+   "in medicine"); JungleCards on its own jungle photo; a livelier Tools card
+   and an arcade-style Games card; the team closes the page. */
+
+.modern .hero {
+  padding: 124px 40px 64px;
+}
+
+/* a slow aurora turning behind everything */
+.modern .hero::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgb(16 185 129 / 0.2) 60deg, transparent 130deg,
+    rgb(6 182 212 / 0.18) 210deg, transparent 280deg);
+  filter: blur(48px);
+  pointer-events: none;
+  animation: heroAurora 48s linear infinite;
+}
+
+/* a line of light along the bottom edge */
+.modern .hero::after {
+  content: "";
+  position: absolute;
+  right: 12%;
+  bottom: 0;
+  left: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(110 231 183 / 0.7), transparent);
+  pointer-events: none;
+}
+
+@keyframes heroAurora {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.modern .hero-net {
+  color: #6ee7b7;
+  opacity: 0.55;
+}
+
+.modern .hero-kicker::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: -2px 10px 0 0;
+  border-radius: 50%;
+  background: var(--spark);
+  vertical-align: middle;
+  animation: heroPulse 2.4s ease-out infinite;
+}
+
+@keyframes heroPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(16 185 129 / 0.7);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 9px rgb(16 185 129 / 0);
+  }
+}
+
+.modern .hero-title {
+  font-size: clamp(3.1rem, 9vw, 6.4rem);
+  text-shadow: 0 10px 40px rgb(0 0 0 / 0.25);
+}
+
+/* "in medicine": a slow shimmer from mint to cyan */
+.modern .hero-em {
+  padding-right: 0.08em;
+  background: linear-gradient(90deg, #6ee7b7 0%, #22d3ee 35%, #a7f3d0 65%, #6ee7b7 100%);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: heroShimmer 9s ease-in-out infinite;
+}
+
+@keyframes heroShimmer {
+  50% {
+    background-position: 100% 0;
+  }
+}
+
+/* --- JungleCards on its own background --- */
+.modern .featured-visual--jungle {
+  background:
+    radial-gradient(circle at 50% 42%, rgb(16 185 129 / 0.28), transparent 58%),
+    linear-gradient(140deg, rgb(0 0 0 / 0.42), rgb(2 19 10 / 0.72)),
+    url("images/featured/junglecards-bg.jpg") center / cover;
+}
+
+.modern .jc-stage {
+  min-height: 300px;
+}
+
+.modern .featured-credit {
+  right: 14px;
+  bottom: 10px;
+  color: rgb(255 255 255 / 0.6);
+  font-size: 0.6875rem;
+}
+
+/* --- the cards: paper and briefing, then tools and games, then the team --- */
+@media (min-width: 901px) {
+  .modern .home-panel--review {
+    grid-row: 1;
+  }
+
+  .modern .home-panel--briefing {
+    grid-row: 1;
+  }
+
+  .modern .home-panel--tools,
+  .modern .home-panel--hub {
+    grid-row: 2;
+  }
+}
+
+.modern .home-panel--members {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-row: auto;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 24px 48px;
+  padding: 40px;
+}
+
+.modern .team-headline {
+  margin: 8px 0 12px;
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.modern .team-text {
+  color: rgb(226 240 235 / 0.8);
+  font-size: 1rem;
+}
+
+.modern .home-panel--members .home-panel-link,
+.modern .home-panel--members .home-panel-link:visited {
+  display: inline-block;
+  margin-top: 22px;
+  padding: 11px 20px;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+}
+
+.modern .home-panel--members .home-panel-link:hover {
+  background: rgb(255 255 255 / 0.16);
+  text-decoration: none;
+}
+
+.modern .team-grid {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.modern .team-person,
+.modern .team-person:visited {
+  padding: 16px 6px 14px;
+  border: 0;
+  border-radius: 16px;
+  background: rgb(255 255 255 / 0.05);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+}
+
+.modern .team-person:hover {
+  background: rgb(255 255 255 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(110 231 183 / 0.35), 0 0 22px rgb(110 231 183 / 0.15);
+  transform: translateY(-3px);
+}
+
+.modern .team-person img {
+  width: 64px;
+  height: 64px;
+  border: 0;
+  box-shadow: 0 0 0 2px rgb(110 231 183 / 0.55), 0 8px 18px rgb(0 0 0 / 0.3);
+}
+
+.modern .team-name {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.modern .team-role {
+  color: var(--spark-soft);
+  font-size: 0.75rem;
+}
+
+/* --- Tools: a headline figure and one row of icons on a dotted mint wash --- */
+.modern .home-panel--tools {
+  background:
+    radial-gradient(420px 220px at 100% 0, rgb(16 185 129 / 0.16), transparent 70%),
+    radial-gradient(circle, rgb(15 23 42 / 0.07) 1px, transparent 1.6px) 0 0 / 18px 18px,
+    var(--card);
+}
+
+.modern .home-panel--tools .bento-apps {
+  grid-template-columns: repeat(6, 52px);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.modern .home-panel--tools .bento-apps img,
+.modern .home-panel--tools .bento-more {
+  width: 52px;
+  height: 52px;
+}
+
+.modern .home-stat {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.modern .home-stat span {
+  margin-right: 4px;
+  color: var(--brand);
+  font-size: 2.6rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+/* --- Games: an arcade cabinet in the night green, games as glowing tiles --- */
+.modern .home-panel--hub {
+  border-color: transparent;
+  background:
+    radial-gradient(340px 220px at 0 0, rgb(16 185 129 / 0.34), transparent 70%),
+    radial-gradient(360px 240px at 100% 100%, rgb(6 182 212 / 0.3), transparent 70%),
+    linear-gradient(160deg, #07332b 0%, var(--night) 100%);
+  color: #fff;
+}
+
+.modern .home-panel--hub .home-panel-title {
+  color: var(--spark-soft);
+}
+
+.modern .home-panel--hub .home-panel-link,
+.modern .home-panel--hub .home-panel-link:visited {
+  color: #fff;
+}
+
+.modern .home-panel--hub .home-games {
+  gap: 10px;
+}
+
+.modern .home-panel--hub .home-game {
+  gap: 12px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.06);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  transition: transform 0.15s ease-out, background 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.modern .home-panel--hub .home-game:hover {
+  background: rgb(255 255 255 / 0.11);
+  box-shadow: inset 0 0 0 1px rgb(110 231 183 / 0.35), 0 0 22px rgb(110 231 183 / 0.18);
+  transform: translateY(-2px);
+}
+
+.modern .home-panel--hub .home-game .game-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.modern .home-panel--hub .home-game-title {
+  color: #fff;
+  font-size: 0.98rem;
+}
+
+.modern .home-panel--hub .home-game:hover .home-game-title {
+  color: var(--spark-soft);
+}
+
+.modern .home-panel--hub .home-list-meta {
+  color: rgb(167 243 208 / 0.7);
+}
+
+@media (max-width: 600px) {
+  .modern .hero {
+    padding: 84px 20px 40px;
+  }
+
+  .modern .home-panel--members {
+    padding: 24px;
+  }
+
+  .modern .team-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .modern .home-panel--tools .bento-apps {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .modern .home-panel--tools .bento-apps img,
+  .modern .home-panel--tools .bento-more {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+
+@media (max-width: 420px) {
+  .modern .home-panel--hub .home-games {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modern .hero::before,
+  .modern .hero-kicker::before,
+  .modern .hero-em {
+    animation: none;
+  }
+}
+
+.modern .featured-credit a {
+  color: rgb(255 255 255 / 0.8);
+}
+
+.modern .home-earlier-label {
+  margin-top: 26px;
+  color: var(--muted);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modern .home-earlier .home-list-title {
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.modern .home-earlier .home-list-title:hover {
+  color: var(--brand);
+}
+
+@media (max-width: 1100px) {
+  .modern .home-panel--members {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1100px) {
+  .modern .team-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 }

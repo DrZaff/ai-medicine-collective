@@ -843,13 +843,9 @@ button:hover {
 
 /* "Members" beside pages only members can use, in the menu and footer */
 .nav-members-tag {
-  margin-left: 4px;
-  padding: 1px 5px;
-  border: 1px solid var(--line-strong);
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  vertical-align: middle;
+  margin-left: 2px;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
   color: var(--muted);
 }
 
@@ -2314,8 +2310,26 @@ button.onboard-hide {
 /* === LANDING PAGE ============================================ */
 
 .hero {
+  position: relative;
   padding: 28px 0 8px;
   text-align: center;
+}
+
+/* The drifting network behind the hero's words (script.js: initHeroNet);
+   its colour is the CSS colour below, so each theme sets its own */
+.hero-net {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--text);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.hero > :not(.hero-net) {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-kicker {
@@ -2456,12 +2470,117 @@ button.onboard-hide {
   box-shadow: var(--glow);
 }
 
-/* A grid of unequal cards: the AI vs Physician paper is the large one, the
-   latest briefing and the team sit beside it, and the tools and the games
-   share the row below. */
+/* A grid of unequal cards: the AI vs Physician paper is the large one with
+   the latest briefing beside it, the tools and the games share the next
+   row, and the team closes the page across the full width. */
 .home-panel--review {
   grid-column: span 2;
-  grid-row: span 2;
+}
+
+.home-panel--members {
+  grid-column: 1 / -1;
+}
+
+.home-panel--members {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 18px 28px;
+}
+
+.team-headline {
+  margin: 4px 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.team-text {
+  margin: 0;
+  font-family: var(--font-read);
+  line-height: 1.55;
+}
+
+/* the seven people, each a photo with a name and role */
+.team-grid,
+.section .team-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.team-grid li {
+  min-width: 0;
+  margin: 0;
+}
+
+.team-person,
+.team-person:visited {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border: 1px solid transparent;
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 0.15s ease-out, transform 0.15s ease-out;
+}
+
+.team-person:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-2px);
+}
+
+.team-person img {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 4px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.team-name {
+  font-size: 0.82rem;
+  font-weight: bold;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.team-role {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .home-panel--members {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .team-grid,
+  .section .team-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* the tools card's headline figure */
+.home-stat {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.home-stat span {
+  font-size: 1.8rem;
 }
 
 .home-panel--hub {
@@ -2533,9 +2652,40 @@ button.onboard-hide {
 }
 
 .featured-visual {
+  position: relative;
   display: grid;
   place-items: center;
   min-width: 0;
+  margin: 0;
+}
+
+.jc-stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+/* JungleCards' own background photo, darkened so the card stands out */
+.featured-visual--jungle {
+  min-height: 300px;
+  padding: 32px 20px 40px;
+  background:
+    linear-gradient(rgb(var(--surface-rgb) / 0.55), rgb(var(--surface-rgb) / 0.7)),
+    url("images/featured/junglecards-bg.jpg") center / cover;
+}
+
+.featured-credit {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  left: 10px;
+  font-size: 0.68rem;
+  text-align: right;
+  color: var(--muted);
+}
+
+.featured-credit a {
+  color: inherit;
 }
 
 .jc-card {
@@ -2807,6 +2957,11 @@ a.verdict-dot:focus-visible {
 
 .home-games li {
   margin: 0;
+}
+
+/* in the card on the home page: two by two */
+.home-panel--hub .home-games {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .home-game,
@@ -5221,4 +5376,19 @@ button.meeting-undo {
   .vision-dialog[open] {
     animation: none;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-net {
+    opacity: 0.25;
+  }
+}
+
+/* the home page's briefing card: the three briefings before the latest */
+.home-earlier-label {
+  margin: 18px 0 4px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
