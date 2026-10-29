@@ -500,7 +500,7 @@ function initCurrentNav() {
   const inMemberFolder = /\/member\/[^/]*$/.test(path);
   if (inMemberFolder) here = "members"; // the hand-made profile pages
   if (here === "appstore" || here === "projects" || here === "tools") here = "hub";
-  if (here === "resources") here = "learn";
+  if (here === "resources" || here.startsWith("course-")) here = "learn";
   if (here === "ai-vs-human") here = "ai-vs-physician";
 
   const group = MENU_GROUPS.find((g) => g.tabs.some(([page]) => page === here) || g.also.includes(here));

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" class="modern">
+<head>
+  <meta charset="UTF-8" />
+  <title>Deslopify: editing AI writing – AI Medicine Collective</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/png" href="images/icon-192.png" />
+  <meta property="og:site_name" content="AI Medicine Collective" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Deslopify: editing AI writing – AI Medicine Collective" />
+  <meta property="og:description" content="A short members' course on turning AI drafts into writing you can put your name to." />
+  <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="modern.css" />
+  <script>try{if(localStorage.getItem("amc-theme")==="terminal")document.documentElement.className="terminal"}catch(e){}</script>
+</head>
+<body>
+  <div class="terminal-frame">
+
+    <div class="horizontal-rule"></div>
+
+    <header>
+      <h1 class="headline"><a href="index.html">:: AI MEDICINE COLLECTIVE ::</a></h1>
+
+      <nav class="nav" aria-label="Main">
+        <a href="index.html">HOME</a>
+        <a href="hub.html">TOOLS</a>
+        <a href="games.html">GAMES</a>
+        <a href="blog.html">EVIDENCE</a>
+        <a href="learn.html">LEARN</a>
+        <a href="members.html">COMMUNITY</a>
+        <a href="index.html#vision" data-vision>OUR VISION</a>
+        <a href="join.html" class="nav-cta" data-signed-out-only>JOIN</a>
+        <a href="account.html" class="nav-account" data-account-link="ACCOUNT">SIGN IN</a>
+      </nav>
+
+      <div class="horizontal-rule"></div>
+    </header>
+
+    <main class="section">
+      <h2 class="section-title">DESLOPIFY</h2>
+
+      <!-- A members' course. Its text is ordinary page text (like the Learning
+           library), shown to signed-in members by course.js; nothing private
+           belongs here. Every example is made up: no patient information. -->
+
+      <section id="course-locked" class="empty-state" hidden>
+        <p class="empty-state-title">&gt; THIS COURSE IS FOR MEMBERS</p>
+        <p class="empty-state-text">Deslopify is a short course on turning AI drafts into writing you can put
+          your name to. Membership is free.</p>
+        <p><a class="btn btn--primary" href="join.html" data-signed-out-only>&gt; Join the Collective</a>
+          <a class="btn" href="account.html">&gt; Sign in</a></p>
+      </section>
+
+      <div id="course" class="course" hidden>
+
+        <header class="course-head">
+          <p class="course-kicker">// A Collective course &middot; 6 lessons &middot; about 30 minutes</p>
+          <h3 class="course-title">Editing AI writing, from draft to yours</h3>
+          <p class="course-lede">AI can draft a patient message, an abstract or a personal statement in
+            seconds. Left as it comes, the draft is often <em>slop</em>: padded, vague, oddly upbeat, and
+            sometimes wrong. Readers notice, and in medicine they stop trusting what they read. This course
+            shows you how to spot slop and fix it.</p>
+          <div class="course-progress" aria-live="polite">
+            <div class="course-progress-bar"><span id="course-progress-fill"></span></div>
+            <p id="course-progress-text" class="course-progress-text">0 of 6 lessons done</p>
+          </div>
+          <p class="course-how">// Each lesson ends with an exercise: tap every phrase you would cut or
+            check, then press <strong>Check my answers</strong>. Your progress is saved on this device.</p>
+        </header>
+
+        <!-- ===================== Lesson 1 ===================== -->
+        <details class="lesson" data-lesson="1" open>
+          <summary class="lesson-summary"><span class="lesson-num">1</span>
+            <span class="lesson-name">What slop is, and why it matters in medicine</span></summary>
+          <div class="lesson-body">
+            <p>Slop is text that sounds finished but says little. It is not the same as "written by AI":
+              plenty of AI drafts are fine, and people wrote slop long before chatbots. What AI changed is
+              the volume. You will see five signs again and again:</p>
+            <ul class="lesson-list">
+              <li><strong>Padding.</strong> Openers, recaps, and sentences that repeat the one before.</li>
+              <li><strong>Stock phrases.</strong> Words that turn up far more in AI text than in people's
+                writing: <em>delve, crucial, landscape, navigate, foster, testament</em>.</li>
+              <li><strong>Tics of shape.</strong> Everything in threes, "not just X, but Y", bullets and bold
+                where a sentence would do.</li>
+              <li><strong>Unearned confidence.</strong> Numbers, doses and citations that nobody checked.</li>
+              <li><strong>No author.</strong> It could have been written by anyone, for anyone.</li>
+            </ul>
+            <p><strong>Why it matters here.</strong> Patients may act on a message you send. Program
+              directors read hundreds of personal statements and recognize the pattern within a line.
+              Editors and reviewers stop trusting a paper after one invented reference. Your name is on the
+              text, not the model's.</p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 1 &middot; An abstract opening</p>
+              <p class="exercise-task">Tap the phrases that add nothing. (There are 5.)</p>
+              <p class="spot" data-spot><span data-slop="An opener about the whole field. It delays the point and fits any topic.">In today's rapidly evolving healthcare landscape,</span> artificial intelligence is <span data-slop="Hype. Say what it does, not that it will change everything.">poised to revolutionize</span> how residents learn. <span data-slop="A slogan in the 'not just X, it's Y' shape. Delete it.">It's not just a tool; it's a partner.</span> Our pilot gave 24 interns an AI tutor on night float. <span data-slop="Three empty adjectives in a row. The results, not the adjectives, should persuade.">This innovative, comprehensive and transformative approach</span> cut the time they spent looking things up. <span data-slop="A closing line that could end any abstract.">Ultimately, the future of medical education is bright.</span></p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// A cleaner version</p>
+                <p class="spot-clean">Our pilot gave 24 interns an AI tutor on night float, and they spent
+                  less time looking things up. <span class="spot-note">(Then say how much less, from your
+                  data.)</span></p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 1 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 2 ===================== -->
+        <details class="lesson" data-lesson="2">
+          <summary class="lesson-summary"><span class="lesson-num">2</span>
+            <span class="lesson-name">Cut the padding</span></summary>
+          <div class="lesson-body">
+            <p>The fastest fix is deletion. AI drafts wrap the useful middle in politeness and recap. Read
+              the draft once and strike:</p>
+            <ul class="lesson-list">
+              <li><strong>Openers</strong>: "Great question!", "I hope this finds you well", "I wanted to take a
+                moment to...".</li>
+              <li><strong>Announcements</strong>: "It's important to note that", "It's worth mentioning",
+                "Let's take a closer look". If it is important, the sentence shows it.</li>
+              <li><strong>Recaps</strong>: "In summary", "In conclusion", and any last paragraph that repeats the
+                first.</li>
+              <li><strong>Stacked hedges</strong>: "may potentially help to some extent". Keep one hedge, the
+                true one.</li>
+              <li><strong>Formulaic closers</strong>: "Please don't hesitate to reach out if you have any
+                questions or concerns."</li>
+            </ul>
+            <p>A good test: if you delete a sentence and nothing is lost, it should stay deleted. Most
+              AI drafts shrink by a third without losing a fact.</p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 2 &middot; A portal message about lab results</p>
+              <p class="exercise-task">Tap the padding. (There are 6.)</p>
+              <p class="spot" data-spot><span data-slop="Gushing opener. A patient wants the result.">Thank you so much for reaching out!</span> <span data-slop="Email filler that delays the point.">I hope this message finds you well.</span> Your cholesterol results are back. <span data-slop="Announces what the message is about to do instead of doing it.">I wanted to take a moment to explain them.</span> Your LDL is 162 mg/dL, above the goal we discussed. <span data-slop="An announcement: the sentence works without it.">It's important to note that</span> diet and exercise can bring it down, and we can talk about medication at your next visit. <span data-slop="A recap of a message that is six sentences long.">In summary, your LDL is high and there are options to lower it.</span> <span data-slop="A stock closer. Say plainly how to reach you.">Please don't hesitate to reach out if you have any questions or concerns!</span></p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// A cleaner version</p>
+                <p class="spot-clean">Your cholesterol results are back. Your LDL is 162 mg/dL, above the
+                  goal we discussed. Diet and exercise can bring it down, and we can talk about medication
+                  at your next visit. Reply here with any questions.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 2 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 3 ===================== -->
+        <details class="lesson" data-lesson="3">
+          <summary class="lesson-summary"><span class="lesson-num">3</span>
+            <span class="lesson-name">Replace the stock phrases</span></summary>
+          <div class="lesson-body">
+            <p>Some words have become a signature of AI text. None is wrong on its own; a page full of them
+              tells the reader nobody edited it. Swap each for the plain word, or better, for the specific
+              thing you mean.</p>
+            <div class="swap-table" role="table" aria-label="Stock phrases and what to write instead">
+              <div class="swap-row swap-row--head" role="row"><span role="columnheader">Instead of</span><span role="columnheader">Try</span></div>
+              <div class="swap-row" role="row"><span role="cell">delve into, dive into</span><span role="cell">look at, study, or just start</span></div>
+              <div class="swap-row" role="row"><span role="cell">crucial, pivotal, vital</span><span role="cell">important, or say why it matters</span></div>
+              <div class="swap-row" role="row"><span role="cell">navigate the complexities of</span><span role="cell">handle, manage, or name the hard part</span></div>
+              <div class="swap-row" role="row"><span role="cell">foster, cultivate</span><span role="cell">build, encourage</span></div>
+              <div class="swap-row" role="row"><span role="cell">landscape, realm, tapestry</span><span role="cell">field, area, or leave it out</span></div>
+              <div class="swap-row" role="row"><span role="cell">a testament to</span><span role="cell">shows</span></div>
+              <div class="swap-row" role="row"><span role="cell">robust, seamless, cutting-edge</span><span role="cell">the measured result</span></div>
+              <div class="swap-row" role="row"><span role="cell">in a meaningful way</span><span role="cell">how, exactly?</span></div>
+            </div>
+            <p>The deeper fix is specificity. "My time in the ICU taught me the importance of teamwork" could
+              be anyone's sentence. "On my second night, the charge nurse caught a dose I had written wrong"
+              could only be yours.</p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 3 &middot; A personal statement</p>
+              <p class="exercise-task">Tap the stock phrases. (There are 7.)</p>
+              <p class="spot" data-spot>Throughout my journey in medicine, I have <span data-slop="'Delve' is the best-known AI tell. Say what you did.">delved into</span> the <span data-slop="A decorative metaphor that means nothing in particular.">intricate tapestry</span> of patient care. My time in the ICU <span data-slop="Inflated phrasing for 'showed'.">served as a testament to</span> the <span data-slop="'Pivotal' adds emphasis without information.">pivotal role</span> of teamwork, and I learned to <span data-slop="A stock phrase. Name the hard part instead.">navigate the complexities</span> of <span data-slop="'Fostering' is a favourite AI verb. 'Building' is plainer.">fostering</span> trust with families <span data-slop="Vague. In what way?">in a meaningful way</span>.</p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// A cleaner version (the details are yours to supply)</p>
+                <p class="spot-clean">In the ICU I learned that a family trusts the team only when everyone
+                  tells them the same thing. On my second night, a daughter heard two different plans in one
+                  hour; I watched our attending sit down with her and start again.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 3 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 4 ===================== -->
+        <details class="lesson" data-lesson="4">
+          <summary class="lesson-summary"><span class="lesson-num">4</span>
+            <span class="lesson-name">Fix the shape</span></summary>
+          <div class="lesson-body">
+            <p>AI drafts have a recognizable rhythm even when every word is fine. Look for:</p>
+            <ul class="lesson-list">
+              <li><strong>Automatic threes.</strong> "Clear, concise and compassionate." Ask whether there are
+                really three things, or one.</li>
+              <li><strong>The contrast slogan.</strong> "It's not just X, it's Y." "Not only... but also." Usually
+                cut, or say Y plainly.</li>
+              <li><strong>Cheerleading.</strong> "Let's dive in!", "You've got this!" Out of place in clinical
+                writing.</li>
+              <li><strong>Bullets and bold everywhere.</strong> Three short sentences read better than three
+                bullets with bold labels. Keep lists for steps people follow in order.</li>
+              <li><strong>Even rhythm.</strong> Every sentence the same length. Mix short and long.</li>
+            </ul>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 4 &middot; An asthma handout</p>
+              <p class="exercise-task">Tap the tics of shape. (There are 4.)</p>
+              <p class="spot" data-spot><span data-slop="Cheerleading opener. A handout should start with what to do.">Let's dive in!</span> Managing asthma comes down to <span data-slop="An automatic three of abstract nouns. None of them tells the patient what to do.">three pillars: awareness, action and empowerment.</span> <span data-slop="The contrast slogan. It sounds wise and says nothing.">It's not just about medicine; it's about taking control of your life.</span> Use your controller inhaler every day, even when you feel well. Keep your rescue inhaler with you. <span data-slop="A bold label on a single sentence: emphasis where a plain sentence would do.">Key takeaway:</span> call us if you need your rescue inhaler more often than usual.</p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// A cleaner version</p>
+                <p class="spot-clean">Use your controller inhaler every day, even when you feel well. Keep
+                  your rescue inhaler with you. Call us if you need it more often than usual.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 4 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 5 ===================== -->
+        <details class="lesson" data-lesson="5">
+          <summary class="lesson-summary"><span class="lesson-num">5</span>
+            <span class="lesson-name">Check every claim</span></summary>
+          <div class="lesson-body">
+            <p>This is the lesson that matters most in medicine. Language models write the most likely next
+              words, not checked facts. They can produce a confident number, a guideline that was revised, or
+              a real-looking reference to a paper that does not exist or says something else.</p>
+            <ul class="lesson-list">
+              <li><strong>Every number</strong>: open the source it came from. If there is no source, it goes.</li>
+              <li><strong>Every citation</strong>: find the paper and read the part being cited. Real authors
+                and journals are often attached to the wrong claim.</li>
+              <li><strong>Every dose and every guideline</strong>: check the current guideline or a drug
+                reference, never the draft.</li>
+              <li><strong>Every "all", "always" and "never"</strong>: guidelines rarely say them.</li>
+              <li><strong>Reassurance</strong>: "nothing to worry about" is a clinical judgment. Make it
+                yourself or remove it.</li>
+            </ul>
+            <p>And one rule before you start: <strong>never paste patient-identifying information into an AI
+              tool</strong> that your institution has not approved for it.</p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 5 &middot; A teaching slide on sepsis</p>
+              <p class="exercise-task">Tap the claims you would have to check before using this. (There are 3.)</p>
+              <p class="spot" data-spot><span data-slop="A real figure (about 11 million sepsis-related deaths in 2017, from the Global Burden of Disease analysis by Rudd and colleagues in The Lancet, 2020), but AI often attaches real citations to the wrong claim. Open the paper and confirm it before you use it.">Sepsis causes about 11 million deaths worldwide each year (Rudd et al., 2020).</span> <span data-slop="A precise effect size with no source. Treat any unsourced number as invented until you find it.">Giving antibiotics within one hour cuts sepsis mortality by 50%.</span> <span data-slop="Over-general. The Surviving Sepsis Campaign 2021 guideline suggests at least 30 mL/kg of crystalloid within 3 hours for sepsis-induced hypoperfusion or septic shock, as a weak recommendation; it does not say every patient with sepsis.">Guidelines recommend a 30 mL/kg fluid bolus for all patients with sepsis.</span> Our hospital's bundle compliance last quarter was 64%.</p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// What about the last sentence?</p>
+                <p class="spot-clean">It is your own hospital's figure, so you can check it at the source: the
+                  quality report it came from. The AI cannot know it; if a draft contains a local number you
+                  did not give it, it was made up.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 5 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 6 ===================== -->
+        <details class="lesson" data-lesson="6">
+          <summary class="lesson-summary"><span class="lesson-num">6</span>
+            <span class="lesson-name">Make it yours, and ask for less slop</span></summary>
+          <div class="lesson-body">
+            <p>The last pass is about the reader. A patient handout and a grant abstract need different
+              words. For patients, aim for a 6th to 8th grade reading level: short sentences, everyday words,
+              one instruction per sentence. Then add what only you know (the real follow-up date, the detail
+              from your own experience) and read it aloud once. Anything you would not say out loud, change.</p>
+            <p><strong>Ask for less slop up front.</strong> A clear request saves editing. For example:</p>
+            <blockquote class="prompt-box">Write this for a patient at a 6th grade reading level. Use only the
+              facts I give you below. No greeting, no sign-off, no summary. Short sentences. If something is
+              missing, ask me instead of guessing.</blockquote>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 6 &middot; Discharge instructions</p>
+              <p class="exercise-task">Tap the words a patient might not understand. (There are 6.)</p>
+              <p class="spot" data-spot><span data-slop="Clinical jargon: 'walk'.">Ambulate</span> <span data-slop="Vague clinical phrase: 'as much as you comfortably can'.">as tolerated.</span> <span data-slop="Formal: 'check' or 'watch'.">Monitor for</span> signs of infection, including <span data-slop="Jargon: 'redness'.">erythema</span> or <span data-slop="Jargon: 'pus' or 'thick, cloudy fluid'.">purulent drainage</span> at the incision site. <span data-slop="Formal: 'take your medicines as listed'.">Adhere to</span> your medication schedule.</p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// A cleaner version</p>
+                <p class="spot-clean">Walk as much as you comfortably can. Look at your cut every day. Call
+                  us if it gets red or swollen, or if pus comes out. Take your medicines as listed on your
+                  sheet.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 6 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== The checklist ===================== -->
+        <section id="course-checklist" class="course-checklist" aria-labelledby="checklist-title">
+          <p class="course-kicker">// Keep this one</p>
+          <h3 id="checklist-title" class="course-title course-title--small">The deslopify checklist</h3>
+          <p>Before you send anything AI helped you write:</p>
+          <ol class="checklist">
+            <li>No patient-identifying information went into the AI tool.</li>
+            <li>Cut the opener, the recap and the stock closer.</li>
+            <li>Delete any sentence that repeats the one before.</li>
+            <li>Swap stock phrases for plain, specific words.</li>
+            <li>Undo automatic threes, contrast slogans, and bullets that should be sentences.</li>
+            <li>Check every number, dose, guideline and citation against its source.</li>
+            <li>Remove anything you cannot stand behind, including reassurance.</li>
+            <li>Add what only you know: the real detail, date and next step.</li>
+            <li>Match the reader. For patients, short sentences and everyday words.</li>
+            <li>Read it aloud once.</li>
+          </ol>
+          <p><button type="button" class="btn btn--primary" data-print-checklist>&gt; Print the checklist</button></p>
+        </section>
+
+      </div>
+
+      <noscript>
+        <p>&gt; The course needs JavaScript.</p>
+      </noscript>
+
+      <p><a href="learn.html" class="back-link">&lt; LEARNING</a></p>
+    </main>
+
+    <p class="site-social"><a href="https://www.instagram.com/aimedicinecollective/" target="_blank" rel="noopener noreferrer"><svg class="site-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg><span>&gt; INSTAGRAM: @aimedicinecollective</span></a></p>
+
+    <p class="site-note">// The AI Medicine Collective is an independent, volunteer-run group.
+      Everything on this site, including AI-assisted summaries and member-built tools, is for
+      educational purposes only and is not medical advice. We make no guarantee that it is
+      accurate, complete or current. Check all information against primary sources and use
+      your own clinical judgment.</p>
+
+    <div class="horizontal-rule bottom-rule"></div>
+
+    <footer class="footer">
+      &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+      <span class="cursor">█</span>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+  <script src="course.js"></script>
+</body>
+</html>
