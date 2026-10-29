@@ -3420,6 +3420,11 @@ html.terminal::view-transition-new(root) {
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06), 0 6px 16px rgb(5 38 31 / 0.25);
 }
 
+.modern .game-shot {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
 .modern .game-title {
   color: var(--ink);
   font-family: var(--font-serif);
