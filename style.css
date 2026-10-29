@@ -5476,3 +5476,360 @@ button.meeting-undo {
   text-transform: uppercase;
   color: var(--muted);
 }
+
+
+/* === COURSES (course-*.html, course.js) ======================
+   A members' course: a header with progress, one fold per lesson, a
+   "spot the slop" exercise in each, and a printable checklist. */
+
+.course-card,
+.course-card:visited {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 24px;
+  padding: 16px 18px;
+  border: 1px solid var(--accent);
+  background: var(--panel);
+  color: var(--body);
+  text-decoration: none;
+  transition: box-shadow 0.15s ease-out;
+}
+
+.course-card:hover {
+  box-shadow: var(--glow);
+}
+
+.course-card-kicker,
+.course-kicker,
+.exercise-label,
+.spot-clean-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.course-card-title,
+.course-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.course-card-text,
+.course-lede,
+.lesson-body,
+.spot-result,
+.course-checklist {
+  font-family: var(--font-read);
+  line-height: 1.6;
+}
+
+.course-card-link {
+  font-weight: bold;
+  color: var(--text);
+}
+
+.course-head {
+  margin-bottom: 18px;
+}
+
+.course-title {
+  margin: 4px 0 10px;
+}
+
+.course-title--small {
+  font-size: 1.2rem;
+}
+
+.course-lede {
+  max-width: 72ch;
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+}
+
+.course-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-bottom: 10px;
+}
+
+.course-progress-bar {
+  flex: 1 1 200px;
+  max-width: 360px;
+  height: 8px;
+  border: 1px solid var(--line-strong);
+}
+
+.course-progress-bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--text);
+  transition: width 0.3s ease-out;
+}
+
+.course-progress-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.course-how {
+  max-width: 72ch;
+}
+
+/* one fold per lesson */
+.lesson {
+  margin-bottom: 10px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+}
+
+.lesson-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.lesson-summary::-webkit-details-marker {
+  display: none;
+}
+
+.lesson-num {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--accent);
+  font-family: var(--font-display);
+  font-weight: bold;
+  color: var(--text);
+}
+
+.lesson.is-done .lesson-num {
+  background: var(--text);
+  color: var(--base);
+}
+
+.lesson-name {
+  font-family: var(--font-display);
+  font-weight: bold;
+  color: var(--text);
+}
+
+.lesson-body {
+  padding: 4px 16px 18px;
+}
+
+.lesson-body > p,
+.lesson-list {
+  max-width: 72ch;
+}
+
+.lesson-list li {
+  margin-bottom: 6px;
+}
+
+.lesson-done {
+  margin-top: 14px;
+}
+
+/* the stock-phrase table in lesson 3 */
+.swap-table {
+  max-width: 560px;
+  margin: 10px 0 14px;
+  border: 1px solid var(--line-strong);
+}
+
+.swap-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  padding: 7px 12px;
+  border-top: 1px var(--rule-style) var(--line);
+}
+
+.swap-row:first-child {
+  border-top: 0;
+}
+
+.swap-row--head {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.swap-row span:first-child {
+  text-decoration: line-through;
+  text-decoration-color: rgb(var(--error-rgb) / 0.6);
+}
+
+.prompt-box {
+  max-width: 68ch;
+  margin: 10px 0 16px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--accent);
+  background: rgb(var(--green-rgb) / 0.05);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+}
+
+/* the exercise */
+.exercise {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--accent);
+}
+
+.exercise-task {
+  margin: 4px 0 10px;
+  font-weight: bold;
+}
+
+.spot {
+  max-width: 72ch;
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  line-height: 1.9;
+}
+
+.spot-word {
+  margin: 0;
+  padding: 1px 1px;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.spot-word:hover {
+  background: rgb(var(--green-rgb) / 0.1);
+}
+
+.spot-word.is-flagged {
+  background: rgb(var(--amber-rgb) / 0.3);
+}
+
+.spot-word.is-found {
+  background: rgb(var(--teal-rgb) / 0.25);
+  box-shadow: inset 0 -2px 0 var(--teal);
+}
+
+.spot-word.is-missed {
+  background: rgb(var(--error-rgb) / 0.12);
+  box-shadow: inset 0 -2px 0 var(--error);
+}
+
+.spot-word.is-extra {
+  background: rgb(var(--yellow-rgb) / 0.15);
+  text-decoration: line-through;
+}
+
+.spot-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.spot-result {
+  margin-top: 14px;
+}
+
+.spot-score {
+  margin: 0 0 8px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.spot-reasons {
+  max-width: 72ch;
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.spot-reasons li {
+  margin-bottom: 6px;
+}
+
+.spot-clean {
+  max-width: 72ch;
+  margin: 4px 0 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--teal);
+}
+
+.spot-note {
+  color: var(--muted);
+}
+
+/* the checklist */
+.course-checklist {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid var(--accent);
+  border-top-width: 2px;
+}
+
+.checklist {
+  max-width: 68ch;
+  padding-left: 22px;
+}
+
+.checklist li {
+  margin-bottom: 6px;
+}
+
+@media print {
+  body.print-checklist .terminal-frame > :not(main),
+  body.print-checklist main > :not(#course),
+  body.print-checklist #course > :not(#course-checklist),
+  body.print-checklist #course-checklist button,
+  body.print-checklist .vision-dialog {
+    display: none !important;
+  }
+
+  body.print-checklist,
+  body.print-checklist .terminal-frame,
+  body.print-checklist #course-checklist {
+    border: 0;
+    background: #fff !important;
+    box-shadow: none;
+    color: #000 !important;
+  }
+
+  body.print-checklist::after,
+  body.print-checklist .terminal-frame::before,
+  body.print-checklist .terminal-frame::after {
+    display: none;
+  }
+
+  body.print-checklist #course-checklist * {
+    color: #000 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .lesson-body {
+    padding: 4px 12px 14px;
+  }
+
+  .exercise {
+    padding: 12px;
+  }
+}

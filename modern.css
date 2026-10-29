@@ -4307,3 +4307,235 @@ html.terminal::view-transition-new(root) {
     grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 }
+
+
+/* === COURSES (2026-10-29) ====================================
+   The course card on the Learning page is a small night-green stage;
+   lessons are white cards with a numbered disc; exercises sit on a mint
+   wash; words in the exercise highlight like a marker. */
+
+.modern .course-card,
+.modern .course-card:visited {
+  gap: 8px;
+  margin: 8px 0 32px;
+  padding: 26px 28px;
+  border: 0;
+  border-radius: 20px;
+  background:
+    radial-gradient(420px 220px at 100% 0, rgb(6 182 212 / 0.25), transparent 70%),
+    radial-gradient(380px 220px at 0 100%, rgb(16 185 129 / 0.3), transparent 70%),
+    var(--night);
+  box-shadow: var(--shadow);
+  color: rgb(226 240 235 / 0.88);
+}
+
+.modern .course-card:hover {
+  box-shadow: var(--shadow-lift);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.modern .course-card-kicker {
+  color: var(--spark-soft);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modern .course-card-title {
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.modern .course-card-text {
+  max-width: 64ch;
+}
+
+.modern .course-card-link {
+  margin-top: 6px;
+  color: var(--spark-soft);
+  font-size: 0.875rem;
+}
+
+.modern .course-kicker,
+.modern .exercise-label,
+.modern .spot-clean-label {
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modern .course-title {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4.4vw, 2.8rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.modern .course-title--small {
+  font-size: 1.6rem;
+}
+
+.modern .course-lede {
+  color: var(--body);
+  font-size: 1.15rem;
+}
+
+.modern .course-progress-bar {
+  height: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  overflow: hidden;
+}
+
+.modern .course-progress-bar span {
+  border-radius: 999px;
+  background: var(--grad-bright);
+}
+
+.modern .lesson {
+  margin-bottom: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .lesson-summary {
+  padding: 18px 22px;
+}
+
+.modern .lesson-num {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+.modern .lesson.is-done .lesson-num {
+  background: var(--brand);
+  color: #fff;
+}
+
+.modern .lesson-name {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.modern .lesson-body {
+  padding: 0 26px 24px 70px;
+  color: var(--body);
+}
+
+.modern .swap-table {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.modern .swap-row--head {
+  background: #f8fafc;
+  color: var(--muted);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.modern .prompt-box {
+  border-left-color: var(--spark);
+  border-radius: 0 10px 10px 0;
+  background: var(--brand-soft);
+  color: var(--ink);
+}
+
+.modern .exercise {
+  padding: 20px 22px;
+  border: 0;
+  border-radius: 14px;
+  background:
+    radial-gradient(360px 160px at 100% 0, rgb(16 185 129 / 0.12), transparent 70%),
+    #f6faf8;
+  box-shadow: inset 0 0 0 1px rgb(16 185 129 / 0.2);
+}
+
+.modern .spot-word.is-flagged {
+  background: #fde68a;
+}
+
+.modern .spot-word.is-found {
+  background: #bbf7d0;
+  box-shadow: inset 0 -2px 0 var(--spark);
+}
+
+.modern .spot-word.is-missed {
+  background: #fee2e2;
+}
+
+.modern .spot-word.is-extra {
+  background: #fef3c7;
+}
+
+.modern .spot-score {
+  color: var(--ink);
+}
+
+.modern .spot-clean {
+  border-left-color: var(--spark);
+  border-radius: 0 10px 10px 0;
+  background: var(--card);
+}
+
+.modern .course-checklist {
+  padding: 28px 32px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .checklist li::marker {
+  color: var(--brand);
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .modern .lesson-body {
+    padding: 0 16px 20px;
+  }
+
+  .modern .course-card {
+    padding: 22px;
+  }
+
+  .modern .course-checklist {
+    padding: 22px;
+  }
+}
+
+/* the exercise words are buttons, but must read as plain text */
+.modern .spot-word {
+  padding: 1px 2px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: none;
+}
+
+.modern .spot-word:hover {
+  background: rgb(16 185 129 / 0.12);
+}
