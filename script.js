@@ -189,6 +189,10 @@ function initFooterNav() {
   row.append(instagram);
   nav.append(row);
   footer.prepend(nav);
+
+  // The independence note and disclaimer sit at the very bottom, inside the footer
+  const note = document.querySelector(".terminal-frame .site-note");
+  if (note) footer.append(note);
 }
 
 document.addEventListener("DOMContentLoaded", initFooterNav);
@@ -469,12 +473,21 @@ const MENU_GROUPS = [
 
 // A group's pages as links, named as written ("AI vs Physician"); prefix is
 // "../" on the pages in member/
+// (Pages in MEMBERS_ONLY_PAGES carry a small "Members" tag.)
+const MEMBERS_ONLY_PAGES = new Set(["schedule", "chat", "requests"]);
+
 function groupLinks(group, prefix, className) {
   return group.tabs.map(([page, , name]) => {
     const link = document.createElement("a");
     link.className = className;
     link.href = `${prefix}${page}.html`;
     link.textContent = name;
+    if (MEMBERS_ONLY_PAGES.has(page)) {
+      const tag = document.createElement("span");
+      tag.className = "nav-members-tag";
+      tag.textContent = "Members";
+      link.append(" ", tag);
+    }
     return link;
   });
 }
