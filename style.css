@@ -4842,7 +4842,7 @@ button.meeting-undo {
 
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin: 16px 0 8px;
 }
@@ -4870,7 +4870,18 @@ button.meeting-undo {
   transform: translateY(-2px);
 }
 
-/* The app icon: line art in --icon-a and --icon-b on --icon-bg */
+/* A real gameplay screenshot (images/games/, 720x540 WebP) is the card's picture */
+.game-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-inner);
+}
+
+/* The app icon: line art in --icon-a and --icon-b on --icon-bg (the home page's Games card) */
 .game-icon {
   display: grid;
   flex: none;
@@ -4943,20 +4954,10 @@ button.meeting-undo {
   color: var(--yellow);
 }
 
+/* On a phone the games stack: screenshot on top, words below */
 @media (max-width: 720px) {
   .game-grid {
     grid-template-columns: 1fr;
-  }
-
-  /* On a phone each game is a row: icon on the left, words on the right */
-  .game-card {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
-  .game-icon {
-    width: 72px;
-    height: 72px;
   }
 }
 
