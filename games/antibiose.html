@@ -146,6 +146,12 @@ button{cursor:pointer;touch-action:manipulation}
 .btn{min-height:52px;border-radius:15px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:16px;padding:6px 14px;line-height:1.2;box-shadow:0 6px 20px var(--accent-glow);hyphens:none}
 .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
 a.btn{display:flex;align-items:center;justify-content:center;text-decoration:none}
+.toggle{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface-2);font-size:14px;line-height:1.35;cursor:pointer}
+.toggle input{flex:none;width:20px;height:20px;margin:0;accent-color:var(--accent)}
+.upnext{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--accent);background:var(--accent-soft)}
+.upnext b{font:800 18px/1.2 var(--f-display)}
+.upnext small{font:500 11px var(--f-mono);color:var(--muted)}
+.upnext .fine b{font:inherit;font-weight:700;font-variant-numeric:tabular-nums}
 .btn:disabled{opacity:.5;cursor:default}
 .legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;font-size:13px;hyphens:none}
 .legend span{display:flex;align-items:center;gap:8px;min-width:0}
@@ -1082,7 +1088,7 @@ function hud(){
   const L=LEVELS[G.lv];el.score.textContent=G.score;
   if(G.score!==lastScore&&!RM.matches){el.score.classList.remove('bump');void el.score.offsetWidth;el.score.classList.add('bump')}lastScore=G.score;
   el.combo.textContent='×'+mult();el.combo.classList.toggle('hot',mult()>1);
-  el.lvlLbl.textContent=L.spec?'Mode':'Round';el.lvl.textContent=L.spec?'Single':(L.idx+1)+'/'+CHAPTERS[L.ch].count;const h=Math.max(0,G.health);el.vt.textContent=Math.round(h)+'%';el.vt.classList.toggle('low',h<35);
+  const runOn=L.spec&&G.run?.auto;el.lvlLbl.textContent=runOn?'Drug':L.spec?'Mode':'Round';el.lvl.textContent=runOn?`${G.run.i+1}/${SPEC_DRUGS.length}`:L.spec?'Single':(L.idx+1)+'/'+CHAPTERS[L.ch].count;const h=Math.max(0,G.health);el.vt.textContent=Math.round(h)+'%';el.vt.classList.toggle('low',h<35);
   el.pt.textContent=Math.min(G.kills,L.q)+'/'+L.q;el.pf.style.transform=`scaleX(${Math.min(1,G.kills/L.q)})`;
   riskHud();
 }
@@ -1117,7 +1123,7 @@ function startLevel(lv){
   G.ls=newStats();G.lvStart=G.score;G.w=L.wpn.find(w=>!contra(w,lv));G.risk=L.mod?.risk||0;G.riskWarned=0;G.tip=null;buildWeapons();
   G.maxLv=Math.max(G.maxLv,lv);el.gauges.classList.toggle('no-risk',L.ch!=='bac');
   el.ptBox.hidden=!L.mod;if(L.mod)el.ptBox.innerHTML=`<span class="lbl">Patient</span>${L.mod.label}`;
-  lesson('',null,L.spec?`Shoot only what <b>${WPN[L.drug].name}</b> kills. Let resistant microbes drift past.`:L.idx===0?'Tap a microbe to fire the loaded drug. Follow the green tips for your first few shots.':
+  lesson('',null,L.spec?`${G.run?.auto?`Drug ${G.run.i+1} of ${SPEC_DRUGS.length}. `:''}Shoot only what <b>${WPN[L.drug].name}</b> kills. Let resistant microbes drift past.`:L.idx===0?'Tap a microbe to fire the loaded drug. Follow the green tips for your first few shots.':
     L.mod?`<b>${L.mod.label}:</b> ${L.mod.detail} Choose drugs with that in mind.`:`Tap a microbe to fire <b>${WPN[G.w].name}</b>. Switch drugs with the buttons below.`);
   hud();G.phase='play';hideOverlay();G.last=null;
 }
@@ -1231,7 +1237,7 @@ function update(dt){
   for(const t of G.texts){t.y-=42*dt;t.life-=dt*1.2}G.texts=G.texts.filter(t=>t.life>0);
   for(const d of DEBRIS){d.x+=d.vx*dt;d.y+=d.vy*dt;if(d.y-d.r>H){d.y=-d.r;d.x=Math.random()*W}}
   if(G.hurt>0)G.hurt-=dt;if(G.shake>0)G.shake-=dt;if(G.muzzle>0)G.muzzle-=dt*5;
-  if(G.phase==='ending'){G.endT-=dt;if(G.endT<=0){saveBest();LEVELS[G.lv].spec?showSpecEnd(G.won):G.won?(G.lv===CHAPTERS[LEVELS[G.lv].ch].last?showWin():showClear()):showOver()}}
+  if(G.phase==='ending'){G.endT-=dt;if(G.endT<=0){saveBest();LEVELS[G.lv].spec?(G.won&&G.run?.auto?(SPEC_DRUGS[G.run.i+1]?showSpecNext():showSpecDone()):showSpecEnd(G.won)):G.won?(G.lv===CHAPTERS[LEVELS[G.lv].ch].last?showWin():showClear()):showOver()}}
 }
 const rr=(x,y,w,h,r)=>{ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h)};
 // Labels go in their own pass, on top of every sprite, clamped to the slide and nudged apart so none overlap
@@ -1421,13 +1427,21 @@ function makeSpec(w){
   Object.assign(LEVELS[SPEC_IX],{name:WPN[w].name,drug:w,dch:ch,cov,dec,covAll,mic:[...cov,...dec],wpn:[w],
     vig:`Only ${WPN[w].name} is loaded. Shoot the microbes it kills and let the resistant ones drift past.`});
 }
+// Single-drug mode only offers drugs that kill at least two microbes in their chapter; one-target drugs make a dull slide
+const SPEC_DRUGS=CH_KEYS.flatMap(ch=>Object.keys(WPN).filter(w=>drugChapter(w)===ch&&WPN[w].covers.filter(t=>chOf(t)===ch).length>=2));
+let autoAdv=store.get('antibiose-autoadv')!=='off';
+// G.run tracks a single-drug session: where it is in SPEC_DRUGS and whether a win moves straight on to the next drug
+function specStart(w,auto){G.run={i:SPEC_DRUGS.indexOf(w),auto};makeSpec(w);resetRun(SPEC_IX)}
+function specNext(){const nx=SPEC_DRUGS[G.run.i+1];if(!nx)return showSpecDone();G.run.i++;makeSpec(nx);G.health=Math.min(100,G.health+35);startLevel(SPEC_IX)}
 function showDrugs(){
   G.phase='menu';
   show(showDrugs,`<p class="eyebrow">Single-drug mode</p><h2>Pick your drug</h2>
   <p>One drug, a slide full of microbes. Shoot only what it kills. Hitting a resistant microbe costs points.</p>
+  <div class="btns"><button class="btn" data-act="specall">Play all ${SPEC_DRUGS.length} drugs in a row</button></div>
+  <label class="toggle" for="autoAdv"><input type="checkbox" id="autoAdv"${autoAdv?' checked':''}><span>Auto-advance: after a win, go straight to the next drug on the list</span></label>
   <div class="form"><label for="drugSearch">Search drugs<input id="drugSearch" type="search" placeholder="Name or class, like azole or macrolide" autocomplete="off"></label></div>
-  <div class="btns"><button class="btn" data-act="specrand">Random drug</button></div>
-  ${CH_KEYS.map(ch=>{const ws=Object.keys(WPN).filter(w=>drugChapter(w)===ch);
+  <div class="btns"><button class="btn ghost" data-act="specrand">Random drug</button></div>
+  ${CH_KEYS.map(ch=>{const ws=SPEC_DRUGS.filter(w=>drugChapter(w)===ch);
     return `<h3>${CHAPTERS[ch].drugs}</h3><div class="drugpick">${ws.map(w=>`<button class="dchip" data-act="specpick" data-w="${w}" data-q="${(WPN[w].name+' '+(WPN[w].full||'')+' '+WPN[w].tag).toLowerCase()}" style="--dc:${wcol(w)}"><b>${WPN[w].name}</b><small>${WPN[w].tag}</small></button>`).join('')}</div>`}).join('')}
   <p class="fine" id="drugNone" hidden>No drug matches that search.</p>
   <div class="btns"><button class="btn ghost" data-act="home">Back</button></div>`);
@@ -1435,6 +1449,7 @@ function showDrugs(){
 card.addEventListener('input',e=>{if(e.target.id!=='drugSearch')return;const q=e.target.value.trim().toLowerCase();let any=0;
   card.querySelectorAll('.drugpick').forEach(g=>{let n=0;g.querySelectorAll('.dchip').forEach(c=>{const ok=!q||c.dataset.q.includes(q);c.hidden=!ok;if(ok)n++});g.hidden=!n;g.previousElementSibling.hidden=!n;any+=n});
   $('#drugNone').hidden=!!any});
+card.addEventListener('change',e=>{if(e.target.id!=='autoAdv')return;autoAdv=e.target.checked;store.set('antibiose-autoadv',autoAdv?'on':'off')});
 function showSpecIntro(){
   G.phase='menu';G.lv=SPEC_IX;const L=LEVELS[SPEC_IX],W=WPN[L.drug];
   show(showSpecIntro,`<p class="eyebrow">Single-drug mode · ${CHAPTERS[L.dch].name}</p><h2>${W.full||W.name}</h2>
@@ -1445,14 +1460,34 @@ function showSpecIntro(){
   <div class="btns"><button class="btn" data-act="begin">Start</button><button class="btn ghost" data-act="chart">Show coverage chart</button><button class="btn ghost" data-act="specdrugs">Pick a different drug</button></div>
   <p class="fine">Cure ${L.q} covered microbes. A resistant hit costs 10 points. A covered microbe that escapes hurts the patient.</p>`);
 }
+const specAcc=s=>{const n=s.best+s.works+s.wrong;return n?Math.round((s.best+s.works)/n*100):0};
+const specCovers=L=>`<h3>${WPN[L.drug].name} covers</h3><p>${L.covAll.map(t=>(MIC[t].best.includes(L.drug)?'★ ':'')+MIC[t].short).join(', ')}</p>`;
 function showSpecEnd(won){
-  G.phase='over';const L=LEVELS[SPEC_IX],w=L.drug,W=WPN[w],s=G.ls,n=s.best+s.works+s.wrong,acc=n?Math.round((s.best+s.works)/n*100):0;
-  show(()=>showSpecEnd(won),`<p class="eyebrow">Single-drug mode · ${W.name}</p><h2 class="${won?'c-ok':'c-bad'}">${won?'Spectrum mastered':'Patient crashed'}</h2>
-  <div class="stats"><div><span class="lbl">Score</span><b>${G.score}</b></div><div><span class="lbl">Accuracy</span><b>${acc}%</b></div><div><span class="lbl">Resistant hits</span><b>${s.wrong}</b></div><div><span class="lbl">Escaped</span><b>${s.esc}</b></div></div>
-  <h3>${W.name} covers</h3><p>${L.covAll.map(t=>(MIC[t].best.includes(w)?'★ ':'')+MIC[t].short).join(', ')}</p>
-  <h3>Resistant on this slide</h3><p>${L.dec.map(t=>MIC[t].short).join(', ')}</p>
+  G.phase='over';const L=LEVELS[SPEC_IX],W=WPN[L.drug],s=G.ls,run=G.run?.auto,nx=SPEC_DRUGS[(G.run?.i??-1)+1];
+  show(()=>showSpecEnd(won),`<p class="eyebrow">Single-drug mode · ${run?`Drug ${G.run.i+1} of ${SPEC_DRUGS.length}`:W.name}</p><h2 class="${won?'c-ok':'c-bad'}">${won?'Spectrum mastered':'Patient crashed'}</h2>
+  <div class="stats"><div><span class="lbl">Score</span><b>${G.score}</b></div><div><span class="lbl">Accuracy</span><b>${specAcc(s)}%</b></div><div><span class="lbl">Resistant hits</span><b>${s.wrong}</b></div><div><span class="lbl">Escaped</span><b>${s.esc}</b></div></div>
+  ${specCovers(L)}<h3>Resistant on this slide</h3><p>${L.dec.map(t=>MIC[t].short).join(', ')}</p>
   <p class="fine">★ marks microbes where ${W.name} is first-line.</p>${reviewHTML(4)}
-  <div class="btns"><button class="btn" data-act="specagain">Play ${W.name} again</button><button class="btn ghost" data-act="specdrugs">Pick another drug</button><button class="btn ghost" data-act="home">Main menu</button>${fbBtn()}</div>`);
+  <div class="btns"><button class="btn" data-act="specagain">${won?'Play':'Retry'} ${W.name}${won?' again':''}</button>${nx?`<button class="btn ghost" data-act="specnext">${won?'Next':'Skip to'} ${WPN[nx].name}</button>`:''}<button class="btn ghost" data-act="specdrugs">Pick another drug</button><button class="btn ghost" data-act="home">Main menu</button>${fbBtn()}</div>`);
+}
+// Between drugs in an auto-advance run: a short summary, then the next round starts on its own
+function showSpecNext(){
+  G.phase='menu';const L=LEVELS[SPEC_IX],W=WPN[L.drug],N=WPN[SPEC_DRUGS[G.run.i+1]];
+  show(showSpecNext,`<p class="eyebrow">Drug ${G.run.i+1} of ${SPEC_DRUGS.length} cleared</p><h2 class="c-ok">${W.name} mastered</h2>
+  <div class="stats"><div><span class="lbl">Score</span><b>${G.score}</b></div><div><span class="lbl">Accuracy</span><b>${specAcc(G.ls)}%</b></div></div>
+  ${specCovers(L)}
+  <div class="upnext"><span class="lbl">Up next</span><b>${N.full||N.name}</b><small>${N.tag}</small><span class="fine" aria-live="polite">Starting in <b id="advCount">5</b> s</span></div>
+  <div class="btns"><button class="btn" data-act="specnext">Start ${N.name} now</button><button class="btn ghost" data-act="specstop">Stop after this drug</button></div>`);
+  let k=5;clearInterval(G.advTimer);
+  G.advTimer=setInterval(()=>{if(G.card!==showSpecNext||ov.hidden){clearInterval(G.advTimer);return}
+    if(document.hidden)return;k--;const c=$('#advCount');if(c)c.textContent=k;if(k<=0){clearInterval(G.advTimer);specNext()}},1000);
+}
+function showSpecDone(){
+  G.phase='over';const g=grade();
+  show(showSpecDone,`<p class="eyebrow">Single-drug mode</p><h2 class="c-ok">All ${SPEC_DRUGS.length} drugs done</h2>
+  <div style="display:flex;align-items:center;gap:16px"><span class="grade">${g}</span><p>Stewardship grade, based on how often you hit first-line targets.</p></div>
+  <div class="stats"><div><span class="lbl">Score</span><b>${G.score}</b></div><div><span class="lbl">Accuracy</span><b>${specAcc(G.ts)}%</b></div><div><span class="lbl">Resistant hits</span><b>${G.ts.wrong}</b></div><div><span class="lbl">Escaped</span><b>${G.ts.esc}</b></div></div>
+  ${reviewHTML(6)}<div class="btns"><button class="btn" data-act="specall">Play them all again</button><button class="btn ghost" data-act="home">Main menu</button>${fbBtn()}</div>`);
 }
 
 /* ---------- Feedback: saved to the artifact's database when this viewer may write, otherwise copied out ---------- */
@@ -1512,9 +1547,13 @@ card.addEventListener('click',e=>{
   else if(a==='multi')showMulti();
   else if(a==='howto')showHowTo();
   else if(a==='music'){MUS.on=!MUS.on;store.set('antibiose-music',MUS.on?'on':'off');b.textContent=`Music: ${MUS.on?'on':'off'}`;MUS.on?musStart():musStop();musUI()}
-  else if(a==='specpick'){makeSpec(b.dataset.w);resetRun(SPEC_IX)}
-  else if(a==='specrand'){const ks=Object.keys(WPN);makeSpec(ks[Math.random()*ks.length|0]);resetRun(SPEC_IX)}
-  else if(a==='specagain'){makeSpec(LEVELS[SPEC_IX].drug);resetRun(SPEC_IX)}
+  else if(a==='specpick')specStart(b.dataset.w,autoAdv);
+  else if(a==='specrand')specStart(SPEC_DRUGS[Math.random()*SPEC_DRUGS.length|0],autoAdv);
+  else if(a==='specall')specStart(SPEC_DRUGS[0],true);
+  else if(a==='specnext'){clearInterval(G.advTimer);specNext()}
+  else if(a==='specstop'){clearInterval(G.advTimer);G.run.auto=false;showSpecEnd(true)}
+  // inside a run a retry keeps the run's score; on its own it starts fresh from the drug's intro
+  else if(a==='specagain'){makeSpec(LEVELS[SPEC_IX].drug);if(G.run?.auto){G.score=G.lvStart;G.health=100;startLevel(SPEC_IX)}else resetRun(SPEC_IX)}
   else if(a==='home')showStart();
   else if(a==='begin')startLevel(G.lv);
   else if(a==='next'){G.health=Math.min(100,G.health+35);showIntro(G.lv+1)}
