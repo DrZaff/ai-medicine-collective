@@ -3846,25 +3846,106 @@ a:active {
   pointer-events: none;
 }
 
+/* The emblem: a drawn rod of Asclepius on its own dark panel, with two faint
+   rings behind it. Colours are the Games icon tokens, so both themes match. */
 .join-emblem {
   position: relative;
   grid-column: 2;
   grid-row: 1;
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 480px;
-  object-fit: contain;
-  mix-blend-mode: screen;
-  /* Fade the picture's edges away so no rectangle shows */
-  -webkit-mask-image: radial-gradient(ellipse closest-side, var(--base) 72%, transparent 100%);
-  mask-image: radial-gradient(ellipse closest-side, var(--base) 72%, transparent 100%);
-  animation: emblemPulse 5s ease-in-out infinite;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 18px 0;
+  border: 1px solid var(--line-strong);
+  background: var(--icon-bg);
 }
 
-@keyframes emblemPulse {
-  0%, 100% { filter: brightness(1.1); }
-  50% { filter: brightness(1.6); }
+.join-emblem svg {
+  width: 100%;
+  max-width: 230px;
+  height: auto;
+  overflow: visible;
+}
+
+:where(.join-emblem svg *) {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.em-ring {
+  stroke: rgb(var(--icon-a-rgb) / 0.16);
+  stroke-width: 1;
+}
+
+.em-ring--dash {
+  stroke-dasharray: 2 7;
+  transform-origin: 100px 160px;
+  animation: emblemTurn 60s linear infinite;
+}
+
+.em-rod {
+  stroke: var(--icon-b);
+  stroke-width: 6;
+}
+
+/* short pieces of staff drawn over the serpent, so it winds in front and behind */
+.em-rod--front {
+  animation: fadeInSoft 0.4s ease-out 1.6s backwards;
+}
+
+.em-knob {
+  fill: rgb(var(--icon-a-rgb) / 0.16);
+  stroke: var(--icon-b);
+  stroke-width: 3;
+}
+
+.em-snake {
+  stroke: var(--icon-a);
+  stroke-width: 7;
+  filter: drop-shadow(0 0 6px rgb(var(--icon-a-rgb) / 0.45));
+  stroke-dasharray: 520;
+  stroke-dashoffset: 0;
+  animation: emblemDraw 2.4s ease-out 0.2s backwards;
+}
+
+.em-head {
+  fill: var(--icon-a);
+  stroke: var(--icon-a);
+  stroke-width: 2;
+  animation: fadeInSoft 0.5s ease-out 2.2s backwards;
+}
+
+.em-eye {
+  fill: var(--bg-inner);
+  stroke: none;
+}
+
+.em-tongue {
+  stroke: var(--icon-b);
+  stroke-width: 1.6;
+  animation: fadeInSoft 0.5s ease-out 2.4s backwards;
+}
+
+@keyframes emblemDraw {
+  from {
+    stroke-dashoffset: 520;
+  }
+}
+
+@keyframes emblemTurn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .em-ring--dash,
+  .em-snake,
+  .em-head,
+  .em-tongue {
+    animation: none;
+  }
 }
 
 .join-content {
@@ -3901,7 +3982,10 @@ a:active {
   .join-emblem {
     grid-column: 1;
     grid-row: 1;
-    max-height: 240px;
+  }
+
+  .join-emblem svg {
+    max-width: 150px;
   }
 
   .join-content {
