@@ -254,6 +254,9 @@ organizers (draft ready, digest ready to send, run failed). Two GitHub secrets
 - `RESEND_API_KEY`: a Resend key with sending access only, limited to the mail domain (a new key, not the one in Supabase).
 - `NOTIFY_EMAIL`: who to tell. Several addresses separated by commas.
 
+To check them: repository > Actions > **Test email** > Run workflow. It sends one
+test message and changes nothing else; a red run means the key or address is wrong.
+
 **Starting the jobs on time.** GitHub's scheduler is unreliable, so the
 database starts the workflows (migration 018, `pg_cron`). It needs a GitHub
 fine-grained personal access token: repository access "Only select

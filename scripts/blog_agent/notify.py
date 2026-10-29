@@ -13,6 +13,8 @@ fails the workflow: the email is a courtesy, not the job.
 Usage:
     python scripts/blog_agent/notify.py --subject "..." --body-file path.txt
     python scripts/blog_agent/notify.py --subject "..." --body "..."
+    Add --strict to fail (exit 1) when the email is not sent: the "Test email"
+    workflow uses it, so a broken key shows as a failed run.
 """
 
 from __future__ import annotations
@@ -33,6 +35,7 @@ def main() -> int:
     parser.add_argument("--subject", required=True)
     parser.add_argument("--body")
     parser.add_argument("--body-file", type=Path)
+    parser.add_argument("--strict", action="store_true", help="Exit 1 if the email is not sent")
     args = parser.parse_args()
 
     key = os.environ.get("RESEND_API_KEY", "").strip()
@@ -55,11 +58,12 @@ def main() -> int:
     try:
         with urllib.request.urlopen(request, timeout=20) as response:
             print(f"Email sent to {len(recipients)} address(es): HTTP {response.status}")
+            return 0
     except urllib.error.HTTPError as err:
         print(f"::warning::Email not sent: HTTP {err.code} {err.read().decode('utf-8', 'replace')[:300]}")
     except (urllib.error.URLError, TimeoutError) as err:
         print(f"::warning::Email not sent: {err}")
-    return 0
+    return 1 if args.strict else 0
 
 
 if __name__ == "__main__":

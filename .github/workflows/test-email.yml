@@ -1,0 +1,38 @@
+# A "send test email" button: Actions > Test email > Run workflow.
+# Sends one plain email through the same path as the action emails
+# (scripts/blog_agent/notify.py, the RESEND_API_KEY and NOTIFY_EMAIL secrets),
+# so the organizers can check those work without starting a real job.
+# It changes nothing on the site and costs nothing.
+
+name: Test email
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the secrets are set
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+        run: |
+          if [ -z "$RESEND_API_KEY" ] || [ -z "$NOTIFY_EMAIL" ]; then
+            echo "::error::RESEND_API_KEY or NOTIFY_EMAIL is not set (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
+      - name: Send the test email
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+        run: |
+          python scripts/blog_agent/notify.py --strict --subject "Test: the site's action emails work" \
+            --body "This is a test from the AI Medicine Collective site, sent by the \"Test email\" button on GitHub. If you can read this, the action emails (blog draft ready, digest ready to send, a run failed) will reach you. Nothing else happened and there is nothing to do."
