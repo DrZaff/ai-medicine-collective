@@ -473,7 +473,7 @@ const MENU_GROUPS = [
 
 // A group's pages as links, named as written ("AI vs Physician"); prefix is
 // "../" on the pages in member/
-// (Pages in MEMBERS_ONLY_PAGES carry a small "Members" tag.)
+// (Pages in MEMBERS_ONLY_PAGES are marked "(members only)".)
 const MEMBERS_ONLY_PAGES = new Set(["schedule", "chat", "requests"]);
 
 function groupLinks(group, prefix, className) {
@@ -485,7 +485,7 @@ function groupLinks(group, prefix, className) {
     if (MEMBERS_ONLY_PAGES.has(page)) {
       const tag = document.createElement("span");
       tag.className = "nav-members-tag";
-      tag.textContent = "Members";
+      tag.textContent = "(members only)";
       link.append(" ", tag);
     }
     return link;
@@ -629,6 +629,19 @@ function initHome() {
       } catch {
         // headline alone is fine
       }
+      // ...and the three before it
+      const earlier = index.slice(1, 4).filter((older) => /^\d{4}-\d{2}-\d{2}$/.test(older.date));
+      if (earlier.length) {
+        const list = node("ul", "home-list home-earlier");
+        for (const older of earlier) {
+          const item = node("li");
+          const title = node("a", "home-list-title", older.headline);
+          title.href = `blog.html?date=${older.date}`;
+          item.append(title, node("span", "home-list-meta", niceDate(older.date)));
+          list.append(item);
+        }
+        nodes.push(node("p", "home-earlier-label", "// Earlier"), list);
+      }
       briefing.replaceChildren(...nodes);
     } catch {
       // keep the plain text
@@ -677,6 +690,137 @@ function initReveal() {
 }
 
 document.addEventListener("DOMContentLoaded", initReveal);
+
+// The home hero's backdrop: points drifting slowly, joined by faint lines
+// when they come close, and drawn towards the pointer. The colour comes from
+// the canvas's CSS colour, so each theme sets its own. It only runs while
+// the hero is on screen, and holds still for people who ask for less motion.
+function initHeroNet() {
+  const canvas = document.querySelector(".hero-net");
+  if (!canvas || !canvas.getContext) return;
+  const hero = canvas.parentElement;
+  const context = canvas.getContext("2d");
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let width = 0;
+  let height = 0;
+  let points = [];
+  let pointer = null;
+  let running = false;
+  let frame = 0;
+  let colour = "110 231 183";
+
+  function readColour() {
+    const match = /(\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(canvas).color);
+    if (match) colour = `${match[1]} ${match[2]} ${match[3]}`;
+  }
+
+  function size() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    width = hero.clientWidth;
+    height = hero.clientHeight;
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const count = Math.round(Math.min(90, Math.max(28, (width * height) / 11000)));
+    points = Array.from({ length: count }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      dx: (Math.random() - 0.5) * 0.28,
+      dy: (Math.random() - 0.5) * 0.28,
+      r: 1 + Math.random() * 1.6,
+    }));
+  }
+
+  function draw() {
+    if (frame++ % 60 === 0) readColour();
+    context.clearRect(0, 0, width, height);
+    const reach = 130;
+    for (const point of points) {
+      if (!still) {
+        point.x += point.dx;
+        point.y += point.dy;
+        if (point.x < 0 || point.x > width) point.dx *= -1;
+        if (point.y < 0 || point.y > height) point.dy *= -1;
+        if (pointer) {
+          const px = pointer.x - point.x;
+          const py = pointer.y - point.y;
+          const far = Math.hypot(px, py);
+          if (far < 160 && far > 1) {
+            point.x += (px / far) * 0.25;
+            point.y += (py / far) * 0.25;
+          }
+        }
+      }
+    }
+    for (let i = 0; i < points.length; i++) {
+      const a = points[i];
+      for (let j = i + 1; j < points.length; j++) {
+        const b = points[j];
+        const far = Math.hypot(a.x - b.x, a.y - b.y);
+        if (far > reach) continue;
+        context.strokeStyle = `rgb(${colour} / ${(1 - far / reach) * 0.35})`;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(a.x, a.y);
+        context.lineTo(b.x, b.y);
+        context.stroke();
+      }
+      if (pointer) {
+        const far = Math.hypot(a.x - pointer.x, a.y - pointer.y);
+        if (far < 160) {
+          context.strokeStyle = `rgb(${colour} / ${(1 - far / 160) * 0.5})`;
+          context.beginPath();
+          context.moveTo(a.x, a.y);
+          context.lineTo(pointer.x, pointer.y);
+          context.stroke();
+        }
+      }
+      context.fillStyle = `rgb(${colour} / 0.75)`;
+      context.beginPath();
+      context.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+      context.fill();
+    }
+    if (running && !still) requestAnimationFrame(draw);
+  }
+
+  function start() {
+    if (running) return;
+    running = true;
+    requestAnimationFrame(draw);
+  }
+
+  size();
+  readColour();
+  draw();
+  window.addEventListener("resize", () => {
+    size();
+    if (still) draw();
+  });
+  hero.addEventListener("pointermove", (event) => {
+    const box = hero.getBoundingClientRect();
+    pointer = { x: event.clientX - box.left, y: event.clientY - box.top };
+  });
+  hero.addEventListener("pointerleave", () => {
+    pointer = null;
+  });
+  // the theme button changes the colour: redraw at once when it does
+  new MutationObserver(() => {
+    readColour();
+    if (still) draw();
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  if (still) return;
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((entries) => {
+      const visible = entries.some((entry) => entry.isIntersecting);
+      if (visible) start();
+      else running = false;
+    }).observe(hero);
+  } else {
+    start();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initHeroNet);
 
 /* ========= TOOLS PAGE: launcher ========= */
 
