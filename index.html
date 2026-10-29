@@ -59,36 +59,42 @@
           <a class="btn btn--primary" href="join.html" data-signed-out-only>&gt; Join the Collective</a>
           <a class="btn btn--vision" href="#vision" data-vision><svg class="btn-icon m-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/><path d="M19 3v4M17 5h4"/></svg><span>&gt; Our vision</span></a>
         </div>
+      </section>
 
-        <!-- Three ways in, so nobody has to work out the menu first. The
-             third door changes once someone is signed in. -->
-        <div class="home-doors">
-          <div class="home-door">
-            <span class="home-door-step">// 01</span>
-            <a class="home-door-title" href="hub.html">Use a tool</a>
-            <p class="home-door-text"><span id="home-project-count">15</span> calculators and assistants built by clinicians. Free, with nothing to install.</p>
-            <a class="home-door-link" href="hub.html">&gt; BROWSE THE TOOLS</a>
-          </div>
-          <div class="home-door">
-            <span class="home-door-step">// 02</span>
-            <a class="home-door-title" href="blog.html">Read the evidence</a>
-            <p class="home-door-text">Three short briefings a week on AI in medicine, and AI vs Physician: one paper weighing the studies.</p>
-            <a class="home-door-link" href="blog.html">&gt; LATEST BRIEFING</a>
-            <a class="home-door-link home-door-link--as-written" href="ai-vs-physician.html">&gt; AI vs Physician</a>
-          </div>
-          <div class="home-door" data-signed-out-only>
-            <span class="home-door-step">// 03</span>
-            <a class="home-door-title" href="join.html">Join the community</a>
-            <p class="home-door-text">Chat, a monthly meeting, a members' library and a place to share what you build. Free.</p>
-            <a class="home-door-link" href="join.html">&gt; REQUEST MEMBERSHIP</a>
-          </div>
-          <div class="home-door" data-signed-in-only hidden>
-            <span class="home-door-step">// 03</span>
-            <a class="home-door-title" href="chat.html">Your community</a>
-            <p class="home-door-text">Ask a question in chat, vote on the monthly meeting time, or post a tool you wish existed.</p>
-            <a class="home-door-link" href="chat.html">&gt; CHAT</a>
-            <a class="home-door-link" href="schedule.html">&gt; MEETINGS</a>
-            <a class="home-door-link" href="requests.html">&gt; REQUESTS</a>
+      <!-- Featured creation: one thing a member built, shown large. To feature
+           something else, change this block (and the card in the picture). -->
+      <section class="home-featured" aria-labelledby="featured-title" data-reveal>
+        <div class="featured-copy">
+          <p class="featured-kicker">// Featured creation</p>
+          <h3 id="featured-title" class="featured-title">JungleCards</h3>
+          <p class="featured-lede">Spaced-repetition flashcards for medicine, built by Brandon Zaffuto.</p>
+          <p class="featured-text">Anki is powerful, but you find, download and tidy decks yourself, and set it up
+            on every device. JungleCards keeps what works, the spaced repetition and the fill-in-the-blank cards, and
+            removes the chores.</p>
+          <ul class="featured-points">
+            <li><strong>One shared, checked library.</strong> Cards are written once for everyone and reviewed by a
+              moderator before they go live, so there are no decks to hunt for.</li>
+            <li><strong>Study by topic.</strong> Pick a topic and its subtopics come with it; mix new and due cards in a
+              few taps.</li>
+            <li><strong>AI-drafted cards.</strong> Paste your notes and get draft cards to edit, which a moderator
+              checks before they join the library.</li>
+            <li><strong>Simpler reviews.</strong> Three buttons, Difficult, Medium and Easy, and a dashboard that
+              shows what is due and how you are doing.</li>
+            <li><strong>Nothing to install or sync.</strong> It runs in the browser on any device, with your progress
+              saved to your account.</li>
+          </ul>
+          <p class="featured-actions">
+            <a class="btn btn--primary" href="https://junglecards.aimedicinecollective.com" target="_blank" rel="noopener noreferrer">&gt; Open JungleCards</a>
+          </p>
+        </div>
+        <!-- A drawing of a card, for decoration -->
+        <div class="featured-visual" aria-hidden="true">
+          <div class="jc-card jc-card--behind"></div>
+          <div class="jc-card">
+            <span class="jc-topic">Emergency medicine</span>
+            <p class="jc-cloze">First-line treatment for anaphylaxis is intramuscular <span class="jc-blank">[ &hellip; ]</span>.</p>
+            <p class="jc-answer">epinephrine</p>
+            <div class="jc-grades"><span>Difficult</span><span>Medium</span><span>Easy</span></div>
           </div>
         </div>
       </section>
@@ -132,20 +138,6 @@
             <p>Founded by resident physicians. The Collective is independent and volunteer-run.</p>
           </div>
           <a class="home-panel-link" href="members.html">&gt; MEET THE TEAM</a>
-        </article>
-
-        <article class="home-panel home-panel--meeting" data-reveal>
-          <h3 class="home-panel-title">// Monthly meeting</h3>
-          <div class="home-panel-body">
-            <p class="bento-big m-only">First week<span>4&ndash;7 PM Eastern</span></p>
-            <!-- The first seven days of a month; members vote on one slot -->
-            <ol class="meet-week" aria-hidden="true">
-              <li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li>
-            </ol>
-            <p>We meet in the first week of every month, between 4 and 7 PM Eastern.</p>
-            <p>Members vote on the exact time and get a calendar invite.</p>
-          </div>
-          <a class="home-panel-link" href="schedule.html">&gt; VOTE ON A TIME (MEMBERS)</a>
         </article>
 
         <article class="home-panel home-panel--tools" data-reveal>

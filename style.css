@@ -841,6 +841,28 @@ button:hover {
   color: var(--text);
 }
 
+/* "Members" beside pages only members can use, in the menu and footer */
+.nav-members-tag {
+  margin-left: 4px;
+  padding: 1px 5px;
+  border: 1px solid var(--line-strong);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  color: var(--muted);
+}
+
+/* The independence note and disclaimer: moved into the footer by
+   script.js (initFooterNav), last of all */
+.footer .site-note {
+  flex: 0 0 100%;
+  order: 3;
+  max-width: none;
+  margin: 12px 0 0;
+  text-align: left;
+}
+
 .cursor {
   animation: blink 1s step-start infinite;
 }
@@ -2435,11 +2457,152 @@ button.onboard-hide {
 }
 
 /* A grid of unequal cards: the AI vs Physician paper is the large one, the
-   latest briefing and the team sit beside it, and the meeting, the tools
-   and the newest tools share the row below. */
+   latest briefing and the team sit beside it, and the tools and the games
+   share the row below. */
 .home-panel--review {
   grid-column: span 2;
   grid-row: span 2;
+}
+
+.home-panel--hub {
+  grid-column: span 2;
+}
+
+/* Featured creation: one thing a member built, between the hero and the
+   cards. Copy on the left, a drawing of the thing on the right. */
+.home-featured {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--accent);
+  background: var(--panel);
+}
+
+.featured-kicker {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.featured-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.featured-lede,
+.featured-text,
+.featured-points {
+  font-family: var(--font-read);
+  line-height: 1.6;
+}
+
+.featured-lede {
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+.featured-text {
+  margin: 0 0 12px;
+}
+
+.featured-points,
+.section .featured-points {
+  margin: 0 0 16px;
+  padding-left: 20px;
+}
+
+.featured-points li {
+  margin-bottom: 6px;
+}
+
+.featured-points strong {
+  color: var(--text);
+}
+
+.featured-actions {
+  margin: 0;
+}
+
+.featured-visual {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+}
+
+.jc-card {
+  grid-area: 1 / 1;
+  width: min(320px, 100%);
+  padding: 16px;
+  border: 1px solid var(--accent);
+  background: var(--bg-inner);
+}
+
+.jc-card:not(.jc-card--behind) {
+  position: relative;
+  z-index: 1;
+}
+
+.jc-card--behind {
+  height: 200px;
+  transform: translate(10px, 10px);
+  border-color: var(--line-strong);
+}
+
+.jc-topic {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.jc-cloze {
+  margin: 10px 0 8px;
+  font-family: var(--font-read);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.jc-blank,
+.jc-answer {
+  color: var(--text);
+}
+
+.jc-answer {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px var(--rule-style) var(--line-strong);
+  font-family: var(--font-display);
+  font-weight: bold;
+}
+
+.jc-grades {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.jc-grades span {
+  flex: 1;
+  padding: 4px 0;
+  border: 1px solid var(--line-strong);
+  font-size: 0.75rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .home-featured {
+    grid-template-columns: 1fr;
+  }
 }
 
 .home-findings {
@@ -2771,7 +2934,8 @@ a.verdict-dot:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .home-panel--review {
+  .home-panel--review,
+  .home-panel--hub {
     grid-column: auto;
     grid-row: auto;
   }
