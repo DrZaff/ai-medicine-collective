@@ -1,0 +1,41 @@
+:: AI MEDICINE COLLECTIVE ::
+Weekly digest, Oct 24 - Oct 30, 2026
+
+[[AMC:NOTE]]
+// THE ONE THING
+Medical students' knowledge, attitudes, and practices regarding artificial intelligence: A cross-sectional study
+Students are already using AI, but this study suggests many do not yet understand it well. That supports teaching AI literacy explicitly in the curriculum rather than assuming students will pick it up on their own.
+https://pubmed.ncbi.nlm.nih.gov/42945317/
+
+// AI VS PHYSICIAN
+This week: Mixed results
+Clinicians vs. artificial intelligence in patient outcome prediction in the intensive care unit
+How a clinician compared with the AI depended on their experience, which is useful context for the debate over trainees relying on AI. For educators, it supports teaching learners to combine their own judgement with model output instead of deferring to it.
+https://www.nature.com/articles/s41746-026-03132-0
+
+// ALSO THIS WEEK
+> Performance of Clinical AI System and Physicians and Frontier Language Models in primary care diagnostics (arXiv (preprint))
+  https://arxiv.org/pdf/2609.09070
+> How AI is changing the training of doctors (RTÉ News (ERTNews, A European Perspective))
+  https://www.rte.ie/news/a-european-perspective/2026/1023/1596627-artificial-intelligence-doctors/
+> Medical Education: How are Residents Using AI? (Yale School of Medicine)
+  https://medicine.yale.edu/news-article/how-are-residents-using-ai/
+> Sequential diagnosis with language models (Science)
+  https://www.science.org/doi/10.1126/science.aeh7930?adobe_mc=MCMID%3D66027218407067200574056250616867011642%7CMCORGID%3D242B6472541199F70A4C98A6%40AdobeOrg%7CTS%3D1792680784
+
+// TOOL OF THE WEEK
+Obesity Phenotype Calculator
+Non-validated questionnaire to stratify patients based on obesity phenotype, with personalized recommendations to assist with pharmacologic and lifestyle management.
+https://www.aimedicinecollective.com/hub.html?project=e9db8a37-b986-4e5f-955e-98ef3aa2e07f
+
+// FROM THE COLLECTIVE
+[[AMC:COLLECTIVE]]
+
+// ONE ASK
+[[AMC:ASK]]Wish a tool existed? Post the idea, or vote for someone else's. https://www.aimedicinecollective.com/requests.html[[/AMC:ASK]]
+
+Every briefing: https://www.aimedicinecollective.com/blog.html
+Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.
+
+On Instagram: @aimedicinecollective (https://www.instagram.com/aimedicinecollective/)
+You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" under Your profile on your account page: https://www.aimedicinecollective.com/account.html#profile
