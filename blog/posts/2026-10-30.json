@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-30",
+  "headline": "How medical students view AI, and an AI consultation system against primary-care doctors",
+  "intro": "A survey from Iraq finds medical students feel underprepared for AI. A new preprint shows why that preparation matters: a clinical AI system scored higher than physicians on simulated primary-care consultations, though the evidence comes with real caveats.",
+  "items": [
+    {
+      "title": "Medical students' knowledge, attitudes, and practices regarding artificial intelligence: A cross-sectional study",
+      "source": "PLOS ONE (indexed in PubMed)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42945317/",
+      "published": "2026-10-27",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "Researchers surveyed 575 medical students in the Kurdistan Region of Iraq between November 2025 and January 2026, using a structured questionnaire on paper or online. They asked what students know about AI, how they feel about it and how they use it. The authors found these levels were below what they consider adequate and recommend adding structured AI teaching to the medical curriculum. It is a single-region, self-reported cross-sectional survey, so it describes student views rather than measuring real skill.",
+      "why_it_matters": "Students are already using AI, but this study suggests many do not yet understand it well. That supports teaching AI literacy explicitly in the curriculum rather than assuming students will pick it up on their own."
+    },
+    {
+      "title": "Performance of Clinical AI System and Physicians and Frontier Language Models in primary care diagnostics",
+      "source": "arXiv (preprint)",
+      "url": "https://arxiv.org/pdf/2609.09070",
+      "published": "2026-09-08",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_ahead",
+      "summary": "The task was to run adaptive primary-care consultations, asking questions before choosing a diagnosis, a workup and initial treatment, across 150 synthetic Polish-language cases. The AI was Doctorina, a clinical AI system, which was also compared with four standalone frontier language models. The human comparison group was eight physicians. Doctorina's Top-1 diagnostic concordance was 82.0% against 57.0% for the physicians (difference 25.0 percentage points; 95% CI 17.7–32.7), and its primary-or-reference-differential concordance was 97.3% against 85.0%. Across 149 case pairs, normalized workup scores were 89.4 against 66.9 and treatment scores were 83.7 against 61.2. The main limitation is that the cases were synthetic consultations, not real patients, and only eight physicians took part. This is also a preprint that has not been peer reviewed, and its authors include Doctorina's co-founder and staff.",
+      "why_it_matters": "The study tests more than exam answers: it covers questioning, workup and treatment planning, which is closer to real consultations. But learners should treat the results as an early, developer-run finding on simulated cases, not proof that the system beats doctors in real clinics."
+    }
+  ],
+  "tags": [
+    "ai literacy",
+    "clinical decision support",
+    "conflict of interest",
+    "curriculum",
+    "diagnostic accuracy",
+    "large language models",
+    "medical education",
+    "medical students",
+    "preprint",
+    "primary care",
+    "simulated consultations",
+    "survey"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
