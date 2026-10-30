@@ -1,0 +1,14 @@
+How medical students view AI, and an AI consultation system against primary-care doctors
+
+A survey from Iraq finds medical students feel underprepared for AI. A new preprint shows why that preparation matters: a clinical AI system scored higher than physicians on simulated primary-care consultations, though the evidence comes with real caveats.
+
+Med-ed: Medical students' knowledge, attitudes, and practices regarding artificial intelligence: A cross-sectional study (PLOS ONE (indexed in PubMed))
+AI vs physician: Performance of Clinical AI System and Physicians and Frontier Language Models in primary care diagnostics (arXiv (preprint))
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-10-30 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AiLiteracy #ClinicalDecisionSupport #ConflictOfInterest #Curriculum #DiagnosticAccuracy #LargeLanguageModels
