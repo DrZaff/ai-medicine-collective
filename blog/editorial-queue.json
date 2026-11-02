@@ -1,0 +1,36 @@
+{
+  "_about": "Studies the editors want the blog agent to review on a given day (scripts/blog_agent/agent.py reads this). The agent still fetches and checks the primary source, skips anything already covered or not verifiable, and explains in the draft's notes. One entry per date and section. Delete entries once their day has passed.",
+  "entries": [
+    {
+      "date": "2026-11-04",
+      "section": "med_ed",
+      "title": "Artificial Intelligence-Enhanced Colposcopy Training Improves Diagnostic Reasoning and Communication Competencies",
+      "source": "Journal of Gynecology Obstetrics and Human Reproduction",
+      "url": "https://doi.org/10.1016/j.jogoh.2026.103307",
+      "published": "2026-10-24",
+      "angle": "AI virtual patients may speed up diagnostic reasoning and communication, but conversational coaching should not be assumed to transfer to procedural skill.",
+      "caveats": [
+        "small, specialty-specific sample at affiliated sites",
+        "short follow-up and a wait-list design",
+        "no durable independent performance or patient outcomes",
+        "operative competence did not differ"
+      ],
+      "may_be_replaced": false
+    },
+    {
+      "date": "2026-11-06",
+      "section": "med_ed",
+      "title": "Generative AI Factors, Cognitive Engagement, and Patient Safety Learning in Medical Education",
+      "source": "JMIR Medical Education",
+      "url": "https://mededu.jmir.org/2026/1/e100828",
+      "published": "2026-10-27",
+      "angle": "Teaching responsible AI use should cover verification, calibrated trust, privacy, alignment with local protocols, and continued human accountability.",
+      "caveats": [
+        "cross-sectional and self-reported, so no causal claim",
+        "a narrow sample of private universities in one country",
+        "no observed safety outcome"
+      ],
+      "may_be_replaced": true
+    }
+  ]
+}
