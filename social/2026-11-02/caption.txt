@@ -1,8 +1,8 @@
-Teaching doctors to work with AI without losing core clinical skills
+ChatGPT lifts residents' decisions in neurosurgical emergencies, but only while it is open
 
-In this briefing, medical educators at a health journalism summit talk about how to fit AI into training while making sure trainees can still reason on their own when the tools fail or are wrong.
+In a simulation study, ChatGPT-4 raised trainees' accuracy on neurosurgical emergency cases, most of all for junior residents. The harder question for educators is what those trainees can still do once the tool is taken away.
 
-Med-ed: Schooled by AI: The evolving role of artificial intelligence in medical education (Association of Health Care Journalists (AHCJ))
+Med-ed: AI-augmented decision support in neurosurgical emergencies: a prospective study of resident performance (BMC Medical Education)
 
 Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-11-02 (link in bio).
 
@@ -10,4 +10,4 @@ Follow @aimedicinecollective for three briefings a week on AI in medicine.
 
 AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
 
-#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AiCurriculum #ClinicalReasoning #FacultyDevelopment #NeverSkilling
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #Chatgpt #ClinicalDecisionSupport #GraduateMedicalEducation #LargeLanguageModels #Neurosurgery #NeverSkilling

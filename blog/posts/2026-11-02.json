@@ -1,26 +1,29 @@
 {
   "date": "2026-11-02",
-  "headline": "Teaching doctors to work with AI without losing core clinical skills",
-  "intro": "In this briefing, medical educators at a health journalism summit talk about how to fit AI into training while making sure trainees can still reason on their own when the tools fail or are wrong.",
+  "headline": "ChatGPT lifts residents' decisions in neurosurgical emergencies, but only while it is open",
+  "intro": "In a simulation study, ChatGPT-4 raised trainees' accuracy on neurosurgical emergency cases, most of all for junior residents. The harder question for educators is what those trainees can still do once the tool is taken away.",
   "items": [
     {
-      "title": "Schooled by AI: The evolving role of artificial intelligence in medical education",
-      "source": "Association of Health Care Journalists (AHCJ)",
-      "url": "https://healthjournalism.org/blog/2026/10/schooled-by-ai-the-evolving-role-of-artificial-intelligence-in-medical-education",
+      "title": "AI-augmented decision support in neurosurgical emergencies: a prospective study of resident performance",
+      "source": "BMC Medical Education",
+      "url": "https://doi.org/10.1186/s12909-026-10696-8",
       "published": "2026-10-29",
-      "category": "news",
+      "category": "research",
       "section": "med_ed",
       "verdict": "not_applicable",
-      "summary": "This is a write-up of a panel at AHCJ's fall 2026 summit, not a research study. On the panel were Tina Hernandez-Boussard of Stanford and Graciela Gonzalez-Hernandez of Cedars-Sinai. They argued that trainees should learn to use AI while still building skills they can fall back on when it fails. They pointed to 'never-skilling', where trainees lean on AI output instead of developing their own reasoning, and said faculty should teach responsible AI use rather than police it, with some exercises deliberately run without digital tools.",
-      "why_it_matters": "For educators, it gives a practical way to plan an AI curriculum: build AI fluency and unaided clinical reasoning side by side. For trainees, it is a reminder to practise without the tool as well as with it."
+      "summary": "In a simulation study, 55 frontline trainees answered 10 neurosurgical emergency case vignettes twice, once on their own and once with ChatGPT-4, 48 hours apart. Their accuracy against expert consensus rose from 58.0% to 81.0% with the AI, junior residents gained the most (45.8% to 83.0%, against 68.2% to 80.0% for seniors), and their answers became more complete (71% to 92%). These were written cases scored while the AI was in use, so the study does not show what trainees retain without the tool, or any effect on patients.",
+      "why_it_matters": "AI can lift a novice's performance while it is on the screen, which makes it a strong scaffold. The question for programs is the one the authors raise themselves: how to scaffold and then wean, so trainees still reason well when the tool is gone."
     }
   ],
   "tags": [
-    "ai curriculum",
-    "clinical reasoning",
-    "faculty development",
-    "medical education",
-    "never-skilling"
+    "chatgpt",
+    "clinical decision support",
+    "graduate medical education",
+    "large language models",
+    "neurosurgery",
+    "never-skilling",
+    "residents",
+    "simulation"
   ],
   "generated_by": "claude-opus-5-5"
 }
