@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-02",
+  "headline": "Teaching doctors to work with AI without losing core clinical skills",
+  "intro": "In this briefing, medical educators at a health journalism summit talk about how to fit AI into training while making sure trainees can still reason on their own when the tools fail or are wrong.",
+  "items": [
+    {
+      "title": "Schooled by AI: The evolving role of artificial intelligence in medical education",
+      "source": "Association of Health Care Journalists (AHCJ)",
+      "url": "https://healthjournalism.org/blog/2026/10/schooled-by-ai-the-evolving-role-of-artificial-intelligence-in-medical-education",
+      "published": "2026-10-29",
+      "category": "news",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "This is a write-up of a panel at AHCJ's fall 2026 summit, not a research study. On the panel were Tina Hernandez-Boussard of Stanford and Graciela Gonzalez-Hernandez of Cedars-Sinai. They argued that trainees should learn to use AI while still building skills they can fall back on when it fails. They pointed to 'never-skilling', where trainees lean on AI output instead of developing their own reasoning, and said faculty should teach responsible AI use rather than police it, with some exercises deliberately run without digital tools.",
+      "why_it_matters": "For educators, it gives a practical way to plan an AI curriculum: build AI fluency and unaided clinical reasoning side by side. For trainees, it is a reminder to practise without the tool as well as with it."
+    }
+  ],
+  "tags": [
+    "ai curriculum",
+    "clinical reasoning",
+    "faculty development",
+    "medical education",
+    "never-skilling"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
