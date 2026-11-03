@@ -1,8 +1,9 @@
-ChatGPT lifts residents' decisions in neurosurgical emergencies, but only while it is open
+Neurosurgical vignettes with ChatGPT, and an AI system that matches neurologists on autopsy-confirmed cases
 
-In a simulation study, ChatGPT-4 raised trainees' accuracy on neurosurgical emergency cases, most of all for junior residents. The harder question for educators is what those trainees can still do once the tool is taken away.
+Both reviews look at AI in diagnostic reasoning for brain and nervous-system disease. In the first, residents got more accurate with ChatGPT-4 on written neurosurgical emergencies. In the second, an LLM-based system was about as accurate as experienced neurologists on complex cases whose true diagnosis was confirmed at autopsy.
 
 Med-ed: AI-augmented decision support in neurosurgical emergencies: a prospective study of resident performance (BMC Medical Education)
+AI vs physician: Assessing AI and Neurologist Diagnostic Reasoning Against Neuropathological Ground Truth (medRxiv (preprint, not peer reviewed))
 
 Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-11-02 (link in bio).
 
@@ -10,4 +11,4 @@ Follow @aimedicinecollective for three briefings a week on AI in medicine.
 
 AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
 
-#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #Chatgpt #ClinicalDecisionSupport #GraduateMedicalEducation #LargeLanguageModels #Neurosurgery #NeverSkilling
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AiVsPhysician #Chatgpt #ClinicalDecisionSupport #DiagnosticReasoning #DifferentialDiagnosis #GraduateMedicalEducation
