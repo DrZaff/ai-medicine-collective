@@ -1,0 +1,11 @@
+AI vs Physician, edition 2: how AI is changing what physicians can do.
+
+The strongest evidence still comes from randomised trials in which clinicians use AI on real patients. AI-supported mammography screening was at least as safe as double reading, and AI help raised retinal specialists' accuracy in predicting the genetic cause of inherited retinal disease, but colonoscopy detection aids showed no clear overall gain and ambient scribes gave mixed results. On written or simulated cases, large language models (LLMs) raised physicians' scores in randomised trials across several countries, and the models alone often scored higher still. Real-patient comparisons remain split, wrong or citation-backed AI advice can pull physicians toward errors, and one study found LLM care plans about three times as costly as physicians' plans.
+
+The full paper, with every study and its source: aimedicinecollective.com/ai-vs-physician (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+A summary of published research, drafted by AI and reviewed by clinicians. Not medical advice.
+
+#AIinMedicine #MedEd #EvidenceBasedMedicine #DigitalHealth #ClinicalAI
