@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-02",
+  "headline": "Neurosurgical vignettes with ChatGPT, and an AI system that matches neurologists on autopsy-confirmed cases",
+  "intro": "Both reviews look at AI in diagnostic reasoning for brain and nervous-system disease. In the first, residents got more accurate with ChatGPT-4 on written neurosurgical emergencies. In the second, an LLM-based system was about as accurate as experienced neurologists on complex cases whose true diagnosis was confirmed at autopsy.",
+  "items": [
+    {
+      "title": "AI-augmented decision support in neurosurgical emergencies: a prospective study of resident performance",
+      "source": "BMC Medical Education",
+      "url": "https://doi.org/10.1186/s12909-026-10696-8",
+      "published": "2026-10-29",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "In a simulation study, 55 frontline trainees answered 10 neurosurgical emergency case vignettes twice, once on their own and once with ChatGPT-4, 48 hours apart. Their accuracy against expert consensus rose from 58.0% to 81.0% with the AI, junior residents gained the most (45.8% to 83.0%, against 68.2% to 80.0% for seniors), and their answers became more complete (71% to 92%). These were written cases scored while the AI was in use, so the study does not show what trainees retain without the tool, or any effect on patients.",
+      "why_it_matters": "AI can lift a novice's performance while it is on the screen, which makes it a strong scaffold. The question for programs is the one the authors raise themselves: how to scaffold and then wean, so trainees still reason well when the tool is gone."
+    },
+    {
+      "title": "Assessing AI and Neurologist Diagnostic Reasoning Against Neuropathological Ground Truth",
+      "source": "medRxiv (preprint, not peer reviewed)",
+      "url": "https://www.medrxiv.org/content/10.64898/2026.07.07.26356930v2.full.pdf",
+      "published": "2026-10-03",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "comparable",
+      "summary": "Task: give a ranked top-three differential diagnosis from written case summaries of complex neurological illness, scored against the diagnosis confirmed at autopsy. The AI was DIAGNO, an LLM-based system built on GPT-4o that rates its own confidence and looks up references for cases where its confidence is lower. The humans were three board-certified neurologists, each with more than 10 years in practice; every case was read by just one of them, and they could use resources such as UpToDate. On 203 complex Massachusetts General Hospital cases, DIAGNO's top-3 accuracy was 0.67 against the neurologists' 0.63, and its accuracy by disease category was 0.74 against 0.67. None of the comparisons by disease category was statistically significant, and the authors describe DIAGNO's performance as comparable to the neurologists'. The main limitation is that this was a retrospective study of selected written summaries rather than full records or real patients, and it is a preprint; GPT-4o was also one of the three blinded judges scoring the answers.",
+      "why_it_matters": "Most AI-versus-doctor studies score answers against what other clinicians concluded. This one uses autopsy findings as the reference standard, and both the AI and experienced neurologists missed about a third of these hard cases. That makes it a useful model for teaching diagnostic uncertainty, but it does not show that the tool helps neurologists or trainees when they use it."
+    }
+  ],
+  "tags": [
+    "ai vs physician",
+    "chatgpt",
+    "clinical decision support",
+    "diagnostic reasoning",
+    "differential diagnosis",
+    "graduate medical education",
+    "large language models",
+    "neurology",
+    "neuropathology",
+    "neurosurgery",
+    "never-skilling",
+    "preprint",
+    "residents",
+    "simulation"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
