@@ -26,6 +26,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 ROOT = Path(__file__).resolve().parents[2]
 POSTS_DIR = ROOT / "blog" / "posts"
+# Studies the editors want reviewed on a given day (see queued_for)
+QUEUE_PATH = ROOT / "blog" / "editorial-queue.json"
 
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"
@@ -222,7 +224,42 @@ def collect_urls(value, found: set[str]) -> None:
             collect_urls(inner, found)
 
 
-def build_user_prompt(date: dt.date, avoid: list[dict]) -> str:
+def queued_for(date: dt.date) -> list[dict]:
+    """The editorial queue's entries for this date: studies the editors want
+    reviewed that day. The agent still fetches and checks each one."""
+    try:
+        queue = json.loads(QUEUE_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return [entry for entry in queue.get("entries", [])
+            if entry.get("date") == date.isoformat() and entry.get("section") in SECTIONS and entry.get("url")]
+
+
+def queue_prompt(entries: list[dict]) -> str:
+    if not entries:
+        return ""
+    parts = []
+    for entry in entries:
+        caveats = "; ".join(entry.get("caveats", [])) or "(none listed)"
+        replace = ("You may choose a clearly stronger med-ed item published in the window instead; if you do, say "
+                   "which and why in \"note\"." if entry.get("may_be_replaced") else
+                   "Use it unless it fails the checks below.")
+        parts.append(
+            f"EDITORS' REQUEST for the {SECTION_LABELS[entry['section']]} (section \"{entry['section']}\"): "
+            f"\"{entry.get('title', '')}\" ({entry.get('source', '')}, published {entry.get('published', '?')}), "
+            f"{entry['url']}\n"
+            f"Fetch this primary source and write the review from it, never from these notes; link to the page you "
+            f"fetched. It is exempt from the lookback window. {replace}\n"
+            f"Angle the editors suggest: {entry.get('angle', '(none)')}\n"
+            f"Caveats the editors expect (include those the source confirms, and no claim it does not support): "
+            f"{caveats}\n"
+            "Skip it, and say why in \"note\", if it was already covered, cannot be opened, or does not say what "
+            "these notes claim. When you use it, say in \"note\" that you did and anything in these notes the "
+            "source did not confirm.")
+    return "\n\n".join(parts) + "\n\n"
+
+
+def build_user_prompt(date: dt.date, avoid: list[dict], queued: list[dict] | None = None) -> str:
     window_start = date - dt.timedelta(days=LOOKBACK_DAYS)
     covered = [
         f"- {item['title']} ({item['url']})"
@@ -238,6 +275,7 @@ def build_user_prompt(date: dt.date, avoid: list[dict]) -> str:
         f"through {date.isoformat()}.\n\n"
         f"Already covered in the last {RECENT_DAYS_TO_AVOID} days (do not repeat):\n"
         f"{covered_text}\n\n"
+        + queue_prompt(queued or []) +
         "For the med-ed review, search topics such as: AI in medical "
         "education, AI tutors or simulation for medical students and residents, "
         "LLMs in clinical training, AI assessment and feedback in GME, AI "
@@ -530,6 +568,7 @@ def main() -> int:
 
     avoid = recent_posts(date, RECENT_DAYS_TO_AVOID)
     fixture = json.loads(args.fixture.read_text(encoding="utf-8")) if args.fixture else None
+    queued = queued_for(date)
 
     if post_path.exists():
         # Only a draft that has not been published is topped up (the workflow
@@ -559,7 +598,7 @@ def main() -> int:
         found_urls = {normalize_url(u) for u in fixture.get("search_urls", [])}
         usage = None
     else:
-        result, found_urls, usage = run_claude(build_user_prompt(date, avoid))
+        result, found_urls, usage = run_claude(build_user_prompt(date, avoid, queued))
 
     items, dropped = verify_items(result, found_urls, avoid)
     for reason in dropped:
@@ -581,6 +620,13 @@ def main() -> int:
     # Readers expect both reviews: if one is missing, look for it on its own
     notes = []
     first_note = (result.get("note") or "").strip()
+    # Tell the editor what happened to each study they asked for
+    for entry in queued:
+        wanted = entry.get("title", "").strip().lower()
+        used = any(wanted and wanted[:50] in item.get("title", "").lower() for item in items)
+        notes.append(f"Editorial queue: {'used' if used else 'NOT used'} \"{entry.get('title', '')}\".")
+    if queued and first_note and not missing_sections(items):
+        notes.append(f"Agent's note: {first_note}")
     if missing_sections(items):
         if first_note:
             notes.append(f"First pass: {first_note}")
