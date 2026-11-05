@@ -459,7 +459,7 @@ const MENU_GROUPS = [
   {
     menu: "blog",
     label: "Evidence",
-    tabs: [["blog", "BRIEFINGS", "Briefings"], ["ai-vs-physician", "AI VS PHYSICIAN", "AI vs Physician"]],
+    tabs: [["blog", "BRIEFINGS", "Briefings"], ["ai-vs-human", "AI VS HUMAN", "AI vs Human"]],
     also: [],
   },
   {
@@ -471,7 +471,7 @@ const MENU_GROUPS = [
   },
 ];
 
-// A group's pages as links, named as written ("AI vs Physician"); prefix is
+// A group's pages as links, named as written ("AI vs Human"); prefix is
 // "../" on the pages in member/
 // (Pages in MEMBERS_ONLY_PAGES are marked "(members only)".)
 const MEMBERS_ONLY_PAGES = new Set(["schedule", "chat", "requests"]);
@@ -501,7 +501,7 @@ function initCurrentNav() {
   if (inMemberFolder) here = "members"; // the hand-made profile pages
   if (here === "appstore" || here === "projects" || here === "tools") here = "hub";
   if (here === "resources" || here.startsWith("course-")) here = "learn";
-  if (here === "ai-vs-human") here = "ai-vs-physician";
+  if (here === "ai-vs-physician") here = "ai-vs-human"; // the old address
 
   const group = MENU_GROUPS.find((g) => g.tabs.some(([page]) => page === here) || g.also.includes(here));
   const menuPage = group ? group.menu : here;
@@ -936,7 +936,7 @@ function initBlog() {
       const li = el("li", "blog-item");
       // Newer posts have two reviews, each labelled by section; older ones
       // carry only a category.
-      const SECTION_NAMES = { med_ed: "Med-ed review", ai_vs_human: "AI vs physician" };
+      const SECTION_NAMES = { med_ed: "Med-ed review", ai_vs_human: "AI vs human" };
       const head = el("div", "blog-item-head");
       const labels = el("div", "blog-item-labels");
       labels.append(el("span", "blog-cat", SECTION_NAMES[item.section] || item.category));
@@ -1045,7 +1045,7 @@ function initBlog() {
 
 document.addEventListener("DOMContentLoaded", initBlog);
 
-/* ========= AI VS PHYSICIAN: the living review ========= */
+/* ========= AI VS HUMAN: the living review ========= */
 
 // Draws evidence/ai-vs-human.json: a paper rewritten each month by the
 // "Living review" job from a register of studies, and approved by a person
@@ -1100,7 +1100,7 @@ function initLivingReview() {
         const these = mine.filter((study) => study.verdict === verdict);
         these.forEach((study) => {
           const dot = el("a", `verdict-dot verdict-dot--${DIRECTION[verdict]}`);
-          dot.href = `ai-vs-physician.html#study-${encodeURIComponent(study.id)}`;
+          dot.href = `ai-vs-human.html#study-${encodeURIComponent(study.id)}`;
           dot.title = `${study.title} (${VERDICTS[verdict]})`;
           dot.setAttribute("aria-label", dot.title);
           dot.style.setProperty("--i", String(n++));
@@ -1128,7 +1128,7 @@ function initLivingReview() {
         const meta = el("p", "home-list-meta",
           `// Edition ${review.edition} · ${review.studies.length} studies · updated ${longDate(review.updated)}`);
         const title = el("a", "home-headline", "How AI is changing what physicians can do");
-        title.href = "ai-vs-physician.html";
+        title.href = "ai-vs-human.html";
         const summary = el("p", "home-panel-text", plain(review.summary).split(/(?<=\.)\s+/).slice(0, 2).join(" "));
         const findings = el("ul", "home-findings");
         (review.key_findings || []).slice(0, 1).forEach((finding) => findings.append(el("li", null, plain(finding))));

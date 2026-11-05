@@ -2340,7 +2340,7 @@ html.terminal::view-transition-new(root) {
   }
 }
 
-/* --- AI vs Physician: the living review, set as a journal article --- */
+/* --- AI vs Human: the living review, set as a journal article --- */
 
 /* a page title that keeps its own capitals */
 .modern .section-title--as-written {
@@ -2910,7 +2910,7 @@ html.terminal::view-transition-new(root) {
 
 
 /* === HOME GRID: THE PAPER IS THE FEATURE (2026-10-13) =========
-   The AI vs Physician review takes the large card; the latest briefing
+   The AI vs Human review takes the large card; the latest briefing
    and the team sit beside it; the meeting, the tools and the newest
    tools share the row below. These rules come last so they replace the
    earlier placements. */
@@ -3083,7 +3083,7 @@ html.terminal::view-transition-new(root) {
 
 
 /* === VISUAL POLISH (2026-10-26) ===============================
-   The AI vs Physician chart, the blog archive as covers, the home page's
+   The AI vs Human chart, the blog archive as covers, the home page's
    bottom row, small movement, and a footer that carries the menu. */
 
 .modern {

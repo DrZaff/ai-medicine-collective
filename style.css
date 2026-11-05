@@ -63,7 +63,7 @@
   --icon-b: #00cc55;
   --icon-a-rgb: 0 255 102;
 
-  /* The AI vs Physician chart: which way each study went */
+  /* The AI vs Human chart: which way each study went */
   --v-up: var(--text);       /* in AI's favour */
   --v-even: var(--cyan);     /* no difference */
   --v-down: var(--yellow);   /* against AI */
@@ -517,7 +517,7 @@ html.theme-fading body {
   white-space: nowrap;
 }
 
-/* Footer links written as names ("AI vs Physician") */
+/* Footer links written as names ("AI vs Human") */
 .footer-links a.as-written {
   text-transform: uppercase;
 }
@@ -2470,7 +2470,7 @@ button.onboard-hide {
   box-shadow: var(--glow);
 }
 
-/* A grid of unequal cards: the AI vs Physician paper is the large one with
+/* A grid of unequal cards: the AI vs Human paper is the large one with
    the latest briefing beside it, the tools and the games share the next
    row, and the team closes the page across the full width. */
 .home-panel--review {
@@ -2818,7 +2818,7 @@ button.onboard-hide {
   color: var(--text);
 }
 
-/* The AI vs Physician chart: one dot per study, a row per kind of study
+/* The AI vs Human chart: one dot per study, a row per kind of study
    (script.js: verdictChart). On the home page and the paper. */
 .verdict-chart {
   display: grid;
@@ -4233,7 +4233,7 @@ textarea.join-input {
   gap: 6px;
 }
 
-/* The "AI vs physician" review: cyan edge, and who came out ahead */
+/* The "AI vs human" review: cyan edge, and who came out ahead */
 .blog-item--versus {
   border-left-color: var(--cyan);
 }
@@ -4886,7 +4886,7 @@ button.meeting-undo {
 }
 
 
-/* === AI VS PHYSICIAN: THE LIVING REVIEW ========================== */
+/* === AI VS HUMAN: THE LIVING REVIEW ========================== */
 
 /* The card on the Learning page */
 .evidence-card,

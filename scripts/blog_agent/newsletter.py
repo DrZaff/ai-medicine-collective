@@ -1,7 +1,7 @@
 """Assemble the weekly digest: a two-minute read with a fixed shape.
 
   1. The one thing        the week's most useful item, in two sentences
-  2. AI vs physician      the week's strongest head-to-head study (others go to 'Also')
+  2. AI vs human      the week's strongest head-to-head study (others go to 'Also')
   3. Tool of the week     one tool from the hub
   4. From the Collective  who published what (public part; the members-only
                           part is added when an admin sends it)
@@ -90,7 +90,7 @@ VERDICTS = {
 # repeat itself. The admin can still replace it when sending.
 ASKS = [
     ("Open one tool this week and tell its author what you think.", "/hub.html", "Open tools"),
-    ("Send this week's AI vs physician study to a colleague who would argue with it.", "/blog.html", "Read it"),
+    ("Send this week's AI vs human study to a colleague who would argue with it.", "/blog.html", "Read it"),
     ("Wish a tool existed? Post the idea, or vote for someone else's.", "/requests.html", "See requests"),
     ("Built something useful? Add it to the Tools page; a moderator checks it first.", "/hub.html?view=submit", "Add a tool"),
     ("Vote on a time for this month's meeting.", "/schedule.html", "Vote"),
@@ -257,7 +257,7 @@ def render_html(d: dict) -> str:
         inside.append(short(item["title"], 70))
     if d["versus"]:
         verdict = VERDICTS.get(d["versus"][0].get("verdict"), "the result")
-        inside.append(f"AI vs physician: {verdict.lower().replace("ai ", "AI ")}")
+        inside.append(f"AI vs human: {verdict.lower().replace("ai ", "AI ")}")
     if tool:
         inside.append(f"Tool of the week: {tool['title']}")
 
@@ -312,8 +312,8 @@ def render_html(d: dict) -> str:
             RULE,
         ]
 
-    # AI vs physician: this week's results
-    out.append(f'<p style="{LABEL}">AI vs physician</p>')
+    # AI vs human: this week's results
+    out.append(f'<p style="{LABEL}">AI vs human</p>')
     for versus in d["versus"]:
         verdict = VERDICTS.get(versus.get("verdict"), "Result")
         out += [
@@ -323,7 +323,7 @@ def render_html(d: dict) -> str:
         ]
     if not d["versus"]:
         out.append(f'<p style="{P}">No head-to-head study made the cut this week. Every study so far is weighed in the '
-                   f'<a href="{SITE_URL}/ai-vs-physician.html" style="{LINK}">AI vs Physician paper</a>.</p>')
+                   f'<a href="{SITE_URL}/ai-vs-human.html" style="{LINK}">AI vs Human paper</a>.</p>')
 
     if d["also"]:
         out += [RULE, f'<p style="{LABEL}">Also this week</p>']
@@ -393,12 +393,12 @@ def render_text(d: dict) -> str:
     item = d["one_thing"]
     if item:
         lines += ["// THE ONE THING", item["title"], item["why_it_matters"], item["url"], ""]
-    lines.append("// AI VS PHYSICIAN")
+    lines.append("// AI VS HUMAN")
     for versus in d["versus"]:
         lines += [f"This week: {VERDICTS.get(versus.get('verdict'), 'Result')}", versus["title"],
                   versus["why_it_matters"], versus["url"]]
     if not d["versus"]:
-        lines.append(f"No head-to-head study made the cut this week. Every study so far: {SITE_URL}/ai-vs-physician.html")
+        lines.append(f"No head-to-head study made the cut this week. Every study so far: {SITE_URL}/ai-vs-human.html")
     lines.append("")
     if d["also"]:
         lines.append("// ALSO THIS WEEK")

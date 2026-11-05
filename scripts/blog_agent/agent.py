@@ -32,7 +32,7 @@ QUEUE_PATH = ROOT / "blog" / "editorial-queue.json"
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"
 LOOKBACK_DAYS = 7              # med-ed review
-VS_HUMAN_LOOKBACK_DAYS = 30    # "AI vs physician" review: good comparison studies are rarer
+VS_HUMAN_LOOKBACK_DAYS = 30    # "AI vs human" review: good comparison studies are rarer
 # If the first pass comes back without one of the two reviews, a second pass
 # looks for just that one, further back (see fill_missing).
 FALLBACK_LOOKBACK_DAYS = {"med_ed": 21, "ai_vs_human": 120}
@@ -57,8 +57,8 @@ CATEGORIES = ["education", "research", "news", "policy", "tool"]
 
 # Every briefing has two reviews, one per section.
 SECTIONS = ["med_ed", "ai_vs_human"]
-SECTION_LABELS = {"med_ed": "Med-ed review", "ai_vs_human": "AI vs physician"}
-# Who came out ahead on the study's main measure (AI vs physician reviews only).
+SECTION_LABELS = {"med_ed": "Med-ed review", "ai_vs_human": "AI vs human"}
+# Who came out ahead on the study's main measure (AI vs human reviews only).
 # Shown to readers as: AI outperformed physicians, Physicians outperformed AI,
 # Comparable (AI on its own vs physicians); AI helped improve, AI help: no
 # difference, AI help made it worse (physicians with vs without AI); Mixed results.
@@ -77,14 +77,14 @@ AI in medical education: teaching, learning, assessment, or training with AI \
 (medical students, residents, fellows, faculty development). Published within \
 the med-ed lookback window you are given. Set its verdict to "not_applicable".
 
-2. AI VS PHYSICIAN (section "ai_vs_human"). One study that directly compares the \
+2. AI VS HUMAN (section "ai_vs_human"). One study that directly compares the \
 performance of an AI system with the performance of humans on a task in \
 medicine: clinicians, trainees, or students against an AI, or clinicians \
 working with an AI against clinicians working without it. It must be a real \
 study with a reported comparison: a peer-reviewed article, or a preprint \
 clearly labelled as one. Not a press release on its own, not vendor \
 marketing, not an opinion piece, not a study that only benchmarks AI against \
-other AI. Published within the AI-vs-physician lookback window you are given. \
+other AI. Published within the AI-vs-human lookback window you are given. \
 Its summary must say, in this order: the task; which AI system; who the \
 humans were and how many; the main measure and each side's result, with \
 numbers exactly as the source reports them; and the most important \
@@ -118,7 +118,7 @@ If nothing qualifies at all, return an empty items list.
 both reviews are present. Otherwise say in 2 to 4 sentences what you searched \
 for and why the best candidates did not qualify (name them).
 - Write in clear, plain language for busy clinicians. The med-ed summary is 2 \
-to 3 sentences; the AI-vs-physician summary is 3 to 5. "Why it matters" is 1 to 2 \
+to 3 sentences; the AI-vs-human summary is 3 to 5. "Why it matters" is 1 to 2 \
 sentences aimed at learners and educators.
 - The headline is a short, specific title for the whole briefing (no \
 clickbait). The intro is 1 to 2 sentences tying the two reviews together.
@@ -128,7 +128,7 @@ or how many items there are.
 - You have a limited number of searches and page fetches. Split your searches \
 roughly evenly between the two sections, and fetch a page only when the \
 search result does not give you enough to summarize it accurately. For the \
-AI-vs-physician study, fetch the article page so the numbers are right.
+AI-vs-human study, fetch the article page so the numbers are right.
 """
 
 POST_SCHEMA = {
@@ -271,7 +271,7 @@ def build_user_prompt(date: dt.date, avoid: list[dict], queued: list[dict] | Non
         f"Today is {date.isoformat()}. Prepare this briefing.\n\n"
         f"Med-ed lookback window: published from {window_start.isoformat()} "
         f"through {date.isoformat()}.\n"
-        f"AI-vs-physician lookback window: published from {vs_start.isoformat()} "
+        f"AI-vs-human lookback window: published from {vs_start.isoformat()} "
         f"through {date.isoformat()}.\n\n"
         f"Already covered in the last {RECENT_DAYS_TO_AVOID} days (do not repeat):\n"
         f"{covered_text}\n\n"
@@ -282,7 +282,7 @@ def build_user_prompt(date: dt.date, avoid: list[dict], queued: list[dict] | Non
         "curricula and policies at medical schools, and med-ed journals such as "
         "Academic Medicine, Medical Education, Medical Teacher, BMC Medical "
         "Education, and JMIR Medical Education.\n\n"
-        "For the AI-vs-physician review, search for studies such as: large "
+        "For the AI-vs-human review, search for studies such as: large "
         "language model versus physicians on diagnosis or management, AI "
         "versus radiologists, pathologists, dermatologists or ophthalmologists "
         "on image reading, AI versus residents or students on examinations, "

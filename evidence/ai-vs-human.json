@@ -375,7 +375,7 @@
       ]
     }
   ],
-  "title": "AI vs Physician: how AI is changing what physicians can do",
+  "title": "AI vs Human: how AI is changing what physicians can do",
   "updated": "2026-11-01",
   "summary": "The strongest evidence still comes from randomised trials in which clinicians use AI on real patients. AI-supported mammography screening was at least as safe as double reading [S2], and AI help raised retinal specialists' accuracy in predicting the genetic cause of inherited retinal disease [S16], but colonoscopy detection aids showed no clear overall gain [S7][S8] and ambient scribes gave mixed results [S3]. On written or simulated cases, large language models (LLMs) raised physicians' scores in randomised trials across several countries [S5][S9][S13][S14], and the models alone often scored higher still [S5][S9][S18][S20]. Real-patient comparisons remain split [S4][S10][S19], wrong or citation-backed AI advice can pull physicians toward errors [S6][S14], and one study found LLM care plans about three times as costly as physicians' plans [S17].",
   "key_findings": [
