@@ -1,6 +1,6 @@
 AI as tutor and as measurer: colposcopy training for residents, and heart MRI ejection fraction compared with clinicians
 
-One review covers a randomised trial in which an AI virtual-patient platform improved OB/GYN residents' diagnostic reasoning but not their operative skill. The other covers a large Lancet Digital Health study where AI ejection-fraction measurements from cardiac MRI predicted death slightly better than expert clinicians' measurements, which raises the question of what trainees still need to learn to do by hand.
+One review covers a randomised trial in which an AI virtual-patient platform improved OB/GYN residents' diagnostic reasoning but not their operative skill. The other covers a large Lancet Digital Health study in which AI measurements of heart function on cardiac MRI predicted death marginally better than expert clinicians' measurements.
 
 Med-ed: Artificial intelligence-enhanced colposcopy training improves diagnostic reasoning and communication competencies: A randomized controlled study (Journal of Gynecology Obstetrics and Human Reproduction)
 AI vs physician: Performance of artificial intelligence versus clinician left-ventricular segmentation of cardiac MRI for mortality prediction: a retrospective, multicentre, prognostic study (The Lancet Digital Health)

@@ -1,7 +1,7 @@
 {
   "date": "2026-11-04",
   "headline": "AI as tutor and as measurer: colposcopy training for residents, and heart MRI ejection fraction compared with clinicians",
-  "intro": "One review covers a randomised trial in which an AI virtual-patient platform improved OB/GYN residents' diagnostic reasoning but not their operative skill. The other covers a large Lancet Digital Health study where AI ejection-fraction measurements from cardiac MRI predicted death slightly better than expert clinicians' measurements, which raises the question of what trainees still need to learn to do by hand.",
+  "intro": "One review covers a randomised trial in which an AI virtual-patient platform improved OB/GYN residents' diagnostic reasoning but not their operative skill. The other covers a large Lancet Digital Health study in which AI measurements of heart function on cardiac MRI predicted death marginally better than expert clinicians' measurements.",
   "items": [
     {
       "title": "Artificial intelligence-enhanced colposcopy training improves diagnostic reasoning and communication competencies: A randomized controlled study",
@@ -22,8 +22,8 @@
       "category": "research",
       "section": "ai_vs_human",
       "verdict": "ai_ahead",
-      "summary": "The task was outlining the left ventricle on cardiac MRI to measure ejection fraction and other volume measures, and then using those measures to predict death from any cause. A deep-learning segmentation tool was compared with expert clinicians' segmentation of the same scans from 27,382 patients at UK and US centres who had known or suspected heart disease. Over an average follow-up of more than five years there were 3,458 deaths. In Cox models, AI-derived ejection fraction predicted mortality 'marginally' better than clinician-derived ejection fraction. The difference was statistically significant and held after adjusting for factors such as age and sex. The AI took about 2–3 seconds per patient, against roughly 13 minutes for expert analysis in the team's earlier work, and it made errors in about 1% of patients. The main limitations: the study was retrospective, it measured how well each set of numbers predicted death rather than any effect on care or outcomes, the gain was small, and the senior author invented the AI tool.",
-      "why_it_matters": "Ejection fraction decides who gets heart-failure drugs, devices and procedures. If AI measures it at least as well as experts, trainees' time may be better spent checking and interpreting the numbers than producing them. The roughly 1% error rate is a reminder that someone still has to know what a wrong contour looks like."
+      "summary": "The task was outlining the left ventricle on cardiac MRI to measure ejection fraction, and then using those measurements to predict death from any cause. A deep-learning segmentation tool was compared with expert clinicians' segmentation of the same scans from 27,382 consecutive patients at UK and US centres. Over a median follow-up of 5.6 years, 3,458 patients (13%) died. AI-derived ejection fraction predicted death marginally better than clinician-derived ejection fraction (C index 0.669 vs 0.637, and 0.781 vs 0.777 after adjusting for age and sex). The main limitations are that the study was retrospective, that it measured how well each set of numbers predicted death rather than any effect on care, and that the gain after adjustment was very small.",
+      "why_it_matters": "Ejection fraction drives decisions about heart-failure drugs, devices and procedures. If AI measures it at least as well as experts, the authors suggest it could do the first pass with clinicians checking it, so trainees still need to know what a wrong measurement looks like."
     }
   ],
   "tags": [
