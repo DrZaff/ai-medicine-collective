@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-04",
+  "headline": "AI virtual patients speed up colposcopy reasoning, but not hands-on skill",
+  "intro": "In a randomised trial, residents trained with an AI virtual-patient platform reasoned and communicated better after a month, but their operative skill was no different.",
+  "items": [
+    {
+      "title": "Artificial intelligence-enhanced colposcopy training improves diagnostic reasoning and communication competencies: A randomized controlled study",
+      "source": "Journal of Gynecology Obstetrics and Human Reproduction",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42925890/",
+      "published": "2026-10-24",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "In a randomised, assessor-blinded, wait-list trial, 60 PGY-2 and PGY-3 obstetrics and gynecology residents at two affiliated teaching hospitals added an AI virtual-patient platform to their usual colposcopy teaching either straight away or a month later. At one month the AI group scored higher on case analysis (78.57 vs 71.03, a mean difference of 7.54), diagnostic justification and communication, but operative competence did not differ (p = 0.113), and both groups were proficient by three months. It was a small, single-specialty trial with short follow-up, scored on OSCEs rather than patient care.",
+      "why_it_matters": "AI virtual patients look like a way to speed up practice in diagnostic reasoning and communication. Programs should not assume that talking a case through with an AI builds hands-on procedural skill."
+    }
+  ],
+  "tags": [
+    "colposcopy",
+    "medical education",
+    "obstetrics and gynecology",
+    "randomized controlled trial",
+    "residents",
+    "simulation",
+    "virtual patients"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
