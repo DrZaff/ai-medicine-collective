@@ -478,7 +478,9 @@ def drop_duplicates(studies: list[dict]) -> list[dict]:
 def rank(studies: list[dict], landmark_n: int, since: str) -> list[dict]:
     """Group, score and order the studies: the clinical group first, ranked,
     then the appendix groups, then the excluded. Landmarks come from the
-    clinical group only."""
+    clinical group only. An editor can pin a clinical study with
+    "pin": "landmark" (always a landmark, listed first) or "pin": "appendix"
+    (never one); the remaining places go by score."""
     studies = drop_duplicates(studies)
     for st in studies:
         st["group"] = study_group(st, since)
@@ -490,9 +492,15 @@ def rank(studies: list[dict], landmark_n: int, since: str) -> list[dict]:
     for group in GROUPS:
         members = sorted((st for st in studies if st["group"] == group),
                          key=lambda st: (-st["score"], -(st.get("citations") or 0)))
+        if group == "clinical":
+            pinned = [st for st in members if st.get("pin") == "landmark"]
+            free = [st for st in members if st.get("pin") not in ("landmark", "appendix")]
+            top = pinned + free[:max(0, landmark_n - len(pinned))]
+            top.sort(key=lambda st: (-st["score"], -(st.get("citations") or 0)))
+            members = top + [st for st in members if st not in top]
         for i, st in enumerate(members, 1):
             st["rank"] = i
-            st["proposed_tier"] = ("landmark" if group == "clinical" and i <= landmark_n
+            st["proposed_tier"] = ("landmark" if group == "clinical" and i <= landmark_n and st.get("pin") != "appendix"
                                    else "excluded" if group == "excluded" else "appendix")
         ordered += members
     return ordered
@@ -558,7 +566,7 @@ def write_pr_body(path: Path, ranked: list[dict], landmark_n: int, stats: dict) 
         "|---|---|---|---|---|---|---|---|",
     ]
     for st in clinical[:landmark_n]:
-        title = st["title"].replace("|", "/")
+        title = st["title"].replace("|", "/") + (" *(pinned by an editor)*" if st.get("pin") == "landmark" else "")
         lines.append(
             f"| {st['rank']} | {st['score']} | [{title}]({st['url']}) | {st['source']}, {st['published']} | "
             f"{st['design_class']} / {st['setting']} | {st['strength']} | "
