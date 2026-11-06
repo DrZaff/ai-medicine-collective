@@ -575,7 +575,9 @@ def write_pr_body(path: Path, review: dict, new: list[dict], dropped: list[str],
                + (", corrected" if study.get("check_status") == "corrected" else "") if study.get("tier") else ""),
             *([f"  - *Check:* {study['check_note']}"] if study.get("check_note") else []),
             f"  - {study['url']}",
-            f"  - {study['finding']}",
+            # GitHub refuses a description over 65,536 characters; a big edition
+            # (edition 3 added 43 studies) shows shortened summaries instead
+            f"  - {study['finding'] if len(new) <= 15 else agent_short(study['finding'], 400)}",
             *([f"  - *Limitation:* {study['limitation']}"] if study["limitation"] else []),
         ]
     if not new:
@@ -617,7 +619,11 @@ def write_pr_body(path: Path, review: dict, new: list[dict], dropped: list[str],
                       f"{usage['input'] + usage['cache_read'] + usage['cache_write']:,} input tokens, "
                       f"{usage['output']:,} output tokens, {usage['searches']} web searches, "
                       f"about ${agent.estimate_cost(usage):.2f}.</sub>"]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    text = "\n".join(lines) + "\n"
+    if len(text) > 60000:
+        text = text[:60000].rsplit("\n", 1)[0] + ("\n\n*(Cut short: GitHub limits a description to 65,536 "
+                                                 "characters. Every study is in `evidence/ai-vs-human.json`.)*\n")
+    path.write_text(text, encoding="utf-8")
 
 
 # ---------------------------------------------------------------- main
