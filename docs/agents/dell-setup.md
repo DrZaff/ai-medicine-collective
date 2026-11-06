@@ -5,7 +5,7 @@ The Dell OptiPlex 7060 Micro (i5-8500T, 16 GB RAM, 512 GB SSD) becomes the alway
 ## A. On GitHub now (no Dell needed)
 
 1. Review and merge the pull request that adds this file.
-2. Create the labels: `agent:proposed`, `agent:ready`, `agent:working`, `agent:review`, `agent:human`, `agent:blocked`, `agent:failed`, `risk:low`, `risk:medium`, `risk:high`, `needs-clinical-review` (Issues > Labels > New label).
+2. Create the labels: `agent:proposed`, `agent:ready`, `agent:working`, `agent:review`, `agent:human`, `agent:blocked`, `agent:failed`, `risk:low`, `risk:medium`, `risk:high`, `needs-clinical-review`, `needs-adjudication` (when the two models disagree about a study; docs/editorial/scientific-review.md) (Issues > Labels > New label).
 3. Add `.github/CODEOWNERS`, by pull request (drafted in #125):
     - the owner for `/.github/`, `/supabase/`, `auth.js` and `netlify.toml`
     - the clinical reviewer for the clinical files (calculators and tool logic, `evidence/`, `course-*.html`)

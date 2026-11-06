@@ -4,7 +4,7 @@ Instructions for AI coding agents (Codex, Claude Code and others) working in thi
 
 **[CLAUDE.md](CLAUDE.md) is the source of truth for this project.** Read it fully before changing anything: the stack, the Supabase rules, the two themes, the design system and the four non-negotiable rules all live there. This file only adds what an agent working on its own needs on top of it. If the two ever disagree, CLAUDE.md wins; fix this file.
 
-How agent tasks flow from GitHub issues to pull requests is described in [docs/agents/architecture.md](docs/agents/architecture.md).
+How agent tasks flow from GitHub issues to pull requests is described in [docs/agents/architecture.md](docs/agents/architecture.md). Proposing studies for the blog, and reviewing blog drafts and AI vs Physician editions for scientific rigor, follow [docs/editorial/scientific-review.md](docs/editorial/scientific-review.md).
 
 ## Before you start
 
