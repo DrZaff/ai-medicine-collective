@@ -8,6 +8,27 @@
 # send), and that preview is the review step. The owner chose this on
 # 2026-10-07 in place of a pull request each Friday; it is the one automated
 # exception to "never commit directly to main" (see CLAUDE.md).
+#
+# Who pushes: a dedicated GitHub App ("digest publisher"), so the ruleset on
+# main can let exactly this job through without letting every workflow
+# through (a bypass for github-actions[bot] would cover all of them).
+# Until the App's secrets exist, the job pushes with the default token as
+# before, so merging this change breaks nothing.
+#
+# Setup (one time, by the repo owner):
+#   1. Settings > Developer settings > GitHub Apps > New GitHub App.
+#      Name it, e.g. "AMC Digest Publisher". Untick Webhook "Active".
+#      Repository permissions: Contents = Read and write; nothing else.
+#      "Only on this account". Create it, note the App ID, and generate a
+#      private key (a .pem file downloads).
+#   2. Install the App on this repository only.
+#   3. Settings > Environments > New environment: digest-publish.
+#      Deployment branches: Selected branches > add "main" only, so pull
+#      request workflows can never read its secrets.
+#      Environment secrets: DIGEST_APP_ID (the App ID) and
+#      DIGEST_APP_PRIVATE_KEY (the whole .pem file). Then delete the .pem.
+#   4. In the main ruleset, add the App as the only bypass actor.
+#   5. Run this workflow by hand from main and check it publishes.
 
 name: Weekly digest
 
@@ -29,8 +50,34 @@ jobs:
   assemble:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Only main may use this environment, so only main can read the App's key.
+    environment: digest-publish
     steps:
+      - name: Check for the digest publisher App
+        id: app
+        env:
+          DIGEST_APP_ID: ${{ secrets.DIGEST_APP_ID }}
+          DIGEST_APP_PRIVATE_KEY: ${{ secrets.DIGEST_APP_PRIVATE_KEY }}
+        run: |
+          if [ -n "$DIGEST_APP_ID" ] && [ -n "$DIGEST_APP_PRIVATE_KEY" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::The digest publisher App is not set up yet; pushing with the default token (see the top of this file)."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Get a token for the digest publisher App
+        id: token
+        if: steps.app.outputs.ok == 'true'
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DIGEST_APP_ID }}
+          private-key: ${{ secrets.DIGEST_APP_PRIVATE_KEY }}
+
+      # The push at the end uses whichever token checked the code out.
       - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.token.outputs.token || github.token }}
 
       - uses: actions/setup-python@v5
         with:
