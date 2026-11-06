@@ -30,3 +30,5 @@ Used only by the designed templates in `card-studio-templates.js`: loaded on `si
 | `archivo-800.woff2` | Archivo | © The Archivo Project Authors |
 | `dm-serif-display-400.woff2` | DM Serif Display | © 2014–2017 Adobe Systems Incorporated, © 2019 Google LLC |
 | `manrope-500.woff2`, `manrope-700.woff2` | Manrope | © The Manrope Project Authors |
+| `manrope-600.woff2` | Manrope | © The Manrope Project Authors |
+| `playfair-display-600.woff2` | Playfair Display | © The Playfair Display Project Authors |

@@ -39,8 +39,8 @@
     leading: 1.1,
     promote: 36,     // an affiliation this close below an empty title moves up
     // Templates: a two-line field stays on one line down to this share of
-    // its size, and wraps at no more than this share
-    oneLineShare: 0.78,
+    // its size, and (if larger than 32 units) wraps at no more than this share
+    oneLineShare: 0.92,
     twoLineShare: 0.8,
   };
 
@@ -114,7 +114,7 @@
     let best = options.reduce((a, b) => (b.size > (a ? a.size : -1) ? b : a), null);
     const credentials = options.find((option) => option.credentials);
     if (credentials && best && credentials.size >= best.size * 0.95) best = credentials;
-    if (!best || best.size < floor) {
+    if (!options.length) { // one unbroken word: break between characters
       const parts = graphemes(text);
       for (let i = 1; i < parts.length; i++) {
         const lines = [parts.slice(0, i).join(""), parts.slice(i).join("")];
@@ -149,9 +149,12 @@
     if (opts.lines < 2) {
       return one >= floor ? { lines: [text], size: one } : { lines: [text], size: floor, overflow: true };
     }
+    // Nearly full size on one line: keep it on one line
     if (one >= Math.max(floor, opts.size * FIT.oneLineShare)) return { lines: [text], size: one };
-    const wrapped = twoLines(text, opts.size * FIT.twoLineShare, floor, width, font, mainName);
-    // Prefer one line when it is at least as large as the wrapped version
+    // Otherwise wrap: a large name may shrink a little when it wraps, a small
+    // field wraps at its own size rather than shrinking first
+    const cap = opts.size > 32 ? opts.size * FIT.twoLineShare : opts.size;
+    const wrapped = twoLines(text, Math.max(floor, cap), floor, width, font, mainName);
     if (one >= floor && one >= wrapped.size) return { lines: [text], size: one };
     return wrapped;
   }
