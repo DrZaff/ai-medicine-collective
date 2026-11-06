@@ -5,8 +5,9 @@ Runs once a month (owner's request, 2026-11-06: go deeper every month):
   0. Deepen   read more PubMed abstracts in priority order (deep_sweep.py,
               --sweep-budget, default $8), then take the next best clinical
               studies from the deep sweep's shortlists (--promote, default 8)
-              and check each against its paper (full text where it can be
-              opened, else the abstract) before it joins the register as a
+              and check each against its paper (full text from PubMed
+              Central where it is open access, else the PubMed abstract,
+              both fetched through NCBI's API) before it joins the register as a
               landmark study. --mode landmarks adds every proposed landmark
               at once and skips the searches (used to rebuild the paper).
   1. Search   find studies published since the last edition that measure AI
@@ -31,7 +32,7 @@ Usage:
     python scripts/blog_agent/living_review.py --mode landmarks [--pr-body PATH]
     python scripts/blog_agent/living_review.py --fixture sample.json [--mode ...]   # no API call
         sample.json: {"search": {"result": {...}, "search_urls": [...]}, "write": {"result": {...}},
-                      "verify": {"result": {"results": [...]}, "urls": [...]}}
+                      "verify": {"result": {<one checked record, used for every study>}}}
         (with a fixture, the monthly mode does not read new abstracts: that needs PubMed)
 
 Needs ANTHROPIC_API_KEY in the environment (a GitHub Actions secret in CI).
@@ -303,27 +304,29 @@ def verify_studies(result: dict, found_urls: set[str], studies: list[dict], limi
 # ---------------------------------------------------------------- landmark studies
 
 # Studies promoted from the deep sweep's shortlists. Their records were made
-# from abstracts, so each is checked against the paper itself (full text where
-# it can be opened, else the abstract) before it joins the register.
-VERIFY_BATCH = 4
-VERIFY_WORKERS = 3
-VERIFY_TOOLS = [
-    {"type": "web_fetch_20260209", "name": "web_fetch", "max_uses": 12, "max_content_tokens": 9000},
-    {"type": "web_search_20260209", "name": "web_search", "max_uses": 4},
-]
+# from abstracts, so each is checked against the paper itself before it joins
+# the register. The text comes from NCBI's own API, not from web pages: the
+# full text from PubMed Central when the paper is open access there, else the
+# PubMed abstract. (The first try, on 2026-11-06, let Claude open the pages
+# itself; PubMed showed it CAPTCHAs and publishers blocked it, so 30 of 40
+# studies could not be checked.)
+VERIFY_WORKERS = 4
+MAX_PAPER_CHARS = 80000    # about 20,000 tokens of full text per study
 MONTHLY_PROMOTE = 8        # studies added from the shortlists each month
 MONTHLY_SWEEP_BUDGET = 8.0  # dollars for reading new abstracts each month
 VERIFY_BUDGET = 15.0        # dollars for checking studies against their papers
+EUTILS = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 
 VERIFY_SYSTEM = SEARCH_SYSTEM.split("Rules:")[0] + """\
-You are checking studies that a screening pass recorded from their abstracts. \
-For each study, open the paper: try its DOI link and PubMed Central first for \
-the full text, then the journal page; if the full text cannot be opened, use \
-the PubMed abstract. Then return a corrected record from what the paper says.
+You are checking a study that a screening pass recorded from its abstract. \
+You are given the paper's text (the full text where it is open access, else \
+the abstract) and the screening record. Return a corrected record from what \
+the text says, and nothing else.
 
 Rules:
 - Every number exactly as the paper reports it, with its units. Never compute \
-or round. Do not add anything the paper does not say.
+or round. Do not add anything the text does not say, and do not use your own \
+memory of the paper.
 - "finding": 3 to 5 sentences in this order: the task; the AI system; who the \
 clinicians were and how many; the main result for each side with numbers; \
 the main limitation. Plain language for clinicians.
@@ -331,11 +334,9 @@ the main limitation. Plain language for clinicians.
 ai_ahead, humans_ahead or comparable; for clinicians with and without AI use \
 ai_help_improved, ai_help_no_benefit or ai_help_harmed; mixed when the \
 answer depends on the subgroup, task or measure.
-- "status": confirmed (the record was right), corrected (you fixed it), \
+- "status": confirmed (the record was right), corrected (you fixed it) or \
 does_not_qualify (the paper does not compare AI with clinicians as defined \
-above, for example the comparator is not AI or no clinicians took part) or \
-unreachable (you could open neither the paper nor its abstract).
-- "checked_against": full_text or abstract.
+above, for example the comparator is not AI or no clinicians took part).
 - "note": one sentence for the editors on what you corrected or why it does \
 not qualify. Never published.
 - Never include patient-identifiable information.
@@ -344,45 +345,62 @@ not qualify. Never published.
 
 def verify_schema() -> dict:
     record = record_schema()
-    fields = ["ref", "status", "checked_against", "note", *[k for k in STUDY_FIELDS if k not in ("title", "url", "source", "published")]]
+    fields = ["status", "note", *[k for k in STUDY_FIELDS if k not in ("title", "url", "source", "published")]]
     props = {k: v for k, v in record["properties"].items() if k in fields}
     props.update({
-        "ref": {"type": "string"},
-        "status": {"type": "string", "enum": ["confirmed", "corrected", "does_not_qualify", "unreachable"]},
-        "checked_against": {"type": "string", "enum": ["full_text", "abstract", ""]},
+        "status": {"type": "string", "enum": ["confirmed", "corrected", "does_not_qualify"]},
         "note": {"type": "string"},
     })
-    item = {"type": "object", "properties": props, "required": fields, "additionalProperties": False}
-    return {"type": "object", "properties": {"results": {"type": "array", "items": item}},
-            "required": ["results"], "additionalProperties": False}
+    return {"type": "object", "properties": props, "required": fields, "additionalProperties": False}
 
 
-def verify_prompt(batch: list[dict]) -> str:
-    parts = []
-    for i, st in enumerate(batch):
-        doi = st.get("doi") or ""
-        parts.append(json.dumps({
-            "ref": str(i), "title": st["title"], "journal": st["source"], "published": st["published"],
-            "pubmed": st["url"], "doi_link": f"https://doi.org/{doi}" if doi else "",
-            "recorded_from_abstract": {k: st.get(k, "") for k in
-                                       ("domain", "comparison", "design", "ai_system", "humans", "finding",
-                                        "limitation", "verdict")},
-        }, ensure_ascii=False))
-    return ("Check each of these studies against the paper itself and return one result per ref.\n\n"
-            + "\n".join(parts) + "\n\nReturn the results in the required JSON format.")
+def _text(node) -> str:
+    return " ".join(" ".join(node.itertext()).split()) if node is not None else ""
 
 
-def opened(st: dict, found_urls: set[str]) -> bool:
-    """The check is believed only if a page about this study came back from
-    the tools: its PubMed record, its DOI, or a page whose address carries
-    the DOI or PubMed id."""
-    pmid = re.search(r"/(\d+)/?$", st["url"])
-    doi = (st.get("doi") or "").lower()
-    for url in found_urls:
-        low = url.lower()
-        if (doi and doi in low) or (pmid and pmid.group(1) in low) or agent.normalize_url(st["url"]) == url:
-            return True
-    return False
+def paper_text(st: dict) -> tuple[str, str]:
+    """The paper's text from NCBI: ("full_text", text) from PubMed Central when
+    it is open access there, else ("abstract", text) from PubMed, else ("", "")."""
+    import time
+    import xml.etree.ElementTree as ET
+    import deep_sweep  # its get() retries and identifies the client
+    pmid = re.search(r"pubmed\.ncbi\.nlm\.nih\.gov/(\d+)", st.get("url", ""))
+    if not pmid:
+        return "", ""
+    pmid = pmid.group(1)
+    common = "tool=amc-living-review&email=noreply@aimedicinecollective.com"
+    try:
+        links = json.loads(deep_sweep.get(f"{EUTILS}elink.fcgi?dbfrom=pubmed&db=pmc&id={pmid}&retmode=json&{common}"))
+        time.sleep(0.4)
+        pmc = [i for ls in links.get("linksets", []) for db in ls.get("linksetdbs", [])
+               if db.get("linkname") == "pubmed_pmc" for i in db.get("links", [])]
+        if pmc:
+            root = ET.fromstring(deep_sweep.get(f"{EUTILS}efetch.fcgi?db=pmc&id={pmc[0]}&retmode=xml&{common}"))
+            time.sleep(0.4)
+            body = root.find(".//body")
+            if body is not None and len(_text(body)) > 2000:
+                abstract = _text(root.find(".//abstract"))
+                tables = " ".join(_text(t) for t in root.iter("table-wrap"))
+                text = f"ABSTRACT: {abstract}\n\nFULL TEXT: {_text(body)}\n\nTABLES: {tables}"
+                return "full_text", text[:MAX_PAPER_CHARS]
+        root = ET.fromstring(deep_sweep.get(f"{EUTILS}efetch.fcgi?db=pubmed&id={pmid}&retmode=xml&{common}"))
+        time.sleep(0.4)
+        abstract = " ".join(_text(a) for a in root.iter("AbstractText"))
+        return ("abstract", abstract) if len(abstract) > 200 else ("", "")
+    except Exception as err:  # one paper that cannot be fetched should not stop the edition
+        print(f"Could not fetch PMID {pmid}: {err}")
+        return "", ""
+
+
+def verify_prompt(st: dict, kind: str, text: str) -> str:
+    return (
+        "Check this study against its paper and return the corrected record.\n\n"
+        + json.dumps({"title": st["title"], "journal": st["source"], "published": st["published"],
+                      "recorded_from_abstract": {k: st.get(k, "") for k in
+                                                 ("domain", "comparison", "design", "ai_system", "humans",
+                                                  "finding", "limitation", "verdict")}}, ensure_ascii=False)
+        + f"\n\nThe paper ({'full text from PubMed Central' if kind == 'full_text' else 'abstract only, from PubMed'}):\n"
+        + text + "\n\nReturn the record in the required JSON format.")
 
 
 def verify_landmarks(chosen: list[dict], budget: float, fixture: dict | None = None):
@@ -390,59 +408,61 @@ def verify_landmarks(chosen: list[dict], budget: float, fixture: dict | None = N
     ready for the register, reasons for the ones left out, usage, the
     (url, reason) of studies found not to qualify)."""
     import concurrent.futures as cf
-    batches = [chosen[i:i + VERIFY_BATCH] for i in range(0, len(chosen), VERIFY_BATCH)]
-    usage, kept, dropped, rejected, spent, per_batch = None, [], [], [], 0.0, 0.0
+    usage, kept, dropped, rejected, spent, per_study = None, [], [], [], 0.0, 0.0
 
-    def run(batch):
+    # Fetch every paper first (NCBI asks for a few requests a second at most)
+    papers = []
+    for st in chosen:
+        kind, text = ("full_text", "Fixture text.") if fixture is not None else paper_text(st)
+        if not text:
+            dropped.append(f"{st['title']}: its text could not be fetched from PubMed; it stays in the queue")
+        else:
+            papers.append((st, kind, text))
+    print(f"Fetched {len(papers)} of {len(chosen)} papers "
+          f"({sum(1 for p in papers if p[1] == 'full_text')} full text, the rest abstracts)")
+
+    def run(st, kind, text):
         if fixture is not None:
-            return fixture["result"], {agent.normalize_url(u) for u in fixture.get("urls", [])}, \
-                {"input": 1000, "output": 100, "cache_read": 0, "cache_write": 0, "searches": 0}
-        return agent.run_claude(verify_prompt(batch), system=VERIFY_SYSTEM, schema=verify_schema(), tools=VERIFY_TOOLS)
+            return fixture["result"], {"input": 1000, "output": 100, "cache_read": 0, "cache_write": 0, "searches": 0}
+        result, _, used = agent.run_claude(verify_prompt(st, kind, text), system=VERIFY_SYSTEM,
+                                           schema=verify_schema(), tools=[])
+        return result, used
 
     with cf.ThreadPoolExecutor(max_workers=VERIFY_WORKERS) as pool_:
-        pending, queue = {}, list(batches)
+        pending, queue = {}, list(papers)
         while queue or pending:
-            while queue and len(pending) < VERIFY_WORKERS and spent + per_batch * (len(pending) + 1) <= budget:
-                batch = queue.pop(0)
-                pending[pool_.submit(run, batch)] = batch
-                if per_batch == 0.0:
+            while queue and len(pending) < VERIFY_WORKERS and spent + per_study * (len(pending) + 1) <= budget:
+                item = queue.pop(0)
+                pending[pool_.submit(run, *item)] = item
+                if per_study == 0.0:
                     break
             if not pending:
                 break
             done, _ = cf.wait(pending, return_when=cf.FIRST_COMPLETED)
             for future in done:
-                batch = pending.pop(future)
+                st, kind, _ = pending.pop(future)
                 try:
-                    result, found_urls, used = future.result()
-                except BaseException as err:  # a failed batch is reported, not fatal
-                    dropped += [f"{st['title']}: the check failed ({err})" for st in batch]
+                    row, used = future.result()
+                except BaseException as err:  # one failed check is reported, not fatal
+                    dropped.append(f"{st['title']}: the check failed ({err}); it stays in the queue")
                     continue
                 usage = agent.add_usage(usage, used)
                 spent = agent.estimate_cost(usage)
-                per_batch = max(per_batch, spent / max(1, (len(kept) + len(dropped) + len(batch)) / VERIFY_BATCH))
-                rows = {str(r.get("ref")): r for r in result.get("results", [])}
-                for i, st in enumerate(batch):
-                    row = rows.get(str(i))
-                    if row is None:
-                        dropped.append(f"{st['title']}: no result came back")
-                    elif row.get("status") in ("does_not_qualify", "unreachable"):
-                        if row["status"] == "does_not_qualify":
-                            rejected.append((st["url"], str(row.get("note", "")).strip()))
-                        dropped.append(f"{st['title']}: {row['status'].replace('_', ' ')} ({row.get('note', '').strip()})")
-                    elif not opened(st, found_urls):
-                        dropped.append(f"{st['title']}: the paper was not opened, so the record was not checked")
-                    elif row.get("verdict") not in VERDICTS or row.get("domain") not in DOMAINS \
-                            or row.get("comparison") not in COMPARISONS or not str(row.get("finding", "")).strip():
-                        dropped.append(f"{st['title']}: the checked record was incomplete")
-                    else:
-                        kept.append({**{k: row.get(k, "") for k in STUDY_FIELDS},
-                                     "title": st["title"], "url": st["url"], "source": st["source"],
-                                     "published": st["published"],
-                                     "_extra": {"tier": "landmark", "checked": row.get("checked_against") or "abstract",
-                                                "check_status": row.get("status"),
-                                                "check_note": str(row.get("note", "")).strip()}})
-    for batch in queue:
-        dropped += [f"{st['title']}: not checked this month (budget reached); it stays in the queue" for st in batch]
+                per_study = max(per_study, spent / max(1, len(kept) + len(rejected) + 1))
+                if row.get("status") == "does_not_qualify":
+                    rejected.append((st["url"], str(row.get("note", "")).strip()))
+                    dropped.append(f"{st['title']}: does not qualify ({row.get('note', '').strip()})")
+                elif row.get("verdict") not in VERDICTS or row.get("domain") not in DOMAINS \
+                        or row.get("comparison") not in COMPARISONS or not str(row.get("finding", "")).strip():
+                    dropped.append(f"{st['title']}: the checked record was incomplete; it stays in the queue")
+                else:
+                    kept.append({**{k: row.get(k, "") for k in STUDY_FIELDS},
+                                 "title": st["title"], "url": st["url"], "source": st["source"],
+                                 "published": st["published"],
+                                 "_extra": {"tier": "landmark", "checked": kind,
+                                            "check_status": row.get("status"),
+                                            "check_note": str(row.get("note", "")).strip()}})
+    dropped += [f"{st['title']}: not checked this time (budget reached); it stays in the queue" for st, _, _ in queue]
     return kept, dropped, usage, rejected
 
 
