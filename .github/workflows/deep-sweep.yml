@@ -21,6 +21,11 @@ on:
         description: "How many studies to propose as landmark studies"
         required: false
         default: "40"
+      preprints_only:
+        description: "Screen preprints only (Europe PMC: medRxiv and others), not PubMed"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -69,27 +74,31 @@ jobs:
           BUDGET: ${{ github.event.inputs.budget }}
           SINCE: ${{ github.event.inputs.since }}
           LANDMARKS: ${{ github.event.inputs.landmarks }}
+          PREPRINTS_ONLY: ${{ github.event.inputs.preprints_only }}
         run: |
-          python scripts/blog_agent/deep_sweep.py --pr-body "$RUNNER_TEMP/pr-body.md" \
-            --budget "${BUDGET:-30}" --since "${SINCE:-2023-01-01}" --landmarks "${LANDMARKS:-40}"
+          args=(--pr-body "$RUNNER_TEMP/pr-body.md" --budget "${BUDGET:-30}"
+                --since "${SINCE:-2023-01-01}" --landmarks "${LANDMARKS:-40}")
+          if [ "$PREPRINTS_ONLY" = "true" ]; then args+=(--preprints-only); fi
+          python scripts/blog_agent/deep_sweep.py "${args[@]}"
 
       - name: Open pull request
         if: steps.sweep.outputs.created == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           DATE: ${{ steps.sweep.outputs.date }}
+          NAME: ${{ steps.sweep.outputs.name }}
         run: |
-          branch="review/deep-sweep-$DATE"
+          branch="review/$NAME"
           if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
-            echo "::notice::A sweep for $DATE already exists; not opening another."
+            echo "::notice::A sweep named $NAME already exists; not opening another."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add "evidence/deep-sweep-$DATE.json" evidence/deep-sweep-screened.json
-          git commit -m "AI vs Physician: deep sweep shortlist ($DATE)"
+          git add "evidence/$NAME.json" evidence/deep-sweep-screened.json
+          git commit -m "AI vs Physician: deep sweep shortlist ($NAME)"
           git push -u origin "$branch"
           gh pr create --base main --head "$branch" \
-            --title "AI vs Physician: deep sweep shortlist ($DATE)" \
+            --title "AI vs Physician: deep sweep shortlist ($NAME)" \
             --body-file "$RUNNER_TEMP/pr-body.md"

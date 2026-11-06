@@ -531,7 +531,7 @@ def write_pr_body(path: Path, ranked: list[dict], landmark_n: int, stats: dict) 
         f"**{len(clinical)} studies of clinical decisions; the top {landmark_n} are proposed as landmark studies.** "
         f"Workflow ({len(groups['workflow'])}) and education ({len(groups['education'])}) studies go to the "
         f"appendix; {len(groups['excluded'])} are excluded. Merging this pull request only saves the shortlist "
-        f"(`evidence/deep-sweep-{stats['date']}.json`); the AI vs Physician page does not change. After approval, "
+        f"(`evidence/{stats.get('name') or 'deep-sweep-' + stats['date']}.json`); the AI vs Physician page does not change. After approval, "
         "the landmark studies are checked against their full text and the paper is rewritten from them, with the "
         "rest in an appendix.",
         "",
@@ -649,6 +649,9 @@ def already_screened(c: dict, ledger: dict, keys: set[str] | None = None) -> boo
     if c["key"] in (keys if keys is not None else set(ledger.get("keys", []))):
         return True
     for rule in ledger.get("rules", []):
+        # The first sweep's rule covers PubMed only: Europe PMC was down that day
+        if not c["key"].startswith(rule.get("prefix", "pmid:")):
+            continue
         if c["published"] <= rule["through"] and (priority(c)[0] == 0 or c["published"] >= rule["rest_from"]):
             return True
     return False
@@ -759,6 +762,8 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="List and count candidates only; no AI, nothing written")
     parser.add_argument("--fake-ai", action="store_true", help="Local testing only: placeholder screening, no API")
     parser.add_argument("--rerank", type=Path, help="Sort and rank a saved shortlist again; no AI, no searching")
+    parser.add_argument("--preprints-only", action="store_true",
+                        help="Screen Europe PMC preprints only (medRxiv and others); skips PubMed")
     args = parser.parse_args()
 
     if args.rerank:
@@ -768,12 +773,16 @@ def main() -> int:
     agent.set_output("date", date.isoformat())
     studies = lr.load_review()["studies"]
 
-    pubmed = pubmed_candidates(args.since, date)
+    pubmed = [] if args.preprints_only else pubmed_candidates(args.since, date)
     preprints = preprint_candidates(args.since, date)
     ledger = load_ledger()
     keys = set(ledger.get("keys", []))
+    # A preprint whose published version is already on a shortlist is not read again
+    listed = {simple(st["title"]) for path in shortlists()
+              for st in json.loads(path.read_text(encoding="utf-8"))["studies"]}
     candidates = [c for c in fresh_candidates(pubmed + preprints, studies)
-                  if c["published"] >= args.since.isoformat() and not already_screened(c, ledger, keys)]
+                  if c["published"] >= args.since.isoformat() and not already_screened(c, ledger, keys)
+                  and simple(c["title"]) not in listed]
     high = sum(1 for c in candidates if priority(c)[0] == 0)
     print(f"{len(candidates)} new candidates ({high} high-impact) after removing duplicates and the register's studies")
     if args.dry_run:
@@ -804,11 +813,14 @@ def main() -> int:
         return 0
     ranked = rank(found, args.landmarks, args.since.isoformat())
 
-    out = agent.ROOT / "evidence" / f"deep-sweep-{date.isoformat()}.json"
+    name = f"deep-sweep-{date.isoformat()}" + ("-preprints" if args.preprints_only else "")
+    agent.set_output("name", name)
+    out = agent.ROOT / "evidence" / f"{name}.json"
     cost = agent.estimate_cost(usage) if usage else 0.0
     stats = {"date": date.isoformat(), "since": args.since.isoformat(), "cost": round(cost, 2), "high": high,
              "listed": len(pubmed) + len(preprints), "pubmed": len(pubmed), "preprints": len(preprints),
-             "fresh": len(candidates), "screened": screened, "reached": reached, "budget": args.budget}
+             "fresh": len(candidates), "screened": screened, "reached": reached, "budget": args.budget,
+             "name": name}
     save(out, stats, ranked)
     print(f"Wrote {out.relative_to(agent.ROOT)}: {len(ranked)} studies, about ${cost:.2f}.")
     if args.pr_body:
