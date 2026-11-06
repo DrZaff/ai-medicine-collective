@@ -1,7 +1,15 @@
 """The living review "AI vs Physician": how AI changes what physicians can do.
 
-Runs once a month. Two requests to Claude:
+Runs once a month (owner's request, 2026-11-06: go deeper every month):
 
+  0. Deepen   read more PubMed abstracts in priority order (deep_sweep.py,
+              --sweep-budget, default $8), then take the next best clinical
+              studies from the deep sweep's shortlists (--promote, default 8)
+              and check each against its paper (full text from PubMed
+              Central where it is open access, else the PubMed abstract,
+              both fetched through NCBI's API) before it joins the register as a
+              landmark study. --mode landmarks adds every proposed landmark
+              at once and skips the searches (used to rebuild the paper).
   1. Search   find studies published since the last edition that measure AI
               against clinicians, or clinicians with AI against clinicians
               without it, and record each one in a fixed form.
@@ -21,8 +29,11 @@ to studies that are not in the register are removed from the paper.
 
 Usage:
     python scripts/blog_agent/living_review.py [--date YYYY-MM-DD] [--pr-body PATH]
-    python scripts/blog_agent/living_review.py --fixture sample.json   # no API call
-        sample.json: {"search": {"result": {...}, "search_urls": [...]}, "write": {"result": {...}}}
+    python scripts/blog_agent/living_review.py --mode landmarks [--pr-body PATH]
+    python scripts/blog_agent/living_review.py --fixture sample.json [--mode ...]   # no API call
+        sample.json: {"search": {"result": {...}, "search_urls": [...]}, "write": {"result": {...}},
+                      "verify": {"result": {<one checked record, used for every study>}}}
+        (with a fixture, the monthly mode does not read new abstracts: that needs PubMed)
 
 Needs ANTHROPIC_API_KEY in the environment (a GitHub Actions secret in CI).
 """
@@ -138,6 +149,11 @@ else:
 inline by id in square brackets, like [S4] or [S4][S9]. Never cite an id \
 that is not in the register. Do not bring in studies, numbers or facts from \
 your own memory.
+- Studies marked "tier": "landmark" are the strongest and most influential \
+in the field (randomised or prospective designs, real patients, top journals, \
+widely cited), checked against their papers. Build each section's argument \
+on them first; the other studies add recent detail, other specialties and \
+counter-examples.
 - Weigh the evidence, do not count it. Say how strong it is: design, sample \
 size, real patients or written cases, one centre or many. Give negative and \
 mixed results the same space as positive ones. Say where studies disagree.
@@ -285,6 +301,171 @@ def verify_studies(result: dict, found_urls: set[str], studies: list[dict], limi
     return kept, dropped
 
 
+# ---------------------------------------------------------------- landmark studies
+
+# Studies promoted from the deep sweep's shortlists. Their records were made
+# from abstracts, so each is checked against the paper itself before it joins
+# the register. The text comes from NCBI's own API, not from web pages: the
+# full text from PubMed Central when the paper is open access there, else the
+# PubMed abstract. (The first try, on 2026-11-06, let Claude open the pages
+# itself; PubMed showed it CAPTCHAs and publishers blocked it, so 30 of 40
+# studies could not be checked.)
+VERIFY_WORKERS = 4
+MAX_PAPER_CHARS = 80000    # about 20,000 tokens of full text per study
+MONTHLY_PROMOTE = 8        # studies added from the shortlists each month
+MONTHLY_SWEEP_BUDGET = 8.0  # dollars for reading new abstracts each month
+VERIFY_BUDGET = 15.0        # dollars for checking studies against their papers
+EUTILS = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+
+VERIFY_SYSTEM = SEARCH_SYSTEM.split("Rules:")[0] + """\
+You are checking a study that a screening pass recorded from its abstract. \
+You are given the paper's text (the full text where it is open access, else \
+the abstract) and the screening record. Return a corrected record from what \
+the text says, and nothing else.
+
+Rules:
+- Every number exactly as the paper reports it, with its units. Never compute \
+or round. Do not add anything the text does not say, and do not use your own \
+memory of the paper.
+- "finding": 3 to 5 sentences in this order: the task; the AI system; who the \
+clinicians were and how many; the main result for each side with numbers; \
+the main limitation. Plain language for clinicians.
+- "verdict" from the paper's own main result. For AI-on-its-own studies use \
+ai_ahead, humans_ahead or comparable; for clinicians with and without AI use \
+ai_help_improved, ai_help_no_benefit or ai_help_harmed; mixed when the \
+answer depends on the subgroup, task or measure.
+- "status": confirmed (the record was right), corrected (you fixed it) or \
+does_not_qualify (the paper does not compare AI with clinicians as defined \
+above, for example the comparator is not AI or no clinicians took part).
+- "note": one sentence for the editors on what you corrected or why it does \
+not qualify. Never published.
+- Never include patient-identifiable information.
+"""
+
+
+def verify_schema() -> dict:
+    record = record_schema()
+    fields = ["status", "note", *[k for k in STUDY_FIELDS if k not in ("title", "url", "source", "published")]]
+    props = {k: v for k, v in record["properties"].items() if k in fields}
+    props.update({
+        "status": {"type": "string", "enum": ["confirmed", "corrected", "does_not_qualify"]},
+        "note": {"type": "string"},
+    })
+    return {"type": "object", "properties": props, "required": fields, "additionalProperties": False}
+
+
+def _text(node) -> str:
+    return " ".join(" ".join(node.itertext()).split()) if node is not None else ""
+
+
+def paper_text(st: dict) -> tuple[str, str]:
+    """The paper's text from NCBI: ("full_text", text) from PubMed Central when
+    it is open access there, else ("abstract", text) from PubMed, else ("", "")."""
+    import time
+    import xml.etree.ElementTree as ET
+    import deep_sweep  # its get() retries and identifies the client
+    pmid = re.search(r"pubmed\.ncbi\.nlm\.nih\.gov/(\d+)", st.get("url", ""))
+    if not pmid:
+        return "", ""
+    pmid = pmid.group(1)
+    common = "tool=amc-living-review&email=noreply@aimedicinecollective.com"
+    try:
+        links = json.loads(deep_sweep.get(f"{EUTILS}elink.fcgi?dbfrom=pubmed&db=pmc&id={pmid}&retmode=json&{common}"))
+        time.sleep(0.4)
+        pmc = [i for ls in links.get("linksets", []) for db in ls.get("linksetdbs", [])
+               if db.get("linkname") == "pubmed_pmc" for i in db.get("links", [])]
+        if pmc:
+            root = ET.fromstring(deep_sweep.get(f"{EUTILS}efetch.fcgi?db=pmc&id={pmc[0]}&retmode=xml&{common}"))
+            time.sleep(0.4)
+            body = root.find(".//body")
+            if body is not None and len(_text(body)) > 2000:
+                abstract = _text(root.find(".//abstract"))
+                tables = " ".join(_text(t) for t in root.iter("table-wrap"))
+                text = f"ABSTRACT: {abstract}\n\nFULL TEXT: {_text(body)}\n\nTABLES: {tables}"
+                return "full_text", text[:MAX_PAPER_CHARS]
+        root = ET.fromstring(deep_sweep.get(f"{EUTILS}efetch.fcgi?db=pubmed&id={pmid}&retmode=xml&{common}"))
+        time.sleep(0.4)
+        abstract = " ".join(_text(a) for a in root.iter("AbstractText"))
+        return ("abstract", abstract) if len(abstract) > 200 else ("", "")
+    except Exception as err:  # one paper that cannot be fetched should not stop the edition
+        print(f"Could not fetch PMID {pmid}: {err}")
+        return "", ""
+
+
+def verify_prompt(st: dict, kind: str, text: str) -> str:
+    return (
+        "Check this study against its paper and return the corrected record.\n\n"
+        + json.dumps({"title": st["title"], "journal": st["source"], "published": st["published"],
+                      "recorded_from_abstract": {k: st.get(k, "") for k in
+                                                 ("domain", "comparison", "design", "ai_system", "humans",
+                                                  "finding", "limitation", "verdict")}}, ensure_ascii=False)
+        + f"\n\nThe paper ({'full text from PubMed Central' if kind == 'full_text' else 'abstract only, from PubMed'}):\n"
+        + text + "\n\nReturn the record in the required JSON format.")
+
+
+def verify_landmarks(chosen: list[dict], budget: float, fixture: dict | None = None):
+    """Check the chosen shortlist studies against their papers. Returns (records
+    ready for the register, reasons for the ones left out, usage, the
+    (url, reason) of studies found not to qualify)."""
+    import concurrent.futures as cf
+    usage, kept, dropped, rejected, spent, per_study = None, [], [], [], 0.0, 0.0
+
+    # Fetch every paper first (NCBI asks for a few requests a second at most)
+    papers = []
+    for st in chosen:
+        kind, text = ("full_text", "Fixture text.") if fixture is not None else paper_text(st)
+        if not text:
+            dropped.append(f"{st['title']}: its text could not be fetched from PubMed; it stays in the queue")
+        else:
+            papers.append((st, kind, text))
+    print(f"Fetched {len(papers)} of {len(chosen)} papers "
+          f"({sum(1 for p in papers if p[1] == 'full_text')} full text, the rest abstracts)")
+
+    def run(st, kind, text):
+        if fixture is not None:
+            return fixture["result"], {"input": 1000, "output": 100, "cache_read": 0, "cache_write": 0, "searches": 0}
+        result, _, used = agent.run_claude(verify_prompt(st, kind, text), system=VERIFY_SYSTEM,
+                                           schema=verify_schema(), tools=[])
+        return result, used
+
+    with cf.ThreadPoolExecutor(max_workers=VERIFY_WORKERS) as pool_:
+        pending, queue = {}, list(papers)
+        while queue or pending:
+            while queue and len(pending) < VERIFY_WORKERS and spent + per_study * (len(pending) + 1) <= budget:
+                item = queue.pop(0)
+                pending[pool_.submit(run, *item)] = item
+                if per_study == 0.0:
+                    break
+            if not pending:
+                break
+            done, _ = cf.wait(pending, return_when=cf.FIRST_COMPLETED)
+            for future in done:
+                st, kind, _ = pending.pop(future)
+                try:
+                    row, used = future.result()
+                except BaseException as err:  # one failed check is reported, not fatal
+                    dropped.append(f"{st['title']}: the check failed ({err}); it stays in the queue")
+                    continue
+                usage = agent.add_usage(usage, used)
+                spent = agent.estimate_cost(usage)
+                per_study = max(per_study, spent / max(1, len(kept) + len(rejected) + 1))
+                if row.get("status") == "does_not_qualify":
+                    rejected.append((st["url"], str(row.get("note", "")).strip()))
+                    dropped.append(f"{st['title']}: does not qualify ({row.get('note', '').strip()})")
+                elif row.get("verdict") not in VERDICTS or row.get("domain") not in DOMAINS \
+                        or row.get("comparison") not in COMPARISONS or not str(row.get("finding", "")).strip():
+                    dropped.append(f"{st['title']}: the checked record was incomplete; it stays in the queue")
+                else:
+                    kept.append({**{k: row.get(k, "") for k in STUDY_FIELDS},
+                                 "title": st["title"], "url": st["url"], "source": st["source"],
+                                 "published": st["published"],
+                                 "_extra": {"tier": "landmark", "checked": kind,
+                                            "check_status": row.get("status"),
+                                            "check_note": str(row.get("note", "")).strip()}})
+    dropped += [f"{st['title']}: not checked this time (budget reached); it stays in the queue" for st, _, _ in queue]
+    return kept, dropped, usage, rejected
+
+
 # ---------------------------------------------------------------- prompts
 
 def search_prompt(date: dt.date, studies: list[dict], first: bool) -> str:
@@ -318,7 +499,8 @@ def search_prompt(date: dt.date, studies: list[dict], first: bool) -> str:
 
 def write_prompt(date: dt.date, review: dict, new_ids: list[str]) -> str:
     register = json.dumps(
-        [{k: v for k, v in s.items() if k not in ("url", "added") and v} for s in review["studies"]],
+        [{k: v for k, v in s.items() if k not in ("url", "added", "checked", "check_status", "check_note") and v}
+         for s in review["studies"]],
         indent=1, ensure_ascii=False)
     previous = review.get("summary")
     return (
@@ -373,7 +555,7 @@ def agent_short(text: str, limit: int = 110) -> str:
 
 
 def write_pr_body(path: Path, review: dict, new: list[dict], dropped: list[str], removed: list[str],
-                  flagged: list[str], note: str, usage: dict | None) -> None:
+                  flagged: list[str], note: str, usage: dict | None, deep: dict | None = None) -> None:
     lines = [
         f"## AI vs Physician: edition {review['edition']} ({review['updated']})",
         "",
@@ -384,18 +566,37 @@ def write_pr_body(path: Path, review: dict, new: list[dict], dropped: list[str],
         "",
         "### New studies (check each one against its source)",
     ]
+    checked = {"full_text": "checked against the full text", "abstract": "checked against the abstract only"}
     for study in new:
         lines += [
             f"- **{study['id']}: {study['title']}** — {study['source']}, {study['published']} "
-            f"(`{VERDICT_LABELS[study['verdict']]}`)",
+            f"(`{VERDICT_LABELS[study['verdict']]}`)"
+            + (f" · landmark, {checked.get(study.get('checked'), 'checked')}"
+               + (", corrected" if study.get("check_status") == "corrected" else "") if study.get("tier") else ""),
+            *([f"  - *Check:* {study['check_note']}"] if study.get("check_note") else []),
             f"  - {study['url']}",
-            f"  - {study['finding']}",
+            # GitHub refuses a description over 65,536 characters; a big edition
+            # (edition 3 added 43 studies) shows shortened summaries instead
+            f"  - {study['finding'] if len(new) <= 15 else agent_short(study['finding'], 400)}",
             *([f"  - *Limitation:* {study['limitation']}"] if study["limitation"] else []),
         ]
     if not new:
         lines.append("- None: the paper was rewritten from the existing register.")
     if flagged:
         lines += ["", "### Sentences with no citation (read these first)", *[f"- {t}" for t in flagged]]
+    if deep:
+        sweep = deep.get("sweep")
+        lines += ["", "### Going deeper (deep sweep)"]
+        if sweep:
+            lines.append(f"- Read {sweep.get('screened', 0)} more abstracts (about ${sweep.get('cost', 0):.2f}); "
+                         f"{sweep.get('qualifying', 0)} qualified"
+                         + (f" and were saved to `{sweep['path']}`" if sweep.get("path") else "") + ". "
+                         f"{max(0, sweep.get('fresh', 0) - sweep.get('screened', 0))} candidates are still unread.")
+        lines.append(f"- Added from the shortlists: {len(deep.get('added', []))}, each checked against its paper. "
+                     f"{deep.get('waiting', 0)} clinical studies are waiting for later editions.")
+        if deep.get("dropped"):
+            lines += ["- Not added (they stay in the queue unless they do not qualify):",
+                      *[f"  - {d}" for d in deep["dropped"]]]
     if removed:
         lines += ["", "### Citations removed automatically",
                   f"- The draft cited {', '.join(removed)}, which are not in the register."]
@@ -418,7 +619,11 @@ def write_pr_body(path: Path, review: dict, new: list[dict], dropped: list[str],
                       f"{usage['input'] + usage['cache_read'] + usage['cache_write']:,} input tokens, "
                       f"{usage['output']:,} output tokens, {usage['searches']} web searches, "
                       f"about ${agent.estimate_cost(usage):.2f}.</sub>"]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    text = "\n".join(lines) + "\n"
+    if len(text) > 60000:
+        text = text[:60000].rsplit("\n", 1)[0] + ("\n\n*(Cut short: GitHub limits a description to 65,536 "
+                                                 "characters. Every study is in `evidence/ai-vs-human.json`.)*\n")
+    path.write_text(text, encoding="utf-8")
 
 
 # ---------------------------------------------------------------- main
@@ -428,6 +633,14 @@ def main() -> int:
     parser.add_argument("--date", type=dt.date.fromisoformat, help="Defaults to today (US Eastern)")
     parser.add_argument("--pr-body", type=Path, help="Where to write the PR description")
     parser.add_argument("--fixture", type=Path, help="Test without the API (see the top of this file)")
+    parser.add_argument("--mode", choices=["monthly", "landmarks", "search"], default="monthly",
+                        help="monthly: read more abstracts, add the next best studies from the shortlists, "
+                             "and search the web for new ones (the default); landmarks: add every proposed "
+                             "landmark study not yet in the paper, no searching; search: web search only")
+    parser.add_argument("--promote", type=int, default=MONTHLY_PROMOTE,
+                        help=f"monthly mode: how many shortlist studies to add (default {MONTHLY_PROMOTE})")
+    parser.add_argument("--sweep-budget", type=float, default=MONTHLY_SWEEP_BUDGET,
+                        help=f"monthly mode: dollars for reading new abstracts (default {MONTHLY_SWEEP_BUDGET:.0f})")
     args = parser.parse_args()
 
     date: dt.date = args.date or agent.today_eastern()
@@ -439,20 +652,55 @@ def main() -> int:
     studies = review["studies"]
     new = from_blog(studies, date)
     usage = None
+    deep: dict | None = None
+    dropped: list[str] = []
+    note = ""
 
-    # 1. Search for new studies
-    if fixture is not None:
-        result = fixture["search"]["result"]
-        found_urls = {agent.normalize_url(u) for u in fixture["search"].get("search_urls", [])}
-    else:
-        result, found_urls, usage = agent.run_claude(
-            search_prompt(date, studies, first), system=SEARCH_SYSTEM, schema=SEARCH_SCHEMA,
-            tools=FIRST_TOOLS if first else MONTHLY_TOOLS)
-    kept, dropped = verify_studies(result, found_urls, studies, FIRST_MAX_STUDIES if first else MAX_STUDIES)
-    new += [add_study(studies, record, date) for record in kept]
-    for reason in dropped:
-        print(f"Left out: {reason}")
-    note = str(result.get("note", "")).strip()
+    # 1a. Go deeper into the literature (owner's request, 2026-11-06): read
+    # more abstracts, then add the best studies from the shortlists, each
+    # checked against its paper. The landmarks mode adds every proposed
+    # landmark at once (used to rebuild the paper on them).
+    if args.mode in ("monthly", "landmarks"):
+        import deep_sweep  # imported here: it imports this module too
+        deep = {"mode": args.mode}
+        if args.mode == "monthly" and fixture is None:
+            sweep = deep_sweep.monthly_sweep(date, args.sweep_budget)
+            usage = agent.add_usage(usage, sweep.pop("usage", None))
+            deep["sweep"] = sweep
+        waiting = deep_sweep.pool(studies)
+        chosen = [st for st in waiting if st.get("proposed_tier") == "landmark" or st.get("pin") == "landmark"] \
+            if args.mode == "landmarks" else waiting[:args.promote]
+        deep["waiting"] = len(waiting) - len(chosen)
+        if chosen:
+            records, deep["dropped"], used, rejected = verify_landmarks(
+                chosen, VERIFY_BUDGET, fixture.get("verify") if fixture is not None else None)
+            usage = agent.add_usage(usage, used)
+            deep_sweep.record_rejected(rejected, date)
+            deep["added"] = []
+            for record in records:
+                extra = record.pop("_extra")
+                study = add_study(studies, record, date)
+                study.update(extra)
+                deep["added"].append(study)
+            new += deep["added"]
+        for reason in deep.get("dropped", []):
+            print(f"Not added from the shortlist: {reason}")
+
+    # 1b. Search the web for studies too new to be in PubMed
+    if args.mode in ("monthly", "search"):
+        if fixture is not None:
+            result = fixture["search"]["result"]
+            found_urls = {agent.normalize_url(u) for u in fixture["search"].get("search_urls", [])}
+        else:
+            result, found_urls, more = agent.run_claude(
+                search_prompt(date, studies, first), system=SEARCH_SYSTEM, schema=SEARCH_SCHEMA,
+                tools=FIRST_TOOLS if first else MONTHLY_TOOLS)
+            usage = agent.add_usage(usage, more)
+        kept, dropped = verify_studies(result, found_urls, studies, FIRST_MAX_STUDIES if first else MAX_STUDIES)
+        new += [add_study(studies, record, date) for record in kept]
+        for reason in dropped:
+            print(f"Left out: {reason}")
+        note = str(result.get("note", "")).strip()
 
     if not studies:
         print("No studies in the register; nothing to write.")
@@ -460,7 +708,20 @@ def main() -> int:
         return 0
     if not new and review.get("sections"):
         print("No new studies this month; the published edition stands.")
-        agent.set_output("created", "false")
+        sweep = (deep or {}).get("sweep") or {}
+        if sweep.get("screened") or (deep or {}).get("dropped"):
+            # Save the sweep's progress (what was read, what was found) anyway
+            if args.pr_body:
+                args.pr_body.write_text("\n".join([
+                    f"## AI vs Physician: deep sweep progress ({date.isoformat()})", "",
+                    "No study was added to the paper this month, so the published edition stands. This saves "
+                    "what the monthly sweep read, so next month goes further. Merging changes nothing on the site.",
+                    "", f"- Read {sweep.get('screened', 0)} more abstracts (about ${sweep.get('cost', 0):.2f}); "
+                    f"{sweep.get('qualifying', 0)} qualified.",
+                    *[f"- Not added: {d}" for d in (deep or {}).get("dropped", [])]]) + "\n", encoding="utf-8")
+            agent.set_output("created", "sweep")
+        else:
+            agent.set_output("created", "false")
         return 0
 
     # 2. Rewrite the paper from the register
@@ -504,7 +765,7 @@ def main() -> int:
         print(f"No Instagram slides ({err}).")
 
     if args.pr_body:
-        write_pr_body(args.pr_body, review, new, dropped, removed, flagged, note, usage)
+        write_pr_body(args.pr_body, review, new, dropped, removed, flagged, note, usage, deep)
     agent.set_output("created", "true")
     agent.set_output("edition", str(review["edition"]))
     return 0

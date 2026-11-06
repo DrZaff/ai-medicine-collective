@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-04",
+  "headline": "AI as tutor and as measurer: colposcopy training for residents, and heart MRI ejection fraction compared with clinicians",
+  "intro": "One review covers a randomised trial in which an AI virtual-patient platform improved OB/GYN residents' diagnostic reasoning but not their operative skill. The other covers a large Lancet Digital Health study in which AI measurements of heart function on cardiac MRI predicted death marginally better than expert clinicians' measurements.",
+  "items": [
+    {
+      "title": "Artificial intelligence-enhanced colposcopy training improves diagnostic reasoning and communication competencies: A randomized controlled study",
+      "source": "Journal of Gynecology Obstetrics and Human Reproduction",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42925890/",
+      "published": "2026-10-24",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "In a randomised, assessor-blinded, wait-list trial, 60 PGY-2 and PGY-3 obstetrics and gynecology residents at two affiliated teaching hospitals added an AI virtual-patient platform to their usual colposcopy teaching either straight away or a month later. At one month the AI group scored higher on case analysis (78.57 vs 71.03, a mean difference of 7.54), diagnostic justification and communication, but operative competence did not differ (p = 0.113), and both groups were proficient by three months. It was a small, single-specialty trial with short follow-up, scored on OSCEs rather than patient care.",
+      "why_it_matters": "AI virtual patients look like a way to speed up practice in diagnostic reasoning and communication. Programs should not assume that talking a case through with an AI builds hands-on procedural skill."
+    },
+    {
+      "title": "Performance of artificial intelligence versus clinician left-ventricular segmentation of cardiac MRI for mortality prediction: a retrospective, multicentre, prognostic study",
+      "source": "The Lancet Digital Health",
+      "url": "https://www.thelancet.com/journals/landig/article/PIIS2589-7500(26)00065-8/fulltext",
+      "published": "2026-11-02",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_ahead",
+      "summary": "The task was outlining the left ventricle on cardiac MRI to measure ejection fraction, and then using those measurements to predict death from any cause. A deep-learning segmentation tool was compared with expert clinicians' segmentation of the same scans from 27,382 consecutive patients at UK and US centres. Over a median follow-up of 5.6 years, 3,458 patients (13%) died. AI-derived ejection fraction predicted death marginally better than clinician-derived ejection fraction (C index 0.669 vs 0.637, and 0.781 vs 0.777 after adjusting for age and sex). The main limitations are that the study was retrospective, that it measured how well each set of numbers predicted death rather than any effect on care, and that the gain after adjustment was very small.",
+      "why_it_matters": "Ejection fraction drives decisions about heart-failure drugs, devices and procedures. If AI measures it at least as well as experts, the authors suggest it could do the first pass with clinicians checking it, so trainees still need to know what a wrong measurement looks like."
+    }
+  ],
+  "tags": [
+    "ai vs clinician",
+    "cardiac mri",
+    "cardiology",
+    "colposcopy",
+    "deep learning",
+    "ejection fraction",
+    "imaging ai",
+    "lancet digital health",
+    "medical education",
+    "obstetrics and gynecology",
+    "prognosis",
+    "randomized controlled trial",
+    "residents",
+    "retrospective study",
+    "simulation",
+    "virtual patients"
+  ],
+  "generated_by": "claude-opus-5-5"
+}

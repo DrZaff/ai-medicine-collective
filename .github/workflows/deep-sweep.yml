@@ -1,0 +1,104 @@
+# Deep sweep for "AI vs Physician": lists every candidate study in PubMed and
+# Europe PMC, screens and grades them, and opens a PR with a ranked shortlist
+# of proposed landmark studies (scripts/blog_agent/deep_sweep.py).
+# Started by hand only. Merging the PR saves the shortlist; nothing on the site
+# changes. Uses the same ANTHROPIC_API_KEY secret as the blog draft job.
+
+name: Deep sweep
+
+on:
+  workflow_dispatch:
+    inputs:
+      budget:
+        description: "Spending cap in US dollars"
+        required: false
+        default: "30"
+      since:
+        description: "Oldest publication date to consider (YYYY-MM-DD)"
+        required: false
+        default: "2023-01-01"
+      landmarks:
+        description: "How many studies to propose as landmark studies"
+        required: false
+        default: "40"
+      preprints_only:
+        description: "Screen preprints only (Europe PMC: medRxiv and others), not PubMed"
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: deep-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Check for API key
+        id: key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::notice::ANTHROPIC_API_KEY secret is not set yet; skipping."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.ok == 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.key.outputs.ok == 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/blog_agent/requirements.txt
+
+      - name: Install dependencies
+        if: steps.key.outputs.ok == 'true'
+        run: pip install -r scripts/blog_agent/requirements.txt
+
+      - name: Run the sweep
+        id: sweep
+        if: steps.key.outputs.ok == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BUDGET: ${{ github.event.inputs.budget }}
+          SINCE: ${{ github.event.inputs.since }}
+          LANDMARKS: ${{ github.event.inputs.landmarks }}
+          PREPRINTS_ONLY: ${{ github.event.inputs.preprints_only }}
+        run: |
+          args=(--pr-body "$RUNNER_TEMP/pr-body.md" --budget "${BUDGET:-30}"
+                --since "${SINCE:-2023-01-01}" --landmarks "${LANDMARKS:-40}")
+          if [ "$PREPRINTS_ONLY" = "true" ]; then args+=(--preprints-only); fi
+          python scripts/blog_agent/deep_sweep.py "${args[@]}"
+
+      - name: Open pull request
+        if: steps.sweep.outputs.created == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DATE: ${{ steps.sweep.outputs.date }}
+          NAME: ${{ steps.sweep.outputs.name }}
+        run: |
+          branch="review/$NAME"
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "::notice::A sweep named $NAME already exists; not opening another."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add "evidence/$NAME.json" evidence/deep-sweep-screened.json
+          git commit -m "AI vs Physician: deep sweep shortlist ($NAME)"
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "AI vs Physician: deep sweep shortlist ($NAME)" \
+            --body-file "$RUNNER_TEMP/pr-body.md"

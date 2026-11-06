@@ -1,0 +1,14 @@
+Patient-safety learning with generative AI, and why AI did not rescue tired residents' chest X-ray reads
+
+This briefing looks at AI and trainees from two sides. A survey links how students use generative AI to their self-reported safety practice, and a small reader study tested whether AI help can make up for radiology residents' fatigue after a night shift.
+
+Med-ed: Generative AI Factors, Cognitive Engagement, and Patient Safety Learning in Medical Education: Mixed Methods Study (JMIR Medical Education)
+AI vs physician: From dusk till dawn?—Night shift-induced fatigue, diagnostic performance, and AI assistance in chest radiography (European Radiology)
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-11-06 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AiAssistance #AiLiteracy #ChestRadiography #Clerkship #EyeTracking #Fatigue

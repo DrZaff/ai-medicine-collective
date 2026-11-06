@@ -1,6 +1,12 @@
 # Drafts the monthly edition of the living review "AI vs Physician" and opens a PR.
 # Merging the PR publishes the edition (human review step, see CLAUDE.md).
 # Uses the same ANTHROPIC_API_KEY secret and settings as the blog draft job.
+# Each month it also goes deeper (owner's request, 2026-11-06): it reads more
+# PubMed abstracts and adds the next best studies from the deep sweep's
+# shortlists, each checked against its paper. Expected cost: about $8 for
+# reading abstracts, a few dollars for the checks, and the usual search and
+# write. Start it by hand with mode "landmarks" to add every proposed landmark
+# study at once (no searching).
 
 name: Living review
 
@@ -12,6 +18,18 @@ on:
       date:
         description: "Date of the edition (YYYY-MM-DD). Leave empty for today."
         required: false
+      mode:
+        description: "monthly (go deeper and search), landmarks (add every proposed landmark study), search (web search only)"
+        required: false
+        default: "monthly"
+      promote:
+        description: "Monthly mode: how many shortlist studies to add"
+        required: false
+        default: "8"
+      sweep_budget:
+        description: "Monthly mode: dollars for reading new abstracts"
+        required: false
+        default: "8"
 
 permissions:
   contents: write
@@ -24,7 +42,7 @@ concurrency:
 jobs:
   draft:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 150
     steps:
       - name: Check for API key
         id: key
@@ -58,17 +76,22 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DATE_INPUT: ${{ github.event.inputs.date }}
+          MODE: ${{ github.event.inputs.mode }}
+          PROMOTE: ${{ github.event.inputs.promote }}
+          SWEEP_BUDGET: ${{ github.event.inputs.sweep_budget }}
         run: |
-          args=(--pr-body "$RUNNER_TEMP/pr-body.md")
+          args=(--pr-body "$RUNNER_TEMP/pr-body.md" --mode "${MODE:-monthly}"
+                --promote "${PROMOTE:-8}" --sweep-budget "${SWEEP_BUDGET:-8}")
           if [ -n "$DATE_INPUT" ]; then args+=(--date "$DATE_INPUT"); fi
           python scripts/blog_agent/living_review.py "${args[@]}"
 
       - name: Open pull request
-        if: steps.draft.outputs.created == 'true'
+        if: steps.draft.outputs.created == 'true' || steps.draft.outputs.created == 'sweep'
         env:
           GH_TOKEN: ${{ github.token }}
           DATE: ${{ steps.draft.outputs.date }}
           EDITION: ${{ steps.draft.outputs.edition }}
+          CREATED: ${{ steps.draft.outputs.created }}
         run: |
           branch="review/ai-vs-human-$DATE"
           if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
@@ -78,10 +101,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add evidence/ai-vs-human.json
+          # The paper, plus the deep sweep's shortlist and its record of what was read
+          git add evidence/
           if [ -d "social/review-$DATE" ]; then git add "social/review-$DATE"; fi
-          git commit -m "AI vs Physician: edition $EDITION ($DATE)"
+          if [ "$CREATED" = "sweep" ]; then
+            title="AI vs Physician: deep sweep progress ($DATE)"
+          else
+            title="AI vs Physician: edition $EDITION ($DATE)"
+          fi
+          git commit -m "$title"
           git push -u origin "$branch"
-          gh pr create --base main --head "$branch" \
-            --title "AI vs Physician: edition $EDITION ($DATE)" \
+          gh pr create --base main --head "$branch" --title "$title" \
             --body-file "$RUNNER_TEMP/pr-body.md"
