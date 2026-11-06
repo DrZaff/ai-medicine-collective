@@ -755,8 +755,11 @@ def in_register(study: dict, register: list[dict]) -> bool:
 
 def pool(register: list[dict]) -> list[dict]:
     """Clinical-decision studies from every saved shortlist that are not in the
-    paper yet, best first: pinned landmarks, then proposed landmarks, then the
-    rest by score. Studies pinned to the appendix or excluded never qualify."""
+    paper yet, best first: pinned landmarks, then by score across every list.
+    (Each list's own "landmark" mark is not used here: a small list's top ten,
+    such as a preprint sweep's, would otherwise jump ahead of much stronger
+    studies further down the main list.) Studies pinned to the appendix,
+    excluded or rejected never qualify."""
     seen, out = set(), []
     rejected = load_ledger().get("rejected", {})
     for path in shortlists():
@@ -768,8 +771,7 @@ def pool(register: list[dict]) -> list[dict]:
                 continue
             seen.add(key)
             out.append(st)
-    order = {"landmark": 0}
-    return sorted(out, key=lambda st: (st.get("pin") != "landmark", order.get(st.get("proposed_tier"), 1),
+    return sorted(out, key=lambda st: (st.get("pin") != "landmark",
                                        -float(st.get("score") or 0), -(st.get("citations") or 0)))
 
 

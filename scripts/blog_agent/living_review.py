@@ -313,6 +313,7 @@ def verify_studies(result: dict, found_urls: set[str], studies: list[dict], limi
 VERIFY_WORKERS = 4
 MAX_PAPER_CHARS = 80000    # about 20,000 tokens of full text per study
 MONTHLY_PROMOTE = 8        # studies added from the shortlists each month
+MONTHLY_PREPRINTS = 1      # of those, places kept for the best preprints (owner's choice, 2026-11-06)
 MONTHLY_SWEEP_BUDGET = 8.0  # dollars for reading new abstracts each month
 VERIFY_BUDGET = 15.0        # dollars for checking studies against their papers
 EUTILS = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -359,11 +360,23 @@ def _text(node) -> str:
 
 
 def paper_text(st: dict) -> tuple[str, str]:
-    """The paper's text from NCBI: ("full_text", text) from PubMed Central when
-    it is open access there, else ("abstract", text) from PubMed, else ("", "")."""
+    """The paper's text: ("full_text", text) from PubMed Central when it is
+    open access there, else ("abstract", text) from PubMed, both through
+    NCBI's API; for a medRxiv preprint, the latest version's abstract from
+    medRxiv's own API; else ("", "")."""
     import time
     import xml.etree.ElementTree as ET
     import deep_sweep  # its get() retries and identifies the client
+    medrxiv = re.search(r"medrxiv\.org/content/(10\.\d+/\d[\d.]*\d)", st.get("url", ""))
+    if medrxiv:  # a medRxiv preprint: the latest version's abstract, from medRxiv's own API
+        try:
+            data = json.loads(deep_sweep.get(f"https://api.biorxiv.org/details/medrxiv/{medrxiv.group(1)}"))
+            versions = data.get("collection") or []
+            abstract = (versions[-1].get("abstract") or "").strip() if versions else ""
+            return ("abstract", abstract) if len(abstract) > 200 else ("", "")
+        except Exception as err:
+            print(f"Could not fetch medRxiv {medrxiv.group(1)}: {err}")
+            return "", ""
     pmid = re.search(r"pubmed\.ncbi\.nlm\.nih\.gov/(\d+)", st.get("url", ""))
     if not pmid:
         return "", ""
@@ -390,6 +403,20 @@ def paper_text(st: dict) -> tuple[str, str]:
     except Exception as err:  # one paper that cannot be fetched should not stop the edition
         print(f"Could not fetch PMID {pmid}: {err}")
         return "", ""
+
+
+def is_preprint(study: dict) -> bool:
+    return "preprint" in str(study.get("source", "")).lower()
+
+
+def monthly_choice(waiting: list[dict], count: int, preprints: int) -> list[dict]:
+    """The month's studies from the queue (best first): `preprints` places
+    for the best preprints, which would otherwise rarely reach the top (no
+    citations yet, and a lower score by design), the rest by rank. A place
+    no preprint can fill goes to the next study in the queue."""
+    kept = [st for st in waiting if is_preprint(st)][:max(0, min(preprints, count))]
+    rest = [st for st in waiting if st not in kept][:count - len(kept)]
+    return sorted(rest + kept, key=waiting.index)
 
 
 def verify_prompt(st: dict, kind: str, text: str) -> str:
@@ -639,6 +666,8 @@ def main() -> int:
                              "landmark study not yet in the paper, no searching; search: web search only")
     parser.add_argument("--promote", type=int, default=MONTHLY_PROMOTE,
                         help=f"monthly mode: how many shortlist studies to add (default {MONTHLY_PROMOTE})")
+    parser.add_argument("--preprints", type=int, default=MONTHLY_PREPRINTS,
+                        help=f"monthly mode: places kept for preprints (default {MONTHLY_PREPRINTS})")
     parser.add_argument("--sweep-budget", type=float, default=MONTHLY_SWEEP_BUDGET,
                         help=f"monthly mode: dollars for reading new abstracts (default {MONTHLY_SWEEP_BUDGET:.0f})")
     args = parser.parse_args()
@@ -669,7 +698,7 @@ def main() -> int:
             deep["sweep"] = sweep
         waiting = deep_sweep.pool(studies)
         chosen = [st for st in waiting if st.get("proposed_tier") == "landmark" or st.get("pin") == "landmark"] \
-            if args.mode == "landmarks" else waiting[:args.promote]
+            if args.mode == "landmarks" else monthly_choice(waiting, args.promote, args.preprints)
         deep["waiting"] = len(waiting) - len(chosen)
         if chosen:
             records, deep["dropped"], used, rejected = verify_landmarks(
