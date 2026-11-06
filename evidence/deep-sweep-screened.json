@@ -1,0 +1,6 @@
+{
+"rules": [
+{"sweep": "2026-11-06", "through": "2026-11-06", "rest_from": "2026-10-08", "note": "The first sweep read every high-impact candidate published by 2026-11-06 and the rest back to 2026-10-08; it did not keep a list."}
+],
+"keys": []
+}

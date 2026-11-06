@@ -353,11 +353,12 @@ def unmatched_numbers(finding: str, abstract: str) -> list[str]:
 
 
 def screen(candidates: list[dict], budget_for_screening: float, fake: bool = False):
-    """Screen batches newest first until the money set aside runs out.
-    Returns (records, usage, how many candidates were screened)."""
+    """Screen batches in priority order until the money set aside runs out.
+    Returns (records, usage, how many candidates were screened, their keys)."""
     batches = [candidates[i:i + BATCH] for i in range(0, len(candidates), BATCH)]
     usage = None
     records, screened, per_batch = [], 0, 0.0
+    done_keys: list[str] = []
 
     def run(batch):
         if fake:
@@ -397,6 +398,7 @@ def screen(candidates: list[dict], budget_for_screening: float, fake: bool = Fal
                 usage = agent.add_usage(usage, used)
                 spent = agent.estimate_cost(usage)
                 screened += len(batch)
+                done_keys += [c["key"] for c in batch]
                 per_batch = max(per_batch, spent / max(1, screened / BATCH))
                 for row in result.get("results", []):
                     try:
@@ -409,7 +411,7 @@ def screen(candidates: list[dict], budget_for_screening: float, fake: bool = Fal
                         continue
                     records.append({"candidate": c, "row": row})
                 print(f"Screened {screened} of {len(candidates)}; kept {len(records)}; about ${spent:.2f} so far")
-    return records, usage, screened
+    return records, usage, screened, done_keys
 
 
 # ---------------------------------------------------------------- 3. rank
@@ -628,6 +630,122 @@ def rerank(path: Path, landmarks: int, pr_body: Path | None) -> int:
     return 0
 
 
+# ---------------------------------------------------------------- what has been screened
+
+# Every abstract the sweeps have read, so a later sweep goes deeper instead of
+# reading the same ones again. The first sweep (2026-11-06) did not keep its
+# list, so it is recorded as a rule: it read every high-impact candidate
+# published up to its date, and the rest back to 2026-10-08.
+LEDGER_PATH = agent.ROOT / "evidence" / "deep-sweep-screened.json"
+
+
+def load_ledger() -> dict:
+    if LEDGER_PATH.exists():
+        return json.loads(LEDGER_PATH.read_text(encoding="utf-8"))
+    return {"rules": [], "keys": []}
+
+
+def already_screened(c: dict, ledger: dict, keys: set[str] | None = None) -> bool:
+    if c["key"] in (keys if keys is not None else set(ledger.get("keys", []))):
+        return True
+    for rule in ledger.get("rules", []):
+        if c["published"] <= rule["through"] and (priority(c)[0] == 0 or c["published"] >= rule["rest_from"]):
+            return True
+    return False
+
+
+def record_screened(keys: list[str], date: dt.date) -> None:
+    ledger = load_ledger()
+    ledger["keys"] = sorted(set(ledger.get("keys", [])) | set(keys))
+    ledger["updated"] = date.isoformat()
+    LEDGER_PATH.parent.mkdir(parents=True, exist_ok=True)
+    LEDGER_PATH.write_text(json.dumps(ledger, indent=0) + "\n", encoding="utf-8")
+
+
+def record_rejected(rejected: list[tuple[str, str]], date: dt.date) -> None:
+    """Studies the full-text check found do not qualify: never offered again.
+    The reason stays in the file for the editors."""
+    if not rejected:
+        return
+    ledger = load_ledger()
+    ledger.setdefault("rejected", {}).update({url: f"{date.isoformat()}: {why}" for url, why in rejected})
+    LEDGER_PATH.parent.mkdir(parents=True, exist_ok=True)
+    LEDGER_PATH.write_text(json.dumps(ledger, indent=0) + "\n", encoding="utf-8")
+
+
+def shortlists() -> list[Path]:
+    return sorted((agent.ROOT / "evidence").glob("deep-sweep-20*.json"))
+
+
+def in_register(study: dict, register: list[dict]) -> bool:
+    have = {agent.normalize_url(s.get("url", "")) for s in register} | {simple(s.get("title", "")) for s in register}
+    have |= {(s.get("doi") or "").lower() for s in register} - {""}
+    return bool({agent.normalize_url(study["url"]), simple(study["title"]), (study.get("doi") or "").lower()} & have)
+
+
+def pool(register: list[dict]) -> list[dict]:
+    """Clinical-decision studies from every saved shortlist that are not in the
+    paper yet, best first: pinned landmarks, then proposed landmarks, then the
+    rest by score. Studies pinned to the appendix or excluded never qualify."""
+    seen, out = set(), []
+    rejected = load_ledger().get("rejected", {})
+    for path in shortlists():
+        for st in json.loads(path.read_text(encoding="utf-8"))["studies"]:
+            key = simple(st["title"])
+            if st.get("group") != "clinical" or st.get("pin") == "appendix" or st.get("excluded") \
+                    or st["url"] in rejected \
+                    or key in seen or in_register(st, register):
+                continue
+            seen.add(key)
+            out.append(st)
+    order = {"landmark": 0}
+    return sorted(out, key=lambda st: (st.get("pin") != "landmark", order.get(st.get("proposed_tier"), 1),
+                                       -float(st.get("score") or 0), -(st.get("citations") or 0)))
+
+
+def monthly_sweep(date: dt.date, budget: float, since: dt.date = dt.date(2023, 1, 1),
+                  landmarks: int = 10) -> dict:
+    """The monthly step of the living review: list every candidate again
+    (free), skip what earlier sweeps read, screen the next ones in priority
+    order within the budget, and save them as evidence/deep-sweep-<date>.json.
+    Returns the run's statistics (with "path" when a shortlist was written)."""
+    register = lr.load_review()["studies"]
+    ledger = load_ledger()
+    keys = set(ledger.get("keys", []))
+    pubmed = pubmed_candidates(since, date)
+    preprints = preprint_candidates(since, date)
+    candidates = [c for c in fresh_candidates(pubmed + preprints, register)
+                  if c["published"] >= since.isoformat() and not already_screened(c, ledger, keys)]
+    high = sum(1 for c in candidates if priority(c)[0] == 0)
+    print(f"Monthly sweep: {len(candidates)} candidates not read before ({high} high-impact)")
+    stats = {"date": date.isoformat(), "since": since.isoformat(), "high": high,
+             "listed": len(pubmed) + len(preprints), "pubmed": len(pubmed), "preprints": len(preprints),
+             "fresh": len(candidates), "budget": budget, "screened": 0, "cost": 0.0, "usage": None}
+    if not candidates or budget <= SAFETY_MARGIN:
+        return stats
+    records, usage, screened, done_keys = screen(candidates, budget - SAFETY_MARGIN)
+    record_screened(done_keys, date)
+    found = []
+    for item in records:
+        c, row = item["candidate"], item["row"]
+        study = {**{k: row.get(k, "") for k in [*SCREEN_FIELDS, *GRADE_FIELDS]},
+                 "title": c["title"], "url": c["url"], "source": c["source"], "published": c["published"],
+                 "doi": c.get("doi", ""), "citations": c.get("citations", 0), "rcr": c.get("rcr", 0.0)}
+        odd = unmatched_numbers(row.get("finding", ""), c["abstract"])
+        if odd:
+            study["unverified_numbers"] = odd
+        found.append(study)
+    stats.update({"screened": screened, "cost": round(agent.estimate_cost(usage), 2) if usage else 0.0,
+                  "usage": usage, "qualifying": len(found)})
+    rest = [c["published"] for c in candidates[:screened] if priority(c)[0] == 1]
+    stats["reached"] = min(rest) if rest else "(only high-impact candidates were reached)"
+    if found:
+        out = agent.ROOT / "evidence" / f"deep-sweep-{date.isoformat()}.json"
+        save(out, {k: v for k, v in stats.items() if k != "usage"}, rank(found, landmarks, since.isoformat()))
+        stats["path"] = str(out.relative_to(agent.ROOT))
+    return stats
+
+
 # ---------------------------------------------------------------- main
 
 def main() -> int:
@@ -652,7 +770,10 @@ def main() -> int:
 
     pubmed = pubmed_candidates(args.since, date)
     preprints = preprint_candidates(args.since, date)
-    candidates = fresh_candidates(pubmed + preprints, studies)
+    ledger = load_ledger()
+    keys = set(ledger.get("keys", []))
+    candidates = [c for c in fresh_candidates(pubmed + preprints, studies)
+                  if c["published"] >= args.since.isoformat() and not already_screened(c, ledger, keys)]
     high = sum(1 for c in candidates if priority(c)[0] == 0)
     print(f"{len(candidates)} new candidates ({high} high-impact) after removing duplicates and the register's studies")
     if args.dry_run:
@@ -662,7 +783,8 @@ def main() -> int:
             print(f"  RCR {c.get('rcr', 0) or 0:.1f}, {c.get('citations', 0)} citations: {c['source']} - {c['title'][:90]}")
         return 0
 
-    records, usage, screened = screen(candidates, max(0.0, args.budget - SAFETY_MARGIN), fake=args.fake_ai)
+    records, usage, screened, done_keys = screen(candidates, max(0.0, args.budget - SAFETY_MARGIN), fake=args.fake_ai)
+    record_screened(done_keys, date)
     rest = [c["published"] for c in candidates[:screened] if priority(c)[0] == 1]
     reached = min(rest) if rest else "(only high-impact candidates were reached)"
 
