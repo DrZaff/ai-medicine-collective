@@ -13,9 +13,10 @@ The Dell OptiPlex 7060 Micro (i5-8500T, 16 GB RAM, 512 GB SSD) becomes the alway
     - Require a pull request with 1 approval, **require review from code owners**, and **dismiss stale approvals when new commits are pushed** (this ties clinical sign-off to the exact commit).
     - Require the status checks **Data, build, links and secrets** and **Pages open without errors**.
     - Block force pushes and deletion.
-    - Bypass: `github-actions[bot]` only, so the weekly digest can still commit to `main`. Check that the next Friday run succeeds.
+    - Bypass: **none at first**. Don't add `github-actions[bot]`: a bypass applies to every workflow running as that actor. Before turning the ruleset on, move the weekly digest onto its own GitHub App (architecture.md, "Security boundaries"), in its own pull request, and put only that App on the bypass list. Check that the next Friday run succeeds.
+    - Then run a **negative test**: a test PR without the owner's approval, and a test PR touching a clinical file without the clinician's approval, must both be blocked from merging.
 5. Make the orchestrator's GitHub credential: a fine-grained personal access token limited to the repositories agents may work on, with Contents, Issues and Pull requests set to read and write and nothing else. Keep it for part C.
-6. **Step zero** (architecture.md): try Codex's GitHub pull request review on a small PR, and Claude Code's GitHub Action on a small labeled issue. Write down what each covers and which allowance it uses. This decides how much the Dell has to do.
+6. **Step zero** (architecture.md): the three experiments: Claude's GitHub Action building a low-risk issue, Codex reviewing a PR with a planted defect, and the two end to end. Record the permissions, the usage, the reliability, and whether Site checks ran on the PRs they opened. This decides how much the Dell has to do; if the integrations cover building and reviewing, parts D and E shrink to scheduling and monitoring.
 
 ## B. Install the operating system
 
@@ -52,18 +53,39 @@ sudo loginctl enable-linger agent      # its services keep running when nobody i
 
 4. As `agent`, store the GitHub token from A.5 with `gh auth login --with-token < token.txt`, then delete `token.txt`.
 
-## D. Containers for the workers
+## D. Sandboxes for the workers
 
-1. Install rootless Docker for the `agent` user (Docker's "Run the Docker daemon as a non-root user" guide), so even a container escape lands in an unprivileged account. Optional, stronger: the gVisor runtime (`runsc`).
-2. Build one worker image per repository type (for this site: Python 3.12, Node 22, Playwright 1.63.0 with Chromium, git, Claude Code, Codex). Pin every version.
-3. Limit what workers can reach: a dedicated Docker network whose outbound traffic only goes to GitHub, the package registries and the AI providers, through an allow-list proxy. Block the home network, `169.254.169.254` and everything else. Test that a worker can't reach your router's address.
-4. Give each container CPU and memory limits (for example 2 CPUs and 6 GB), and `--read-only` with a writable work folder only.
+Only needed if step zero shows custom workers are required.
 
-## E. Sign in the agents
+1. Install rootless Docker for the `agent` user (Docker's "Run the Docker daemon as a non-root user" guide), plus the **gVisor runtime (`runsc`)**. gVisor (or a disposable virtual machine) is **required** before any unattended run. Rootless Docker alone is for supervised tests with harmless code only. If gVisor breaks Chromium, put the workers in a small virtual machine instead.
+2. Build one worker image per repository type (for this site: Python 3.12, Node 22, Playwright 1.63.0 with Chromium, git, Claude Code, Codex). Pin every version. No credentials in the image.
+3. Enforce outbound limits:
+    - Workers sit on an internal network whose only exit is an allow-list proxy (for example Squid or tinyproxy).
+    - The proxy allows GitHub, the package registries and the AI API hosts.
+    - Host firewall rules drop all other outbound traffic from that network, IPv4 and IPv6, including DNS to anything but the proxy.
+4. Give each sandbox CPU and memory limits (for example 2 CPUs and 6 GB), and a read-only root with one writable work folder.
+5. **Sandbox validation tests**, run inside a worker before going further. Each must fail:
+    - reach the router or any `192.168.*` address
+    - reach `169.254.169.254`
+    - reach a blocked site over IPv4 and over IPv6
+    - follow a redirect from an allowed site to a blocked one
+    - query an outside DNS server
+    - read a file from the host
 
-1. Sign in to Claude Code and Codex inside the worker setup with your own accounts, through their own sign-in flows. Never copy their tokens into a tool or a file the orchestrator manages.
-2. Check the current terms and usage pages for scripted, scheduled use of each plan. Plan for month one as a measurement period (architecture.md, "Limits and usage").
-3. Confirm the installed versions support the headless options used (`claude -p --help`, `codex exec --help`), and record the versions.
+   And these must work: `git clone` from GitHub, `npm install`, `pip install`, and one AI API call. Measure memory with the browser smoke test running.
+
+## E. AI credentials
+
+The owner's subscription sign-ins never go into a worker: code running in a worker can read anything the worker holds (architecture.md, "AI credentials").
+
+1. **Official integrations** (step zero) connect to your plans through each vendor's own setup on GitHub. Nothing is stored on the Dell.
+2. **Your own interactive use** on the Dell: sign in to Claude Code and Codex as yourself, outside the `agent` user and every worker.
+3. **Custom unattended workers:**
+    - Create one dedicated API key per provider (the Claude Console, and the OpenAI platform) in a separate project or workspace, with a hard monthly spending limit.
+    - Store each key where only the orchestrator can read it. The orchestrator passes the key into one run's sandbox as an environment variable, and it is gone when the sandbox is deleted.
+    - Revoke and replace a key on any sign of misuse.
+4. Before scheduling any unattended runs, check each provider's current terms for that exact pattern. If a provider confirms a subscription credential is allowed for it, it may replace the API key, still injected per run, never stored in an image, never copied or proxied.
+5. Confirm the installed versions support the headless options used (`claude -p --help`, `codex exec --help`), and record the versions.
 
 ## F. First runs, by hand
 
@@ -74,6 +96,7 @@ sudo loginctl enable-linger agent      # its services keep running when nobody i
 ## Decisions for the owner
 
 - **Step zero results:** how much of the loop GitHub's built-in Claude and Codex integrations cover.
-- **Usage after month one:** whether the Max and Plus plans are enough, or an API key with a hard monthly limit is needed for the overflow.
+- **Usage after month one:** how much runs on the plans through official integrations, and what the capped worker API keys actually cost.
+- **The digest publisher App** (A.4), before the ruleset goes on.
 - **Who the clinical reviewer is** for CODEOWNERS.
 - **Which repository joins next**, one at a time, once it has an AGENTS.md and working checks.

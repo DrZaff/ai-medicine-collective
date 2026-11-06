@@ -39,6 +39,7 @@ body:
     id: risk
     attributes:
       label: Risk
+      description: Your estimate. The orchestrator also rates the change from the files it touches and uses the higher of the two.
       options:
         - Low (text, styling, docs)
         - Medium (page behaviour, scripts)

@@ -36,7 +36,7 @@ Anything that a clinician could act on needs a clinician's approval before mergi
 - validation cases: normal, abnormal, boundary and invalid input, with expected results
 - the intended users and known limitations
 
-A new commit after the clinician approves needs a fresh approval. Never present AI-generated medical content as verified.
+A new commit after the clinician approves needs a fresh approval. The label is applied by path as well: a change to a clinical file is clinical whatever the issue says. Until CODEOWNERS and the ruleset enforce clinical approval on GitHub (docs/agents/dell-setup.md, A.3–A.4), agents don't take clinical tasks at all. Never present AI-generated medical content as verified.
 
 ## Checks to run before opening a pull request
 

@@ -35,12 +35,13 @@ Also preserved: the Netlify deploy previews, the `pg_cron` jobs, and the human r
 3. **No tests for the Python agents** beyond their `--fixture` modes. Next step: run each fixture mode in CI.
 4. **No database tests.** Row-level security is reviewed by reading migrations only. A local Supabase with pgTAP tests is possible later; until then every migration PR needs a human security read.
 5. **No signed-in tests.** The smoke test covers signed-out pages only. Signed-in tests need a test Supabase project with synthetic members; don't point tests at production.
-6. **No dependency updates.** Actions are pinned by tag (`@v4`), not by commit; Python packages are pinned. Dependabot for Actions and pip is a low-risk next step.
+6. **Limits of the new checks.** The secret scan is a set of patterns, not a full scanner; GitHub's own secret scanning should also be on. The browser test covers signed-out pages only. Neither check says anything about clinical correctness, which is the clinician's job (architecture.md, "Risk tiers"). Stronger checks come before higher-risk automation.
+7. **No dependency updates.** Actions are pinned by tag (`@v4`), not by commit; Python packages are pinned. Dependabot for Actions and pip is a low-risk next step.
 
 ## Security and deployment risks
 
 1. **Merging is deploying.** Every merge to `main` goes to production, can post to Instagram, and can rebuild the digest. Agents must never merge; branch protection should enforce it.
-2. **Branch protection is not visible from the code.** Recommended: require a pull request and one approving review on `main`, block force pushes, and let only `github-actions[bot]` bypass for the digest job.
+2. **Branch protection is not visible from the code.** Recommended: a ruleset requiring a pull request, one approving review and code-owner review on `main`, and blocking force pushes. **Don't** bypass for `github-actions[bot]`: a bypass applies to every workflow running as that actor. Move the weekly digest's direct push onto a dedicated GitHub App, the only bypass actor, whose key only `main` deployments can read (architecture.md, "Security boundaries").
 3. **The repository is public.** Issues, PRs, logs and agent comments are public. Task descriptions must never carry patient information or secrets.
 4. **Prompt injection through issues.** Anyone can open an issue or comment. Only issues the owner labels `agent:ready` become tasks, and the orchestrator must check who applied the label.
 5. **Workflow files are powerful.** A changed workflow can read secrets once merged. Recommended: CODEOWNERS on `.github/` so those changes always need the owner.
@@ -61,7 +62,7 @@ Also preserved: the Netlify deploy previews, the `pg_cron` jobs, and the human r
 | --- | --- |
 | Branch names | Agents use `agent/<issue>-<name>`; `blog/` and `review/` stay with the bots |
 | Instagram posting on merge | Agents never add `social/*/caption.txt` (AGENTS.md) |
-| Digest job pushing to `main` | Agents don't edit `newsletter/`; rebase agent branches before review |
+| Digest job pushing to `main` | Agents don't edit `newsletter/`; rebase agent branches before review; the push moves to a dedicated GitHub App before the ruleset is on |
 | `blog/editorial-queue.json` | Edited by people (and Claude on request) and read by the blog agent; agents edit it only when an issue asks |
 | Netlify build minutes | Each PR push builds a preview. Keep agent PRs as drafts and push in batches; watch the monthly build-minute allowance |
 | Emails that say "tell Claude 'merge it'" | Fine in a conversation with the owner; unattended agents never merge |
