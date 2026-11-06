@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-06",
+  "headline": "Patient-safety learning with generative AI, and why AI did not rescue tired residents' chest X-ray reads",
+  "intro": "This briefing looks at AI and trainees from two sides. A survey links how students use generative AI to their self-reported safety practice, and a small reader study tested whether AI help can make up for radiology residents' fatigue after a night shift.",
+  "items": [
+    {
+      "title": "Generative AI Factors, Cognitive Engagement, and Patient Safety Learning in Medical Education: Mixed Methods Study",
+      "source": "JMIR Medical Education",
+      "url": "https://mededu.jmir.org/2026/1/e100828",
+      "published": "2026-10-27",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "The researchers first interviewed 8 clerkship students who use generative AI. They then surveyed 214 students from 5 private universities in the Jakarta Metropolitan Area, Indonesia, to test a model of how AI-related factors relate to self-reported infection-prevention practice on the wards. Students' confidence in using AI output (self-efficacy, β=0.477) and their sense of balanced control over the AI (β=0.407) were both linked to better self-reported practice, together explaining 51.9% of its variance. Overall model fit was limited, and because the data are cross-sectional and self-reported, the authors say they do not establish causal or clinical effects; no actual safety outcomes were observed.",
+      "why_it_matters": "The authors suggest clerkship guidance should cover supervised checking of AI output, protecting patient data, following local protocols, and keeping clinicians responsible for clinical decisions. Educators should treat this as a hypothesis to test, not proof that AI training improves patient safety."
+    },
+    {
+      "title": "From dusk till dawn?—Night shift-induced fatigue, diagnostic performance, and AI assistance in chest radiography",
+      "source": "European Radiology",
+      "url": "https://doi.org/10.1007/s00330-026-12969-8",
+      "published": "2026-10-22",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_no_benefit",
+      "summary": "The task was reading bedside chest radiographs for five findings: cardiomegaly, pulmonary congestion, pleural effusion, pulmonary opacities and atelectasis. Residents read with and without help from an AI model built at Aachen University Hospital, which pre-filled a structured report that they could accept or change. Ten radiology residents (mean experience 35 months) each read sets of 33 radiographs before and after a first-call on-site night shift, and the morning after the shift they read both with and without AI. Accuracy was measured as Cohen's κ against an expert majority vote. Six residents classed as fatigued by eye tracking fell from κ = 0.71 ± 0.05 to κ = 0.61 ± 0.10 after the shift (p < 0.001), and non-fatigued readers fell from κ = 0.72 ± 0.03 to κ = 0.65 ± 0.03 (p = 0.037). AI help did not significantly improve accuracy (Δκ = 0.03–0.04; p ≥ 0.525) and did not restore pre-shift performance, although it significantly shortened reporting time in non-fatigued readers (Δ9.9 s; p = 0.031). The main limitation is size: 10 residents at a single centre, using one in-house AI model on a set of test radiographs rather than live clinical reporting.",
+      "why_it_matters": "A tired resident's accuracy can drop while reading speed stays the same, so neither the resident nor a supervisor may notice. This study suggests that a pre-filled AI report alone does not fix the problem. Educators and programme leads should not count on AI as a substitute for fatigue management and supervision overnight."
+    }
+  ],
+  "tags": [
+    "ai assistance",
+    "ai literacy",
+    "chest radiography",
+    "clerkship",
+    "eye tracking",
+    "fatigue",
+    "generative ai",
+    "medical education",
+    "night shift",
+    "patient safety",
+    "radiology",
+    "reader study",
+    "residents",
+    "self-efficacy"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
