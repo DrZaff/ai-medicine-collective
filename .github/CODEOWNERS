@@ -1,0 +1,34 @@
+# Code owners: who must review changes to which files.
+#
+# On its own this file only requests reviews. It becomes binding once the
+# ruleset on `main` requires code-owner review, with stale approvals
+# dismissed on new commits (docs/agents/dell-setup.md, part A).
+#
+# The LAST matching line wins, so the specific lines come after the default.
+# Every owner listed must have write access to this repository.
+
+# Default: the owner reviews everything.
+*                               @DrZaff
+
+# Automations, deploy settings, the database and sign-in. These act outside
+# the code once merged (secrets, production builds, access rules).
+/.github/                       @DrZaff
+/netlify.toml                   @DrZaff
+/supabase/                      @DrZaff
+/auth.js                        @DrZaff
+/scripts/                       @DrZaff
+
+# Clinical content: medical claims, evidence and tool instructions that a
+# clinician could act on. A clinician must approve the exact commit.
+# The clinical reviewer is the owner (DrZaff, decided 2026-11-06). Agent and
+# bot PRs get the owner's clinical approval like any other review; the
+# owner's own clinical PRs can't be self-approved, so for logic that could
+# change care, add a second clinician's username to the end of the line.
+/evidence/                      @DrZaff
+/blog/posts/                    @DrZaff
+/blog/editorial-queue.json      @DrZaff
+/ai-vs-physician.html           @DrZaff
+/projects/                      @DrZaff
+/games/antibiose.html           @DrZaff
+/course-*.html                  @DrZaff
+/learn.html                     @DrZaff
