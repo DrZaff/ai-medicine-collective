@@ -20,9 +20,10 @@
 
 # Clinical content: medical claims, evidence and tool instructions that a
 # clinician could act on. A clinician must approve the exact commit.
-# TODO (owner): add the clinical reviewer's GitHub username to the end of
-# each line below. Their approval is then required too, and a second
-# clinician can be added for logic that could change care.
+# The clinical reviewer is the owner (DrZaff, decided 2026-11-06). Agent and
+# bot PRs get the owner's clinical approval like any other review; the
+# owner's own clinical PRs can't be self-approved, so for logic that could
+# change care, add a second clinician's username to the end of the line.
 /evidence/                      @DrZaff
 /blog/posts/                    @DrZaff
 /blog/editorial-queue.json      @DrZaff
