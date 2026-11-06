@@ -1,0 +1,151 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Signature Card Studio | AI Medicine Collective</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f7f4ef;color:#20232a;font:16px/1.5 system-ui}main{max-width:1240px;margin:auto;padding:28px}a{color:#713149}h1{font:clamp(2.3rem,7vw,4.8rem)/1.02 Georgia;margin:20px 0 10px}h2{margin:0 0 12px}header{padding:20px 0 28px;border-bottom:1px solid #d8d1ca}.grid{display:grid;grid-template-columns:minmax(280px,1fr) minmax(0,1.6fr);gap:22px;margin-top:22px}.panel{background:white;border:1px solid #ddd4cd;border-radius:16px;padding:22px}label{display:block;font-weight:650;margin-top:10px}input,select,textarea,button{font:inherit}input,select,textarea{width:100%;padding:8px;border:1px solid #aaa;border-radius:7px;background:white;color:#20232a}button{border:0;border-radius:7px;background:#66263e;color:white;padding:9px 13px;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #157480;outline-offset:3px}.styles,.buttons{display:flex;gap:8px;flex-wrap:wrap}.styles button{background:#eee7e1;color:#382631;font-size:.85rem}.styles button[aria-pressed=true]{background:#66263e;color:white}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}.cards svg{display:block;width:100%;height:auto;border-radius:5px;box-shadow:0 5px 16px #0002}.cards figure{margin:0}.cards figcaption{margin-bottom:5px;font-weight:650}.small{font-size:.88rem;color:#514950}.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:800px){.grid{grid-template-columns:1fr}}@media(max-width:480px){main{padding:14px}.cards{grid-template-columns:1fr}}
+</style></head><body><main><header><a href="index.html">AI Medicine Collective</a><h1>Signature Card Studio</h1><p>Pick a layout, make it yours, and download both sides of your card.</p><p class="small">Free browser editor. Your details stay on this page. No sign-in required.</p></header><div class="grid"><section class="panel" aria-labelledby="details"><h2 id="details">Your details</h2><form id="fields"></form></section><section class="panel" aria-labelledby="design"><h2 id="design">Choose a layout</h2><div id="styles" class="styles"></div><div class="choices"><label>Palette<select id="palette"></select></label><label>Typography<select id="type"></select></label></div><details id="sharing"><summary>Share a digital card</summary><p class="small">Choose the fields to include. Anyone with the link or QR can see the selected details. Changing them requires a new code.</p><div id="share-fields" class="styles"></div><label><input id="qr-toggle" type="checkbox" style="width:auto"> Add QR code to the back</label><p id="qr-note" class="small" role="status"></p><label>Digital card link<input id="card-link" readonly></label><p><a id="open-card" target="_blank" rel="noopener noreferrer">Preview shared card</a></p></details><div class="cards" id="cards"></div><div class="buttons"><button id="front">Download front SVG</button><button id="back">Download back SVG</button><button id="copy">Copy ChatGPT prompt</button></div><p id="status" role="status"></p><p class="small">SVGs are sized at 3.5 × 2 inches. Check your printer’s bleed, color, and file requirements before ordering.</p><details><summary>Customize further in ChatGPT</summary><p>Copy the prompt and paste it into a new chat. Review the contact details before sending.</p><textarea id="prompt" rows="5" readonly aria-label="Personalized design prompt"></textarea><p><a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Open ChatGPT</a></p></details></section></div></main><script src="signature-card-qr.js"></script><script>
+const layouts=[
+ ['Clinical Future',0,0],['Cincinnati Modern',1,0],['Editorial',2,0],['Gridline',3,0],['Corner Mark',4,0],
+ ['Monogram',2,1],['Side Stripe',0,1],['Quiet Contrast',1,1],['Index',3,1],['Framed',4,1],
+ ['Signal',0,2],['Studio',1,2],['Gallery',2,2],['Ledger',3,2],['Soft Geometry',4,2]
+];
+const palettes=[['Burgundy','#f6eee5','#40192a','#ab6b57'],['Midnight','#101a2c','#f4f8ff','#7dd3fc'],['Forest','#eaf1e7','#173326','#47765a'],['Graphite','#22242a','#ffffff','#a9becd'],['Cobalt','#ecf0ff','#152352','#4466db'],['Sand','#f4e7d0','#33251d','#9a532c']];
+const fonts=[['Modern','Arial, sans-serif','Arial, sans-serif'],['Editorial','Georgia, serif','Arial, sans-serif'],['Technical','Arial, sans-serif','Courier New, monospace']];
+const fields=[['name','Name','Alex Morgan'],['credentials','Credentials',''],['title','Title','Independent Designer'],['company','Affiliation','Morgan Studio'],['email','Email','alex@example.com'],['phone','Phone',''],['website','Website','example.com']];
+const byId=id=>document.getElementById(id);
+const escapeXml=value=>value.replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c]));
+const ns='http://www.w3.org/2000/svg';
+const context=document.createElement('canvas').getContext('2d');
+let selected=0;
+let shared=null;
+let qrMarkup="";
+let qrKey="";
+for(const [id,label,value] of fields){
+ const row=document.createElement('label');row.textContent=label;
+ const field=document.createElement('input');field.id=id;field.value=value;field.maxLength=120;field.autocomplete='off';row.append(field);byId('fields').append(row);
+}
+byId('fields').addEventListener('submit',event=>event.preventDefault());
+for(const [id,options] of [['palette',palettes],['type',fonts]])options.forEach(([label],index)=>byId(id).add(new Option(label,index)));
+layouts.forEach(([name],index)=>{
+ const b=document.createElement('button');b.textContent=name;b.onclick=()=>{selected=index;render()};byId('styles').append(b);
+});
+function values(){return Object.fromEntries(fields.map(([id])=>[id,byId(id).value.trim()]));}
+function shareData(){
+ const data=values();
+ return fields.map(([id])=>byId('share-'+id).checked ? data[id] : '');
+}
+function encodeCard(data){
+ const bytes=new TextEncoder().encode(JSON.stringify(data));
+ return btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function decodeCard(hash){
+ if(!hash.startsWith('#card=') || hash.length>8000)return null;
+ try {
+  const data=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(Uint8Array.from(atob(hash.slice(6).replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0))));
+  if(!Array.isArray(data)||data.length!==10||!data.slice(0,7).every(v=>typeof v==='string'&&v.length<=120)||!data[0].trim())return null;
+  if(![layouts,palettes,fonts].every((options,i)=>Number.isInteger(data[i+7])&&options[data[i+7]]))return null;
+  return data;
+ }catch{return null}
+}
+function refreshQR(){
+ const data=shareData();
+ const link=data[0]?new URL('#card='+encodeCard([...data,selected,Number(byId('palette').value),Number(byId('type').value)]),location.href).href:'';
+ byId('card-link').value=link;
+ const preview=byId('open-card');preview.hidden=!link;
+ if(link)preview.href=link;
+ const enabled=byId('qr-toggle').checked;
+ const key=enabled?link:'';
+ if(key===qrKey)return;
+ qrKey=key;qrMarkup='';
+ byId('qr-note').textContent='';
+ if(!enabled)return;
+ if(!link){byId('qr-note').textContent='Include a name to generate a QR code.';return}
+ try {
+  const qr=new window.CardQRCode(-1,0);qr.addData(link);qr.make();
+  const count=qr.getModuleCount();
+  if(count>73)throw new Error('QR too dense');
+  let path='';
+  for(let y=0;y<count;y++)for(let x=0;x<count;x++)if(qr.isDark(y,x))path+='M'+(x+4)+' '+(y+4)+'h1v1h-1z';
+  const size=count+8;
+  qrMarkup='<svg x="445" y="100" width="215" height="215" viewBox="0 0 '+size+' '+size+'" shape-rendering="crispEdges"><rect width="'+size+'" height="'+size+'" fill="#fff"/><path d="'+path+'" fill="#000"/></svg>';
+  byId('qr-note').textContent='Scan a printed proof at actual size before ordering.';
+ }catch{byId('qr-note').textContent='Too much information for a compact QR code. Select fewer fields and try again.'}
+}
+function contactFile(data){
+ const esc=s=>s.replace(/\\/g,'\\\\').replace(/\r\n|\r|\n/g,'\\n').replace(/[,;]/g,c=>'\\'+c).replace(/[\x00-\x1f\x7f]/g,'');
+ const [name,credentials,title,company,email,phone,website]=data;
+ const properties=[['FN',[name,credentials].filter(Boolean).join(', ')],['TITLE',title],['ORG',company],['EMAIL',email],['TEL',phone],['URL',website]];
+ const lines=['BEGIN:VCARD','VERSION:3.0','N:'+esc(name)+';;;;',...properties.filter(([,v])=>v).map(([k,v])=>k+':'+esc(v)),'END:VCARD'];
+ const encoder=new TextEncoder();
+ return lines.map(line=>{
+  let result='',width=0;
+  for(const character of line){
+   const size=encoder.encode(character).length;
+   if(width+size>75){result+='\r\n ';width=1}
+   result+=character;width+=size;
+  }
+  return result;
+ }).join('\r\n')+'\r\n';
+}
+function artwork(back){
+ const [,layout,motif]=layouts[selected], [,background,ink,accent]=palettes[byId('palette').value], [,heading,body]=fonts[byId('type').value], data=values();
+ const bg=back?ink:background, fg=back?background:ink;
+ const withQR=back&&!!qrMarkup;
+ const center=layout===2&&!withQR, x=center?350:layout===1?92:46, anchor=center?'middle':'start', maxWidth=withQR?420-x:layout===1?550:608;
+ const rect=(x,y,w,h,fill)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+fill+'"/>';
+ function line(value,y,size,font,weight=400){
+  if(!value)return '';
+  context.font=weight+' '+size+'px '+font;
+  const width=context.measureText(value).width;
+  const squeeze=width>maxWidth?' textLength="'+maxWidth+'" lengthAdjust="spacingAndGlyphs"':'';
+  return '<text x="'+x+'" y="'+y+'" fill="'+fg+'" text-anchor="'+anchor+'" font-family="'+font+'" font-size="'+size+'" font-weight="'+weight+'"'+squeeze+'>'+escapeXml(value)+'</text>';
+ }
+ let shape=layout===1?rect(0,0,60,400,accent):layout===3?rect(46,64,608,3,accent):layout===4?'<rect x="20" y="20" width="660" height="360" fill="none" stroke="'+accent+'" stroke-width="3"/>':layout===2?rect(315,64,70,5,accent):rect(46,64,80,6,accent);
+ if(motif===1)shape+='<circle cx="607" cy="100" r="42" fill="'+accent+'" opacity=".2"/>';
+ if(motif===2)shape+='<path d="M535 0h165v150z" fill="'+accent+'" opacity=".25"/>';
+ const name=[data.name,data.credentials].filter(Boolean).join(', ');
+ const titleY=[169,157,187,145,180][layout];
+ const contact=[data.email,data.phone,data.website].filter(Boolean);
+ const copy=back?line(data.company||name,132,38,heading,700)+contact.map((v,i)=>line(v,194+i*43,26,body)).join(''):line(name,titleY,52,heading,700)+line(data.title,titleY+53,28,body)+line(data.company,335,24,body);
+ return '<svg xmlns="'+ns+'" width="3.5in" height="2in" viewBox="0 0 700 400" role="img" aria-label="'+(back?'Back':'Front')+' of business card">'+rect(0,0,700,400,bg)+shape+copy+(withQR?qrMarkup:'')+'</svg>';
+}
+function render(){
+ if(!shared)refreshQR();
+ Array.from(byId('styles').children).forEach((button,i)=>button.setAttribute('aria-pressed',i===selected));
+ byId('cards').innerHTML=['Front','Back'].map((label,i)=>'<figure><figcaption>'+label+'</figcaption>'+artwork(i===1)+'</figure>').join('');
+ const approved=fields.map(([id,label])=>[label,values()[id]]).filter(([,value])=>value).map(([label,value])=>label+': '+value).join('\n');
+ byId('prompt').value='Help me refine a premium business card. Use this exact approved card text and omit absent fields.\n'+approved+'\nVisual direction: '+layouts[selected][0]+'. Palette: '+palettes[byId('palette').value][0]+'. Show the front and back. Check the text against the brief and distinguish a visual mockup from printer-ready files.';
+}
+function saveFile(content,type,name){
+ const url=URL.createObjectURL(new Blob([content],{type}));
+ const link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function download(back){saveFile(artwork(back),'image/svg+xml','signature-card-'+(back?'back':'front')+'.svg');}
+byId('front').onclick=()=>download(false);byId('back').onclick=()=>download(true);
+byId('copy').onclick=async()=>{try{await navigator.clipboard.writeText(byId('prompt').value);byId('status').textContent='Prompt copied.'}catch{byId('prompt').closest('details').open=true;byId('prompt').select();byId('status').textContent='Select and copy the prompt below.'}};
+fields.forEach(([id,label])=>{
+ const row=document.createElement('label');row.style.fontWeight='normal';
+ const input=document.createElement('input');input.type='checkbox';input.id='share-'+id;input.style.width='auto';input.checked=['name','credentials','title','company'].includes(id);input.disabled=id==='name';
+ row.append(input,' '+label);byId('share-fields').append(row);
+});
+if(location.hash.startsWith('#card=')){
+ shared=decodeCard(location.hash);
+ if(!shared){
+  const grid=document.querySelector('.grid');grid.textContent='This card link is incomplete or invalid.';
+ }else{
+  fields.forEach(([id],i)=>byId(id).value=shared[i]);
+  selected=shared[7];byId('palette').value=shared[8];byId('type').value=shared[9];
+  document.querySelector('header h1').textContent=[shared[0],shared[1]].filter(Boolean).join(', ');
+  document.querySelector('header > p').textContent=[shared[2],shared[3]].filter(Boolean).join(' · ');
+  document.querySelector('header .small').hidden=true;
+  document.querySelector('.grid').style.gridTemplateColumns='1fr';
+  byId('fields').closest('section').hidden=true;
+  for(const id of ['styles','sharing','copy'])byId(id).hidden=true;
+  byId('palette').closest('.choices').hidden=true;document.querySelector('.panel > details:last-child').hidden=true;
+  byId('design').textContent='Digital business card';
+  const save=document.createElement('button');save.textContent='Save contact';save.onclick=()=>saveFile(contactFile(shared),'text/vcard;charset=utf-8','contact.vcf');
+  document.querySelector('.buttons').prepend(save);
+  byId('status').textContent='Open the downloaded contact file and confirm the import on your device.';
+  render();
+ }
+}else{
+ document.addEventListener('input',render);render();
+}
+</script></body></html>
