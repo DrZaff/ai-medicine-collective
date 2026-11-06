@@ -14,3 +14,19 @@ browsers do not contact an outside font service.
 The three Bearcat Pinball faces are used only by `games/bearcat-pinball.html`.
 
 Licence text: https://openfontlicense.org
+
+## Signature Card Studio (`fonts/cards/`)
+
+Used only by the designed templates in `card-studio-templates.js`: loaded on `signature-card-studio.html` for the preview and measuring, and embedded in each downloaded card so it prints as designed. Latin subsets, one file per weight and style, taken from the Fontsource packages on npm (version 5.3.0). All are under the SIL Open Font License 1.1, which allows embedding.
+
+| File | Typeface | Copyright |
+|---|---|---|
+| `fraunces-600.woff2`, `fraunces-500-italic.woff2` | Fraunces | © The Fraunces Project Authors |
+| `inter-500.woff2` | Inter | © The Inter Project Authors |
+| `cormorant-garamond-600.woff2`, `cormorant-garamond-600-italic.woff2` | Cormorant Garamond | © The Cormorant Project Authors |
+| `space-grotesk-500.woff2`, `space-grotesk-700.woff2` | Space Grotesk | © The Space Grotesk Project Authors |
+| `ibm-plex-mono-500.woff2` | IBM Plex Mono | © IBM Corp. |
+| `ibm-plex-sans-500.woff2`, `ibm-plex-sans-600.woff2` | IBM Plex Sans | © IBM Corp. |
+| `archivo-800.woff2` | Archivo | © The Archivo Project Authors |
+| `dm-serif-display-400.woff2` | DM Serif Display | © 2014–2017 Adobe Systems Incorporated, © 2019 Google LLC |
+| `manrope-500.woff2`, `manrope-700.woff2` | Manrope | © The Manrope Project Authors |

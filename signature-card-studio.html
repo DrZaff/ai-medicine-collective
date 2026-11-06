@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <title>Signature Card Studio – AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Design a two-sided business card in your browser: 24 layouts, 12 palettes and 6 type pairings, ready to download as print-sized SVG files." />
+  <meta name="description" content="Design a two-sided business card in your browser from designed templates, ready to download as print-sized SVG files." />
   <link rel="icon" type="image/png" href="images/icon-192.png" />
   <meta property="og:site_name" content="AI Medicine Collective" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Signature Card Studio – AI Medicine Collective" />
-  <meta property="og:description" content="Design a two-sided business card in your browser: 24 layouts, 12 palettes and 6 type pairings, ready to download as print-sized SVG files." />
+  <meta property="og:description" content="Design a two-sided business card in your browser from designed templates, ready to download as print-sized SVG files." />
   <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="stylesheet" href="style.css" />
@@ -43,7 +43,7 @@
       <h2 class="section-title">SIGNATURE CARD STUDIO</h2>
 
       <p class="note studio-lede">// Design a two-sided business card and download both sides as print-sized
-        files (3.5 × 2 in). Pick a layout, a palette and a type pairing, or start from an example below.
+        files (3.5 × 2 in). Pick a designed template and a colourway, or start from the gallery below.
         Everything stays in your browser: nothing you type is sent anywhere.</p>
 
       <!-- A shared digital card (#card=...) shows only this -->
@@ -66,7 +66,7 @@
         <section class="studio-panel studio-design" aria-labelledby="studio-design">
           <h3 class="studio-heading" id="studio-design">Design</h3>
           <div class="studio-choices">
-            <label class="studio-field">Layout <select id="card-layout"></select></label>
+            <label class="studio-field">Design <select id="card-layout"></select></label>
             <label class="studio-field">Palette <select id="card-palette"></select></label>
             <label class="studio-field">Type <select id="card-fonts"></select></label>
           </div>
@@ -107,13 +107,21 @@
 
       <section class="studio-gallery-section" aria-labelledby="studio-gallery">
         <h3 class="studio-heading" id="studio-gallery">Gallery</h3>
-        <p class="note">// Ten starting points. Every name, place and contact detail here is made up. "Use this design"
-          copies the layout, palette and type; your own details stay as they are.</p>
-        <ul class="studio-gallery" id="card-gallery"></ul>
+        <p class="note">// Every designed template in each of its colourways. The person on these cards is made up.
+          "Use this design" copies the design and colourway; your own details stay as they are.</p>
+        <ul class="studio-gallery" id="card-templates"></ul>
+
+        <details class="studio-more studio-simple">
+          <summary>Simple layouts</summary>
+          <p class="note">// Plainer cards in fonts found on every computer: 24 layouts, 12 palettes, 6 type
+            pairings. Every name, place and contact detail here is made up.</p>
+          <ul class="studio-gallery" id="card-gallery"></ul>
+        </details>
       </section>
 
-      <p class="note studio-credit">// The 24 layouts, 12 palettes and 6 type pairings were designed with ChatGPT
-        and built and checked by Claude.</p>
+      <p class="note studio-credit">// The designed templates and the simple layouts were designed with ChatGPT
+        and built and checked by Claude. Template typefaces are free fonts under the SIL Open Font License,
+        hosted on this site and built into each downloaded file.</p>
 
       <p><a href="hub.html" class="back-link">&lt; TOOLS</a></p>
     </main>
@@ -138,6 +146,7 @@
   <script src="script.js"></script>
   <script src="signature-card-qr.js"></script>
   <script src="card-studio-designs.js"></script>
+  <script src="card-studio-templates.js"></script>
   <script src="card-studio.js"></script>
 </body>
 </html>
