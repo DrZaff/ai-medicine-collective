@@ -1,0 +1,41 @@
+:: AI MEDICINE COLLECTIVE ::
+Weekly digest, Oct 31 - Nov 06, 2026
+
+[[AMC:NOTE]]
+// THE ONE THING
+Generative AI Factors, Cognitive Engagement, and Patient Safety Learning in Medical Education: Mixed Methods Study
+The authors suggest clerkship guidance should cover supervised checking of AI output, protecting patient data, following local protocols, and keeping clinicians responsible for clinical decisions. Educators should treat this as a hypothesis to test, not proof that AI training improves patient safety.
+https://mededu.jmir.org/2026/1/e100828
+
+// AI VS PHYSICIAN
+This week: AI help: no difference
+From dusk till dawn?—Night shift-induced fatigue, diagnostic performance, and AI assistance in chest radiography
+A tired resident's accuracy can drop while reading speed stays the same, so neither the resident nor a supervisor may notice. This study suggests that a pre-filled AI report alone does not fix the problem. Educators and programme leads should not count on AI as a substitute for fatigue management and supervision overnight.
+https://doi.org/10.1007/s00330-026-12969-8
+
+// ALSO THIS WEEK
+> Artificial intelligence-enhanced colposcopy training improves diagnostic reasoning and communication competencies: A randomized controlled study (Journal of Gynecology Obstetrics and Human Reproduction)
+  https://pubmed.ncbi.nlm.nih.gov/42925890/
+> Performance of artificial intelligence versus clinician left-ventricular segmentation of cardiac MRI for mortality prediction: a retrospective, multicentre, prognostic study (The Lancet Digital Health)
+  https://www.thelancet.com/journals/landig/article/PIIS2589-7500(26)00065-8/fulltext
+> AI-augmented decision support in neurosurgical emergencies: a prospective study of resident performance (BMC Medical Education)
+  https://doi.org/10.1186/s12909-026-10696-8
+> Assessing AI and Neurologist Diagnostic Reasoning Against Neuropathological Ground Truth (medRxiv (preprint, not peer reviewed))
+  https://www.medrxiv.org/content/10.64898/2026.07.07.26356930v2.full.pdf
+
+// TOOL OF THE WEEK
+QT Interval Corrector
+Clinical micro-app that corrects the QT interval, built with ClinicalToolsDEV. Opens in the browser on phone or computer.
+https://www.aimedicinecollective.com/hub.html?project=86dfa07e-7e5c-4997-9858-a9212713c8bd
+
+// FROM THE COLLECTIVE
+[[AMC:COLLECTIVE]]
+
+// ONE ASK
+[[AMC:ASK]]Built something useful? Add it to the Tools page; a moderator checks it first. https://www.aimedicinecollective.com/hub.html?view=submit[[/AMC:ASK]]
+
+Every briefing: https://www.aimedicinecollective.com/blog.html
+Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.
+
+On Instagram: @aimedicinecollective (https://www.instagram.com/aimedicinecollective/)
+You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" under Your profile on your account page: https://www.aimedicinecollective.com/account.html#profile
