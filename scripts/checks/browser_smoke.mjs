@@ -48,8 +48,9 @@ await waitForServer();
 const browser = await chromium.launch();
 const problems = [];
 
-for (const theme of themes) {
-  for (const view of views) {
+// The four theme x width combinations run side by side; pages within one run in order.
+const combos = themes.flatMap((theme) => views.map((view) => ({ theme, view })));
+await Promise.all(combos.map(async ({ theme, view }) => {
     const context = await browser.newContext({ viewport: { width: view.width, height: view.height } });
     // The saved theme choice is read before the page draws (CLAUDE.md, "Two themes").
     await context.addInitScript((t) => {
@@ -77,8 +78,8 @@ for (const theme of themes) {
       await page.close();
     }
     await context.close();
-  }
-}
+}));
+problems.sort();
 
 await browser.close();
 stop();

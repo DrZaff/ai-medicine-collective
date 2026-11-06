@@ -29,7 +29,14 @@ How agent tasks flow from GitHub issues to pull requests is described in [docs/a
 
 ## Clinical content
 
-Anything that a clinician could act on needs a clinician's review before merging: tool logic and calculators, dosing, scores, criteria, blog and evidence text, course material. Add the `needs-clinical-review` label to the pull request and say in its description exactly which statements or calculations a clinician should check. Never present AI-generated medical content as verified.
+Anything that a clinician could act on needs a clinician's approval before merging: tool logic and calculators, dosing, scores, criteria, blog and evidence text, course material. Add the `needs-clinical-review` label and, in the pull request description:
+
+- exactly which statements or calculations a clinician should check
+- the sources, with publication dates
+- validation cases: normal, abnormal, boundary and invalid input, with expected results
+- the intended users and known limitations
+
+A new commit after the clinician approves needs a fresh approval. Never present AI-generated medical content as verified.
 
 ## Checks to run before opening a pull request
 
