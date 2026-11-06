@@ -1,0 +1,11 @@
+AI vs Physician, edition 3: how AI is changing what physicians can do.
+
+The strongest evidence comes from randomised and prospective studies in which clinicians use AI with real patients, and the results depend on the task. In mammography, chest radiograph nodule detection and some ECG-based alerts, AI support found more disease or improved outcomes. Colonoscopy and gastroscopy detection aids, an AI stethoscope and AI-triggered trial notifications showed no clear benefit on their main outcomes. On written or simulated cases, large language models (LLMs) often matched or beat physicians and sometimes raised physicians' scores, but not always, and wrong AI advice, and possibly regular AI use, can make clinicians worse.
+
+The full paper, with every study and its source: aimedicinecollective.com/ai-vs-physician (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+A summary of published research, drafted by AI and reviewed by clinicians. Not medical advice.
+
+#AIinMedicine #MedEd #EvidenceBasedMedicine #DigitalHealth #ClinicalAI
