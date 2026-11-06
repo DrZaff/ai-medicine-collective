@@ -965,7 +965,16 @@ function initBlog() {
       const why = el("p", "blog-why");
       why.append(el("span", "blog-why-label", "Why it matters"), item.why_it_matters);
       const more = el("details", "blog-more");
-      more.append(el("summary", null, "Read the summary"), el("p", "blog-summary", item.summary));
+      // How long the fuller summary takes to read, so people know what they're opening
+      const words = (item.summary || "").trim().split(/\s+/).length;
+      const minutes = Math.round(words / 200);
+      // Put the study design up front: bold design words in the summary
+      const summaryText = el("p", "blog-summary");
+      summaryText.innerHTML = (item.summary || "").replace(
+        /\b(randomi[sz]ed|prospective|retrospective|cohort|meta-analysis|cross-sectional)\b/gi,
+        "<strong>$1</strong>"
+      );
+      more.append(el("summary", null, `Read the summary · ${minutes} min`), summaryText);
 
       li.append(head, el("p", "blog-source", `${item.source} · ${niceDate(item.published)}`), why, more);
       list.append(li);
