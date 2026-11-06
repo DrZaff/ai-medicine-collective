@@ -16,9 +16,19 @@ shortlist for the editors to approve.
              setting (real patients, real records, written cases or images) and
              reach (a task found across medicine, or one specialty). Title,
              journal, date and link come from PubMed, not from Claude.
-  3. Rank    each study gets a landmark score from those grades, its journal and
-             its citations. The result is evidence/deep-sweep-<date>.json, and
-             the pull request lists the proposed landmark studies.
+  3. Sort    each study goes in one group (owner's decision, 2026-11-06: the
+             paper is about clinical decisions):
+               clinical   diagnosis, imaging, management, procedures, and AI
+                          answering patients' medical questions
+               workflow   documentation, scribes, coding, inbox drafts, consent
+                          and patient-education material (appendix)
+               education  trials with students only, or about teaching (appendix)
+               excluded   published before the start date, or marked by an
+                          editor with "excluded": "<reason>" in the file
+  4. Rank    each study gets a landmark score from its design, setting, journal,
+             citations and number of clinicians. The landmark studies come
+             from the clinical group only. The result is
+             evidence/deep-sweep-<date>.json, and the pull request lists them.
 
 Nothing on the site reads the shortlist. Once the editors approve it, the
 landmark studies are checked against their full text and the paper is
@@ -30,6 +40,9 @@ and the pull request says how far it reached.
 Usage:
     python scripts/blog_agent/deep_sweep.py --dry-run              # list and count only, no AI
     python scripts/blog_agent/deep_sweep.py [--budget 30] [--since 2023-01-01] [--pr-body PATH]
+    python scripts/blog_agent/deep_sweep.py --rerank evidence/deep-sweep-<date>.json [--pr-body PATH]
+        # sort and rank a saved shortlist again (after a change to the ranking,
+        # or after an editor marks a study excluded); no AI, no searching
 
 Needs ANTHROPIC_API_KEY (a GitHub Actions secret in CI). PubMed, Europe PMC
 and iCite need no key.
@@ -41,6 +54,7 @@ import argparse
 import concurrent.futures as cf
 import datetime as dt
 import json
+import math
 import re
 import sys
 import time
@@ -402,20 +416,94 @@ def screen(candidates: list[dict], budget_for_screening: float, fake: bool = Fal
 
 DESIGN_POINTS = {"rct": 4, "prospective": 3, "retrospective": 1, "cross_sectional": 1, "other": 0}
 SETTING_POINTS = {"real_patients": 3, "real_records": 2, "images": 1, "simulated": 1}
+GROUPS = ["clinical", "workflow", "education", "excluded"]
+GROUP_LABELS = {"clinical": "Clinical decisions", "workflow": "Workflow (appendix)",
+                "education": "Education (appendix)", "excluded": "Excluded"}
+
+STUDENTS = re.compile(r"\bstudents?\b|undergraduate", re.I)
+CLINICIANS = re.compile(r"physician|resident|doctor|clinician|surgeon|radiologist|attending|specialist|nurse|"
+                        r"consultant|expert|endoscopist|dermatologist|patholog|ophthalmolog|cardiolog|sonographer|"
+                        r"practitioner|psychiatrist|oncologist|neurologist|urologist|dentist", re.I)
+WORKFLOW_TITLE = re.compile(r"\bcoding\b|\bcoders?\b|scribe|ambient|documentation|draft repl|portal message|"
+                            r"in-basket|inbox|consent|patient education|education material|self-injection", re.I)
+CLINICAL_COMMUNICATION = re.compile(r"prognos|advance care planning|mortality", re.I)
+
+
+def study_group(study: dict, since: str) -> str:
+    """Which group a study belongs in (see the module docstring)."""
+    if study.get("excluded") or (study.get("published") or "") < since:
+        return "excluded"
+    humans, title, domain = study.get("humans", ""), study.get("title", ""), study.get("domain")
+    if domain == "education" or (STUDENTS.search(humans) and not CLINICIANS.search(humans)):
+        return "education"
+    if domain == "documentation" or WORKFLOW_TITLE.search(title):
+        return "workflow"
+    if domain == "communication" and study.get("comparison") != "ai_alone" \
+            and not CLINICAL_COMMUNICATION.search(title):
+        return "workflow"  # clinicians using AI for messages or summaries, not AI answering patients
+    return "clinical"
 
 
 def landmark_score(study: dict) -> float:
-    """How much a study should shape the paper: its design and setting, how far
-    its task reaches across medicine, how many clinicians took part, where it
-    was published and how much it is cited for its age (NIH iCite RCR)."""
+    """How much a study should shape the paper: its design and setting, where
+    it was published, how much it is cited for its age (NIH iCite RCR, on a log
+    scale so a field-defining paper counts without drowning out design) and how
+    many clinicians took part. The clinician count only counts when every
+    number in the record was found in the abstract, because that count comes
+    from the screening model."""
     score = DESIGN_POINTS.get(study.get("design_class"), 0) + SETTING_POINTS.get(study.get("setting"), 0)
-    score += 3 if study.get("reach") == "broad" else 0
     score += 2 if top_journal(study.get("source", "")) else 0
-    n = int(study.get("humans_n") or 0)
-    score += 2 if n >= 100 else 1 if n >= 20 else 0
-    score += min(3.0, float(study.get("rcr") or 0))
+    score += min(10.0, 2 * math.log2(1 + float(study.get("rcr") or 0)))
+    if not study.get("unverified_numbers"):
+        n = int(study.get("humans_n") or 0)
+        score += 2 if n >= 100 else 1 if n >= 20 else 0
     score -= 2 if "preprint" in study.get("source", "").lower() else 0
     return round(score, 1)
+
+
+def drop_duplicates(studies: list[dict]) -> list[dict]:
+    """One record per paper: a preprint and its published version share most
+    of a title; keep the published one."""
+    kept, seen = [], {}
+    for st in sorted(studies, key=lambda s: "preprint" in s.get("source", "").lower()):
+        key = simple(st["title"])[:50]
+        if key in seen:
+            seen[key].setdefault("also", []).append(st["url"])
+            continue
+        seen[key] = st
+        kept.append(st)
+    return kept
+
+
+def rank(studies: list[dict], landmark_n: int, since: str) -> list[dict]:
+    """Group, score and order the studies: the clinical group first, ranked,
+    then the appendix groups, then the excluded. Landmarks come from the
+    clinical group only. An editor can pin a clinical study with
+    "pin": "landmark" (always a landmark, listed first) or "pin": "appendix"
+    (never one); the remaining places go by score."""
+    studies = drop_duplicates(studies)
+    for st in studies:
+        st["group"] = study_group(st, since)
+        st["score"] = landmark_score(st)
+        st["strength"] = strength(st)
+        if st["group"] == "excluded" and not st.get("excluded"):
+            st["excluded"] = f"published {st.get('published')}, before the start date {since}"
+    ordered = []
+    for group in GROUPS:
+        members = sorted((st for st in studies if st["group"] == group),
+                         key=lambda st: (-st["score"], -(st.get("citations") or 0)))
+        if group == "clinical":
+            pinned = [st for st in members if st.get("pin") == "landmark"]
+            free = [st for st in members if st.get("pin") not in ("landmark", "appendix")]
+            top = pinned + free[:max(0, landmark_n - len(pinned))]
+            top.sort(key=lambda st: (-st["score"], -(st.get("citations") or 0)))
+            members = top + [st for st in members if st not in top]
+        for i, st in enumerate(members, 1):
+            st["rank"] = i
+            st["proposed_tier"] = ("landmark" if group == "clinical" and i <= landmark_n and st.get("pin") != "appendix"
+                                   else "excluded" if group == "excluded" else "appendix")
+        ordered += members
+    return ordered
 
 
 def strength(study: dict) -> str:
@@ -428,57 +516,116 @@ def strength(study: dict) -> str:
     return "limited"
 
 
-def write_pr_body(path: Path, ranked: list[dict], landmark_n: int, flagged_numbers: list[str],
-                  stats: dict, cost: float) -> None:
-    by = lambda key: ", ".join(f"{k} {n}" for k, n in sorted(stats[key].items(), key=lambda kv: -kv[1]))
+def write_pr_body(path: Path, ranked: list[dict], landmark_n: int, stats: dict) -> None:
+    count = lambda key, rows: ", ".join(f"{k} {n}" for k, n in sorted(
+        {k: sum(1 for st in rows if st.get(key) == k) for k in {st.get(key) for st in rows}}.items(),
+        key=lambda kv: -kv[1]))
+    groups = {g: [st for st in ranked if st["group"] == g] for g in GROUPS}
+    clinical = groups["clinical"]
+    landmark_n = min(landmark_n, len(clinical))
     lines = [
         f"## AI vs Physician: deep sweep shortlist ({stats['date']})",
         "",
-        f"**{len(ranked)} qualifying studies found; the top {landmark_n} are proposed as landmark studies.** "
-        "Merging this pull request only saves the shortlist (`evidence/deep-sweep-" + stats["date"] + ".json`); "
-        "the AI vs Physician page does not change. After approval, the landmark studies are checked against their "
-        "full text and the paper is rewritten from them, with the rest in an appendix.",
+        f"**{len(clinical)} studies of clinical decisions; the top {landmark_n} are proposed as landmark studies.** "
+        f"Workflow ({len(groups['workflow'])}) and education ({len(groups['education'])}) studies go to the "
+        f"appendix; {len(groups['excluded'])} are excluded. Merging this pull request only saves the shortlist "
+        f"(`evidence/deep-sweep-{stats['date']}.json`); the AI vs Physician page does not change. After approval, "
+        "the landmark studies are checked against their full text and the paper is rewritten from them, with the "
+        "rest in an appendix.",
         "",
         "### How far the sweep reached",
-        f"- Candidates listed: {stats['listed']} (PubMed {stats['pubmed']}, preprints {stats['preprints']}), "
-        f"{stats['fresh']} after removing duplicates and studies already in the register.",
-        f"- Screened in priority order: {stats['screened']}. First the {stats['high']} high-impact candidates "
-        "(top journals, or highly cited for their age by NIH iCite), most cited first; then the rest, newest first, "
-        f"reaching back to {stats['reached']}.",
-        f"- Qualifying studies by comparison: {by('comparison')}.",
-        f"- By evidence strength: {by('strength')}.",
-        f"- By reach: {by('reach')}.",
+    ]
+    if stats.get("listed"):
+        lines += [
+            f"- Candidates listed: {stats['listed']} (PubMed {stats['pubmed']}, preprints {stats['preprints']}), "
+            f"{stats['fresh']} after removing duplicates and studies already in the register.",
+            f"- Screened in priority order: {stats['screened']}. First the {stats['high']} high-impact candidates "
+            "(top journals, or highly cited for their age by NIH iCite), most cited first; then the rest, newest "
+            f"first, reaching back to {stats['reached']}.",
+        ]
+    else:
+        lines.append(f"- Screened: {stats['screened']} candidates.")
+    if stats.get("preprints") == 0:
+        lines.append("- No preprints: Europe PMC did not answer during the run, so this list is PubMed only.")
+    lines += [
+        f"- Clinical studies by comparison: {count('comparison', clinical)}.",
+        f"- Clinical studies by evidence strength: {count('strength', clinical)}.",
         "",
-        "### How studies are ranked",
-        "Design (randomised 4, prospective 3, retrospective or one-off reader/vignette study 1), setting (real patients 3, "
-        "real records 2, images or written cases 1), a task found across medicine (+3), a top journal (+2), "
-        "clinicians in the study (+1 for 20 or more, +2 for 100 or more), citations for its age (iCite RCR, up to +3), "
-        "and a preprint (−2).",
+        "### How studies are sorted and ranked",
+        "- **Groups** (owner's decision): *clinical decisions* (diagnosis, imaging, management, procedures, AI "
+        "answering patients' medical questions) can be landmarks. *Workflow* (documentation, scribes, coding, "
+        "inbox drafts, consent and patient-education material) and *education* (students only, or teaching) go to "
+        "the appendix. Studies published before the start date, or marked by an editor, are excluded.",
+        "- **Score:** design (randomised 4, prospective 3, retrospective or one-off reader/vignette study 1), "
+        "setting (real patients 3, real records 2, images or written cases 1), a top journal (+2), citations for "
+        "its age (2 × log2(1 + iCite RCR), up to +10), clinicians in the study (+1 for 20 or more, +2 for 100 or "
+        "more; only when every number in the record was found in the abstract), and a preprint (−2).",
         "",
         f"### Proposed landmark studies (top {landmark_n})",
-        "| # | Score | Study | Journal, date | Design / setting / reach | Evidence | Cited | Verdict |",
+        "| # | Score | Study | Journal, date | Design / setting | Evidence | Cited | Verdict |",
         "|---|---|---|---|---|---|---|---|",
     ]
-    for i, st in enumerate(ranked[:landmark_n], 1):
-        title = st["title"].replace("|", "/")
+    for st in clinical[:landmark_n]:
+        title = st["title"].replace("|", "/") + (" *(pinned by an editor)*" if st.get("pin") == "landmark" else "")
         lines.append(
-            f"| {i} | {st['score']} | [{title}]({st['url']}) | {st['source']}, {st['published']} | "
-            f"{st['design_class']} / {st['setting']} / {st['reach']} | {st['strength']} | "
-            f"{st.get('citations', 0)} (RCR {float(st.get('rcr') or 0):.1f}) | {lr.VERDICT_LABELS.get(st['verdict'], st['verdict'])} |")
-    lines += ["", f"The other {max(0, len(ranked) - landmark_n)} studies are in the shortlist file, ranked, "
-              "for the appendix."]
-    if flagged_numbers:
-        lines += ["", f"### Numbers not found in the abstract ({len(flagged_numbers)})",
-                  *[f"- {f}" for f in flagged_numbers[:60]]]
+            f"| {st['rank']} | {st['score']} | [{title}]({st['url']}) | {st['source']}, {st['published']} | "
+            f"{st['design_class']} / {st['setting']} | {st['strength']} | "
+            f"{st.get('citations', 0)} (RCR {float(st.get('rcr') or 0):.1f}) | "
+            f"{lr.VERDICT_LABELS.get(st['verdict'], st['verdict'])} |")
+    nxt = [st for st in clinical[landmark_n:] if st.get("pin") != "appendix"][:20]
+    if nxt:
+        lines += ["", f"<details><summary>Next {len(nxt)} clinical studies (candidates to swap in)</summary>", ""]
+        lines += [f"{st['rank']}. [{st['title']}]({st['url']}) ({st['source']}, {st['published'][:4]}; "
+                  f"score {st['score']})" for st in nxt]
+        lines += ["", "</details>"]
+    for g in ("workflow", "education"):
+        rows = groups[g]
+        if rows:
+            lines += ["", f"<details><summary>{GROUP_LABELS[g]}: {len(rows)} studies, top 10</summary>", ""]
+            lines += [f"{st['rank']}. [{st['title']}]({st['url']}) ({st['source']}, {st['published'][:4]})"
+                      for st in rows[:10]]
+            lines += ["", "</details>"]
+    excluded = groups["excluded"]
+    if excluded:
+        marked = [st for st in excluded if not st["excluded"].startswith("published ")]
+        lines += ["", f"### Excluded ({len(excluded)})",
+                  f"- {len(excluded) - len(marked)} were first published before {stats['since']} "
+                  "(PubMed lists them by print date)."]
+        lines += [f"- [{st['title']}]({st['url']}): {st['excluded']}" for st in marked]
+    flagged = [st for st in ranked if st.get("unverified_numbers") and st["group"] != "excluded"]
+    if flagged:
+        lines += ["", f"<details><summary>Numbers not found in the abstract ({len(flagged)}); these studies get "
+                  "no points for clinician count</summary>", ""]
+        lines += [f"- [{st['title'][:80]}]({st['url']}): {', '.join(st['unverified_numbers'])}" for st in flagged]
+        lines += ["", "</details>"]
     lines += [
         "",
         "### To approve",
         "- Tell Claude which studies to add to or drop from the landmark list (by #), or approve it as it is.",
         "- Merging saves the shortlist; it publishes nothing.",
         "",
-        f"<sub>Screened by `{agent.MODEL}`: about ${cost:.2f} (cap ${stats['budget']:.0f}).</sub>",
+        f"<sub>Screened by `{agent.MODEL}`: about ${stats['cost']:.2f} (cap ${stats['budget']:.0f}).</sub>",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def save(out: Path, stats: dict, ranked: list[dict]) -> None:
+    out.write_text(json.dumps({"date": stats["date"], "since": stats["since"], "cost": stats["cost"],
+                               "screened": stats["screened"], "stats": stats, "studies": ranked},
+                              indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def rerank(path: Path, landmarks: int, pr_body: Path | None) -> int:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    stats = {"date": data["date"], "since": data["since"], "cost": data.get("cost", 0.0),
+             "screened": data.get("screened", 0), "budget": 30.0, **data.get("stats", {})}
+    ranked = rank(data["studies"], landmarks, stats["since"])
+    save(path, stats, ranked)
+    by_group = {g: sum(1 for st in ranked if st["group"] == g) for g in GROUPS}
+    print(f"Ranked {path.name} again: {by_group}")
+    if pr_body:
+        write_pr_body(pr_body, ranked, landmarks, stats)
+    return 0
 
 
 # ---------------------------------------------------------------- main
@@ -493,7 +640,11 @@ def main() -> int:
     parser.add_argument("--pr-body", type=Path, help="Where to write the PR description")
     parser.add_argument("--dry-run", action="store_true", help="List and count candidates only; no AI, nothing written")
     parser.add_argument("--fake-ai", action="store_true", help="Local testing only: placeholder screening, no API")
+    parser.add_argument("--rerank", type=Path, help="Sort and rank a saved shortlist again; no AI, no searching")
     args = parser.parse_args()
+
+    if args.rerank:
+        return rerank(args.rerank, args.landmarks, args.pr_body)
 
     date: dt.date = args.date or agent.today_eastern()
     agent.set_output("date", date.isoformat())
@@ -515,42 +666,31 @@ def main() -> int:
     rest = [c["published"] for c in candidates[:screened] if priority(c)[0] == 1]
     reached = min(rest) if rest else "(only high-impact candidates were reached)"
 
-    ranked, flagged_numbers = [], []
+    found = []
     for item in records:
         c, row = item["candidate"], item["row"]
         study = {**{k: row.get(k, "") for k in [*SCREEN_FIELDS, *GRADE_FIELDS]},
                  "title": c["title"], "url": c["url"], "source": c["source"], "published": c["published"],
                  "doi": c.get("doi", ""), "citations": c.get("citations", 0), "rcr": c.get("rcr", 0.0)}
-        study["score"] = landmark_score(study)
-        study["strength"] = strength(study)
-        ranked.append(study)
         odd = unmatched_numbers(row.get("finding", ""), c["abstract"])
         if odd:
-            flagged_numbers.append(f"{c['title'][:80]} ({c['url']}): {', '.join(odd)}")
-    ranked.sort(key=lambda st: (-st["score"], -(st.get("citations") or 0)))
-    for i, st in enumerate(ranked, 1):
-        st["rank"] = i
-        st["proposed_tier"] = "landmark" if i <= args.landmarks else "appendix"
-
-    if not ranked:
+            study["unverified_numbers"] = odd
+        found.append(study)
+    if not found:
         print("Nothing qualified; nothing written.")
         agent.set_output("created", "false")
         return 0
+    ranked = rank(found, args.landmarks, args.since.isoformat())
 
     out = agent.ROOT / "evidence" / f"deep-sweep-{date.isoformat()}.json"
     cost = agent.estimate_cost(usage) if usage else 0.0
-    out.write_text(json.dumps({"date": date.isoformat(), "since": args.since.isoformat(), "cost": round(cost, 2),
-                               "screened": screened, "studies": ranked}, indent=1, ensure_ascii=False) + "\n",
-                   encoding="utf-8")
+    stats = {"date": date.isoformat(), "since": args.since.isoformat(), "cost": round(cost, 2), "high": high,
+             "listed": len(pubmed) + len(preprints), "pubmed": len(pubmed), "preprints": len(preprints),
+             "fresh": len(candidates), "screened": screened, "reached": reached, "budget": args.budget}
+    save(out, stats, ranked)
     print(f"Wrote {out.relative_to(agent.ROOT)}: {len(ranked)} studies, about ${cost:.2f}.")
-
     if args.pr_body:
-        count = lambda key: {k: sum(1 for st in ranked if st[key] == k) for k in {st[key] for st in ranked}}
-        stats = {"date": date.isoformat(), "high": high, "listed": len(pubmed) + len(preprints),
-                 "pubmed": len(pubmed), "preprints": len(preprints), "fresh": len(candidates),
-                 "screened": screened, "reached": reached, "budget": args.budget,
-                 "comparison": count("comparison"), "strength": count("strength"), "reach": count("reach")}
-        write_pr_body(args.pr_body, ranked, min(args.landmarks, len(ranked)), flagged_numbers, stats, cost)
+        write_pr_body(args.pr_body, ranked, args.landmarks, stats)
     agent.set_output("created", "true")
     return 0
 
