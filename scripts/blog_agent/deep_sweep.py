@@ -217,39 +217,106 @@ def parse_pubmed(article) -> dict | None:
             "url": f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"}
 
 
-def preprint_candidates(since: dt.date, until: dt.date, limit: int = 1500) -> list[dict]:
-    """Preprints (medRxiv, arXiv, Research Square...) through Europe PMC."""
-    field = lambda terms: "(" + " OR ".join(f"ABSTRACT:{t.strip()}" for t in terms.split(" OR ")) + ")"
-    query = (f"{field(AI_TERMS)} AND {field(HUMAN_TERMS)} AND {field(COMPARE_TERMS)} AND SRC:PPR "
+# Plain-text versions of the search terms, for filtering preprints locally
+AI_RE = re.compile(r"artificial intelligence|large language model|\bLLMs?\b|chatgpt|\bGPT-?4|deep learning|"
+                   r"machine learning|neural network|computer-aided|AI-assisted|AI assistance|\bAI\b", re.I)
+HUMAN_RE = re.compile(r"physician|clinician|radiologist|dermatologist|pathologist|ophthalmologist|endoscopist|"
+                      r"cardiologist|surgeon|\bresidents\b|medical students|\bdoctors\b|\breaders\b|\bnurses\b", re.I)
+COMPARE_RE = re.compile(r"versus|compared (?:with|to)|reader study|with and without|outperform|non-?inferior|"
+                        r"randomi[sz]ed|head-to-head|diagnostic accuracy", re.I)
+
+
+def relevant(title: str, abstract: str) -> bool:
+    text = f"{title} {abstract}"
+    return bool(AI_RE.search(text) and HUMAN_RE.search(text) and COMPARE_RE.search(text))
+
+
+def europe_pmc_candidates(since: dt.date, until: dt.date, limit: int) -> list[dict]:
+    """Preprints through Europe PMC. The query is kept short and has no
+    wildcards inside quoted phrases: the first, longer query got HTTP 503 on
+    two days running. The comparison terms are checked locally instead."""
+    ai = ["\"artificial intelligence\"", "\"large language model\"", "\"large language models\"",
+          "\"machine learning\"", "\"deep learning\"", "ChatGPT", "\"GPT-4\""]
+    humans = ["physician", "physicians", "clinician", "clinicians", "radiologists", "doctors", "residents"]
+    field = lambda terms: "(" + " OR ".join(f"ABSTRACT:{t}" for t in terms) + ")"
+    query = (f"{field(ai)} AND {field(humans)} AND SRC:PPR "
              f"AND FIRST_PDATE:[{since.isoformat()} TO {until.isoformat()}]")
     found, cursor = [], "*"
     while len(found) < limit:
-        try:
-            page = json.loads(get("https://www.ebi.ac.uk/europepmc/webservices/rest/search?" + urllib.parse.urlencode({
-                "query": query, "format": "json", "resultType": "core", "pageSize": 100, "cursorMark": cursor,
-                "sort": "FIRST_PDATE desc"})))
-        except Exception as err:  # preprints are a supplement: keep what arrived and carry on
-            print(f"Europe PMC stopped answering ({err}); keeping {len(found)} preprints")
-            break
+        page = json.loads(get("https://www.ebi.ac.uk/europepmc/webservices/rest/search?" + urllib.parse.urlencode({
+            "query": query, "format": "json", "resultType": "core", "pageSize": 100, "cursorMark": cursor,
+            "sort": "FIRST_PDATE desc"})))
         results = page.get("resultList", {}).get("result", [])
         for r in results:
             abstract = re.sub(r"<[^>]+>", " ", r.get("abstractText") or "").strip()
-            if len(abstract) < 200 or not r.get("title"):
+            title = re.sub(r"<[^>]+>", "", r.get("title") or "").strip()
+            if len(abstract) < 200 or not title or not relevant(title, abstract):
                 continue
             server = (r.get("bookOrReportDetails") or {}).get("publisher") or r.get("source", "Preprint")
             link = next((u["url"] for u in (r.get("fullTextUrlList") or {}).get("fullTextUrl", [])
                          if u.get("url", "").startswith("https://")), "") or \
                 f"https://europepmc.org/article/{r.get('source', 'PPR')}/{r.get('id')}"
-            found.append({"key": f"ppr:{r.get('id')}", "title": re.sub(r"<[^>]+>", "", r["title"]).strip(),
-                          "abstract": abstract, "source": f"{server} (preprint, not peer reviewed)",
+            found.append({"key": f"ppr:{r.get('id')}", "title": title, "abstract": abstract,
+                          "source": f"{server} (preprint, not peer reviewed)",
                           "published": r.get("firstPublicationDate", "1900-01-01"),
                           "doi": (r.get("doi") or "").lower(), "url": link})
         if not results or page.get("nextCursorMark") in (None, cursor):
             break
         cursor = page["nextCursorMark"]
         time.sleep(0.3)
-    print(f"Europe PMC preprints: {len(found)}")
-    return found[:limit]
+    return found
+
+
+def medrxiv_candidates(since: dt.date, until: dt.date, limit: int) -> list[dict]:
+    """medRxiv's own API, used when Europe PMC does not answer. It has no
+    search, so it lists every medRxiv preprint in the window (100 a page,
+    newest window first) and keeps the relevant ones. Preprints that medRxiv
+    says have since been published in a journal are left out: their journal
+    version is in PubMed."""
+    found, seen = [], set()
+    end = until
+    while end >= since and len(found) < limit:
+        start = max(since, end - dt.timedelta(days=30))
+        cursor = 0
+        while True:
+            page = json.loads(get(f"https://api.biorxiv.org/details/medrxiv/{start.isoformat()}/{end.isoformat()}/{cursor}"))
+            items = page.get("collection", [])
+            for r in items:
+                doi = (r.get("doi") or "").lower()
+                title, abstract = (r.get("title") or "").strip(), (r.get("abstract") or "").strip()
+                if not doi or doi in seen or (r.get("published") or "NA") != "NA" or len(abstract) < 200 \
+                        or not relevant(title, abstract):
+                    continue
+                seen.add(doi)
+                found.append({"key": f"medrxiv:{doi}", "title": title, "abstract": abstract,
+                              "source": "medRxiv (preprint, not peer reviewed)", "published": r.get("date", ""),
+                              "doi": doi, "url": f"https://www.medrxiv.org/content/{doi}v{r.get('version', 1)}"})
+            total = int((page.get("messages") or [{}])[0].get("total", 0) or 0)
+            cursor += len(items)
+            if not items or cursor >= total:
+                break
+            time.sleep(0.2)
+        end = start - dt.timedelta(days=1)
+    return found
+
+
+def preprint_candidates(since: dt.date, until: dt.date, limit: int = 1500) -> list[dict]:
+    """Preprints: Europe PMC (medRxiv, arXiv, Research Square...), or medRxiv's
+    own API when Europe PMC does not answer. Preprints are a supplement, so a
+    failure of both keeps what arrived and carries on."""
+    try:
+        found = europe_pmc_candidates(since, until, limit)
+        print(f"Europe PMC preprints: {len(found)}")
+        return found[:limit]
+    except Exception as err:
+        print(f"Europe PMC did not answer ({err}); trying medRxiv's own API")
+    try:
+        found = medrxiv_candidates(since, until, limit)
+        print(f"medRxiv preprints: {len(found)}")
+        return found[:limit]
+    except Exception as err:
+        print(f"medRxiv did not answer either ({err}); no preprints this run")
+        return []
 
 
 def simple(title: str) -> str:
