@@ -499,7 +499,7 @@ function initCurrentNav() {
   let here = path.split("/").pop().replace(/\.html$/, "") || "index";
   const inMemberFolder = /\/member\/[^/]*$/.test(path);
   if (inMemberFolder) here = "members"; // the hand-made profile pages
-  if (here === "appstore" || here === "projects" || here === "tools") here = "hub";
+  if (here === "appstore" || here === "projects" || here === "tools" || here === "signature-card-studio") here = "hub";
   if (here === "resources" || here.startsWith("course-")) here = "learn";
   if (here === "ai-vs-human") here = "ai-vs-physician";
 
