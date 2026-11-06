@@ -572,7 +572,7 @@ def write_pr_body(path: Path, ranked: list[dict], landmark_n: int, stats: dict) 
             f"{st['design_class']} / {st['setting']} | {st['strength']} | "
             f"{st.get('citations', 0)} (RCR {float(st.get('rcr') or 0):.1f}) | "
             f"{lr.VERDICT_LABELS.get(st['verdict'], st['verdict'])} |")
-    nxt = clinical[landmark_n:landmark_n + 20]
+    nxt = [st for st in clinical[landmark_n:] if st.get("pin") != "appendix"][:20]
     if nxt:
         lines += ["", f"<details><summary>Next {len(nxt)} clinical studies (candidates to swap in)</summary>", ""]
         lines += [f"{st['rank']}. [{st['title']}]({st['url']}) ({st['source']}, {st['published'][:4]}; "
