@@ -6,16 +6,17 @@ The Dell OptiPlex 7060 Micro (i5-8500T, 16 GB RAM, 512 GB SSD) becomes the alway
 
 1. Review and merge the pull request that adds this file.
 2. Create the labels: `agent:proposed`, `agent:ready`, `agent:working`, `agent:review`, `agent:human`, `agent:blocked`, `agent:failed`, `risk:low`, `risk:medium`, `risk:high`, `needs-clinical-review` (Issues > Labels > New label).
-3. Add `.github/CODEOWNERS`, by pull request:
+3. Add `.github/CODEOWNERS`, by pull request (drafted in #125):
     - the owner for `/.github/`, `/supabase/`, `auth.js` and `netlify.toml`
     - the clinical reviewer for the clinical files (calculators and tool logic, `evidence/`, `course-*.html`)
 4. Create a ruleset for `main` (Settings > Rules > Rulesets):
     - Require a pull request with 1 approval, **require review from code owners**, and **dismiss stale approvals when new commits are pushed** (this ties clinical sign-off to the exact commit).
+    - GitHub never lets anyone approve their own pull request. So give the **repository admin** role a bypass in **"For pull requests only"** mode: the owner can merge their own PRs (including those Claude opens under the owner's account) through the PR page, but nobody can push straight to `main`. Agent PRs must come from a separate identity (A.5) so the owner can approve them.
     - Require the status checks **Data, build, links and secrets** and **Pages open without errors**.
     - Block force pushes and deletion.
-    - Bypass: **none at first**. Don't add `github-actions[bot]`: a bypass applies to every workflow running as that actor. Before turning the ruleset on, move the weekly digest onto its own GitHub App (architecture.md, "Security boundaries"), in its own pull request, and put only that App on the bypass list. Check that the next Friday run succeeds.
+    - Other bypass: **none at first**. Don't add `github-actions[bot]`: a bypass applies to every workflow running as that actor. Before turning the ruleset on, move the weekly digest onto its own GitHub App (architecture.md, "Security boundaries"), in its own pull request, and put only that App on the bypass list. Check that the next Friday run succeeds.
     - Then run a **negative test**: a test PR without the owner's approval, and a test PR touching a clinical file without the clinician's approval, must both be blocked from merging.
-5. Make the orchestrator's GitHub credential: a fine-grained personal access token limited to the repositories agents may work on, with Contents, Issues and Pull requests set to read and write and nothing else. Keep it for part C.
+5. Make the agents' GitHub identity: a **GitHub App** (for example "AMC Agents"), not a token tied to your own account. PRs opened with your own token count as yours, and you could never approve them. Give it Contents, Issues and Pull requests set to read and write, nothing else (no Administration, Secrets or Workflows), and install it only on the repositories agents may work on. Its PRs appear as the App, so you approve them like anyone else's. Keep its App ID and private key for part C; the orchestrator turns them into short-lived tokens.
 6. **Step zero** (architecture.md): the three experiments: Claude's GitHub Action building a low-risk issue, Codex reviewing a PR with a planted defect, and the two end to end. Record the permissions, the usage, the reliability, and whether Site checks ran on the PRs they opened. This decides how much the Dell has to do; if the integrations cover building and reviewing, parts D and E shrink to scheduling and monitoring.
 
 ## B. Install the operating system
@@ -51,7 +52,7 @@ sudo adduser --disabled-password --gecos "" agent
 sudo loginctl enable-linger agent      # its services keep running when nobody is logged in
 ```
 
-4. As `agent`, store the GitHub token from A.5 with `gh auth login --with-token < token.txt`, then delete `token.txt`.
+4. Store the agents' App ID and private key from A.5 where only the orchestrator (the `agent` user) can read them, for example `~/.config/agents/` with permissions `600`. Delete the downloaded key file.
 
 ## D. Sandboxes for the workers
 

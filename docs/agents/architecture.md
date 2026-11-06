@@ -163,7 +163,7 @@ If a provider confirms that a subscription credential is permitted for this exac
     - The setup tests run inside a sandbox and must fail to reach the router, a blocked site over IPv4 and IPv6, a blocked site through a redirect from an allowed one, and an outside DNS server.
     - Even allowed sites can carry data out, which is why workers hold no secrets beyond their capped, revocable AI key.
 - **Credentials are split.**
-  - The orchestrator holds the GitHub credential that can open PRs and comment: a fine-grained token, later a GitHub App, with Contents, Issues and Pull requests only, and no Administration, Secrets or Workflows permission.
+  - The orchestrator holds the GitHub credential that can open PRs and comment: a GitHub App of its own (not a token tied to the owner's account, because GitHub never lets anyone approve their own PR), with Contents, Issues and Pull requests only, and no Administration, Secrets or Workflows permission. It turns the App's key into short-lived tokens per run.
   - Workers get at most a short-lived, read-only token for their one repository.
   - No production secrets exist on the Dell.
 - **GitHub enforces the gates, not convention:**
