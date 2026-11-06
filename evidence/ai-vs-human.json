@@ -1,5 +1,5 @@
 {
-  "edition": 2,
+  "edition": 3,
   "studies": [
     {
       "id": "S1",
@@ -336,9 +336,277 @@
       "limitation": "Only 60 hospitalisations from one internal medicine setting were used, and the outcome is clinicians' ratings and preferences, not downstream patient outcomes or errors in care.",
       "verdict": "ai_ahead",
       "added": "2026-11-01"
+    },
+    {
+      "id": "S22",
+      "title": "Assessing AI and Neurologist Diagnostic Reasoning Against Neuropathological Ground Truth",
+      "url": "https://www.medrxiv.org/content/10.64898/2026.07.07.26356930v2.full.pdf",
+      "source": "medRxiv (preprint, not peer reviewed)",
+      "published": "2026-10-03",
+      "domain": "other",
+      "comparison": "both",
+      "design": "",
+      "ai_system": "",
+      "humans": "",
+      "finding": "Task: give a ranked top-three differential diagnosis from written case summaries of complex neurological illness, scored against the diagnosis confirmed at autopsy. The AI was DIAGNO, an LLM-based system built on GPT-4o that rates its own confidence and looks up references for cases where its confidence is lower. The humans were three board-certified neurologists, each with more than 10 years in practice; every case was read by just one of them, and they could use resources such as UpToDate. On 203 complex Massachusetts General Hospital cases, DIAGNO's top-3 accuracy was 0.67 against the neurologists' 0.63, and its accuracy by disease category was 0.74 against 0.67. None of the comparisons by disease category was statistically significant, and the authors describe DIAGNO's performance as comparable to the neurologists'. The main limitation is that this was a retrospective study of selected written summaries rather than full records or real patients, and it is a preprint; GPT-4o was also one of the three blinded judges scoring the answers.",
+      "limitation": "",
+      "verdict": "comparable",
+      "added": "2026-11-06"
+    },
+    {
+      "id": "S23",
+      "title": "Performance of artificial intelligence versus clinician left-ventricular segmentation of cardiac MRI for mortality prediction: a retrospective, multicentre, prognostic study",
+      "url": "https://www.thelancet.com/journals/landig/article/PIIS2589-7500(26)00065-8/fulltext",
+      "source": "The Lancet Digital Health",
+      "published": "2026-11-02",
+      "domain": "other",
+      "comparison": "both",
+      "design": "",
+      "ai_system": "",
+      "humans": "",
+      "finding": "The task was outlining the left ventricle on cardiac MRI to measure ejection fraction, and then using those measurements to predict death from any cause. A deep-learning segmentation tool was compared with expert clinicians' segmentation of the same scans from 27,382 consecutive patients at UK and US centres. Over a median follow-up of 5.6 years, 3,458 patients (13%) died. AI-derived ejection fraction predicted death marginally better than clinician-derived ejection fraction (C index 0.669 vs 0.637, and 0.781 vs 0.777 after adjusting for age and sex). The main limitations are that the study was retrospective, that it measured how well each set of numbers predicted death rather than any effect on care, and that the gain after adjustment was very small.",
+      "limitation": "",
+      "verdict": "ai_ahead",
+      "added": "2026-11-06"
+    },
+    {
+      "id": "S24",
+      "title": "From dusk till dawn?—Night shift-induced fatigue, diagnostic performance, and AI assistance in chest radiography",
+      "url": "https://doi.org/10.1007/s00330-026-12969-8",
+      "source": "European Radiology",
+      "published": "2026-10-22",
+      "domain": "other",
+      "comparison": "both",
+      "design": "",
+      "ai_system": "",
+      "humans": "",
+      "finding": "The task was reading bedside chest radiographs for five findings: cardiomegaly, pulmonary congestion, pleural effusion, pulmonary opacities and atelectasis. Residents read with and without help from an AI model built at Aachen University Hospital, which pre-filled a structured report that they could accept or change. Ten radiology residents (mean experience 35 months) each read sets of 33 radiographs before and after a first-call on-site night shift, and the morning after the shift they read both with and without AI. Accuracy was measured as Cohen's κ against an expert majority vote. Six residents classed as fatigued by eye tracking fell from κ = 0.71 ± 0.05 to κ = 0.61 ± 0.10 after the shift (p < 0.001), and non-fatigued readers fell from κ = 0.72 ± 0.03 to κ = 0.65 ± 0.03 (p = 0.037). AI help did not significantly improve accuracy (Δκ = 0.03–0.04; p ≥ 0.525) and did not restore pre-shift performance, although it significantly shortened reporting time in non-fatigued readers (Δ9.9 s; p = 0.031). The main limitation is size: 10 residents at a single centre, using one in-house AI model on a set of test radiographs rather than live clinical reporting.",
+      "limitation": "",
+      "verdict": "ai_help_no_benefit",
+      "added": "2026-11-06"
+    },
+    {
+      "id": "S25",
+      "title": "Comparing Physician and Artificial Intelligence Chatbot Responses to Patient Questions Posted to a Public Social Media Forum.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37115527/",
+      "source": "JAMA internal medicine",
+      "published": "2023-06-01",
+      "domain": "communication",
+      "comparison": "ai_alone",
+      "design": "Cross-sectional study of 195 Reddit r/AskDocs exchanges, blinded evaluation in triplicate",
+      "ai_system": "ChatGPT",
+      "humans": "Verified physicians who answered 195 questions on a public forum; responses rated by a team of licensed health care professionals",
+      "finding": "The task was answering patient questions posted to a public social media forum (Reddit's r/AskDocs). ChatGPT's answers were compared with answers from verified physicians to 195 questions, and a team of licensed health care professionals rated each pair blind, in triplicate. Evaluators preferred the chatbot response in 78.6% (95% CI, 75.0%-81.8%) of the 585 evaluations. Good or very good quality was 78.5% (95% CI, 72.3%-84.1%) for the chatbot vs 22.1% (95% CI, 16.4%-28.2%) for physicians, and empathetic or very empathetic was 45.1% (95% CI, 38.5%-51.8%) vs 4.6% (95% CI, 2.1%-7.7%). The physician answers were forum posts, not clinical care, and they were much shorter (52 [17-62] words vs 211 [168-245] words).",
+      "limitation": "Physician answers came from a public online forum rather than clinical care, and chatbot responses were much longer.",
+      "verdict": "ai_ahead",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "abstract",
+      "check_status": "confirmed",
+      "check_note": "The JAMA page only showed the abstract and front matter, so I checked against the abstract; the numbers match, and I added the CIs and the word counts."
+    },
+    {
+      "id": "S26",
+      "title": "AI-enabled electrocardiography alert intervention and all-cause mortality: a pragmatic randomized clinical trial.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38684860/",
+      "source": "Nature medicine",
+      "published": "2024-04-29",
+      "domain": "management",
+      "comparison": "clinician_with_ai",
+      "design": "Pragmatic multisite randomized controlled trial of AI-ECG mortality-risk alerts delivered to physicians",
+      "ai_system": "AI-enabled ECG alert (AI report plus warning messages flagging patients predicted to be at high risk of death)",
+      "humans": "39 physicians caring for 15,965 hospitalized patients",
+      "finding": "The task was spotting hospitalized patients at high risk of death, with 90-day all-cause mortality as the outcome. The AI-ECG alert sent an AI report and warning messages to physicians, flagging patients predicted to be at high risk of death. The trial involved 39 physicians and 15,965 patients, and physicians who got the alerts were compared with physicians who did not. Mortality was 3.6% in the intervention group versus 4.3% in the control group (HR = 0.83, 95% CI = 0.70-0.99); the benefit was mainly in patients with high-risk ECGs (HR = 0.69, 95% CI = 0.53-0.90), whose cardiac death was 0.2% versus 2.4% (HR = 0.07, 95% CI = 0.01-0.56). Only 39 physicians were randomized, and how the alerts reduced deaths is not yet known.",
+      "limitation": "Only 39 physicians were randomized, and the mechanism of the benefit is unclear.",
+      "verdict": "ai_help_improved",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "abstract",
+      "check_status": "corrected",
+      "check_note": "Checked against the PubMed abstract text (via search, as the direct page did not load): I added the number of physicians (39) and patients (15,965), the HR for high-risk ECGs, and the 95% CI for cardiac death; the other numbers match."
+    },
+    {
+      "id": "S27",
+      "title": "Large Language Model Influence on Diagnostic Reasoning: A Randomized Clinical Trial.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39466245/",
+      "source": "JAMA network open",
+      "published": "2024-10-01",
+      "domain": "diagnosis",
+      "comparison": "both",
+      "design": "Single-blind randomized clinical trial using clinical vignettes",
+      "ai_system": "LLM (GPT-4)",
+      "humans": "50 physicians (26 attending physicians and 24 residents) in family, internal or emergency medicine; 25 randomized to the LLM plus conventional resources and 25 to conventional resources only",
+      "finding": "Physicians worked through up to 6 clinical vignettes and were scored on a structured diagnostic reasoning rubric. One group could use an LLM (GPT-4) along with conventional resources, and the other group used conventional resources only. There were 50 physicians (26 attendings, 24 residents), 25 in each arm. The median diagnostic reasoning score per case was 76% with the LLM vs 74% with conventional resources (adjusted difference 2 percentage points, 95% CI -4 to 8; P = .60), while the LLM on its own scored 16 percentage points (95% CI, 2-30; P = .03) higher than the conventional resources group. The study was small and used vignettes rather than real patients.",
+      "limitation": "Small sample of 50 physicians working on vignettes rather than real patients.",
+      "verdict": "ai_help_no_benefit",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "full_text",
+      "check_status": "corrected",
+      "check_note": "Only part of the journal full text loaded: Table 1 confirmed 50 participants (26 attendings, 24 residents; 25 per arm), which were added to humans and finding; the outcome numbers are as screened and the Results section was not readable in the fetched page, so they should be rechecked."
+    },
+    {
+      "id": "S28",
+      "title": "Comparison of Ophthalmologist and Large Language Model Chatbot Responses to Online Patient Eye Care Questions.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37606922/",
+      "source": "JAMA network open",
+      "published": "2023-08-01",
+      "domain": "communication",
+      "comparison": "ai_alone",
+      "design": "Cross-sectional masked panel evaluation",
+      "ai_system": "ChatGPT",
+      "humans": "AAO-affiliated ophthalmologists who wrote the forum answers; masked panel of 8 board-certified ophthalmologists as raters",
+      "finding": "The task was answering 200 patient eye care questions posted on an online medical forum. ChatGPT answers were compared with answers written by ophthalmologists affiliated with the American Academy of Ophthalmology (AAO), and a masked panel of 8 board-certified ophthalmologists rated both. Chatbot answers were as likely as the ophthalmologists' answers to contain incorrect or inappropriate material (prevalence ratio [PR], 0.92; 95% CI, 0.77-1.10). The two sides were also similar for likelihood of harm (PR 0.84) and extent of harm (PR 0.99), and raters told AI from human answers with a mean (SD) accuracy of 61.3% (9.7%). The answers came from an online forum (posts dated 2007-2016) rather than real clinical care, and they were judged by ophthalmologists, not patients.",
+      "limitation": "Answers came from an online forum rather than real clinical care, and they were rated by ophthalmologists, not patients.",
+      "verdict": "comparable",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "abstract",
+      "check_status": "confirmed",
+      "check_note": "I checked this against the abstract on the JAMA Network Open page; the full text was not available, and the abstract text I got stopped after the PR 0.92 result, so the harm PRs (0.84 and 0.99) come from the screening record and are not independently re-checked, but all other figures match."
+    },
+    {
+      "id": "S29",
+      "title": "Prospective Evaluation of AI Triage of Pulmonary Emboli on CT Pulmonary Angiograms.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37787676/",
+      "source": "Radiology",
+      "published": "2023-10-01",
+      "domain": "imaging",
+      "comparison": "clinician_with_ai",
+      "design": "Prospective single-centre before-after study (two sequential phases)",
+      "ai_system": "Commercially available AI triage system for PE detection on CTPA",
+      "humans": "42 radiologists in total: 31 read without AI (phase 1) and 37 read with AI (phase 2), with 26 of the 42 reading in both phases",
+      "finding": "Radiologists looked for pulmonary embolism on CT pulmonary angiograms in routine practice, first without AI (503 studies) and then with AI (1023 studies), with re-review by thoracic radiologists as the reference standard. The AI was a commercially available triage system that flags studies with suspected PE. There were 42 radiologists: 31 in the no-AI phase and 37 in the AI phase, and 26 of them read in both phases. Accuracy and miss rate for any PE were 97.6% and 12.3% without AI and 98.6% and 6.1% with AI, which was not significantly different (P = .15 and P = .11), and examination and report turnaround times did not improve; only the mean wait time for PE-positive studies improved, falling from 21.5 minutes without AI to 11.3 minutes with AI (P < .001). The two phases ran one after the other at a single centre rather than being randomised, and only some of the radiologists took part in both.",
+      "limitation": "The phases were sequential and not randomised, the study took place at one centre, and the radiologists only partly overlapped between phases.",
+      "verdict": "ai_help_no_benefit",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "abstract",
+      "check_status": "corrected",
+      "check_note": "All numbers matched the PubMed abstract; I added the radiologist counts (31, 37, 26 of 42) and the finding that turnaround times did not improve, but could not open the full text (RSNA/DOI fetch failed)."
+    },
+    {
+      "id": "S30",
+      "title": "From tool to teammate in a randomized controlled trial of clinician-AI collaborative workflows for diagnosis.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41851268/",
+      "source": "NPJ digital medicine",
+      "published": "2026-03-18",
+      "domain": "diagnosis",
+      "comparison": "both",
+      "design": "Randomized controlled trial using clinical vignettes",
+      "ai_system": "Custom LLM-based collaborative diagnostic system that synthesises independent clinician and AI assessments",
+      "humans": "70 clinicians",
+      "finding": "Clinicians worked through up to six clinical vignettes in one hour to reach a diagnosis. They used either conventional resources or a custom LLM system that combined the clinician's and the AI's independent assessments, with the AI giving either the first opinion or a second opinion. Seventy clinicians took part, and two blinded board-certified physicians graded the answers. Diagnostic accuracy was 85% with AI as first opinion and 82% with AI as second opinion, against 75% with conventional resources; neither was statistically different from AI alone (90%). The cases were vignettes, not real patients.",
+      "limitation": "Performance was measured on clinical vignettes under time limits, not in real patient care.",
+      "verdict": "ai_help_improved",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "abstract",
+      "check_status": "corrected",
+      "check_note": "Added the 70 clinicians, the vignette-based design and blinded grading (taken from the PubMed abstract and figure legend; the PMC full text was blocked) and rewrote the finding in the required order."
+    },
+    {
+      "id": "S31",
+      "title": "A large language model for complex cardiology care.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41652123/",
+      "source": "Nature medicine",
+      "published": "2026-02-06",
+      "domain": "management",
+      "comparison": "clinician_with_ai",
+      "design": "Randomized controlled trial using retrospective patient data",
+      "ai_system": "AMIE (Articulate Medical Intelligence Explorer), an LLM-based experimental medical AI system",
+      "humans": "9 general cardiologists; 3 blinded subspecialist raters",
+      "finding": "General cardiologists assessed the triage, diagnosis and management of 107 complex real-world cases of suspected genetic cardiomyopathy. Each case was done twice, once with and once without help from the AMIE large language model. Nine general cardiologists took part, and three blinded subspecialists rated the work using a ten-domain rubric. Subspecialists preferred AMIE-assisted assessments 46.7% of the time versus 32.7% for cardiologists alone (P = 0.02), with 20.6% rated as a tie; cardiologists alone had more clinically significant errors (24.3% versus 13.1%, P = 0.033) and more missing content (37.4% versus 17.8%, P = 0.0021). The study used only nine cardiologists and retrospective records, not live care.",
+      "limitation": "Only nine cardiologists assessed retrospective cases from a single subspecialist practice rather than providing live care.",
+      "verdict": "ai_help_improved",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "full_text",
+      "check_status": "confirmed",
+      "check_note": "The numbers match the paper; added the 107 cases and three blinded subspecialist raters from the Nature Medicine article page."
+    },
+    {
+      "id": "S32",
+      "title": "Detecting structural heart disease from electrocardiograms using AI.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40670798/",
+      "source": "Nature",
+      "published": "2025-07-16",
+      "domain": "diagnosis",
+      "comparison": "ai_alone",
+      "design": "Model development with internal/external validation, a controlled comparison with cardiologists, and a prospective clinical trial",
+      "ai_system": "EchoNext deep learning ECG model",
+      "humans": "Cardiologists (number not given in abstract)",
+      "finding": "The task was detecting many forms of structural heart disease from ECGs. EchoNext is a deep learning model trained on more than 1 million heart rhythm and imaging records. In a controlled evaluation, cardiologists (number not given in the abstract) read the same ECGs. The abstract says the model outperformed cardiologists but gives no numbers. The comparison could not be checked against the full text.",
+      "limitation": "The available abstract gives no figures or cardiologist numbers for the AI-versus-cardiologist comparison.",
+      "verdict": "ai_ahead",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "abstract",
+      "check_status": "confirmed",
+      "check_note": "The Nature page showed only the abstract, which matches the record; the editors should pull the full text to add the comparison numbers and the number of cardiologists."
+    },
+    {
+      "id": "S33",
+      "title": "Assessment of a Large Language Model's Responses to Questions and Cases About Glaucoma and Retina Management.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38386351/",
+      "source": "JAMA ophthalmology",
+      "published": "2024-04-01",
+      "domain": "management",
+      "comparison": "ai_alone",
+      "design": "Single-center comparative cross-sectional study",
+      "ai_system": "GPT-4 (version dated May 12, 2023)",
+      "humans": "15 participants from Mount Sinai–affiliated eye clinics: 12 board-certified, fellowship-trained subspecialists (8 glaucoma, 4 retina) and 3 ophthalmology trainees (2 fellows, 1 senior resident). 13 participants rated the responses while masked to their source.",
+      "finding": "Clinicians and GPT-4 answered 20 patient questions and managed 20 deidentified glaucoma and retina cases (10 of each per specialty), and the responses were rated on Likert scales for accuracy and completeness. GPT-4 (version dated May 12, 2023) was compared with 12 fellowship-trained attendings (8 glaucoma, 4 retina) and 3 trainees. Against glaucoma specialists, GPT-4 had a higher combined mean rank for accuracy (506.2 vs 403.4; P < .001) and for completeness (528.3 vs 398.7; P < .001). Against retina specialists, accuracy did not differ significantly (235.3 vs 216.1; P = .17), but GPT-4 ranked higher for completeness (258.3 vs 208.7; P = .005). The study was single-center, measured one time point and used one group of attendings and trainees.",
+      "limitation": "Single-center, single-time-point study with one group of attendings and trainees and a small set of 20 questions and 20 cases.",
+      "verdict": "mixed",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "full_text",
+      "check_status": "corrected",
+      "check_note": "Added the participant breakdown (8 glaucoma and 4 retina attendings, 2 fellows and 1 senior resident; 13 masked raters) and the missing glaucoma completeness result (528.3 vs 398.7, P < .001), and changed the limitation to the one the authors state; all other numbers matched the full text."
+    },
+    {
+      "id": "S34",
+      "title": "Prospective validation of dermoscopy-based open-source artificial intelligence for melanoma diagnosis (PROVE-AI study).",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37438476/",
+      "source": "NPJ digital medicine",
+      "published": "2023-07-12",
+      "domain": "imaging",
+      "comparison": "both",
+      "design": "Prospective observational study; dermatologists estimated melanoma probability before and after seeing real-time AI scores",
+      "ai_system": "ADAE (\"All Data Are Ext\"), the open-source top-ranked algorithm of the 2020 SIIM-ISIC Challenge, applied to dermoscopy images",
+      "humans": "11 dermatologists recruited patients; 5 dominant dermatologists (mean 16 years post-residency experience) enrolled 97% of lesions",
+      "finding": "For skin lesions already scheduled for biopsy to rule out melanoma, dermatologists estimated the probability of melanoma before and after seeing the score from ADAE, an open-source dermoscopy AI. 435 participants contributed 603 lesions (95 melanomas), and they were recruited by 11 dermatologists, 5 of whom enrolled 97% of lesions. On its own, ADAE had an AUC of 0.857, higher than the dermatologists' AUC before seeing the AI (0.780; p = 0.007). At its predetermined threshold ADAE had a sensitivity of 96.8% (95% CI: 91.1–98.9%) and a specificity of 37.4% (95% CI: 33.3–41.7%). The dermatologists' AUC improved from 0.7798 to 0.8161 after seeing ADAE (p = 0.042), but the study was a non-randomised before/after comparison in a population that was 96% White.",
+      "limitation": "Non-randomised before/after design within one study, limited to lesions already selected for biopsy, with 96% White participants and most lesions from 5 dermatologists.",
+      "verdict": "ai_help_improved",
+      "added": "2026-11-06",
+      "tier": "landmark",
+      "checked": "full_text",
+      "check_status": "corrected",
+      "check_note": "Changed comparison to 'both' because the paper also compares ADAE alone with dermatologists before AI (AUC 0.857 vs 0.780, p = 0.007), and added the dermatologist numbers (11 recruiting, 5 enrolling 97% of lesions); the journal page cut off before the Discussion, so the limitation is taken from the Results and abstract."
     }
   ],
   "changes": [
+    {
+      "date": "2026-11-06",
+      "edition": 3,
+      "text": "This edition rebuilds each section around ten highly cited studies added to the register, published from 2023 onwards. They include the first randomised evidence that AI alerts to physicians can be linked to lower mortality [S26], an earlier trial in which LLM access did not help physicians [S27], prospective studies in pulmonary embolism triage [S29] and melanoma [S34], and the patient-question studies [S25][S28]. It also adds three newer studies: a neurology comparison against autopsy-confirmed diagnoses [S22], cardiac MRI mortality prediction [S23], and residents reading chest X-rays after night shifts [S24].",
+      "added": [
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31",
+        "S32",
+        "S33",
+        "S34"
+      ]
+    },
     {
       "date": "2026-11-01",
       "edition": 2,
@@ -376,83 +644,84 @@
     }
   ],
   "title": "AI vs Physician: how AI is changing what physicians can do",
-  "updated": "2026-11-01",
-  "summary": "The strongest evidence still comes from randomised trials in which clinicians use AI on real patients. AI-supported mammography screening was at least as safe as double reading [S2], and AI help raised retinal specialists' accuracy in predicting the genetic cause of inherited retinal disease [S16], but colonoscopy detection aids showed no clear overall gain [S7][S8] and ambient scribes gave mixed results [S3]. On written or simulated cases, large language models (LLMs) raised physicians' scores in randomised trials across several countries [S5][S9][S13][S14], and the models alone often scored higher still [S5][S9][S18][S20]. Real-patient comparisons remain split [S4][S10][S19], wrong or citation-backed AI advice can pull physicians toward errors [S6][S14], and one study found LLM care plans about three times as costly as physicians' plans [S17].",
+  "updated": "2026-11-06",
+  "summary": "The strongest evidence on real patients still comes from a few trials of clinicians using AI: AI-ECG alerts to physicians were followed by lower 90-day mortality in hospitalised patients [S26], and AI-supported mammography was at least as safe as double reading [S2]. Other real-world tools showed no clear gain in accuracy, including pulmonary embolism triage [S29], colonoscopy detection aids [S7][S8] and chest X-ray reporting after night shifts [S24]. On written cases, large language models (LLMs) alone often score as high as or higher than physicians [S18][S20][S22][S27][S30], and LLM help raised physicians' scores in most recent trials [S5][S9][S13][S30], though not in an earlier one [S27]. Comparisons on real patients remain split [S4][S10][S19], and wrong or citation-backed AI advice can pull physicians into errors [S6][S14].",
   "key_findings": [
-    "In a population-based trial of 105,934 women, AI-supported mammography screening was non-inferior to standard double reading on interval cancers, at 1.55 versus 1.76 per 1000 [S2].",
-    "In a multicentre randomised trial of 300 patients, retinal specialists helped by an AI tool predicted the genetic cause of inherited retinal disease more often than specialists alone (top-5 accuracy 88.5% vs 67.3%), though patient outcomes were not measured [S16].",
-    "Two randomised colonoscopy trials found no significant overall rise in adenoma detection with computer-aided detection [S7][S8].",
-    "On written cases, LLM access raised physicians' scores in randomised trials in Pakistan, France, Kenya, Indonesia and the Netherlands, with the smallest gain in the Netherlands (7.2 points) [S5][S9][S13].",
-    "On written cases the LLM working alone often outscored physicians who had the same LLM's help, so simply giving physicians the tool did not capture all of its performance [S5][S9].",
-    "Wrong AI advice lowered physicians' accuracy, by 14 points with planted errors [S6], and citations attached to wrong answers cut physicians' resistance to those answers from 92% to 34.8% [S14].",
-    "On real patients the picture is split: an LLM beat two attending physicians at emergency triage [S4], emergency physicians beat four LLMs on critically ill patients [S10], and in ICU outcome prediction subspecialists beat the AI while trainees and nurses did worse than it [S19]."
+    "In a pragmatic randomised trial with 39 physicians and 15,965 hospitalised patients, AI-ECG mortality-risk alerts were followed by fewer deaths at 90 days (3.6% vs 4.3%), although it is not known how the alerts produced this effect [S26].",
+    "Results of AI help on real patients depend on the task: AI support improved breast screening [S2], prediction of the genetic cause of inherited retinal disease [S16] and dermatologists' melanoma assessment [S34], but did not clearly improve pulmonary embolism detection [S29] or colonoscopy adenoma detection [S7][S8].",
+    "On written or simulated cases, an LLM working alone often matched or beat both unaided and AI-assisted physicians [S5][S9][S18][S27][S30], but this has not been shown in live care, and one prospective emergency study on real critically ill patients found physicians ahead [S10].",
+    "Giving physicians an LLM did not raise diagnostic reasoning scores in an early 2024 trial [S27], whereas later trials found gains on vignettes [S5][S9][S13][S30] and on retrospective cardiology cases with fewer clinically significant errors [S31].",
+    "Blinded raters judged chatbot answers to patients' online questions to be as accurate as [S11][S28], or better and more empathetic than [S25], clinicians' forum answers, but those answers were forum posts and not clinical care.",
+    "Physicians follow AI errors: deliberately wrong LLM suggestions lowered diagnostic accuracy by 14 percentage points [S6], and citations attached to wrong answers made physicians far less likely to resist them [S14].",
+    "AI-generated care plans for documented cases cost about three times as much as treating physicians' plans, mainly because of more tests, referrals and medicines [S17]."
   ],
   "sections": [
     {
       "heading": "AI on its own against clinicians",
       "paragraphs": [
-        "The head-to-head studies where AI comes out clearly ahead mostly use written or simulated cases. On 56 complex published case records turned into step-by-step puzzles, a GPT-5-based system reached the right diagnosis in 79.6% to 84.5% of cases, while generalist physicians averaged 22.3% without reference tools and 36.1% with them [S18]. A commercial primary-care system beat eight physicians on 150 synthetic Polish consultations (top-1 concordance 82.0% vs 57.0%) [S20]. Both deserve caution: the cases were not real patients, the AI could not examine anyone, the first was run by the system's developer, and the second is a preprint with the company's co-founder and staff among its authors [S18][S20].",
-        "On real patients the results disagree. An LLM placed the correct or a very close diagnosis at triage in 67.1% of 76 emergency cases at one centre, against 55.3% and 50.0% for two attending physicians [S4]. In 180 critically ill emergency patients at another single centre, physicians were significantly better than every one of four LLMs, although the reference diagnosis was the physicians' own final diagnosis, which favours them [S10]. In ICU outcome prediction, AI generally beat individual clinicians on retrospective data but lost to the pooled judgement of all seven clinicians; during live care, subspecialists generally beat it and trainees and nurses did not [S19].",
-        "Comparisons beyond diagnosis also cut both ways. In a retrospective study of 200 outpatient and emergency notes, plans written by 24 AI systems were reported to cost about three times as much as the treating physicians' plans, though whether the extra orders helped or harmed patients was not assessed [S17]. On written tasks, AI matched or was preferred to clinicians in answering patient eye questions [S11] and in writing discharge summaries [S21]. A small study found the best LLM and the best radiologist similarly able to spot AI-generated chest X-rays, while general practitioners performed near chance [S15]."
+        "Several well-cited studies compare AI output directly with clinicians' output, mostly on curated material rather than in live care. On 603 real skin lesions already booked for biopsy, an open-source dermoscopy algorithm had an AUC of 0.857, against 0.780 for dermatologists' own estimates [S34]. At its set threshold it caught 96.8% of melanomas but had a specificity of only 37.4% [S34]. A deep learning ECG model was reported to outperform cardiologists at detecting structural heart disease, but the available abstract gives no figures [S32]. GPT-4 answers to glaucoma questions and cases ranked higher than glaucoma specialists' answers for accuracy and completeness. Against retina specialists, accuracy did not differ, though GPT-4 ranked higher for completeness [S33]. This was a single-centre study using 20 questions and 20 cases [S33].",
+        "Text-based diagnostic studies favour the models, but nearly all of them use written or simulated cases. A diagnostic system built on GPT-5 solved 79.6% to 84.5% of simulated sequential cases, against 22.3% to 36.1% for generalist physicians [S18]. A commercial primary-care system beat eight physicians on synthetic consultations in a preprint written partly by the company's own staff [S20]. In a large prior study, GPT-4 alone also scored above physicians using conventional resources on vignettes [S27]. Against autopsy-confirmed diagnoses in 203 complex neurology cases, an LLM-based system was comparable to experienced neurologists (top-3 accuracy 0.67 vs 0.63, not significant) [S22]. That study is a preprint, and GPT-4o was one of its judges [S22].",
+        "On real patients, the results are split. On 76 real emergency cases, o1 placed the right diagnosis at triage more often than two attending physicians [S4]. In a prospective single-centre study of 180 critically ill patients, however, emergency physicians beat every LLM tested [S10]. That study used the physicians' own final diagnosis as the reference, which favours the physicians [S10]. In ICU outcome prediction, AI generally beat individual clinicians on records. In live care, subspecialised physicians generally beat the AI, while trainees and nurses generally did worse than it [S19]. On 27,382 cardiac MRI scans, AI-measured ejection fraction predicted death marginally better than clinicians' measurements, with very little difference after adjusting for age and sex [S23]."
       ]
     },
     {
       "heading": "Clinicians working with AI",
       "paragraphs": [
-        "The firmest evidence on real patients comes from a few randomised trials, and they do not all point the same way. AI-supported mammography screening in one Swedish programme was non-inferior to double reading, with fewer invasive interval cancers in the AI arm (75 vs 89) [S2]. A multicentre trial in 300 patients found that retinal specialists with AI help predicted the genotype category of inherited retinal disease more accurately (top-1 37.8% vs 22.4%); better management decisions were seen only in a post hoc analysis [S16]. Against these, two colonoscopy trials found no significant overall gain in adenoma detection [S7][S8], and an ambient scribe trial found one product cut note-writing time by 9.5% while the other did not [S3].",
-        "On written cases, randomised trials consistently show physicians scoring higher with an LLM: by 27.5 points in Pakistan [S5], from 37.2% to 57.5% top-3 accuracy in nephrology [S9], from 70.8% to 82.6% with a citing AI assistant [S14], and by 7.2 to 18 points across Kenya, Indonesia and the Netherlands [S13]. The multi-country trial's control group could not use the internet or guidelines, which may inflate the gap [S13], and one of these studies is a preprint with 46 physicians [S14]. In two trials the model alone scored higher than the assisted physicians [S5][S9]."
+        "The study with the most direct link to patient outcomes is a pragmatic randomised trial of AI-ECG alerts. Physicians who received alerts flagging high-risk patients had lower 90-day mortality among their patients (HR 0.83) [S26]. The benefit was concentrated in patients with high-risk ECGs [S26]. Only 39 physicians were randomised, and how the alerts led to fewer deaths is unclear [S26]. A population-based randomised trial of more than 105,000 women also found that AI-supported mammography screening met non-inferiority for interval cancers against standard double reading, with fewer invasive interval cancers [S2]. A multicentre randomised trial in 300 patients found that retinal specialists using an AI tool predicted the genetic cause of inherited retinal disease more accurately (top-5 accuracy 88.5% vs 67.3%) [S16].",
+        "Other real-world studies of clinicians working with AI found no clear benefit. In a prospective single-centre before-and-after study, AI triage of CT pulmonary angiograms did not significantly change accuracy or miss rate [S29]. Turnaround times did not improve either, although waiting time for scans positive for pulmonary embolism fell from 21.5 to 11.3 minutes [S29]. Two randomised colonoscopy trials found no significant overall gain in adenoma detection [S7][S8]. In a small single-centre study, AI-prefilled chest X-ray reports did not restore residents' accuracy after night shifts [S24].",
+        "A recurring finding on written cases is that clinicians working with AI do not reach the score of the AI alone. With a model alone scoring higher still, the LLM-assisted physicians scored no better than controls in one trial [S27], and LLM-assisted physicians and specialists scored below the model alone in others [S5][S9]. A workflow that combined the clinician's and the AI's independent assessments raised accuracy to 82% to 85%, against 75% with conventional resources. The AI alone scored 90%, which was not statistically different [S30]. Pooling clinician and AI predictions often gave the best results in ICU outcome prediction [S19]."
       ]
     },
     {
       "heading": "Reading images and other pattern tasks",
       "paragraphs": [
-        "Imaging and pattern tasks give the most real-world trial evidence, and it is mixed. Screening mammography [S2] and genetic prediction from retinal images [S16] showed gains or non-inferiority on real patients, while colonoscopy detection did not show a clear overall benefit; one trial saw gains only in an exploratory subgroup, mostly from very small adenomas, alongside more intensive surveillance recommendations [S7], and the other may have been underpowered [S8].",
-        "In dermatology the evidence is from image-based reader studies, not clinic. In an online experiment with 153 primary care physicians, AI suggestions raised top-1 accuracy by 21.5% and top-3 by 43.5% from a low baseline (11.5% and 16.1%), but the images were chosen so the AI was right about 79% of the time and there was no patient history [S1]. In a before-and-after study of 16 experienced dermoscopists, an interpretable AI tool raised correct malignant-or-benign calls on 49 hard lesions from 50.6% to 69.3% and correct management from 53.0% to 64.8%; this was not randomised and the result applies to the hard subset only [S12]."
+        "The imaging evidence is the most mature, but it is uneven. The strongest positive result is the large Swedish mammography trial [S2]. That trial used one AI product in one programme and was powered for non-inferiority, not superiority [S2]. In dermatology, one prospective study on real patients found that dermatologists' AUC for melanoma rose from 0.780 to 0.816 after seeing the AI score [S34]. That study was non-randomised, and 96% of participants were White [S34]. Two image-based reader studies point the same way, with large gains for primary care physicians [S1] and gains on hard pigmented lesions [S12]. Both used curated images rather than patients [S1][S12].",
+        "Several studies of detection and triage aids found little or no benefit. Pulmonary embolism triage did not significantly improve accuracy [S29], and colonoscopy aids did not clearly improve adenoma detection, particularly where baseline detection was already high [S7][S8]. One colonoscopy trial also found the AI led to more intensive surveillance recommendations [S7]. For ECGs, AI detected structural heart disease [S32] and flagged mortality risk [S26]. On a different kind of task, the best LLM and the best radiologist were similar at telling real from AI-generated chest X-rays, while general practitioners performed near chance [S15]. That study had only four readers and 160 images [S15]."
       ]
     },
     {
       "heading": "Diagnosis, reasoning and management",
       "paragraphs": [
-        "Diagnosis is where LLMs have been tested most, nearly always on written or simulated cases [S5][S9][S13][S14][S18][S20]. These studies show sizeable score gains with AI help and strong standalone model performance, but they test reading and reasoning about a prepared case, not taking a history, examining a patient or following them over time. The two real-patient emergency studies reach opposite conclusions, and each has a small or biased comparison [S4][S10].",
-        "Management is less studied. AI-assisted physicians chose correct management more often on hard skin lesions [S12], and a primary-care preprint reported higher workup and treatment scores for its AI on synthetic cases [S20]. The cost study is a counterweight: LLM plans ordered more tests, referrals and medications than treating physicians did [S17]. Higher scores on prepared cases and higher costs on real notes have not yet been tested against patient outcomes in the same study."
+        "On written vignettes, trials of LLM help have moved from no effect to consistent gains. In a 2024 trial with 50 physicians, GPT-4 access did not improve diagnostic reasoning scores (76% vs 74%) [S27]. Later trials found sizeable gains: 27.5 percentage points among AI-trained physicians in Pakistan [S5], 7 to 18 points across Indonesia, Kenya and the Netherlands [S13], and higher accuracy in nephrology [S9]. A collaborative workflow also raised accuracy [S30], as did an agentic LLM that cited sources [S14]. All of these used written cases. The control arms in one trial could not use the internet or guidelines [S13], and the nephrology trial was a short research letter [S9].",
+        "Management evidence is thinner but growing. In a randomised study using retrospective records of 107 complex suspected genetic cardiomyopathy cases, subspecialists preferred assessments made with LLM help over those by general cardiologists alone [S31]. The unaided assessments had more clinically significant errors (24.3% vs 13.1%) and more missing content [S31]. Only nine cardiologists took part [S31]. In ophthalmology, GPT-4 answers to management cases ranked well against specialists [S33]. Measured by cost, however, LLM plans for 200 documented cases were about three times as expensive as treating physicians' plans [S17]. That study could not say whether the extra orders helped or harmed patients [S17]."
       ]
     },
     {
       "heading": "Communication and documentation",
       "paragraphs": [
-        "One randomised trial of ambient scribes at a single health system found a modest time saving with one product, none with the other, and small improvements in a burnout-related score with both; the scribes were used in only about 30% of visits [S3]. Clinician reviewers preferred LLM-written discharge summaries for 95% of 60 longer hospital stays and rated them higher on quality, factuality and completeness, though the study measured ratings, not errors in care [S21].",
-        "For patient questions, ChatGPT answers to eye-health questions were rated similarly accurate to ophthalmologists' forum answers but were harder to read [S11]. The comparison used old volunteer forum answers, which may not reflect clinicians' best effort [S11]."
+        "Two well-cited cross-sectional studies compared chatbot answers with clinicians' answers to patients' online questions. On a public forum, blinded health professionals preferred ChatGPT's answers in 78.6% of evaluations and rated them far more often as good quality and as empathetic [S25]. The physicians' answers were short forum posts, about a quarter the length of the chatbot answers [S25]. For eye care questions, chatbot answers were as likely as ophthalmologists' answers to contain incorrect or inappropriate material, and similarly likely to cause harm [S28]. A later study found similar accuracy, with ophthalmologists' answers easier to read [S11]. None of these studies involved real clinical encounters, and patients did not rate the answers [S25][S28][S11].",
+        "For documentation, a pragmatic three-arm randomised trial of ambient scribes found that one product cut note-writing time by 9.5% while the other had no significant effect [S3]. Both scribes improved a measure of physician well-being, but they were used in only about 30% of visits [S3]. Clinicians preferred LLM-written discharge summaries for 95% of 60 longer hospital stays [S21]. That outcome was preference ratings, not errors in care or patient outcomes [S21]."
       ]
     },
     {
       "heading": "Training, examinations and skill",
       "paragraphs": [
-        "Experience changes how people use AI. When the dermatology AI was wrong, primary care physicians barely changed their answers, but medical students and lay people followed it more [S1]. In ICU prediction during live care, subspecialised physicians generally beat the AI while physicians in training and nurses did worse than it [S19]. Radiologists, but not general practitioners, could tell AI-generated chest X-rays from real ones, in a study with only four human readers [S15].",
-        "Training in AI use does not remove the risk of being misled: physicians who had completed a 20-hour AI-literacy course still lost accuracy when given wrong suggestions [S6]. No study in the register tests AI in medical examinations or tracks how trainees' skills develop over time with AI."
+        "No study in this review tests AI in examinations or measures how skills develop over time. Some studies do compare clinicians by training level. In ICU outcome prediction, subspecialised physicians generally did better than the AI, while physicians in training and nurses generally did worse than it [S19]. When a dermatology AI was wrong, primary care physicians' answers barely changed, but medical students relied on it more [S1]. Fatigue after a night shift lowered radiology residents' accuracy, and AI help did not restore it [S24].",
+        "Training in AI use was not enough to protect against AI errors. Two trials in Pakistan gave physicians 20 hours of AI-literacy training. LLM help raised their scores [S5], but deliberately wrong suggestions still lowered their accuracy by 14 percentage points [S6]."
       ]
     },
     {
       "heading": "Risks: over-reliance, lost skill and bias",
       "paragraphs": [
-        "Over-reliance is now shown in two independent settings. Planted errors in LLM suggestions cut physicians' accuracy by 14 points in a vignette trial [S6]. In a preprint, citations shown with an AI's answers raised acceptance of correct advice from 34% to 76.9% but cut resistance to wrong advice from 92% to 34.8% [S14]. In dermatology, trainees and lay people followed wrong AI answers more than primary care physicians did [S1]. Written LLM explanations helped physicians the least of four explanation types [S1].",
-        "Other risks appear less directly. More tests and referrals in AI-written plans [S17] and more intensive surveillance after AI-assisted colonoscopy [S7] suggest AI can push care toward more intervention, with benefit unproven. On bias, a dermatology model trained to perform evenly across skin tones was tested on images balanced for light and dark skin [S1], but no study here compares performance across patient groups in real care. No study in the register measures whether clinicians lose skill after relying on AI."
+        "Over-reliance on AI is documented on written cases. Planted LLM errors cut physicians' diagnostic accuracy [S6]. When citations appeared to support a wrong answer, physicians' resistance to that answer fell from 92% to 34.8% [S14]. Less experienced users followed wrong dermatology AI advice more than primary care physicians did [S1]. No study in this review measured whether clinicians lose skill over time from using AI.",
+        "Other risks include more downstream care and gaps in who the tools were tested on. AI help was linked to more intensive surveillance after colonoscopy [S7], higher-cost care plans [S17], and, for one melanoma algorithm, low specificity at its set threshold [S34]. Bias evidence is limited. One study deliberately balanced light and dark skin tones [S1], while the prospective melanoma study enrolled a population that was 96% White [S34]. AI-generated medical images can also fool general practitioners [S15]."
       ]
     },
     {
       "heading": "Where this is heading",
       "paragraphs": [
-        "This section is interpretation rather than direct evidence. The evidence base is moving from single-model vignette tests toward trials with real patients outside screening [S16], multi-country trials [S13] and studies that look at cost [S17][S18], but most diagnostic work still rests on prepared cases [S5][S9][S13][S18][S20].",
-        "Two trends stand out. First, the repeated finding that the model alone outscores assisted physicians on written cases [S5][S9], together with ICU results where combining clinician and AI predictions often did best [S19], points to how humans and AI are combined as the open design question, not whether the AI is capable. Second, evidence that confident-looking AI output, including citations, can draw physicians into errors [S6][S14] suggests that how AI shows its reasoning matters as much as its accuracy. The register does not support predictions about patient outcomes, since almost no study here measured them."
+        "This section is interpretation, based on trends in the cited studies. First, the evidence is shifting from vignettes towards real patients and outcomes. A trial now links AI alerts to lower mortality [S26], a randomised trial links AI-supported screening to fewer interval cancers [S2], and prospective real-patient studies have appeared in dermatology, radiology and emergency care [S10][S29][S34]. These remain few, often single-centre, and mixed in result.",
+        "Second, study designs are moving from 'AI as a tool' towards structured collaboration and pooled judgement. In these designs, clinician and AI judgements are combined [S19][S30] or the AI drives the diagnostic workup [S18]. On written cases, AI alone often still matches or beats clinician-AI teams [S5][S9][S30]. Third, the risks being studied are moving from accuracy alone to automation bias, citations that make wrong answers look credible, and cost [S6][S14][S17]. On current evidence, these trends do not show that AI improves outcomes across routine practice."
       ]
     }
   ],
   "open_questions": [
-    "Do the large gains on written and simulated cases carry over to diagnosis and management with real patients in routine care?",
-    "Do any of these tools change patient outcomes, such as cancers prevented, harms avoided or deaths, rather than surrogate measures like detection rates, genotype accuracy or clinician ratings?",
-    "How should AI output be shown to clinicians so that they take correct advice but reject wrong advice, given that citations and explanations can increase false reliance?",
-    "Are the extra tests, referrals and surveillance prompted by AI useful, wasteful or harmful for patients?",
-    "Does regular use of AI erode clinicians' own skills, and does it change how trainees learn?",
-    "Does AI perform equally well across patient groups, skin tones, languages and health systems in real use?"
+    "Do the gains seen on written cases from LLM help [S5][S9][S13][S30] carry over to real consultations with real patients?",
+    "How did AI-ECG alerts reduce mortality [S26], and would the effect hold in other hospitals and with more physicians?",
+    "Does regular use of AI change clinicians' unaided skills over time, especially for trainees, who relied on AI more when it was wrong [S1]?",
+    "Do higher-cost AI care plans [S17] and more intensive surveillance [S7] lead to better patient outcomes, or to over-investigation?",
+    "Which ways of presenting AI advice reduce automation bias without losing its benefits [S6][S14][S30]?",
+    "How well do imaging and dermatology tools perform in more diverse populations than those studied [S34]?"
   ],
   "generated_by": "claude-opus-5-5"
 }

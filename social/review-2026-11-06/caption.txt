@@ -1,0 +1,11 @@
+AI vs Physician, edition 3: how AI is changing what physicians can do.
+
+The strongest evidence on real patients still comes from a few trials of clinicians using AI: AI-ECG alerts to physicians were followed by lower 90-day mortality in hospitalised patients, and AI-supported mammography was at least as safe as double reading. Other real-world tools showed no clear gain in accuracy, including pulmonary embolism triage, colonoscopy detection aids and chest X-ray reporting after night shifts. On written cases, large language models (LLMs) alone often score as high as or higher than physicians, and LLM help raised physicians' scores in most recent trials, though not in an earlier one. Comparisons on real patients remain split, and wrong or citation-backed AI advice can pull physicians into errors.
+
+The full paper, with every study and its source: aimedicinecollective.com/ai-vs-physician (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+A summary of published research, drafted by AI and reviewed by clinicians. Not medical advice.
+
+#AIinMedicine #MedEd #EvidenceBasedMedicine #DigitalHealth #ClinicalAI
