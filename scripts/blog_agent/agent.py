@@ -332,10 +332,11 @@ def add_usage(total: dict | None, extra: dict | None) -> dict | None:
 # ---------------------------------------------------------------- Claude call
 
 def run_claude(prompt: str, system: str | None = None, schema: dict | None = None,
-               tools: list | None = None) -> tuple[dict, set[str], dict]:
+               tools: list | None = None, effort: str | None = None) -> tuple[dict, set[str], dict]:
     """One request, returning (the JSON answer, links seen in search results,
     usage). The defaults are the blog's own instructions, answer format and
-    search tools; living_review.py passes its own (tools=[] means no searching)."""
+    search tools; living_review.py passes its own (tools=[] means no searching).
+    effort overrides EFFORT (deep_sweep.py screens abstracts at "low")."""
     import anthropic  # imported here so --fixture runs without the SDK
 
     request = {"tools": TOOLS if tools is None else tools}
@@ -363,7 +364,7 @@ def run_claude(prompt: str, system: str | None = None, schema: dict | None = Non
             fallbacks="default",
             system=system or SYSTEM_PROMPT,
             output_config={
-                "effort": EFFORT,
+                "effort": effort or EFFORT,
                 "format": {"type": "json_schema", "schema": schema or POST_SCHEMA},
             },
             messages=messages,
