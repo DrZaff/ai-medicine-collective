@@ -1,0 +1,60 @@
+name: Agent task
+description: A change for an AI agent to implement. It starts only after the owner adds the agent:ready label.
+title: "[Agent] "
+labels: ["agent:proposed"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        An agent implements this on its own branch and opens a **draft** pull request. A person reviews and merges it; nothing is deployed automatically.
+        **This repository is public.** Never put patient information, passwords, keys or private member details in an issue.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What should be true when this is done, in one or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Pages, files or behaviour involved, and anything the agent should know.
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      description: How a reviewer can tell the change works. One check per line.
+      placeholder: |
+        - The footer links all open the right page
+        - Checked in both themes at phone width
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Anything the agent must not change for this task.
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      options:
+        - Low (text, styling, docs)
+        - Medium (page behaviour, scripts)
+        - High (sign-in, member data, a database migration, workflows)
+    validations:
+      required: true
+  - type: checkboxes
+    id: clinical
+    attributes:
+      label: Medical content
+      options:
+        - label: This changes medical content (tool logic, scores, dosing, blog or evidence text, course material), so a clinician must review it before merging.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Confirm
+      options:
+        - label: This issue contains no patient information and no secrets.
+          required: true

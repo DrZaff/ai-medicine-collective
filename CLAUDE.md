@@ -56,6 +56,7 @@ Club website for the AI Medicine Collective, a group of residents (IM, Med/Peds,
 - **Post files are data, not HTML:** `script.js` renders posts with `textContent` only. Keep it that way, because post text comes from an AI draft.
 - **Home page (`index.html`):** a hero, three panels and a tile grid. "Latest briefing" reads `blog/index.json`; "New in the hub" asks Supabase for the newest published projects with a plain `fetch` and the publishable key (`initHome` in `script.js`; the home page does not load the Supabase library). Both keep their plain HTML text if the request fails. The third panel ("Monthly meeting") is plain HTML describing the standing schedule; the actual date is members-only on `schedule.html`.
 - **Preview locally:** serve the folder (e.g. `python -m http.server`) and open `http://localhost:8000`. Don't just double-click files; that hides path bugs.
+- **Checks before a PR (added 2026-11-06):** `python scripts/checks/site_check.py` (data files, the blog build, links and filename case, JavaScript syntax, secrets) and, after `build_index.py`, `node scripts/checks/browser_smoke.mjs` (every page in both themes at desktop and phone width, failing on JavaScript errors or sideways scrolling). Both run on every PR (`.github/workflows/site-checks.yml`, read-only). Agents working on their own also follow [AGENTS.md](AGENTS.md); design in `docs/agents/`.
 
 ## Non-negotiable rules
 

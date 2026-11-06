@@ -1,0 +1,72 @@
+# Safe checks on every pull request: data files parse, the Netlify build step
+# works, links and filenames match, JavaScript has no syntax errors, no
+# obvious secrets, and every page opens without a JavaScript error in both
+# themes at desktop and phone width.
+#
+# Read-only: no secrets, no deploys, no comments, nothing written to the repo.
+# It does not block merging unless the owner makes it a required check
+# (Settings > Branches). Run the same checks locally with:
+#   python scripts/checks/site_check.py
+#   node scripts/checks/browser_smoke.mjs
+#
+# Note: pull requests opened by other workflows with the default token (the
+# blog drafts, the living review) do not start workflows, so these checks
+# run on human and agent pull requests only.
+
+name: Site checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: Data, build, links and secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run the site checks
+        run: python scripts/checks/site_check.py
+
+  browser:
+    name: Pages open without errors
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the test browser
+        run: |
+          npm install --no-save --no-package-lock playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      - name: Build the blog index (the Netlify build step)
+        run: python scripts/blog_agent/build_index.py
+
+      - name: Open every page
+        run: node scripts/checks/browser_smoke.mjs

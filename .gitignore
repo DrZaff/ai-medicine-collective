@@ -9,3 +9,6 @@ __pycache__/
 # Secrets - never commit (CLAUDE.md Rule 2)
 .env
 .env.*
+
+# Local test tools (scripts/checks/browser_smoke.mjs)
+node_modules/
