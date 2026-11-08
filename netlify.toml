@@ -3,3 +3,43 @@
 [build]
   publish = "."
   command = "python3 scripts/blog_agent/build_index.py"
+
+# Security headers for every page (added 2026-11-08 after the national-
+# readiness audit). The Content Security Policy lists every outside service
+# the site really uses; anything else is refused by the browser.
+#   scripts:  the pinned Supabase library (cdn.jsdelivr.net) and the
+#             Turnstile captcha (challenges.cloudflare.com). Inline scripts
+#             stay allowed: every page has the one-line theme script and the
+#             games are single inline scripts.
+#   connect:  Supabase (data and live chat) and Formspree (join notices)
+#   frames:   the captcha, click-to-play YouTube (no-cookie) and the site's
+#             own newsletter preview
+#   images:   any https host (Google profile photos, tool pictures)
+# frame-ancestors 'self' stops other sites from framing these pages (so no
+# one can trick a moderator into clicking through a disguised page) while
+# the Moderation page can still preview the newsletter files.
+# A new outside service must be added here, or the browser will block it:
+# check the browser console for "Content Security Policy" errors.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = """\
+      default-src 'self'; \
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://challenges.cloudflare.com; \
+      style-src 'self' 'unsafe-inline'; \
+      img-src 'self' data: blob: https:; \
+      font-src 'self' data:; \
+      media-src 'self' data: blob:; \
+      connect-src 'self' https://ahwnarhmuzxgjindreuz.supabase.co wss://ahwnarhmuzxgjindreuz.supabase.co https://formspree.io; \
+      frame-src 'self' https://challenges.cloudflare.com https://www.youtube-nocookie.com; \
+      worker-src 'self' blob:; \
+      object-src 'none'; \
+      base-uri 'self'; \
+      form-action 'self'; \
+      frame-ancestors 'self'; \
+      upgrade-insecure-requests"""
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+    Strict-Transport-Security = "max-age=31536000"
