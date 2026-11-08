@@ -529,6 +529,7 @@ def write_pr_body(path: Path, post: dict, dropped: list[str], usage: dict | None
         "- [ ] Open each link: it works and says what the summary says",
         "- [ ] No patient information anywhere",
         "- [ ] Nothing misleading, overstated, or off-topic",
+        "- [ ] A second clinician has read it (approve this PR, or comment that you have)",
         "",
         "To skip this post, close this PR without merging.",
     ]
