@@ -268,6 +268,8 @@ function initProfilePage() {
         panel.append(edit);
       }
 
+      if (!isMe) panel.append(reportButton("profile", person.id, "Report this profile"));
+
       // What they've shared
       const nodes = [panel];
       const { data: items } = await db
