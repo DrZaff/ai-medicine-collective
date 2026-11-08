@@ -7,14 +7,14 @@
   "date": "2026-11-06",
   "since": "2023-01-01",
   "cost": 3.69,
+  "screened": 557,
+  "budget": 5.0,
   "high": 0,
   "listed": 567,
   "pubmed": 0,
   "preprints": 567,
   "fresh": 557,
-  "screened": 557,
   "reached": "2023-01-07",
-  "budget": 5.0,
   "name": "deep-sweep-2026-11-06-preprints"
  },
  "studies": [
@@ -302,7 +302,7 @@
    "score": 4.0,
    "strength": "moderate",
    "rank": 11,
-   "proposed_tier": "appendix"
+   "proposed_tier": "landmark"
   },
   {
    "domain": "management",
@@ -328,7 +328,7 @@
    "score": 4.0,
    "strength": "moderate",
    "rank": 12,
-   "proposed_tier": "appendix"
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -354,7 +354,7 @@
    "score": 4.0,
    "strength": "moderate",
    "rank": 13,
-   "proposed_tier": "appendix"
+   "proposed_tier": "landmark"
   },
   {
    "domain": "procedures",
@@ -380,7 +380,7 @@
    "score": 4.0,
    "strength": "moderate",
    "rank": 14,
-   "proposed_tier": "appendix"
+   "proposed_tier": "landmark"
   },
   {
    "domain": "management",
@@ -406,7 +406,7 @@
    "score": 4.0,
    "strength": "strong",
    "rank": 15,
-   "proposed_tier": "appendix"
+   "proposed_tier": "landmark"
   },
   {
    "domain": "procedures",
@@ -432,7 +432,7 @@
    "score": 4.0,
    "strength": "strong",
    "rank": 16,
-   "proposed_tier": "appendix"
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -458,33 +458,7 @@
    "score": 4.0,
    "strength": "strong",
    "rank": 17,
-   "proposed_tier": "appendix"
-  },
-  {
-   "domain": "diagnosis",
-   "comparison": "clinician_with_ai",
-   "design": "Single-blind randomized clinical trial",
-   "ai_system": "ChatGPT-4o recommendations (error-free vs deliberately erroneous)",
-   "humans": "AI-trained physicians in Pakistan",
-   "finding": "Physicians diagnosed 6 vignettes with voluntary access to ChatGPT-4o advice that was either error-free or contained errors in 3 of 6 cases. Diagnostic reasoning accuracy was 84.9% with error-free versus 73.3% with flawed recommendations (adjusted difference -14.0 percentage points). Top-choice diagnosis accuracy was 90.5% versus 76.1% (adjusted difference -18.3 percentage points).",
-   "limitation": "Preprint; small sample of 44 physicians and only 6 vignettes, with no no-AI control arm.",
-   "verdict": "ai_help_harmed",
-   "design_class": "rct",
-   "setting": "simulated",
-   "reach": "broad",
-   "humans_n": 44,
-   "title": "Automation Bias in Large Language Model Assisted Diagnostic Reasoning Among AI-Trained Physicians",
-   "url": "https://www.medrxiv.org/content/10.1101/2025.08.23.25334280v2",
-   "source": "medRxiv (preprint, not peer reviewed)",
-   "published": "2025-09-08",
-   "doi": "10.1101/2025.08.23.25334280",
-   "citations": 0,
-   "rcr": 0.0,
-   "group": "clinical",
-   "score": 4.0,
-   "strength": "moderate",
-   "rank": 18,
-   "proposed_tier": "appendix"
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -509,8 +483,8 @@
    "group": "clinical",
    "score": 4.0,
    "strength": "moderate",
-   "rank": 19,
-   "proposed_tier": "appendix"
+   "rank": 18,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "procedures",
@@ -535,8 +509,8 @@
    "group": "clinical",
    "score": 4.0,
    "strength": "moderate",
-   "rank": 20,
-   "proposed_tier": "appendix"
+   "rank": 19,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -561,8 +535,8 @@
    "group": "clinical",
    "score": 4.0,
    "strength": "strong",
-   "rank": 21,
-   "proposed_tier": "appendix"
+   "rank": 20,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -587,34 +561,8 @@
    "group": "clinical",
    "score": 4.0,
    "strength": "strong",
-   "rank": 22,
-   "proposed_tier": "appendix"
-  },
-  {
-   "domain": "management",
-   "comparison": "both",
-   "design": "Multi-institutional randomized controlled trial with five clinical vignettes",
-   "ai_system": "GPT-4 via ChatGPT Plus",
-   "humans": "Attending physicians and residents in internal, family or emergency medicine",
-   "finding": "Open-ended management reasoning on expert-developed vignettes. Physicians using GPT-4 scored higher than those using conventional resources (mean difference 6.5%, 95% CI 2.7-10.2, p<0.001) and spent more time per case (119.3 seconds). There was no significant difference between GPT-4-augmented physicians and GPT-4 alone (-0.9%, 95% CI -9.0 to 7.2, p=0.8).",
-   "limitation": "Preprint; simulated vignettes rather than live patient care.",
-   "verdict": "ai_help_improved",
-   "design_class": "rct",
-   "setting": "simulated",
-   "reach": "broad",
-   "humans_n": 92,
-   "title": "Large Language Model Influence on Management Reasoning: A Randomized Controlled Trial",
-   "url": "https://www.medrxiv.org/content/10.1101/2024.08.05.24311485v1",
-   "source": "medRxiv (preprint, not peer reviewed)",
-   "published": "2024-08-07",
-   "doi": "10.1101/2024.08.05.24311485",
-   "citations": 0,
-   "rcr": 0.0,
-   "group": "clinical",
-   "score": 4.0,
-   "strength": "moderate",
-   "rank": 23,
-   "proposed_tier": "appendix"
+   "rank": 21,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "procedures",
@@ -639,8 +587,8 @@
    "group": "clinical",
    "score": 4.0,
    "strength": "strong",
-   "rank": 24,
-   "proposed_tier": "appendix"
+   "rank": 22,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -665,8 +613,8 @@
    "group": "clinical",
    "score": 3.0,
    "strength": "strong",
-   "rank": 25,
-   "proposed_tier": "appendix"
+   "rank": 23,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "imaging",
@@ -691,8 +639,8 @@
    "group": "clinical",
    "score": 3.0,
    "strength": "strong",
-   "rank": 26,
-   "proposed_tier": "appendix"
+   "rank": 24,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "imaging",
@@ -717,8 +665,8 @@
    "group": "clinical",
    "score": 3.0,
    "strength": "moderate",
-   "rank": 27,
-   "proposed_tier": "appendix"
+   "rank": 25,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "procedures",
@@ -743,8 +691,8 @@
    "group": "clinical",
    "score": 3.0,
    "strength": "moderate",
-   "rank": 28,
-   "proposed_tier": "appendix"
+   "rank": 26,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "imaging",
@@ -769,8 +717,8 @@
    "group": "clinical",
    "score": 3.0,
    "strength": "moderate",
-   "rank": 29,
-   "proposed_tier": "appendix"
+   "rank": 27,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -795,8 +743,8 @@
    "group": "clinical",
    "score": 2.0,
    "strength": "limited",
-   "rank": 30,
-   "proposed_tier": "appendix"
+   "rank": 28,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -821,8 +769,8 @@
    "group": "clinical",
    "score": 2.0,
    "strength": "moderate",
-   "rank": 31,
-   "proposed_tier": "appendix"
+   "rank": 29,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -847,8 +795,8 @@
    "group": "clinical",
    "score": 2.0,
    "strength": "moderate",
-   "rank": 32,
-   "proposed_tier": "appendix"
+   "rank": 30,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "procedures",
@@ -873,8 +821,8 @@
    "group": "clinical",
    "score": 2.0,
    "strength": "moderate",
-   "rank": 33,
-   "proposed_tier": "appendix"
+   "rank": 31,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "imaging",
@@ -899,8 +847,8 @@
    "group": "clinical",
    "score": 2.0,
    "strength": "moderate",
-   "rank": 34,
-   "proposed_tier": "appendix"
+   "rank": 32,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "procedures",
@@ -925,8 +873,8 @@
    "group": "clinical",
    "score": 2.0,
    "strength": "moderate",
-   "rank": 35,
-   "proposed_tier": "appendix"
+   "rank": 33,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "management",
@@ -951,8 +899,8 @@
    "group": "clinical",
    "score": 2.0,
    "strength": "moderate",
-   "rank": 36,
-   "proposed_tier": "appendix"
+   "rank": 34,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -977,8 +925,8 @@
    "group": "clinical",
    "score": 2.0,
    "strength": "limited",
-   "rank": 37,
-   "proposed_tier": "appendix"
+   "rank": 35,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -1003,8 +951,8 @@
    "group": "clinical",
    "score": 2.0,
    "strength": "moderate",
-   "rank": 38,
-   "proposed_tier": "appendix"
+   "rank": 36,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "management",
@@ -1029,8 +977,8 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 39,
-   "proposed_tier": "appendix"
+   "rank": 37,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "management",
@@ -1055,8 +1003,8 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 40,
-   "proposed_tier": "appendix"
+   "rank": 38,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -1081,8 +1029,8 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 41,
-   "proposed_tier": "appendix"
+   "rank": 39,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "diagnosis",
@@ -1107,8 +1055,8 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 42,
-   "proposed_tier": "appendix"
+   "rank": 40,
+   "proposed_tier": "landmark"
   },
   {
    "domain": "imaging",
@@ -1133,7 +1081,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 43,
+   "rank": 41,
    "proposed_tier": "appendix"
   },
   {
@@ -1159,7 +1107,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 44,
+   "rank": 42,
    "proposed_tier": "appendix"
   },
   {
@@ -1185,7 +1133,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 45,
+   "rank": 43,
    "proposed_tier": "appendix"
   },
   {
@@ -1211,7 +1159,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "limited",
-   "rank": 46,
+   "rank": 44,
    "proposed_tier": "appendix"
   },
   {
@@ -1237,7 +1185,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 47,
+   "rank": 45,
    "proposed_tier": "appendix"
   },
   {
@@ -1263,7 +1211,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 48,
+   "rank": 46,
    "proposed_tier": "appendix"
   },
   {
@@ -1289,7 +1237,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 49,
+   "rank": 47,
    "proposed_tier": "appendix"
   },
   {
@@ -1315,7 +1263,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "limited",
-   "rank": 50,
+   "rank": 48,
    "proposed_tier": "appendix"
   },
   {
@@ -1341,7 +1289,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 51,
+   "rank": 49,
    "proposed_tier": "appendix"
   },
   {
@@ -1370,7 +1318,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 52,
+   "rank": 50,
    "proposed_tier": "appendix"
   },
   {
@@ -1396,7 +1344,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 53,
+   "rank": 51,
    "proposed_tier": "appendix"
   },
   {
@@ -1422,7 +1370,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 54,
+   "rank": 52,
    "proposed_tier": "appendix"
   },
   {
@@ -1448,7 +1396,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "limited",
-   "rank": 55,
+   "rank": 53,
    "proposed_tier": "appendix"
   },
   {
@@ -1474,7 +1422,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 56,
+   "rank": 54,
    "proposed_tier": "appendix"
   },
   {
@@ -1500,7 +1448,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 57,
+   "rank": 55,
    "proposed_tier": "appendix"
   },
   {
@@ -1526,7 +1474,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 58,
+   "rank": 56,
    "proposed_tier": "appendix"
   },
   {
@@ -1552,7 +1500,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 59,
+   "rank": 57,
    "proposed_tier": "appendix"
   },
   {
@@ -1578,7 +1526,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 60,
+   "rank": 58,
    "proposed_tier": "appendix"
   },
   {
@@ -1604,7 +1552,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "limited",
-   "rank": 61,
+   "rank": 59,
    "proposed_tier": "appendix"
   },
   {
@@ -1630,7 +1578,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 62,
+   "rank": 60,
    "proposed_tier": "appendix"
   },
   {
@@ -1656,7 +1604,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 63,
+   "rank": 61,
    "proposed_tier": "appendix"
   },
   {
@@ -1682,7 +1630,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 64,
+   "rank": 62,
    "proposed_tier": "appendix"
   },
   {
@@ -1708,7 +1656,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 65,
+   "rank": 63,
    "proposed_tier": "appendix"
   },
   {
@@ -1734,7 +1682,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 66,
+   "rank": 64,
    "proposed_tier": "appendix"
   },
   {
@@ -1760,7 +1708,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 67,
+   "rank": 65,
    "proposed_tier": "appendix"
   },
   {
@@ -1786,7 +1734,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 68,
+   "rank": 66,
    "proposed_tier": "appendix"
   },
   {
@@ -1812,7 +1760,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 69,
+   "rank": 67,
    "proposed_tier": "appendix"
   },
   {
@@ -1838,7 +1786,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 70,
+   "rank": 68,
    "proposed_tier": "appendix"
   },
   {
@@ -1864,7 +1812,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 71,
+   "rank": 69,
    "proposed_tier": "appendix"
   },
   {
@@ -1890,7 +1838,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 72,
+   "rank": 70,
    "proposed_tier": "appendix"
   },
   {
@@ -1916,7 +1864,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 73,
+   "rank": 71,
    "proposed_tier": "appendix"
   },
   {
@@ -1942,7 +1890,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 74,
+   "rank": 72,
    "proposed_tier": "appendix"
   },
   {
@@ -1968,7 +1916,7 @@
    "group": "clinical",
    "score": 1.0,
    "strength": "moderate",
-   "rank": 75,
+   "rank": 73,
    "proposed_tier": "appendix"
   },
   {
@@ -1994,7 +1942,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 76,
+   "rank": 74,
    "proposed_tier": "appendix"
   },
   {
@@ -2020,7 +1968,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 77,
+   "rank": 75,
    "proposed_tier": "appendix"
   },
   {
@@ -2046,7 +1994,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 78,
+   "rank": 76,
    "proposed_tier": "appendix"
   },
   {
@@ -2072,7 +2020,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 79,
+   "rank": 77,
    "proposed_tier": "appendix"
   },
   {
@@ -2098,7 +2046,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 80,
+   "rank": 78,
    "proposed_tier": "appendix"
   },
   {
@@ -2124,7 +2072,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 81,
+   "rank": 79,
    "proposed_tier": "appendix"
   },
   {
@@ -2150,7 +2098,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 82,
+   "rank": 80,
    "proposed_tier": "appendix"
   },
   {
@@ -2176,7 +2124,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 83,
+   "rank": 81,
    "proposed_tier": "appendix"
   },
   {
@@ -2202,7 +2150,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 84,
+   "rank": 82,
    "proposed_tier": "appendix"
   },
   {
@@ -2228,7 +2176,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 85,
+   "rank": 83,
    "proposed_tier": "appendix"
   },
   {
@@ -2254,7 +2202,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 86,
+   "rank": 84,
    "proposed_tier": "appendix"
   },
   {
@@ -2280,7 +2228,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 87,
+   "rank": 85,
    "proposed_tier": "appendix"
   },
   {
@@ -2306,7 +2254,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 88,
+   "rank": 86,
    "proposed_tier": "appendix"
   },
   {
@@ -2332,7 +2280,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 89,
+   "rank": 87,
    "proposed_tier": "appendix"
   },
   {
@@ -2358,7 +2306,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 90,
+   "rank": 88,
    "proposed_tier": "appendix"
   },
   {
@@ -2384,7 +2332,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 91,
+   "rank": 89,
    "proposed_tier": "appendix"
   },
   {
@@ -2410,7 +2358,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 92,
+   "rank": 90,
    "proposed_tier": "appendix"
   },
   {
@@ -2436,7 +2384,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "moderate",
-   "rank": 93,
+   "rank": 91,
    "proposed_tier": "appendix"
   },
   {
@@ -2462,7 +2410,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 94,
+   "rank": 92,
    "proposed_tier": "appendix"
   },
   {
@@ -2488,7 +2436,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 95,
+   "rank": 93,
    "proposed_tier": "appendix"
   },
   {
@@ -2514,7 +2462,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 96,
+   "rank": 94,
    "proposed_tier": "appendix"
   },
   {
@@ -2540,7 +2488,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 97,
+   "rank": 95,
    "proposed_tier": "appendix"
   },
   {
@@ -2569,7 +2517,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 98,
+   "rank": 96,
    "proposed_tier": "appendix"
   },
   {
@@ -2595,7 +2543,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 99,
+   "rank": 97,
    "proposed_tier": "appendix"
   },
   {
@@ -2621,7 +2569,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 100,
+   "rank": 98,
    "proposed_tier": "appendix"
   },
   {
@@ -2647,7 +2595,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 101,
+   "rank": 99,
    "proposed_tier": "appendix"
   },
   {
@@ -2673,7 +2621,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 102,
+   "rank": 100,
    "proposed_tier": "appendix"
   },
   {
@@ -2699,7 +2647,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 103,
+   "rank": 101,
    "proposed_tier": "appendix"
   },
   {
@@ -2725,7 +2673,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 104,
+   "rank": 102,
    "proposed_tier": "appendix"
   },
   {
@@ -2751,7 +2699,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 105,
+   "rank": 103,
    "proposed_tier": "appendix"
   },
   {
@@ -2777,7 +2725,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 106,
+   "rank": 104,
    "proposed_tier": "appendix"
   },
   {
@@ -2803,7 +2751,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 107,
+   "rank": 105,
    "proposed_tier": "appendix"
   },
   {
@@ -2829,7 +2777,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 108,
+   "rank": 106,
    "proposed_tier": "appendix"
   },
   {
@@ -2855,7 +2803,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 109,
+   "rank": 107,
    "proposed_tier": "appendix"
   },
   {
@@ -2881,7 +2829,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 110,
+   "rank": 108,
    "proposed_tier": "appendix"
   },
   {
@@ -2907,7 +2855,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 111,
+   "rank": 109,
    "proposed_tier": "appendix"
   },
   {
@@ -2933,7 +2881,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 112,
+   "rank": 110,
    "proposed_tier": "appendix"
   },
   {
@@ -2959,7 +2907,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 113,
+   "rank": 111,
    "proposed_tier": "appendix"
   },
   {
@@ -2985,7 +2933,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 114,
+   "rank": 112,
    "proposed_tier": "appendix"
   },
   {
@@ -3011,7 +2959,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 115,
+   "rank": 113,
    "proposed_tier": "appendix"
   },
   {
@@ -3037,7 +2985,7 @@
    "group": "clinical",
    "score": 0.0,
    "strength": "limited",
-   "rank": 116,
+   "rank": 114,
    "proposed_tier": "appendix"
   },
   {
@@ -3063,7 +3011,7 @@
    "group": "clinical",
    "score": -1.0,
    "strength": "limited",
-   "rank": 117,
+   "rank": 115,
    "proposed_tier": "appendix"
   },
   {
@@ -3640,6 +3588,60 @@
    "strength": "limited",
    "rank": 5,
    "proposed_tier": "appendix"
+  },
+  {
+   "domain": "diagnosis",
+   "comparison": "clinician_with_ai",
+   "design": "Single-blind randomized clinical trial",
+   "ai_system": "ChatGPT-4o recommendations (error-free vs deliberately erroneous)",
+   "humans": "AI-trained physicians in Pakistan",
+   "finding": "Physicians diagnosed 6 vignettes with voluntary access to ChatGPT-4o advice that was either error-free or contained errors in 3 of 6 cases. Diagnostic reasoning accuracy was 84.9% with error-free versus 73.3% with flawed recommendations (adjusted difference -14.0 percentage points). Top-choice diagnosis accuracy was 90.5% versus 76.1% (adjusted difference -18.3 percentage points).",
+   "limitation": "Preprint; small sample of 44 physicians and only 6 vignettes, with no no-AI control arm.",
+   "verdict": "ai_help_harmed",
+   "design_class": "rct",
+   "setting": "simulated",
+   "reach": "broad",
+   "humans_n": 44,
+   "title": "Automation Bias in Large Language Model Assisted Diagnostic Reasoning Among AI-Trained Physicians",
+   "url": "https://www.medrxiv.org/content/10.1101/2025.08.23.25334280v2",
+   "source": "medRxiv (preprint, not peer reviewed)",
+   "published": "2025-09-08",
+   "doi": "10.1101/2025.08.23.25334280",
+   "citations": 0,
+   "rcr": 0.0,
+   "group": "excluded",
+   "score": 4.0,
+   "strength": "moderate",
+   "rank": 1,
+   "proposed_tier": "excluded",
+   "excluded": "preprint of S6 (Automation Bias in LLM-Assisted Diagnostic Reasoning among AI-trained physicians), already in the paper (editor, 2026-11-08)"
+  },
+  {
+   "domain": "management",
+   "comparison": "both",
+   "design": "Multi-institutional randomized controlled trial with five clinical vignettes",
+   "ai_system": "GPT-4 via ChatGPT Plus",
+   "humans": "Attending physicians and residents in internal, family or emergency medicine",
+   "finding": "Open-ended management reasoning on expert-developed vignettes. Physicians using GPT-4 scored higher than those using conventional resources (mean difference 6.5%, 95% CI 2.7-10.2, p<0.001) and spent more time per case (119.3 seconds). There was no significant difference between GPT-4-augmented physicians and GPT-4 alone (-0.9%, 95% CI -9.0 to 7.2, p=0.8).",
+   "limitation": "Preprint; simulated vignettes rather than live patient care.",
+   "verdict": "ai_help_improved",
+   "design_class": "rct",
+   "setting": "simulated",
+   "reach": "broad",
+   "humans_n": 92,
+   "title": "Large Language Model Influence on Management Reasoning: A Randomized Controlled Trial",
+   "url": "https://www.medrxiv.org/content/10.1101/2024.08.05.24311485v1",
+   "source": "medRxiv (preprint, not peer reviewed)",
+   "published": "2024-08-07",
+   "doi": "10.1101/2024.08.05.24311485",
+   "citations": 0,
+   "rcr": 0.0,
+   "group": "excluded",
+   "score": 4.0,
+   "strength": "moderate",
+   "rank": 2,
+   "proposed_tier": "excluded",
+   "excluded": "preprint of S33 (GPT-4 assistance for physician performance on patient care tasks, Nature Medicine 2025), already in the paper (editor, 2026-11-08)"
   }
  ]
 }
