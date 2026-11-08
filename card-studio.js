@@ -1,27 +1,20 @@
 /* Signature Card Studio (signature-card-studio.html).
-   Two kinds of design, chosen from one menu:
-   - designed templates (card-studio-templates.js): complete SVGs by ChatGPT
-     with text placeholders, three colourways each and their own fonts, which
-     are hosted in fonts/cards/ and embedded in the downloaded files;
-   - simple layouts (card-studio-designs.js): 24 layouts drawn from
-     coordinates, with 12 palettes and 6 pairings of system fonts.
-   Every line is fitted to its space in the font the browser has loaded
-   (fitHeading, fitBody, fitPlaceholder). A line that cannot fit at its
+   The SVG templates have editable fields, three colourways, and embedded fonts.
+   Text is fitted using the font loaded by the browser. A line that cannot fit at its
    smallest allowed size is flagged and blocks the download until shortened.
    Also runs the gallery, the shared digital card (#card=...) and the
-   downloads. Nothing typed here leaves the page: there is no server.
+   downloads. Contact details stay in the browser unless shared by the user.
    Wrapped in a function so its names never meet script.js's. */
 
 (function () {
   "use strict";
 
-  const D = window.CARD_DESIGNS;
   const T = window.CARD_TEMPLATES || [];
+  const builtInCount = T.length;
+  const sharedLibrary = window.CardStudioShared;
   const FONT_FILES = window.CARD_FONT_FILES || {};
   const NS = "http://www.w3.org/2000/svg";
   const SAFE = { left: 25, top: 25, right: 675, bottom: 375 };
-  const BLEED = 25; // 0.125 in at 200 units per inch
-  const QR_BOX = { x: 445, y: 100, size: 215 };
   const FIELDS = [
     ["name", "Name", "Alex Morgan"],
     ["credentials", "Credentials", "MD"],
@@ -31,30 +24,19 @@
     ["phone", "Phone", "(202) 555-0100"],
     ["website", "Website", "example.com/alex"],
   ];
-  const HEADING_FIELDS = new Set(["name", "header"]);
   const FIT = {
-    name: { oneLineFloor: 32, twoLineCap: 36 },
-    header: { oneLineFloor: 24, twoLineCap: 28 },
     floor: 20,       // nothing smaller: 20 units is 7.2 pt at card size
     leading: 1.1,
-    promote: 36,     // an affiliation this close below an empty title moves up
     // Templates: a two-line field stays on one line down to this share of
     // its size, and (if larger than 32 units) wraps at no more than this share
     oneLineShare: 0.92,
     twoLineShare: 0.8,
   };
 
-  // Templates first, then the simple layouts: one list, one menu
-  const DESIGNS = [
-    ...T.map((t, i) => ({ kind: "template", index: i, name: t.name, group: "Designed templates" })),
-    ...D.layouts.map((l, i) => ({ kind: "layout", index: i, name: l.name, group: "Simple layouts" })),
-  ];
-
   const byId = (id) => document.getElementById(id);
-  const indexByName = (list, name) => Math.max(0, list.findIndex((item) => item.name === name));
-  const designIndex = (kind, name) => Math.max(0, DESIGNS.findIndex((d) => d.kind === kind && d.name === name));
-  const escapeXml = (value) => String(value).replace(/[<>&"']/g, (c) =>
-    ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" }[c]));
+
+  // The reference collection originally used numeric positions 44 through 47.
+  const LEGACY_REFERENCE_IDS = ["herbarium-press", "meridian-seal", "ember-signature", "navy-autograph"];
 
   // ---------------------------------------------------------------- measuring
 
@@ -126,22 +108,6 @@
     return { lines: best ? best.lines : [text], size: floor, overflow: true };
   }
 
-  // Simple layouts: a name or header
-  function fitHeading(text, kind, size, width, family, mainName) {
-    const rules = FIT[kind];
-    const font = { family, weight: 700 };
-    const one = largestSize([text], size, width, font);
-    if (one >= rules.oneLineFloor) return { lines: [text], size: one };
-    return twoLines(text, Math.min(size, rules.twoLineCap), FIT.floor, width, font, mainName);
-  }
-
-  // Simple layouts: everything else, one line, down to 20 units
-  function fitBody(text, size, width, family) {
-    const fitted = largestSize([text], size, width, { family, weight: 400 });
-    if (fitted >= FIT.floor) return { lines: [text], size: fitted };
-    return { lines: [text], size: FIT.floor, overflow: true };
-  }
-
   // Templates: one placeholder, by its data-max-width, data-min-size, data-lines
   function fitPlaceholder(text, opts, width, font, mainName) {
     const floor = Math.max(FIT.floor, opts.minSize);
@@ -171,7 +137,7 @@
 
   function cardText(values) {
     const fullName = [values.name, values.credentials].filter(Boolean).join(", ");
-    return { ...values, fullname: fullName, fullName, header: values.affiliation || fullName, initials: initials(values.name) };
+    return { ...values, fullname: fullName, header: values.affiliation || fullName, initials: initials(values.name) };
   }
 
   // QR modules for a link (throws when the code would be too dense)
@@ -193,95 +159,13 @@
       `<rect width="${qr.size}" height="${qr.size}" fill="#FFFFFF"/><path d="${qr.path}" fill="#000000"/></svg>`;
   }
 
-  // ---------------------------------------------------------------- simple layouts
-
-  function rows(face, values, back) {
-    const list = face.text
-      .map(([field, x, y, anchor, size, maxWidth]) => ({ field, x, y, anchor, size, maxWidth }))
-      .map((row) => ({ ...row, value: row.field === "name" ? values.fullName : values[row.field] || "" }));
-    if (!back) {
-      const title = list.find((row) => row.field === "title");
-      const affiliation = list.find((row) => row.field === "affiliation");
-      if (title && affiliation && !title.value && affiliation.value && title.x === affiliation.x &&
-          title.anchor === affiliation.anchor && Math.abs(affiliation.y - title.y) <= FIT.promote) {
-        affiliation.y = title.y;
-        affiliation.maxWidth = Math.min(title.maxWidth, affiliation.maxWidth);
-      }
-    }
-    return list.filter((row) => row.value);
-  }
-
-  function colour(palette, token) {
-    return { accent: palette.accent, ink: palette.ink, background: palette.background }[token] || palette.accent;
-  }
-
-  function shapeMarkup(shape, palette, bleed) {
-    const [type] = shape;
-    if (type === "rect") {
-      let [, x, y, w, h, token] = shape;
-      if (bleed) { // shapes that touch the trim run out to the bleed edge
-        if (x <= 0) { x -= BLEED; w += BLEED; }
-        if (y <= 0) { y -= BLEED; h += BLEED; }
-        if (x + w >= 700) w += BLEED;
-        if (y + h >= 400) h += BLEED;
-      }
-      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${colour(palette, token)}"/>`;
-    }
-    if (type === "line") {
-      const [, x1, y1, x2, y2, token, stroke] = shape;
-      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colour(palette, token)}" stroke-width="${stroke}"/>`;
-    }
-    if (type === "frame") {
-      const [, x, y, w, h, token, stroke] = shape;
-      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="${colour(palette, token)}" stroke-width="${stroke}"/>`;
-    }
-    return "";
-  }
-
-  function renderLayout(state, back) {
-    const layout = D.layouts[DESIGNS[state.design].index];
-    const palette = D.palettes[state.palette] || D.palettes[0];
-    const fonts = D.fonts[state.fonts] || D.fonts[0];
-    const values = cardText(state.values);
-    const withQR = back && !!state.qr;
-    const face = back ? (withQR ? D.qrTemplates[layout.back.qr] : layout.back) : layout.front;
-    const warnings = [];
-
-    let text = "";
-    for (const row of rows(face, values, back)) {
-      const heading = HEADING_FIELDS.has(row.field);
-      const family = heading ? fonts.heading : fonts.body;
-      const width = room(row.x, row.anchor, row.maxWidth);
-      const fit = heading
-        ? fitHeading(row.value, row.field, row.size, width, family, values.name)
-        : fitBody(row.value, row.size, width, family);
-      if (fit.overflow) warnings.push(row.field);
-      fit.lines.forEach((line, i) => {
-        const y = row.y - (fit.lines.length - 1 - i) * fit.size * FIT.leading; // the last line keeps the baseline
-        text += `<text x="${row.x}" y="${Math.round(y * 10) / 10}" fill="${palette.ink}" text-anchor="${row.anchor}" ` +
-          `font-family="${family}" font-size="${fit.size}" font-weight="${heading ? 700 : 400}">${escapeXml(line)}</text>`;
-      });
-    }
-
-    const shapes = face.shapes.map((shape) => shapeMarkup(shape, palette, state.bleed)).join("");
-    const box = state.bleed ? `${-BLEED} ${-BLEED} ${700 + 2 * BLEED} ${400 + 2 * BLEED}` : "0 0 700 400";
-    const inches = state.bleed ? ["3.75in", "2.25in"] : ["3.5in", "2in"];
-    const fill = state.bleed
-      ? `<rect x="${-BLEED}" y="${-BLEED}" width="${700 + 2 * BLEED}" height="${400 + 2 * BLEED}" fill="${palette.background}"/>`
-      : `<rect width="700" height="400" fill="${palette.background}"/>`;
-    const qr = withQR ? qrSvg(state.qr, QR_BOX.x, QR_BOX.y, QR_BOX.size) : "";
-    const label = `${back ? "Back" : "Front"} of business card: ${layout.name}`;
-    const svg = `<svg xmlns="${NS}" width="${inches[0]}" height="${inches[1]}" viewBox="${box}" role="img" aria-label="${escapeXml(label)}">` +
-      fill + shapes + text + qr + "</svg>";
-    return { svg, warnings, fonts: [] };
-  }
-
   // ---------------------------------------------------------------- templates
 
   const COLOUR_ATTRS = ["fill", "stroke", "stop-color", "flood-color", "color"];
+  let paintInstance = 0;
 
-  function renderTemplate(state, back) {
-    const tpl = T[DESIGNS[state.design].index];
+  function render(state, back) {
+    const tpl = T[state.design];
     const colours = tpl.colourways[state.palette] || tpl.colourways[0];
     const values = cardText(state.values);
     const withQR = back && !!state.qr;
@@ -290,11 +174,26 @@
     const svg = doc.documentElement;
     const warnings = [];
 
-    // Colour tokens become plain colours, so any program reads the file
+    // Each inline SVG needs its own paint IDs so nearby colourways cannot share gradients.
+    const paintIds = new Map();
+    const paintNodes = svg.querySelectorAll("defs [id]");
+    if (paintNodes.length) {
+      const prefix = "card-" + ++paintInstance + "-";
+      for (const node of paintNodes) {
+        const id = node.getAttribute("id");
+        paintIds.set(id, prefix + id);
+        node.setAttribute("id", prefix + id);
+      }
+    }
+
+    // Resolve colour tokens and local paint references in the standalone file.
     for (const el of svg.querySelectorAll("*")) {
       for (const attr of COLOUR_ATTRS) {
         const v = el.getAttribute(attr);
-        if (v && v.includes("var(")) el.setAttribute(attr, v.replace(/var\(--([a-z0-9-]+)\)/g, (m, token) => colours[token] || m));
+        if (!v) continue;
+        const value = v.replace(/var\(--([a-z0-9-]+)\)/g, (match, token) => colours[token] || match)
+          .replace(/url\(#([^)]+)\)/g, (match, id) => paintIds.has(id) ? "url(#" + paintIds.get(id) + ")" : match);
+        if (value !== v) el.setAttribute(attr, value);
       }
     }
 
@@ -379,11 +278,6 @@
     return { svg: new XMLSerializer().serializeToString(svg), warnings, fonts: tpl.fonts };
   }
 
-  // One face of a card. state: { values, design, palette, fonts, qr, bleed }
-  function render(state, back) {
-    return DESIGNS[state.design].kind === "template" ? renderTemplate(state, back) : renderLayout(state, back);
-  }
-
   // ---------------------------------------------------------------- fonts
 
   const fontKey = ([family, weight, style]) => `${family}|${weight}|${style}`;
@@ -427,7 +321,7 @@
   }
 
   // Exposed for the layout checks and the console
-  window.CardStudio = { render, withFonts, loadCardFonts, DESIGNS, fitHeading, fitBody, fitPlaceholder, measure, FIELDS, SAFE, QR_BOX, qrModules };
+  window.CardStudio = { render, withFonts, loadCardFonts, DESIGNS: T, fitPlaceholder, measure, FIELDS, SAFE, qrModules };
 
   // ---------------------------------------------------------------- the page
 
@@ -436,9 +330,8 @@
 
   const state = {
     values: Object.fromEntries(FIELDS.map(([id, , value]) => [id, value])),
-    design: T.length ? 0 : designIndex("layout", "Horizon"),
+    design: 0,
     palette: 0,
-    fonts: indexByName(D.fonts, "Editorial Serif"),
     qr: null,
     bleed: false,
   };
@@ -458,30 +351,22 @@
     byId("card-fields").append(row);
   }
 
-  // Design menu, grouped; palette and type menus follow the design
   const designSelect = byId("card-layout");
-  for (const group of [...new Set(DESIGNS.map((d) => d.group))]) {
-    const optgroup = document.createElement("optgroup");
-    optgroup.label = group;
-    DESIGNS.forEach((d, i) => { if (d.group === group) optgroup.append(new Option(d.name, i)); });
-    designSelect.append(optgroup);
+  function fillDesignChoices() {
+    designSelect.replaceChildren(...T.map((t, i) => new Option(t.name, i)));
+    designSelect.value = state.design;
   }
-  D.fonts.forEach((f, i) => byId("card-fonts").add(new Option(f.name, i)));
 
   function fillPalettes() {
     const select = byId("card-palette");
-    const d = DESIGNS[state.design];
-    const list = d.kind === "template" ? T[d.index].colourways : D.palettes;
+    const list = T[state.design].colourways;
     select.replaceChildren(...list.map((p, i) => new Option(p.name, i)));
     if (state.palette >= list.length) state.palette = 0;
     select.value = state.palette;
-    byId("card-fonts").closest("label").hidden = d.kind === "template";
-    byId("card-palette").closest("label").firstChild.textContent = d.kind === "template" ? "Colourway " : "Palette ";
   }
 
-  designSelect.addEventListener("change", (event) => { state.design = Number(event.target.value); state.palette = 0; fillPalettes(); update(); });
+  designSelect.addEventListener("change", (event) => { state.design = Number(event.target.value); state.palette = 0; fillPalettes(); update(); loadPublishedArtwork(); });
   byId("card-palette").addEventListener("change", (event) => { state.palette = Number(event.target.value); update(); });
-  byId("card-fonts").addEventListener("change", (event) => { state.fonts = Number(event.target.value); update(); });
   byId("card-bleed").addEventListener("change", (event) => { state.bleed = event.target.checked; update(); });
 
   // Sharing: which fields the link and QR carry
@@ -504,7 +389,7 @@
     return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
 
-  // A shared card: [7 fields, design index, palette or colourway, type]
+  // A shared card: [7 fields, design ID, colourway, legacy font slot]
   function decodeCard(hash) {
     if (!hash.startsWith("#card=") || hash.length > 8000) return null;
     try {
@@ -512,11 +397,22 @@
       const data = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(Uint8Array.from(raw, (c) => c.charCodeAt(0))));
       if (!Array.isArray(data) || data.length !== 10) return null;
       if (!data.slice(0, 7).every((v) => typeof v === "string" && v.length <= 120) || !data[0].trim()) return null;
-      const d = DESIGNS[data[7]];
-      if (!Number.isInteger(data[7]) || !d) return null;
-      const palettes = d.kind === "template" ? T[d.index].colourways : D.palettes;
-      if (!Number.isInteger(data[8]) || !palettes[data[8]] || !Number.isInteger(data[9]) || !D.fonts[data[9]]) return null;
-      return data;
+      const designKey = data[7];
+      const palette = data[8];
+      const legacyFont = data[9];
+      if (!Number.isInteger(palette) || palette < 0 || !Number.isInteger(legacyFont) || legacyFont < 0 || legacyFont > 5) return null;
+      const numeric = Number.isInteger(designKey);
+      if (numeric && designKey >= 0 && designKey < 44) {
+        const paletteCount = designKey >= 10 && designKey < 34 ? 12 : 3;
+        return palette < paletteCount ? { fields: data.slice(0, 7), design: 0, palette: 0 } : null;
+      }
+      const id = numeric ? LEGACY_REFERENCE_IDS[designKey - 44] : designKey;
+      const design = T.findIndex((template) => template.id === id);
+      if (design < 0 && sharedLibrary?.publishedId.test(id) && palette < 2) {
+        return { fields: data.slice(0, 7), design: 0, palette, publishedId: id };
+      }
+      if (design < 0 || !T[design].colourways[palette]) return null;
+      return { fields: data.slice(0, 7), design, palette };
     } catch (err) {
       return null;
     }
@@ -525,7 +421,7 @@
   function shareLink() {
     const shared = FIELDS.map(([id]) => (byId(`share-${id}`).checked ? state.values[id] : ""));
     if (!shared[0]) return "";
-    return new URL("#card=" + encodeCard([...shared, state.design, state.palette, state.fonts]), location.href).href;
+    return new URL("#card=" + encodeCard([...shared, T[state.design].id, state.palette, 0]), location.href).href;
   }
 
   let lastQR = null;
@@ -547,13 +443,8 @@
   }
 
   function describe() {
-    const d = DESIGNS[state.design];
-    if (d.kind === "template") {
-      const t = T[d.index];
-      return { name: t.name, text: `${t.style}. ${t.description} Suits: ${t.suits.toLowerCase()}.`, palette: t.colourways[state.palette].name, type: "its own typefaces" };
-    }
-    const l = D.layouts[d.index];
-    return { name: l.name, text: `${l.description} Suits: ${l.audience.toLowerCase()}.`, palette: D.palettes[state.palette].name, type: D.fonts[state.fonts].name };
+    const t = T[state.design];
+    return { name: t.name, text: `${t.style}. ${t.description} Suits: ${t.suits.toLowerCase()}.`, palette: t.colourways[state.palette].name, type: "its own typefaces" };
   }
 
   function prompt() {
@@ -589,7 +480,7 @@
       ? `Too long to print legibly: ${[...new Set(tooLong.map((f) => labels[f] || f))].join(", ")}. Shorten it to download. ` +
         "The link and QR code keep the full text."
       : "";
-    for (const id of ["card-front", "card-back"]) byId(id).disabled = tooLong.length > 0;
+    for (const id of ["card-front", "card-back"]) byId(id).disabled = tooLong.length > 0 || !!T[state.design].pending;
     byId("card-prompt").value = prompt();
   }
 
@@ -624,16 +515,15 @@
     }
   });
 
-  function choose(design, palette, fonts, label) {
+  function choose(design, palette, label) {
     state.design = design;
     state.palette = palette;
-    if (fonts !== undefined) state.fonts = fonts;
     designSelect.value = state.design;
-    byId("card-fonts").value = state.fonts;
     fillPalettes();
     update();
     byId("card-editor").scrollIntoView({ behavior: "smooth", block: "start" });
     byId("card-status").textContent = `${label} applied. Your details are unchanged.`;
+    loadPublishedArtwork();
   }
 
   function galleryItem(list, previewState, caption, label, onUse) {
@@ -653,32 +543,122 @@
     list.append(item);
   }
 
-  // Gallery: every template (first in its first colourway) with ChatGPT's
-  // made-up sample person, then the simple-layout examples
+  // Gallery: every template colourway with the same fictional sample person.
   const SAMPLE = { name: "Alexandria Montgomery", credentials: "MD, PhD", title: "Internal Medicine Physician",
     affiliation: "Riverside Health Partners", email: "a.montgomery@example.com", phone: "(202) 555-0142", website: "example.com/montgomery" };
+  const galleryPageSize = 24;
+  let galleryOffset = 0;
   function buildGallery() {
-    const templates = byId("card-templates");
-    T.forEach((t, i) => {
-      t.colourways.forEach((c, ci) => {
-        galleryItem(templates, { values: SAMPLE, design: i, palette: ci, fonts: 0, qr: null, bleed: false },
-          `${t.name} · ${c.name} · ${t.style}`, `${t.name} in ${c.name}`,
-          () => choose(i, ci, undefined, `${t.name} in ${c.name}`));
-      });
+    const list = byId("card-templates");
+    const end = Math.min(builtInCount, galleryOffset + galleryPageSize);
+    for (let design = galleryOffset; design < end; design++) addGalleryTemplate(list, T[design], design);
+    galleryOffset = end;
+    byId("card-gallery-more").hidden = end === builtInCount;
+  }
+  byId("card-gallery-more").addEventListener("click", buildGallery);
+
+  function addGalleryTemplate(list, template, design) {
+    template.colourways.forEach((colourway, palette) => {
+      const label = template.name + " in " + colourway.name;
+      galleryItem(list, { values: SAMPLE, design, palette, qr: null, bleed: false },
+        template.name + " · " + colourway.name + " · " + template.style, label, () => choose(design, palette, label));
     });
-    const gallery = byId("card-gallery");
-    D.examples.forEach((example) => {
-      const preset = {
-        values: Object.fromEntries(FIELDS.map(([id]) => [id, example[id] || ""])),
-        design: designIndex("layout", example.layout),
-        palette: indexByName(D.palettes, example.palette),
-        fonts: indexByName(D.fonts, example.fonts),
-        qr: null,
-        bleed: false,
-      };
-      galleryItem(gallery, preset, `${example.layout} · ${example.palette} · ${example.fonts}`,
-        `the ${example.layout} layout in ${example.palette}`,
-        () => choose(preset.design, preset.palette, preset.fonts, `${example.layout} in ${example.palette}`));
+  }
+
+  function refreshPublished() {
+    const list = byId("card-published-templates");
+    const choice = byId("card-template-delete-choice");
+    list.replaceChildren();
+    const published = T.slice(builtInCount);
+    choice.replaceChildren(...published.map((item) => new Option(item.name, item.id)));
+    byId("card-published-section").hidden = !published.length;
+    byId("card-template-delete").disabled = !published.length;
+    published.forEach((item, i) => addGalleryTemplate(list, item, builtInCount + i));
+    fillDesignChoices();
+  }
+
+  async function loadPublishedArtwork() {
+    const selected = T[state.design];
+    if (!selected?.pending) return;
+    byId("card-status").textContent = "Loading the published artwork…";
+    try {
+      const row = await sharedLibrary.get(selected.id);
+      const complete = row && sharedLibrary.template(row);
+      if (!complete) throw new Error();
+      const position = T.indexOf(selected);
+      if (position < 0) return;
+      T[position] = complete;
+      if (state.design === position) {
+        update();
+        byId("card-status").textContent = complete.name + " is ready.";
+      }
+    } catch {
+      if (T[state.design] === selected) byId("card-status").textContent = "Artwork could not be loaded. Select the design again to retry.";
+    }
+  }
+
+  async function initPublished() {
+    if (!sharedLibrary) return;
+    const [catalog, admin] = await Promise.allSettled([sharedLibrary.list(), sharedLibrary.admin()]);
+    if (catalog.status === "fulfilled") {
+      T.push(...catalog.value.map(sharedLibrary.template).filter(Boolean));
+      refreshPublished();
+    }
+    if (admin.status !== "fulfilled" || !admin.value) return;
+    byId("card-library-admin").hidden = false;
+    const status = byId("card-library-status");
+    if (catalog.status === "rejected") status.textContent = "The shared library could not be loaded. Check the database setup and reload.";
+    const client = admin.value, form = byId("card-template-upload");
+    const publishButton = form.querySelector("button");
+    const deleteButton = byId("card-template-delete");
+    let busy = false;
+    const lock = (value) => {
+      busy = value;
+      publishButton.disabled = value;
+      deleteButton.disabled = value || T.length === builtInCount;
+    };
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (busy) return;
+      const name = byId("card-template-name").value.trim();
+      const front = byId("card-template-front-art").files[0], back = byId("card-template-back-art").files[0];
+      if (!name || !front) { status.textContent = "Enter a name and choose front artwork."; return; }
+      lock(true);
+      status.textContent = "Publishing the template…";
+      try {
+        const item = sharedLibrary.template(await sharedLibrary.publish(client, name, front, back));
+        if (!item) throw new Error("The published artwork could not be loaded. Reload to check the library.");
+        T.push(item);
+        form.reset();
+        refreshPublished();
+        choose(T.length - 1, 0, item.name);
+        status.textContent = item.name + " is now available to everyone.";
+      } catch (error) {
+        status.textContent = error.message || "The template could not be published.";
+      } finally { lock(false); }
+    });
+    deleteButton.addEventListener("click", async () => {
+      if (busy) return;
+      const id = byId("card-template-delete-choice").value;
+      const match = sharedLibrary.publishedId.exec(id);
+      const item = T.find((template) => template.id === id);
+      if (!match || !item || !window.confirm("Delete " + item.name + " from the public template library?")) return;
+      lock(true);
+      status.textContent = "Deleting the template…";
+      try {
+        await sharedLibrary.remove(client, match[1]);
+        const selected = T[state.design].id;
+        const position = T.findIndex((template) => template.id === id);
+        if (position >= builtInCount) T.splice(position, 1);
+        state.design = Math.max(0, T.findIndex((template) => template.id === selected));
+        if (selected === id) state.palette = 0;
+        refreshPublished();
+        fillPalettes();
+        update();
+        status.textContent = item.name + " was deleted.";
+      } catch (error) {
+        status.textContent = error.message || "The template could not be deleted.";
+      } finally { lock(false); }
     });
   }
 
@@ -703,7 +683,7 @@
     }).join("\r\n") + "\r\n";
   }
 
-  function start() {
+  async function start() {
     const shared = decodeCard(location.hash);
     if (location.hash.startsWith("#card=")) {
       app.classList.add("studio--shared");
@@ -712,21 +692,28 @@
         byId("card-shared-title").textContent = "This card link is incomplete or not valid.";
         return;
       }
-      FIELDS.forEach(([id], i) => { state.values[id] = shared[i]; });
-      state.design = shared[7];
-      state.palette = shared[8];
-      state.fonts = shared[9];
-      byId("card-shared-title").textContent = [shared[0], shared[1]].filter(Boolean).join(", ");
-      byId("card-shared-sub").textContent = [shared[2], shared[3]].filter(Boolean).join(" · ");
+      FIELDS.forEach(([id], i) => { state.values[id] = shared.fields[i]; });
+      state.design = shared.design;
+      state.palette = shared.palette;
+      if (shared.publishedId) {
+        try {
+          const row = await sharedLibrary.get(shared.publishedId);
+          const item = row && sharedLibrary.template(row);
+          if (item) { state.design = T.length; T.push(item); }
+        } catch { /* Keep the contact and the default design if artwork is unavailable. */ }
+        if (state.design === 0) state.palette = 0;
+      }
+      byId("card-shared-title").textContent = [shared.fields[0], shared.fields[1]].filter(Boolean).join(", ");
+      byId("card-shared-sub").textContent = [shared.fields[2], shared.fields[3]].filter(Boolean).join(" · ");
       byId("card-shared-cards").innerHTML = [false, true].map((back) => render(state, back).svg).join("");
-      byId("card-save-contact").addEventListener("click", () => save(contactFile(shared), "text/vcard;charset=utf-8", "contact.vcf"));
+      byId("card-save-contact").addEventListener("click", () => save(contactFile(shared.fields), "text/vcard;charset=utf-8", "contact.vcf"));
       return;
     }
-    designSelect.value = state.design;
-    byId("card-fonts").value = state.fonts;
+    fillDesignChoices();
     fillPalettes();
     update();
     buildGallery();
+    initPublished();
     app.classList.add("studio--ready");
   }
 

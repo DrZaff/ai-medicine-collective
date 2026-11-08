@@ -44,7 +44,7 @@
 
       <p class="note studio-lede">// Design a two-sided business card and download both sides as print-sized
         files (3.5 × 2 in). Pick a designed template and a colourway, or start from the gallery below.
-        Everything stays in your browser: nothing you type is sent anywhere.</p>
+        Your contact details stay in your browser until you share them. Admins can publish artwork to the shared library.</p>
 
       <!-- A shared digital card (#card=...) shows only this -->
       <section class="studio-shared" id="card-shared" hidden>
@@ -68,7 +68,6 @@
           <div class="studio-choices">
             <label class="studio-field">Design <select id="card-layout"></select></label>
             <label class="studio-field">Palette <select id="card-palette"></select></label>
-            <label class="studio-field">Type <select id="card-fonts"></select></label>
           </div>
           <p class="note studio-layout-note" id="card-layout-note"></p>
 
@@ -82,6 +81,21 @@
           </div>
           <p class="studio-status" id="card-status" role="status"></p>
           <p class="note">// Check your printer's size, bleed and colour requirements, and look at a printed proof before ordering.</p>
+
+          <details class="studio-more" id="card-library-admin" hidden>
+            <summary>Manage shared templates</summary>
+            <p class="note">Published artwork is visible to anyone who uses the Studio. Use artwork you have permission to share, with no personal or patient information. The Studio adds editable contact text beside the image.</p>
+            <form id="card-template-upload">
+              <label class="studio-field">Template name <input id="card-template-name" type="text" maxlength="64" required /></label>
+              <label class="studio-field">Front artwork <input id="card-template-front-art" type="file" accept="image/png,image/jpeg,image/webp" required /></label>
+              <label class="studio-field">Back artwork (optional) <input id="card-template-back-art" type="file" accept="image/png,image/jpeg,image/webp" /></label>
+              <p class="note">PNG, JPEG, or WebP, up to 12 MB per side. Artwork is cropped to fit the right panel.</p>
+              <div class="studio-buttons"><button class="btn btn--primary" type="submit">Publish template</button></div>
+            </form>
+            <label class="studio-field">Published templates <select id="card-template-delete-choice"></select></label>
+            <div class="studio-buttons"><button class="btn" type="button" id="card-template-delete" disabled>Delete selected template</button></div>
+            <p class="studio-status" id="card-library-status" role="status"></p>
+          </details>
 
           <details class="studio-more" id="card-sharing">
             <summary>Share a digital card</summary>
@@ -109,18 +123,16 @@
         <h3 class="studio-heading" id="studio-gallery">Gallery</h3>
         <p class="note">// Every designed template in each of its colourways. The person on these cards is made up.
           "Use this design" copies the design and colourway; your own details stay as they are.</p>
+        <section id="card-published-section" aria-label="Published templates" hidden>
+          <h4>Published templates</h4>
+          <ul class="studio-gallery" id="card-published-templates"></ul>
+        </section>
         <ul class="studio-gallery" id="card-templates"></ul>
+        <div class="studio-buttons"><button type="button" class="btn" id="card-gallery-more" hidden>Show more designs</button></div>
 
-        <details class="studio-more studio-simple">
-          <summary>Simple layouts</summary>
-          <p class="note">// Plainer cards in fonts found on every computer: 24 layouts, 12 palettes, 6 type
-            pairings. Every name, place and contact detail here is made up.</p>
-          <ul class="studio-gallery" id="card-gallery"></ul>
-        </details>
       </section>
 
-      <p class="note studio-credit">// The designed templates and the simple layouts were designed with ChatGPT
-        and built and checked by Claude. Template typefaces are free fonts under the SIL Open Font License,
+      <p class="note studio-credit">// The Signature Card Studio templates use free fonts under the SIL Open Font License,
         hosted on this site and built into each downloaded file.</p>
 
       <p><a href="hub.html" class="back-link">&lt; TOOLS</a></p>
@@ -145,8 +157,12 @@
 
   <script src="script.js"></script>
   <script src="signature-card-qr.js"></script>
-  <script src="card-studio-designs.js"></script>
   <script src="card-studio-templates.js"></script>
+  <script src="card-studio-reference-plates.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"
+    integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok"
+    crossorigin="anonymous"></script>
+  <script src="card-studio-shared.js"></script>
   <script src="card-studio.js"></script>
 </body>
 </html>
