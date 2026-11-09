@@ -11550,32 +11550,6 @@
    "group": "clinical"
   },
   {
-   "domain": "diagnosis",
-   "comparison": "both",
-   "design": "Multi-center randomized clinical vignette study",
-   "ai_system": "GPT-4",
-   "humans": "Resident and attending physicians in family, internal or emergency medicine",
-   "finding": "Physicians diagnosed up to six clinical vignettes with GPT-4 plus conventional resources or conventional resources alone. Median diagnostic reasoning score per case was 76.3 percent with GPT-4 vs 73.7 percent with conventional resources (adjusted difference 1.6 percentage points, 95% CI -4.4 to 7.6; p=0.60). GPT-4 alone scored 15.5 percentage points (95% CI 1.5 to 29, p=0.03) higher than the conventional resources group.",
-   "limitation": "Preprint; small sample of 50 physicians using vignettes rather than real patients.",
-   "verdict": "ai_help_no_benefit",
-   "design_class": "rct",
-   "setting": "simulated",
-   "reach": "broad",
-   "humans_n": 50,
-   "title": "Influence of a Large Language Model on Diagnostic Reasoning: A Randomized Clinical Vignette Study.",
-   "url": "https://pubmed.ncbi.nlm.nih.gov/38559045/",
-   "source": "medRxiv : the preprint server for health sciences",
-   "published": "2024-03-14",
-   "doi": "10.1101/2024.03.12.24303785",
-   "citations": 19,
-   "rcr": 3.326708600843077,
-   "score": 8.2,
-   "strength": "moderate",
-   "rank": 442,
-   "proposed_tier": "appendix",
-   "group": "clinical"
-  },
-  {
    "domain": "imaging",
    "comparison": "both",
    "design": "Model development with reader comparison and AI-assisted reading",
@@ -11597,7 +11571,7 @@
    "rcr": 3.2945132239556925,
    "score": 8.2,
    "strength": "limited",
-   "rank": 443,
+   "rank": 442,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11623,7 +11597,7 @@
    "rcr": 3.3524962780747787,
    "score": 8.2,
    "strength": "moderate",
-   "rank": 444,
+   "rank": 443,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11649,7 +11623,7 @@
    "rcr": 5.155483286535202,
    "score": 8.2,
    "strength": "moderate",
-   "rank": 445,
+   "rank": 444,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11675,7 +11649,7 @@
    "rcr": 7.401208388725918,
    "score": 8.1,
    "strength": "limited",
-   "rank": 446,
+   "rank": 445,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11701,7 +11675,7 @@
    "rcr": 4.865230439221831,
    "score": 8.1,
    "strength": "limited",
-   "rank": 447,
+   "rank": 446,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11727,7 +11701,7 @@
    "rcr": 7.2979314531544395,
    "score": 8.1,
    "strength": "limited",
-   "rank": 448,
+   "rank": 447,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11753,7 +11727,7 @@
    "rcr": 3.1769811227559375,
    "score": 8.1,
    "strength": "limited",
-   "rank": 449,
+   "rank": 448,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11779,7 +11753,7 @@
    "rcr": 3.1946911018457236,
    "score": 8.1,
    "strength": "limited",
-   "rank": 450,
+   "rank": 449,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11805,7 +11779,7 @@
    "rcr": 3.182285347466805,
    "score": 8.1,
    "strength": "moderate",
-   "rank": 451,
+   "rank": 450,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11831,7 +11805,7 @@
    "rcr": 4.756331736844993,
    "score": 8.1,
    "strength": "moderate",
-   "rank": 452,
+   "rank": 451,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11857,7 +11831,7 @@
    "rcr": 7.307518413797833,
    "score": 8.1,
    "strength": "limited",
-   "rank": 453,
+   "rank": 452,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11883,7 +11857,7 @@
    "rcr": 4.863454050131669,
    "score": 8.1,
    "strength": "moderate",
-   "rank": 454,
+   "rank": 453,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11909,7 +11883,7 @@
    "rcr": 3.2000552709193273,
    "score": 8.1,
    "strength": "moderate",
-   "rank": 455,
+   "rank": 454,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11935,7 +11909,7 @@
    "rcr": 4.83850744507154,
    "score": 8.1,
    "strength": "limited",
-   "rank": 456,
+   "rank": 455,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11961,7 +11935,7 @@
    "rcr": 7.142368179632421,
    "score": 8.1,
    "strength": "limited",
-   "rank": 457,
+   "rank": 456,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -11987,7 +11961,7 @@
    "rcr": 7.147219305429457,
    "score": 8.1,
    "strength": "limited",
-   "rank": 458,
+   "rank": 457,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12013,7 +11987,7 @@
    "rcr": 1.9276053944283087,
    "score": 8.1,
    "strength": "moderate",
-   "rank": 459,
+   "rank": 458,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12039,7 +12013,7 @@
    "rcr": 4.82500777305553,
    "score": 8.1,
    "strength": "moderate",
-   "rank": 460,
+   "rank": 459,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12065,7 +12039,7 @@
    "rcr": 7.331987803681097,
    "score": 8.1,
    "strength": "limited",
-   "rank": 461,
+   "rank": 460,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12091,7 +12065,7 @@
    "rcr": 4.911389124685721,
    "score": 8.1,
    "strength": "limited",
-   "rank": 462,
+   "rank": 461,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12117,7 +12091,7 @@
    "rcr": 6.8733465500440465,
    "score": 8.0,
    "strength": "limited",
-   "rank": 463,
+   "rank": 462,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12143,7 +12117,7 @@
    "rcr": 7.114564863522786,
    "score": 8.0,
    "strength": "limited",
-   "rank": 464,
+   "rank": 463,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12169,7 +12143,7 @@
    "rcr": 4.7117155352192315,
    "score": 8.0,
    "strength": "moderate",
-   "rank": 465,
+   "rank": 464,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12195,7 +12169,7 @@
    "rcr": 4.576810762533928,
    "score": 8.0,
    "strength": "limited",
-   "rank": 466,
+   "rank": 465,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12221,7 +12195,7 @@
    "rcr": 7.027451954423887,
    "score": 8.0,
    "strength": "limited",
-   "rank": 467,
+   "rank": 466,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12247,7 +12221,7 @@
    "rcr": 7.041917118721339,
    "score": 8.0,
    "strength": "limited",
-   "rank": 468,
+   "rank": 467,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12273,7 +12247,7 @@
    "rcr": 7.013142568830576,
    "score": 8.0,
    "strength": "limited",
-   "rank": 469,
+   "rank": 468,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12299,7 +12273,7 @@
    "rcr": 3.0227735262361253,
    "score": 8.0,
    "strength": "limited",
-   "rank": 470,
+   "rank": 469,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12325,7 +12299,7 @@
    "rcr": 7.03035920114948,
    "score": 8.0,
    "strength": "limited",
-   "rank": 471,
+   "rank": 470,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12351,7 +12325,7 @@
    "rcr": 6.9756689784787085,
    "score": 8.0,
    "strength": "limited",
-   "rank": 472,
+   "rank": 471,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "70"
@@ -12380,7 +12354,7 @@
    "rcr": 6.934150267614561,
    "score": 8.0,
    "strength": "limited",
-   "rank": 473,
+   "rank": 472,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12406,7 +12380,7 @@
    "rcr": 3.0062737330866267,
    "score": 8.0,
    "strength": "limited",
-   "rank": 474,
+   "rank": 473,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12432,7 +12406,7 @@
    "rcr": 0.0,
    "score": 8.0,
    "strength": "strong",
-   "rank": 475,
+   "rank": 474,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12458,7 +12432,7 @@
    "rcr": 0.0,
    "score": 8.0,
    "strength": "moderate",
-   "rank": 476,
+   "rank": 475,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12484,7 +12458,7 @@
    "rcr": 0.0,
    "score": 8.0,
    "strength": "strong",
-   "rank": 477,
+   "rank": 476,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12510,7 +12484,7 @@
    "rcr": 0.0,
    "score": 8.0,
    "strength": "strong",
-   "rank": 478,
+   "rank": 477,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12536,7 +12510,7 @@
    "rcr": 0.0,
    "score": 8.0,
    "strength": "strong",
-   "rank": 479,
+   "rank": 478,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12562,7 +12536,7 @@
    "rcr": 0.0,
    "score": 8.0,
    "strength": "strong",
-   "rank": 480,
+   "rank": 479,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12588,7 +12562,7 @@
    "rcr": 0.0,
    "score": 8.0,
    "strength": "strong",
-   "rank": 481,
+   "rank": 480,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12614,7 +12588,7 @@
    "rcr": 0.0,
    "score": 8.0,
    "strength": "strong",
-   "rank": 482,
+   "rank": 481,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12640,7 +12614,7 @@
    "rcr": 6.769836665914578,
    "score": 7.9,
    "strength": "limited",
-   "rank": 483,
+   "rank": 482,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12666,7 +12640,7 @@
    "rcr": 2.818385137897043,
    "score": 7.9,
    "strength": "limited",
-   "rank": 484,
+   "rank": 483,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12692,7 +12666,7 @@
    "rcr": 2.871485118977504,
    "score": 7.9,
    "strength": "moderate",
-   "rank": 485,
+   "rank": 484,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12718,7 +12692,7 @@
    "rcr": 4.421558756509281,
    "score": 7.9,
    "strength": "limited",
-   "rank": 486,
+   "rank": 485,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12744,7 +12718,7 @@
    "rcr": 6.858016666196906,
    "score": 7.9,
    "strength": "limited",
-   "rank": 487,
+   "rank": 486,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12770,7 +12744,7 @@
    "rcr": 6.745900805432462,
    "score": 7.9,
    "strength": "limited",
-   "rank": 488,
+   "rank": 487,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12796,7 +12770,7 @@
    "rcr": 6.698315956650476,
    "score": 7.9,
    "strength": "limited",
-   "rank": 489,
+   "rank": 488,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12822,7 +12796,7 @@
    "rcr": 4.385845388921135,
    "score": 7.9,
    "strength": "limited",
-   "rank": 490,
+   "rank": 489,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12848,7 +12822,7 @@
    "rcr": 4.385845388921135,
    "score": 7.9,
    "strength": "limited",
-   "rank": 491,
+   "rank": 490,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12874,7 +12848,7 @@
    "rcr": 6.622794596103337,
    "score": 7.9,
    "strength": "limited",
-   "rank": 492,
+   "rank": 491,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12900,7 +12874,7 @@
    "rcr": 2.861777504077478,
    "score": 7.9,
    "strength": "limited",
-   "rank": 493,
+   "rank": 492,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12926,7 +12900,7 @@
    "rcr": 6.695546086283142,
    "score": 7.9,
    "strength": "limited",
-   "rank": 494,
+   "rank": 493,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12952,7 +12926,7 @@
    "rcr": 2.8402209552886206,
    "score": 7.9,
    "strength": "moderate",
-   "rank": 495,
+   "rank": 494,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -12978,7 +12952,7 @@
    "rcr": 1.7712339933975187,
    "score": 7.9,
    "strength": "limited",
-   "rank": 496,
+   "rank": 495,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13004,7 +12978,7 @@
    "rcr": 6.7368611887282,
    "score": 7.9,
    "strength": "limited",
-   "rank": 497,
+   "rank": 496,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13030,7 +13004,7 @@
    "rcr": 6.676926208646149,
    "score": 7.9,
    "strength": "limited",
-   "rank": 498,
+   "rank": 497,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13056,7 +13030,7 @@
    "rcr": 4.391136980563642,
    "score": 7.9,
    "strength": "moderate",
-   "rank": 499,
+   "rank": 498,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13082,7 +13056,7 @@
    "rcr": 4.217357283468218,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 500,
+   "rank": 499,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13108,7 +13082,7 @@
    "rcr": 6.585048177561266,
    "score": 7.8,
    "strength": "limited",
-   "rank": 501,
+   "rank": 500,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13134,7 +13108,7 @@
    "rcr": 6.46716806826788,
    "score": 7.8,
    "strength": "limited",
-   "rank": 502,
+   "rank": 501,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13160,7 +13134,7 @@
    "rcr": 6.393315310643336,
    "score": 7.8,
    "strength": "limited",
-   "rank": 503,
+   "rank": 502,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13186,7 +13160,7 @@
    "rcr": 6.343617730616119,
    "score": 7.8,
    "strength": "limited",
-   "rank": 504,
+   "rank": 503,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13212,7 +13186,7 @@
    "rcr": 4.209403333044998,
    "score": 7.8,
    "strength": "limited",
-   "rank": 505,
+   "rank": 504,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13238,7 +13212,7 @@
    "rcr": 2.737614188855877,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 506,
+   "rank": 505,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13264,7 +13238,7 @@
    "rcr": 4.241555444882816,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 507,
+   "rank": 506,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13290,7 +13264,7 @@
    "rcr": 4.344081867301406,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 508,
+   "rank": 507,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13316,7 +13290,7 @@
    "rcr": 4.2495602780519,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 509,
+   "rank": 508,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13342,7 +13316,7 @@
    "rcr": 4.197656482411044,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 510,
+   "rank": 509,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13368,7 +13342,7 @@
    "rcr": 2.702859011887188,
    "score": 7.8,
    "strength": "limited",
-   "rank": 511,
+   "rank": 510,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13394,7 +13368,7 @@
    "rcr": 2.673916691628427,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 512,
+   "rank": 511,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13420,7 +13394,7 @@
    "rcr": 4.340372391192965,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 513,
+   "rank": 512,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13446,7 +13420,7 @@
    "rcr": 6.544951394960547,
    "score": 7.8,
    "strength": "limited",
-   "rank": 514,
+   "rank": 513,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13472,7 +13446,7 @@
    "rcr": 6.5294297710989815,
    "score": 7.8,
    "strength": "limited",
-   "rank": 515,
+   "rank": 514,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13498,7 +13472,7 @@
    "rcr": 4.249167890214593,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 516,
+   "rank": 515,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13524,7 +13498,7 @@
    "rcr": 6.556741219779729,
    "score": 7.8,
    "strength": "limited",
-   "rank": 517,
+   "rank": 516,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13550,7 +13524,7 @@
    "rcr": 6.407609216430869,
    "score": 7.8,
    "strength": "limited",
-   "rank": 518,
+   "rank": 517,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13576,7 +13550,7 @@
    "rcr": 1.6508726648558858,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 519,
+   "rank": 518,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13602,7 +13576,7 @@
    "rcr": 6.08740176155111,
    "score": 7.7,
    "strength": "limited",
-   "rank": 520,
+   "rank": 519,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13628,7 +13602,7 @@
    "rcr": 6.12200083542151,
    "score": 7.7,
    "strength": "limited",
-   "rank": 521,
+   "rank": 520,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13654,7 +13628,7 @@
    "rcr": 4.181016453392074,
    "score": 7.7,
    "strength": "moderate",
-   "rank": 522,
+   "rank": 521,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13680,7 +13654,7 @@
    "rcr": 6.237288019966178,
    "score": 7.7,
    "strength": "limited",
-   "rank": 523,
+   "rank": 522,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13706,7 +13680,7 @@
    "rcr": 6.305738074579797,
    "score": 7.7,
    "strength": "limited",
-   "rank": 524,
+   "rank": 523,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13732,7 +13706,7 @@
    "rcr": 6.089249503928727,
    "score": 7.7,
    "strength": "limited",
-   "rank": 525,
+   "rank": 524,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13758,7 +13732,7 @@
    "rcr": 4.01547748706632,
    "score": 7.7,
    "strength": "moderate",
-   "rank": 526,
+   "rank": 525,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13784,7 +13758,7 @@
    "rcr": 6.1092667606806295,
    "score": 7.7,
    "strength": "limited",
-   "rank": 527,
+   "rank": 526,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13810,7 +13784,7 @@
    "rcr": 2.60764914299612,
    "score": 7.7,
    "strength": "limited",
-   "rank": 528,
+   "rank": 527,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13836,7 +13810,7 @@
    "rcr": 2.5876342921178606,
    "score": 7.7,
    "strength": "limited",
-   "rank": 529,
+   "rank": 528,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13862,7 +13836,7 @@
    "rcr": 1.5235135406142601,
    "score": 7.7,
    "strength": "moderate",
-   "rank": 530,
+   "rank": 529,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13888,7 +13862,7 @@
    "rcr": 6.004481600941427,
    "score": 7.6,
    "strength": "limited",
-   "rank": 531,
+   "rank": 530,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13914,7 +13888,7 @@
    "rcr": 3.9109689917398227,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 532,
+   "rank": 531,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13940,7 +13914,7 @@
    "rcr": 6.049192103979431,
    "score": 7.6,
    "strength": "limited",
-   "rank": 533,
+   "rank": 532,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13966,7 +13940,7 @@
    "rcr": 6.049858314563569,
    "score": 7.6,
    "strength": "limited",
-   "rank": 534,
+   "rank": 533,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -13992,7 +13966,7 @@
    "rcr": 3.9543051961119153,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 535,
+   "rank": 534,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14018,7 +13992,7 @@
    "rcr": 5.90603852983392,
    "score": 7.6,
    "strength": "limited",
-   "rank": 536,
+   "rank": 535,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14044,7 +14018,7 @@
    "rcr": 6.024224599557443,
    "score": 7.6,
    "strength": "limited",
-   "rank": 537,
+   "rank": 536,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "30"
@@ -14073,7 +14047,7 @@
    "rcr": 5.950618917883945,
    "score": 7.6,
    "strength": "limited",
-   "rank": 538,
+   "rank": 537,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14099,7 +14073,7 @@
    "rcr": 3.879044882572838,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 539,
+   "rank": 538,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14125,7 +14099,7 @@
    "rcr": 5.914592667697967,
    "score": 7.6,
    "strength": "limited",
-   "rank": 540,
+   "rank": 539,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14151,7 +14125,7 @@
    "rcr": 8.742612278629867,
    "score": 7.6,
    "strength": "limited",
-   "rank": 541,
+   "rank": 540,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14177,7 +14151,7 @@
    "rcr": 3.8828199132401977,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 542,
+   "rank": 541,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14203,7 +14177,7 @@
    "rcr": 3.955729807646022,
    "score": 7.6,
    "strength": "limited",
-   "rank": 543,
+   "rank": 542,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14229,7 +14203,7 @@
    "rcr": 6.016373421061795,
    "score": 7.6,
    "strength": "limited",
-   "rank": 544,
+   "rank": 543,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14255,7 +14229,7 @@
    "rcr": 2.4917418134001745,
    "score": 7.6,
    "strength": "limited",
-   "rank": 545,
+   "rank": 544,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14281,7 +14255,7 @@
    "rcr": 2.4445651979635064,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 546,
+   "rank": 545,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14307,7 +14281,7 @@
    "rcr": 2.5347320734697867,
    "score": 7.6,
    "strength": "limited",
-   "rank": 547,
+   "rank": 546,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14333,7 +14307,7 @@
    "rcr": 3.898121034706787,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 548,
+   "rank": 547,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14359,7 +14333,7 @@
    "rcr": 3.8974772492344987,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 549,
+   "rank": 548,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14385,7 +14359,7 @@
    "rcr": 4.00730438562463,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 550,
+   "rank": 549,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14411,7 +14385,7 @@
    "rcr": 3.903924688852752,
    "score": 7.6,
    "strength": "limited",
-   "rank": 551,
+   "rank": 550,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14437,7 +14411,7 @@
    "rcr": 2.476308997283829,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 552,
+   "rank": 551,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14463,7 +14437,7 @@
    "rcr": 2.426088704702979,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 553,
+   "rank": 552,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14489,7 +14463,7 @@
    "rcr": 4.008928325727331,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 554,
+   "rank": 553,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14515,7 +14489,7 @@
    "rcr": 2.510005251902756,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 555,
+   "rank": 554,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14541,7 +14515,7 @@
    "rcr": 2.499035447664831,
    "score": 7.6,
    "strength": "limited",
-   "rank": 556,
+   "rank": 555,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14567,7 +14541,7 @@
    "rcr": 2.4955119574319586,
    "score": 7.6,
    "strength": "moderate",
-   "rank": 557,
+   "rank": 556,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14593,7 +14567,7 @@
    "rcr": 5.648028971532154,
    "score": 7.5,
    "strength": "limited",
-   "rank": 558,
+   "rank": 557,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14619,7 +14593,7 @@
    "rcr": 3.7849481840942216,
    "score": 7.5,
    "strength": "limited",
-   "rank": 559,
+   "rank": 558,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14645,7 +14619,7 @@
    "rcr": 3.694611377395172,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 560,
+   "rank": 559,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14671,7 +14645,7 @@
    "rcr": 3.729194072242713,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 561,
+   "rank": 560,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14697,7 +14671,7 @@
    "rcr": 5.717355289296752,
    "score": 7.5,
    "strength": "limited",
-   "rank": 562,
+   "rank": 561,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14723,7 +14697,7 @@
    "rcr": 2.3816158353040833,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 563,
+   "rank": 562,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14749,7 +14723,7 @@
    "rcr": 3.833117175546544,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 564,
+   "rank": 563,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14775,7 +14749,7 @@
    "rcr": 2.3932470987484513,
    "score": 7.5,
    "strength": "limited",
-   "rank": 565,
+   "rank": 564,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14801,7 +14775,7 @@
    "rcr": 3.7743324938521843,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 566,
+   "rank": 565,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14827,7 +14801,7 @@
    "rcr": 5.799177988518048,
    "score": 7.5,
    "strength": "limited",
-   "rank": 567,
+   "rank": 566,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14853,7 +14827,7 @@
    "rcr": 3.7445612471872676,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 568,
+   "rank": 567,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14879,7 +14853,7 @@
    "rcr": 3.778294067261429,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 569,
+   "rank": 568,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14905,7 +14879,7 @@
    "rcr": 5.8189869232064115,
    "score": 7.5,
    "strength": "limited",
-   "rank": 570,
+   "rank": 569,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14931,7 +14905,7 @@
    "rcr": 1.413973921157273,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 571,
+   "rank": 570,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14957,7 +14931,7 @@
    "rcr": 3.7804124540031863,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 572,
+   "rank": 571,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -14983,7 +14957,7 @@
    "rcr": 2.3810114328164347,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 573,
+   "rank": 572,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15009,7 +14983,7 @@
    "rcr": 1.3404060809539364,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 574,
+   "rank": 573,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15035,7 +15009,7 @@
    "rcr": 2.340805892952378,
    "score": 7.5,
    "strength": "limited",
-   "rank": 575,
+   "rank": 574,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15061,7 +15035,7 @@
    "rcr": 1.3661702410625731,
    "score": 7.5,
    "strength": "limited",
-   "rank": 576,
+   "rank": 575,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15087,7 +15061,7 @@
    "rcr": 2.3273397183545255,
    "score": 7.5,
    "strength": "limited",
-   "rank": 577,
+   "rank": 576,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15113,7 +15087,7 @@
    "rcr": 5.3885585496985,
    "score": 7.4,
    "strength": "limited",
-   "rank": 578,
+   "rank": 577,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15139,7 +15113,7 @@
    "rcr": 3.535509815036361,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 579,
+   "rank": 578,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15165,7 +15139,7 @@
    "rcr": 5.38747253552099,
    "score": 7.4,
    "strength": "limited",
-   "rank": 580,
+   "rank": 579,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15191,7 +15165,7 @@
    "rcr": 5.436508574161741,
    "score": 7.4,
    "strength": "limited",
-   "rank": 581,
+   "rank": 580,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15217,7 +15191,7 @@
    "rcr": 5.4239995882085585,
    "score": 7.4,
    "strength": "limited",
-   "rank": 582,
+   "rank": 581,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15243,7 +15217,7 @@
    "rcr": 2.2918279250362015,
    "score": 7.4,
    "strength": "limited",
-   "rank": 583,
+   "rank": 582,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15269,7 +15243,7 @@
    "rcr": 3.6676824233842242,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 584,
+   "rank": 583,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15295,7 +15269,7 @@
    "rcr": 3.6205279827619763,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 585,
+   "rank": 584,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15321,7 +15295,7 @@
    "rcr": 3.5644724204589204,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 586,
+   "rank": 585,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "130"
@@ -15350,7 +15324,7 @@
    "rcr": 3.6651129901412602,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 587,
+   "rank": 586,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "16",
@@ -15380,7 +15354,7 @@
    "rcr": 3.661448610027142,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 588,
+   "rank": 587,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15406,7 +15380,7 @@
    "rcr": 3.5721624070904676,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 589,
+   "rank": 588,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15432,7 +15406,7 @@
    "rcr": 3.5294727252786697,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 590,
+   "rank": 589,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15458,7 +15432,7 @@
    "rcr": 3.673870487664444,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 591,
+   "rank": 590,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15484,7 +15458,7 @@
    "rcr": 5.498923570922598,
    "score": 7.4,
    "strength": "limited",
-   "rank": 592,
+   "rank": 591,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15510,7 +15484,7 @@
    "rcr": 3.5270101246622163,
    "score": 7.4,
    "strength": "limited",
-   "rank": 593,
+   "rank": 592,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15536,7 +15510,7 @@
    "rcr": 5.430102334126758,
    "score": 7.4,
    "strength": "limited",
-   "rank": 594,
+   "rank": 593,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15562,7 +15536,7 @@
    "rcr": 3.6125870255055323,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 595,
+   "rank": 594,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "56"
@@ -15591,7 +15565,7 @@
    "rcr": 2.302082647883418,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 596,
+   "rank": 595,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15617,7 +15591,7 @@
    "rcr": 5.403371435401233,
    "score": 7.4,
    "strength": "limited",
-   "rank": 597,
+   "rank": 596,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15643,7 +15617,7 @@
    "rcr": 5.392567779289321,
    "score": 7.4,
    "strength": "limited",
-   "rank": 598,
+   "rank": 597,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15669,7 +15643,7 @@
    "rcr": 3.5170997474410153,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 599,
+   "rank": 598,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15695,7 +15669,7 @@
    "rcr": 3.529295824144799,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 600,
+   "rank": 599,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15721,7 +15695,7 @@
    "rcr": 2.2492589348184224,
    "score": 7.4,
    "strength": "limited",
-   "rank": 601,
+   "rank": 600,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15747,7 +15721,7 @@
    "rcr": 2.294156650432426,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 602,
+   "rank": 601,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15773,7 +15747,7 @@
    "rcr": 3.4395483177288786,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 603,
+   "rank": 602,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15799,7 +15773,7 @@
    "rcr": 5.226935240332247,
    "score": 7.3,
    "strength": "limited",
-   "rank": 604,
+   "rank": 603,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15825,7 +15799,7 @@
    "rcr": 3.5046558424112924,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 605,
+   "rank": 604,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15851,7 +15825,7 @@
    "rcr": 3.39065039322612,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 606,
+   "rank": 605,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15877,7 +15851,7 @@
    "rcr": 5.311583934454014,
    "score": 7.3,
    "strength": "limited",
-   "rank": 607,
+   "rank": 606,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15903,7 +15877,7 @@
    "rcr": 3.4838098361388394,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 608,
+   "rank": 607,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15929,7 +15903,7 @@
    "rcr": 3.4118940970578335,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 609,
+   "rank": 608,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15955,7 +15929,7 @@
    "rcr": 5.328895421618414,
    "score": 7.3,
    "strength": "limited",
-   "rank": 610,
+   "rank": 609,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -15981,7 +15955,7 @@
    "rcr": 3.4518612497486427,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 611,
+   "rank": 610,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16007,7 +15981,7 @@
    "rcr": 5.21337807307398,
    "score": 7.3,
    "strength": "limited",
-   "rank": 612,
+   "rank": 611,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16033,7 +16007,7 @@
    "rcr": 3.385828514220214,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 613,
+   "rank": 612,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16059,7 +16033,7 @@
    "rcr": 3.5154301602383757,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 614,
+   "rank": 613,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16085,7 +16059,7 @@
    "rcr": 3.5092257738377888,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 615,
+   "rank": 614,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16111,7 +16085,7 @@
    "rcr": 3.5035794372250173,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 616,
+   "rank": 615,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16137,7 +16111,7 @@
    "rcr": 3.5000164826288396,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 617,
+   "rank": 616,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16163,7 +16137,7 @@
    "rcr": 5.370434759714052,
    "score": 7.3,
    "strength": "limited",
-   "rank": 618,
+   "rank": 617,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16189,7 +16163,7 @@
    "rcr": 2.094915645283168,
    "score": 7.3,
    "strength": "limited",
-   "rank": 619,
+   "rank": 618,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16215,7 +16189,7 @@
    "rcr": 3.506571284415288,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 620,
+   "rank": 619,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16241,7 +16215,7 @@
    "rcr": 2.17437574423663,
    "score": 7.3,
    "strength": "limited",
-   "rank": 621,
+   "rank": 620,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16267,7 +16241,7 @@
    "rcr": 1.1847000373551653,
    "score": 7.3,
    "strength": "moderate",
-   "rank": 622,
+   "rank": 621,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16293,7 +16267,7 @@
    "rcr": 4.978085511778803,
    "score": 7.2,
    "strength": "limited",
-   "rank": 623,
+   "rank": 622,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16319,7 +16293,7 @@
    "rcr": 3.346105435794432,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 624,
+   "rank": 623,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16345,7 +16319,7 @@
    "rcr": 3.3048029987901724,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 625,
+   "rank": 624,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16371,7 +16345,7 @@
    "rcr": 5.166317270907705,
    "score": 7.2,
    "strength": "limited",
-   "rank": 626,
+   "rank": 625,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16397,7 +16371,7 @@
    "rcr": 3.3515646160149632,
    "score": 7.2,
    "strength": "limited",
-   "rank": 627,
+   "rank": 626,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16423,7 +16397,7 @@
    "rcr": 5.103875659594648,
    "score": 7.2,
    "strength": "limited",
-   "rank": 628,
+   "rank": 627,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16449,7 +16423,7 @@
    "rcr": 5.062785662823087,
    "score": 7.2,
    "strength": "limited",
-   "rank": 629,
+   "rank": 628,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16475,7 +16449,7 @@
    "rcr": 3.2709725792686206,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 630,
+   "rank": 629,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16501,7 +16475,7 @@
    "rcr": 3.2999481317487294,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 631,
+   "rank": 630,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16527,7 +16501,7 @@
    "rcr": 5.087726727586958,
    "score": 7.2,
    "strength": "limited",
-   "rank": 632,
+   "rank": 631,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16553,7 +16527,7 @@
    "rcr": 3.3429309901863515,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 633,
+   "rank": 632,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16579,7 +16553,7 @@
    "rcr": 3.3239672337183097,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 634,
+   "rank": 633,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16605,7 +16579,7 @@
    "rcr": 2.0116346606696776,
    "score": 7.2,
    "strength": "limited",
-   "rank": 635,
+   "rank": 634,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16631,7 +16605,7 @@
    "rcr": 3.322274717613546,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 636,
+   "rank": 635,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16657,7 +16631,7 @@
    "rcr": 3.2815241037178744,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 637,
+   "rank": 636,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16683,7 +16657,7 @@
    "rcr": 5.0630041167350175,
    "score": 7.2,
    "strength": "limited",
-   "rank": 638,
+   "rank": 637,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16709,7 +16683,7 @@
    "rcr": 3.2595614287451506,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 639,
+   "rank": 638,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16735,7 +16709,7 @@
    "rcr": 5.092311134673373,
    "score": 7.2,
    "strength": "limited",
-   "rank": 640,
+   "rank": 639,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16761,7 +16735,7 @@
    "rcr": 3.332439361371837,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 641,
+   "rank": 640,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16787,7 +16761,7 @@
    "rcr": 2.059269174879135,
    "score": 7.2,
    "strength": "limited",
-   "rank": 642,
+   "rank": 641,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16813,7 +16787,7 @@
    "rcr": 1.1138014321368175,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 643,
+   "rank": 642,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16839,7 +16813,7 @@
    "rcr": 4.899412993851437,
    "score": 7.1,
    "strength": "limited",
-   "rank": 644,
+   "rank": 643,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16865,7 +16839,7 @@
    "rcr": 4.915455642157303,
    "score": 7.1,
    "strength": "limited",
-   "rank": 645,
+   "rank": 644,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16891,7 +16865,7 @@
    "rcr": 3.1920992421727608,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 646,
+   "rank": 645,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16917,7 +16891,7 @@
    "rcr": 3.073652574789347,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 647,
+   "rank": 646,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16943,7 +16917,7 @@
    "rcr": 3.200857336173187,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 648,
+   "rank": 647,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16969,7 +16943,7 @@
    "rcr": 1.9052655836171217,
    "score": 7.1,
    "strength": "limited",
-   "rank": 649,
+   "rank": 648,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -16995,7 +16969,7 @@
    "rcr": 4.8403140683329555,
    "score": 7.1,
    "strength": "limited",
-   "rank": 650,
+   "rank": 649,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17021,7 +16995,7 @@
    "rcr": 4.759871162523644,
    "score": 7.1,
    "strength": "limited",
-   "rank": 651,
+   "rank": 650,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17047,7 +17021,7 @@
    "rcr": 4.95846543486345,
    "score": 7.1,
    "strength": "limited",
-   "rank": 652,
+   "rank": 651,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "26"
@@ -17076,7 +17050,7 @@
    "rcr": 3.1668230973618154,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 653,
+   "rank": 652,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17102,7 +17076,7 @@
    "rcr": 3.122484163311515,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 654,
+   "rank": 653,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17128,7 +17102,7 @@
    "rcr": 4.793545714178472,
    "score": 7.1,
    "strength": "limited",
-   "rank": 655,
+   "rank": 654,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17154,7 +17128,7 @@
    "rcr": 3.0970972906656553,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 656,
+   "rank": 655,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17180,7 +17154,7 @@
    "rcr": 4.930238152597129,
    "score": 7.1,
    "strength": "limited",
-   "rank": 657,
+   "rank": 656,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17206,7 +17180,7 @@
    "rcr": 4.81682366528403,
    "score": 7.1,
    "strength": "limited",
-   "rank": 658,
+   "rank": 657,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17232,7 +17206,7 @@
    "rcr": 4.816168315125488,
    "score": 7.1,
    "strength": "limited",
-   "rank": 659,
+   "rank": 658,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17258,7 +17232,7 @@
    "rcr": 1.9504867123357836,
    "score": 7.1,
    "strength": "limited",
-   "rank": 660,
+   "rank": 659,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17284,7 +17258,7 @@
    "rcr": 3.1414805058967596,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 661,
+   "rank": 660,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17310,7 +17284,7 @@
    "rcr": 3.096719854345635,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 662,
+   "rank": 661,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17336,7 +17310,7 @@
    "rcr": 3.1471047548689324,
    "score": 7.1,
    "strength": "limited",
-   "rank": 663,
+   "rank": 662,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17362,7 +17336,7 @@
    "rcr": 3.1756736409237862,
    "score": 7.1,
    "strength": "limited",
-   "rank": 664,
+   "rank": 663,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17388,7 +17362,7 @@
    "rcr": 1.9637674909841936,
    "score": 7.1,
    "strength": "limited",
-   "rank": 665,
+   "rank": 664,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17414,7 +17388,7 @@
    "rcr": 4.929341983104937,
    "score": 7.1,
    "strength": "limited",
-   "rank": 666,
+   "rank": 665,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17440,7 +17414,7 @@
    "rcr": 4.913945808248806,
    "score": 7.1,
    "strength": "limited",
-   "rank": 667,
+   "rank": 666,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17466,7 +17440,7 @@
    "rcr": 4.777171000832973,
    "score": 7.1,
    "strength": "limited",
-   "rank": 668,
+   "rank": 667,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17492,7 +17466,7 @@
    "rcr": 3.208284583585244,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 669,
+   "rank": 668,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17518,7 +17492,7 @@
    "rcr": 1.8850846605076867,
    "score": 7.1,
    "strength": "limited",
-   "rank": 670,
+   "rank": 669,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17544,7 +17518,7 @@
    "rcr": 1.8836325337377904,
    "score": 7.1,
    "strength": "limited",
-   "rank": 671,
+   "rank": 670,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17570,7 +17544,7 @@
    "rcr": 1.9441898731935925,
    "score": 7.1,
    "strength": "limited",
-   "rank": 672,
+   "rank": 671,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17596,7 +17570,7 @@
    "rcr": 4.929341983104937,
    "score": 7.1,
    "strength": "limited",
-   "rank": 673,
+   "rank": 672,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "100"
@@ -17625,7 +17599,7 @@
    "rcr": 4.755653147623379,
    "score": 7.0,
    "strength": "limited",
-   "rank": 674,
+   "rank": 673,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17651,7 +17625,7 @@
    "rcr": 4.597841682045384,
    "score": 7.0,
    "strength": "limited",
-   "rank": 675,
+   "rank": 674,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17677,7 +17651,7 @@
    "rcr": 4.6359387648588095,
    "score": 7.0,
    "strength": "limited",
-   "rank": 676,
+   "rank": 675,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17703,7 +17677,7 @@
    "rcr": 4.639027560304747,
    "score": 7.0,
    "strength": "limited",
-   "rank": 677,
+   "rank": 676,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17729,7 +17703,7 @@
    "rcr": 4.738632827397445,
    "score": 7.0,
    "strength": "limited",
-   "rank": 678,
+   "rank": 677,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17755,7 +17729,7 @@
    "rcr": 4.594133745205024,
    "score": 7.0,
    "strength": "limited",
-   "rank": 679,
+   "rank": 678,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17781,7 +17755,7 @@
    "rcr": 2.968141316790648,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 680,
+   "rank": 679,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17807,7 +17781,7 @@
    "rcr": 4.742312255921352,
    "score": 7.0,
    "strength": "limited",
-   "rank": 681,
+   "rank": 680,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17833,7 +17807,7 @@
    "rcr": 4.71973972166879,
    "score": 7.0,
    "strength": "limited",
-   "rank": 682,
+   "rank": 681,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17859,7 +17833,7 @@
    "rcr": 4.708037887648124,
    "score": 7.0,
    "strength": "limited",
-   "rank": 683,
+   "rank": 682,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17885,7 +17859,7 @@
    "rcr": 4.71905843908313,
    "score": 7.0,
    "strength": "limited",
-   "rank": 684,
+   "rank": 683,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17911,7 +17885,7 @@
    "rcr": 4.716266451705278,
    "score": 7.0,
    "strength": "limited",
-   "rank": 685,
+   "rank": 684,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17937,7 +17911,7 @@
    "rcr": 2.993445234387075,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 686,
+   "rank": 685,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17963,7 +17937,7 @@
    "rcr": 3.0354869615125626,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 687,
+   "rank": 686,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -17989,7 +17963,7 @@
    "rcr": 4.591288860722741,
    "score": 7.0,
    "strength": "limited",
-   "rank": 688,
+   "rank": 687,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18015,7 +17989,7 @@
    "rcr": 2.956170370136811,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 689,
+   "rank": 688,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18041,7 +18015,7 @@
    "rcr": 2.931580713554645,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 690,
+   "rank": 689,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "61"
@@ -18070,7 +18044,7 @@
    "rcr": 1.82032587557911,
    "score": 7.0,
    "strength": "limited",
-   "rank": 691,
+   "rank": 690,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18096,7 +18070,7 @@
    "rcr": 2.9778201569861062,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 692,
+   "rank": 691,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18122,7 +18096,7 @@
    "rcr": 3.0103987151331215,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 693,
+   "rank": 692,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18148,7 +18122,7 @@
    "rcr": 3.062448059189578,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 694,
+   "rank": 693,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18174,7 +18148,7 @@
    "rcr": 2.968455942655961,
    "score": 7.0,
    "strength": "limited",
-   "rank": 695,
+   "rank": 694,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18200,7 +18174,7 @@
    "rcr": 4.725515567503983,
    "score": 7.0,
    "strength": "limited",
-   "rank": 696,
+   "rank": 695,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18226,7 +18200,7 @@
    "rcr": 1.8162563938518386,
    "score": 7.0,
    "strength": "limited",
-   "rank": 697,
+   "rank": 696,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18252,7 +18226,7 @@
    "rcr": 0.3960700911435108,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 698,
+   "rank": 697,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18278,7 +18252,7 @@
    "rcr": 1.0012399127753453,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 699,
+   "rank": 698,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18304,7 +18278,7 @@
    "rcr": 0.0,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 700,
+   "rank": 699,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18330,7 +18304,7 @@
    "rcr": 0.0,
    "score": 7.0,
    "strength": "strong",
-   "rank": 701,
+   "rank": 700,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18356,7 +18330,7 @@
    "rcr": 0.0,
    "score": 7.0,
    "strength": "strong",
-   "rank": 702,
+   "rank": 701,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18382,7 +18356,7 @@
    "rcr": 0.0,
    "score": 7.0,
    "strength": "strong",
-   "rank": 703,
+   "rank": 702,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18408,7 +18382,7 @@
    "rcr": 0.0,
    "score": 7.0,
    "strength": "strong",
-   "rank": 704,
+   "rank": 703,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18434,7 +18408,7 @@
    "rcr": 0.0,
    "score": 7.0,
    "strength": "strong",
-   "rank": 705,
+   "rank": 704,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18460,7 +18434,7 @@
    "rcr": 0.0,
    "score": 7.0,
    "strength": "strong",
-   "rank": 706,
+   "rank": 705,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18486,7 +18460,7 @@
    "rcr": 4.414118526669974,
    "score": 6.9,
    "strength": "limited",
-   "rank": 707,
+   "rank": 706,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18512,7 +18486,7 @@
    "rcr": 4.505121268528454,
    "score": 6.9,
    "strength": "limited",
-   "rank": 708,
+   "rank": 707,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18538,7 +18512,7 @@
    "rcr": 4.514399136795278,
    "score": 6.9,
    "strength": "limited",
-   "rank": 709,
+   "rank": 708,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18564,7 +18538,7 @@
    "rcr": 2.9300795860377224,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 710,
+   "rank": 709,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18590,7 +18564,7 @@
    "rcr": 2.8662983657119674,
    "score": 6.9,
    "strength": "limited",
-   "rank": 711,
+   "rank": 710,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18616,7 +18590,7 @@
    "rcr": 4.478881143312752,
    "score": 6.9,
    "strength": "limited",
-   "rank": 712,
+   "rank": 711,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18642,7 +18616,7 @@
    "rcr": 2.844013377056718,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 713,
+   "rank": 712,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18668,7 +18642,7 @@
    "rcr": 2.8672808581864877,
    "score": 6.9,
    "strength": "limited",
-   "rank": 714,
+   "rank": 713,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18694,7 +18668,7 @@
    "rcr": 1.6999626030829205,
    "score": 6.9,
    "strength": "limited",
-   "rank": 715,
+   "rank": 714,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18720,7 +18694,7 @@
    "rcr": 4.436990337421351,
    "score": 6.9,
    "strength": "limited",
-   "rank": 716,
+   "rank": 715,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18746,7 +18720,7 @@
    "rcr": 2.89775352092827,
    "score": 6.9,
    "strength": "limited",
-   "rank": 717,
+   "rank": 716,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18772,7 +18746,7 @@
    "rcr": 4.394057007814981,
    "score": 6.9,
    "strength": "limited",
-   "rank": 718,
+   "rank": 717,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18798,7 +18772,7 @@
    "rcr": 4.540495381263086,
    "score": 6.9,
    "strength": "limited",
-   "rank": 719,
+   "rank": 718,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18824,7 +18798,7 @@
    "rcr": 2.8125672098245196,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 720,
+   "rank": 719,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18850,7 +18824,7 @@
    "rcr": 4.385793664695349,
    "score": 6.9,
    "strength": "limited",
-   "rank": 721,
+   "rank": 720,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18876,7 +18850,7 @@
    "rcr": 4.464476871758398,
    "score": 6.9,
    "strength": "limited",
-   "rank": 722,
+   "rank": 721,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18902,7 +18876,7 @@
    "rcr": 2.8398585732990242,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 723,
+   "rank": 722,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18928,7 +18902,7 @@
    "rcr": 2.822498640492146,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 724,
+   "rank": 723,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18954,7 +18928,7 @@
    "rcr": 4.549248143443833,
    "score": 6.9,
    "strength": "limited",
-   "rank": 725,
+   "rank": 724,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -18980,7 +18954,7 @@
    "rcr": 2.892061855896433,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 726,
+   "rank": 725,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "30"
@@ -19009,7 +18983,7 @@
    "rcr": 4.557091674725633,
    "score": 6.9,
    "strength": "limited",
-   "rank": 727,
+   "rank": 726,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19035,7 +19009,7 @@
    "rcr": 4.43237384515171,
    "score": 6.9,
    "strength": "limited",
-   "rank": 728,
+   "rank": 727,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19061,7 +19035,7 @@
    "rcr": 2.838719897046699,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 729,
+   "rank": 728,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19087,7 +19061,7 @@
    "rcr": 2.8337205504460723,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 730,
+   "rank": 729,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19113,7 +19087,7 @@
    "rcr": 2.818154375939203,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 731,
+   "rank": 730,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19139,7 +19113,7 @@
    "rcr": 2.799433540227152,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 732,
+   "rank": 731,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19165,7 +19139,7 @@
    "rcr": 2.7974424779652547,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 733,
+   "rank": 732,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "474"
@@ -19194,7 +19168,7 @@
    "rcr": 1.7693889217705634,
    "score": 6.9,
    "strength": "limited",
-   "rank": 734,
+   "rank": 733,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19220,7 +19194,7 @@
    "rcr": 4.3585537164920325,
    "score": 6.8,
    "strength": "limited",
-   "rank": 735,
+   "rank": 734,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19246,7 +19220,7 @@
    "rcr": 4.294553972147931,
    "score": 6.8,
    "strength": "limited",
-   "rank": 736,
+   "rank": 735,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19272,7 +19246,7 @@
    "rcr": 2.7196115995920094,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 737,
+   "rank": 736,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19298,7 +19272,7 @@
    "rcr": 4.289329766932371,
    "score": 6.8,
    "strength": "limited",
-   "rank": 738,
+   "rank": 737,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19324,7 +19298,7 @@
    "rcr": 2.7200303776801764,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 739,
+   "rank": 738,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19350,7 +19324,7 @@
    "rcr": 2.7550505574928987,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 740,
+   "rank": 739,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19376,7 +19350,7 @@
    "rcr": 2.7465732526924813,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 741,
+   "rank": 740,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19402,7 +19376,7 @@
    "rcr": 2.6972685620511614,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 742,
+   "rank": 741,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19428,7 +19402,7 @@
    "rcr": 2.6983531221917887,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 743,
+   "rank": 742,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19454,7 +19428,7 @@
    "rcr": 4.203109697747021,
    "score": 6.8,
    "strength": "limited",
-   "rank": 744,
+   "rank": 743,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "200"
@@ -19483,7 +19457,7 @@
    "rcr": 2.762177701280128,
    "score": 6.8,
    "strength": "limited",
-   "rank": 745,
+   "rank": 744,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19509,7 +19483,7 @@
    "rcr": 4.362855491719261,
    "score": 6.8,
    "strength": "limited",
-   "rank": 746,
+   "rank": 745,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19535,7 +19509,7 @@
    "rcr": 2.73278119678688,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 747,
+   "rank": 746,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19561,7 +19535,7 @@
    "rcr": 4.262535755613578,
    "score": 6.8,
    "strength": "limited",
-   "rank": 748,
+   "rank": 747,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19587,7 +19561,7 @@
    "rcr": 2.7472318331112557,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 749,
+   "rank": 748,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19613,7 +19587,7 @@
    "rcr": 2.7944913389921004,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 750,
+   "rank": 749,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19639,7 +19613,7 @@
    "rcr": 2.66971452505861,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 751,
+   "rank": 750,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19665,7 +19639,7 @@
    "rcr": 1.652981674452335,
    "score": 6.8,
    "strength": "limited",
-   "rank": 752,
+   "rank": 751,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19691,7 +19665,7 @@
    "rcr": 4.236183805377846,
    "score": 6.8,
    "strength": "limited",
-   "rank": 753,
+   "rank": 752,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19717,7 +19691,7 @@
    "rcr": 4.200953139947402,
    "score": 6.8,
    "strength": "limited",
-   "rank": 754,
+   "rank": 753,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19743,7 +19717,7 @@
    "rcr": 4.233290237204773,
    "score": 6.8,
    "strength": "limited",
-   "rank": 755,
+   "rank": 754,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19769,7 +19743,7 @@
    "rcr": 2.749851403415857,
    "score": 6.8,
    "strength": "limited",
-   "rank": 756,
+   "rank": 755,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19795,7 +19769,7 @@
    "rcr": 2.785482264879134,
    "score": 6.8,
    "strength": "limited",
-   "rank": 757,
+   "rank": 756,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19821,7 +19795,7 @@
    "rcr": 0.8502741091072612,
    "score": 6.8,
    "strength": "limited",
-   "rank": 758,
+   "rank": 757,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19847,7 +19821,7 @@
    "rcr": 2.7504923944189845,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 759,
+   "rank": 758,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19873,7 +19847,7 @@
    "rcr": 2.792256921015369,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 760,
+   "rank": 759,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19899,7 +19873,7 @@
    "rcr": 2.697739152669722,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 761,
+   "rank": 760,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19925,7 +19899,7 @@
    "rcr": 4.294672382914448,
    "score": 6.8,
    "strength": "limited",
-   "rank": 762,
+   "rank": 761,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19951,7 +19925,7 @@
    "rcr": 2.7783405632346234,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 763,
+   "rank": 762,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -19977,7 +19951,7 @@
    "rcr": 1.6424850183821609,
    "score": 6.8,
    "strength": "limited",
-   "rank": 764,
+   "rank": 763,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20003,7 +19977,7 @@
    "rcr": 0.8796133521148547,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 765,
+   "rank": 764,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20029,7 +20003,7 @@
    "rcr": 4.098458057169232,
    "score": 6.7,
    "strength": "limited",
-   "rank": 766,
+   "rank": 765,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20055,7 +20029,7 @@
    "rcr": 4.168971497402089,
    "score": 6.7,
    "strength": "limited",
-   "rank": 767,
+   "rank": 766,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20081,7 +20055,7 @@
    "rcr": 4.162244893366461,
    "score": 6.7,
    "strength": "limited",
-   "rank": 768,
+   "rank": 767,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20107,7 +20081,7 @@
    "rcr": 4.020587562459855,
    "score": 6.7,
    "strength": "limited",
-   "rank": 769,
+   "rank": 768,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20133,7 +20107,7 @@
    "rcr": 4.150015184712049,
    "score": 6.7,
    "strength": "limited",
-   "rank": 770,
+   "rank": 769,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20159,7 +20133,7 @@
    "rcr": 2.629385825312089,
    "score": 6.7,
    "strength": "limited",
-   "rank": 771,
+   "rank": 770,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20185,7 +20159,7 @@
    "rcr": 4.154023254939623,
    "score": 6.7,
    "strength": "limited",
-   "rank": 772,
+   "rank": 771,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20211,7 +20185,7 @@
    "rcr": 4.051204712109667,
    "score": 6.7,
    "strength": "limited",
-   "rank": 773,
+   "rank": 772,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20237,7 +20211,7 @@
    "rcr": 4.05477890424225,
    "score": 6.7,
    "strength": "limited",
-   "rank": 774,
+   "rank": 773,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20263,7 +20237,7 @@
    "rcr": 4.155161082461145,
    "score": 6.7,
    "strength": "limited",
-   "rank": 775,
+   "rank": 774,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20289,7 +20263,7 @@
    "rcr": 4.112321991598766,
    "score": 6.7,
    "strength": "limited",
-   "rank": 776,
+   "rank": 775,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20315,7 +20289,7 @@
    "rcr": 4.111363195838831,
    "score": 6.7,
    "strength": "limited",
-   "rank": 777,
+   "rank": 776,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20341,7 +20315,7 @@
    "rcr": 2.6158434998208198,
    "score": 6.7,
    "strength": "moderate",
-   "rank": 778,
+   "rank": 777,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20367,7 +20341,7 @@
    "rcr": 4.156123473987572,
    "score": 6.7,
    "strength": "limited",
-   "rank": 779,
+   "rank": 778,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20393,7 +20367,7 @@
    "rcr": 4.116491916742349,
    "score": 6.7,
    "strength": "limited",
-   "rank": 780,
+   "rank": 779,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20419,7 +20393,7 @@
    "rcr": 4.08676750921385,
    "score": 6.7,
    "strength": "limited",
-   "rank": 781,
+   "rank": 780,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20445,7 +20419,7 @@
    "rcr": 2.635989994780931,
    "score": 6.7,
    "strength": "moderate",
-   "rank": 782,
+   "rank": 781,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20471,7 +20445,7 @@
    "rcr": 4.0168050402999915,
    "score": 6.7,
    "strength": "limited",
-   "rank": 783,
+   "rank": 782,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "12"
@@ -20500,7 +20474,7 @@
    "rcr": 4.064452054960584,
    "score": 6.7,
    "strength": "limited",
-   "rank": 784,
+   "rank": 783,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20526,7 +20500,7 @@
    "rcr": 4.0583361554797746,
    "score": 6.7,
    "strength": "limited",
-   "rank": 785,
+   "rank": 784,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20552,7 +20526,7 @@
    "rcr": 4.024332605094009,
    "score": 6.7,
    "strength": "limited",
-   "rank": 786,
+   "rank": 785,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "50"
@@ -20581,7 +20555,7 @@
    "rcr": 4.0189900375018865,
    "score": 6.7,
    "strength": "limited",
-   "rank": 787,
+   "rank": 786,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "80"
@@ -20610,7 +20584,7 @@
    "rcr": 2.590474724930284,
    "score": 6.7,
    "strength": "moderate",
-   "rank": 788,
+   "rank": 787,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20636,7 +20610,7 @@
    "rcr": 2.565597906589769,
    "score": 6.7,
    "strength": "moderate",
-   "rank": 789,
+   "rank": 788,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20662,7 +20636,7 @@
    "rcr": 2.6420986054763644,
    "score": 6.7,
    "strength": "moderate",
-   "rank": 790,
+   "rank": 789,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20688,7 +20662,7 @@
    "rcr": 2.570721649685718,
    "score": 6.7,
    "strength": "moderate",
-   "rank": 791,
+   "rank": 790,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20714,7 +20688,7 @@
    "rcr": 0.8297898995820988,
    "score": 6.7,
    "strength": "moderate",
-   "rank": 792,
+   "rank": 791,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20740,7 +20714,7 @@
    "rcr": 3.9728584288882054,
    "score": 6.6,
    "strength": "limited",
-   "rank": 793,
+   "rank": 792,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20766,7 +20740,7 @@
    "rcr": 3.8453000356753932,
    "score": 6.6,
    "strength": "limited",
-   "rank": 794,
+   "rank": 793,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20792,7 +20766,7 @@
    "rcr": 3.9777160157725455,
    "score": 6.6,
    "strength": "limited",
-   "rank": 795,
+   "rank": 794,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "71"
@@ -20821,7 +20795,7 @@
    "rcr": 2.4348177469469783,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 796,
+   "rank": 795,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20847,7 +20821,7 @@
    "rcr": 3.9477336324999794,
    "score": 6.6,
    "strength": "limited",
-   "rank": 797,
+   "rank": 796,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20873,7 +20847,7 @@
    "rcr": 4.000069088649159,
    "score": 6.6,
    "strength": "limited",
-   "rank": 798,
+   "rank": 797,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20899,7 +20873,7 @@
    "rcr": 3.8408955084049303,
    "score": 6.6,
    "strength": "limited",
-   "rank": 799,
+   "rank": 798,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20925,7 +20899,7 @@
    "rcr": 3.9601551801059807,
    "score": 6.6,
    "strength": "limited",
-   "rank": 800,
+   "rank": 799,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "900"
@@ -20954,7 +20928,7 @@
    "rcr": 2.437181115781771,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 801,
+   "rank": 800,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -20980,7 +20954,7 @@
    "rcr": 2.5393713856651603,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 802,
+   "rank": 801,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21006,7 +20980,7 @@
    "rcr": 2.500208840927904,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 803,
+   "rank": 802,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21032,7 +21006,7 @@
    "rcr": 2.445153540686859,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 804,
+   "rank": 803,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21058,7 +21032,7 @@
    "rcr": 2.5103722022381425,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 805,
+   "rank": 804,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21084,7 +21058,7 @@
    "rcr": 2.5096347225078426,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 806,
+   "rank": 805,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21110,7 +21084,7 @@
    "rcr": 2.5065218088502057,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 807,
+   "rank": 806,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21136,7 +21110,7 @@
    "rcr": 2.506071435708072,
    "score": 6.6,
    "strength": "limited",
-   "rank": 808,
+   "rank": 807,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21162,7 +21136,7 @@
    "rcr": 2.500879043754078,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 809,
+   "rank": 808,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21188,7 +21162,7 @@
    "rcr": 0.7515634702681541,
    "score": 6.6,
    "strength": "limited",
-   "rank": 810,
+   "rank": 809,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21214,7 +21188,7 @@
    "rcr": 2.519938573851029,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 811,
+   "rank": 810,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21240,7 +21214,7 @@
    "rcr": 1.456280306093706,
    "score": 6.6,
    "strength": "limited",
-   "rank": 812,
+   "rank": 811,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21266,7 +21240,7 @@
    "rcr": 2.439196355980867,
    "score": 6.6,
    "strength": "moderate",
-   "rank": 813,
+   "rank": 812,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21292,7 +21266,7 @@
    "rcr": 3.7335118812393038,
    "score": 6.5,
    "strength": "limited",
-   "rank": 814,
+   "rank": 813,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21318,7 +21292,7 @@
    "rcr": 3.734590305512284,
    "score": 6.5,
    "strength": "limited",
-   "rank": 815,
+   "rank": 814,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21344,7 +21318,7 @@
    "rcr": 2.410167539185142,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 816,
+   "rank": 815,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21370,7 +21344,7 @@
    "rcr": 2.4033397130183776,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 817,
+   "rank": 816,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21396,7 +21370,7 @@
    "rcr": 3.7971505897768445,
    "score": 6.5,
    "strength": "limited",
-   "rank": 818,
+   "rank": 817,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21422,7 +21396,7 @@
    "rcr": 3.760955467014421,
    "score": 6.5,
    "strength": "limited",
-   "rank": 819,
+   "rank": 818,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21448,7 +21422,7 @@
    "rcr": 3.794760339096325,
    "score": 6.5,
    "strength": "limited",
-   "rank": 820,
+   "rank": 819,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21474,7 +21448,7 @@
    "rcr": 2.3910818097082447,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 821,
+   "rank": 820,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21500,7 +21474,7 @@
    "rcr": 2.3286793203655387,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 822,
+   "rank": 821,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21526,7 +21500,7 @@
    "rcr": 2.4073802435648726,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 823,
+   "rank": 822,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21552,7 +21526,7 @@
    "rcr": 3.6820070917818195,
    "score": 6.5,
    "strength": "limited",
-   "rank": 824,
+   "rank": 823,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21578,7 +21552,7 @@
    "rcr": 2.4216769051077187,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 825,
+   "rank": 824,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21604,7 +21578,7 @@
    "rcr": 2.3107893017404133,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 826,
+   "rank": 825,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21630,7 +21604,7 @@
    "rcr": 3.751321852388205,
    "score": 6.5,
    "strength": "limited",
-   "rank": 827,
+   "rank": 826,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21656,7 +21630,7 @@
    "rcr": 3.727927993451844,
    "score": 6.5,
    "strength": "limited",
-   "rank": 828,
+   "rank": 827,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21682,7 +21656,7 @@
    "rcr": 2.33052112749723,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 829,
+   "rank": 828,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21708,7 +21682,7 @@
    "rcr": 3.7711829314104053,
    "score": 6.5,
    "strength": "limited",
-   "rank": 830,
+   "rank": 829,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "20"
@@ -21737,7 +21711,7 @@
    "rcr": 3.7893492006607317,
    "score": 6.5,
    "strength": "limited",
-   "rank": 831,
+   "rank": 830,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21763,7 +21737,7 @@
    "rcr": 3.7066845147824434,
    "score": 6.5,
    "strength": "limited",
-   "rank": 832,
+   "rank": 831,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21789,7 +21763,7 @@
    "rcr": 2.339452267074586,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 833,
+   "rank": 832,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21815,7 +21789,7 @@
    "rcr": 3.764689453254426,
    "score": 6.5,
    "strength": "limited",
-   "rank": 834,
+   "rank": 833,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21841,7 +21815,7 @@
    "rcr": 3.729333872331683,
    "score": 6.5,
    "strength": "limited",
-   "rank": 835,
+   "rank": 834,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21867,7 +21841,7 @@
    "rcr": 2.4160967232265054,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 836,
+   "rank": 835,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21893,7 +21867,7 @@
    "rcr": 2.408084157562744,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 837,
+   "rank": 836,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21919,7 +21893,7 @@
    "rcr": 0.6564457508794127,
    "score": 6.5,
    "strength": "moderate",
-   "rank": 838,
+   "rank": 837,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21945,7 +21919,7 @@
    "rcr": 3.5633720144611147,
    "score": 6.4,
    "strength": "limited",
-   "rank": 839,
+   "rank": 838,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21971,7 +21945,7 @@
    "rcr": 2.19344496003387,
    "score": 6.4,
    "strength": "moderate",
-   "rank": 840,
+   "rank": 839,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -21997,7 +21971,7 @@
    "rcr": 3.5636276942885683,
    "score": 6.4,
    "strength": "limited",
-   "rank": 841,
+   "rank": 840,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22023,7 +21997,7 @@
    "rcr": 3.6610520882347832,
    "score": 6.4,
    "strength": "limited",
-   "rank": 842,
+   "rank": 841,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22049,7 +22023,7 @@
    "rcr": 2.2178431582678035,
    "score": 6.4,
    "strength": "moderate",
-   "rank": 843,
+   "rank": 842,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22075,7 +22049,7 @@
    "rcr": 2.212965269128573,
    "score": 6.4,
    "strength": "moderate",
-   "rank": 844,
+   "rank": 843,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22101,7 +22075,7 @@
    "rcr": 3.6596648801440486,
    "score": 6.4,
    "strength": "limited",
-   "rank": 845,
+   "rank": 844,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22127,7 +22101,7 @@
    "rcr": 3.6388919910067044,
    "score": 6.4,
    "strength": "limited",
-   "rank": 846,
+   "rank": 845,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "109"
@@ -22156,7 +22130,7 @@
    "rcr": 3.638159924717528,
    "score": 6.4,
    "strength": "limited",
-   "rank": 847,
+   "rank": 846,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22182,7 +22156,7 @@
    "rcr": 2.2028665415851805,
    "score": 6.4,
    "strength": "limited",
-   "rank": 848,
+   "rank": 847,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22208,7 +22182,7 @@
    "rcr": 3.576056902593467,
    "score": 6.4,
    "strength": "limited",
-   "rank": 849,
+   "rank": 848,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22234,7 +22208,7 @@
    "rcr": 3.566495253121292,
    "score": 6.4,
    "strength": "limited",
-   "rank": 850,
+   "rank": 849,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22260,7 +22234,7 @@
    "rcr": 2.267604272290494,
    "score": 6.4,
    "strength": "moderate",
-   "rank": 851,
+   "rank": 850,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22286,7 +22260,7 @@
    "rcr": 2.199868386699466,
    "score": 6.4,
    "strength": "moderate",
-   "rank": 852,
+   "rank": 851,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22312,7 +22286,7 @@
    "rcr": 3.565207262216849,
    "score": 6.4,
    "strength": "limited",
-   "rank": 853,
+   "rank": 852,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22338,7 +22312,7 @@
    "rcr": 3.540391434405595,
    "score": 6.4,
    "strength": "limited",
-   "rank": 854,
+   "rank": 853,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22364,7 +22338,7 @@
    "rcr": 2.207462869047105,
    "score": 6.4,
    "strength": "moderate",
-   "rank": 855,
+   "rank": 854,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22390,7 +22364,7 @@
    "rcr": 2.248769033607463,
    "score": 6.4,
    "strength": "limited",
-   "rank": 856,
+   "rank": 855,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22416,7 +22390,7 @@
    "rcr": 3.5426672358739912,
    "score": 6.4,
    "strength": "limited",
-   "rank": 857,
+   "rank": 856,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22442,7 +22416,7 @@
    "rcr": 3.541907658850863,
    "score": 6.4,
    "strength": "limited",
-   "rank": 858,
+   "rank": 857,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22468,7 +22442,7 @@
    "rcr": 3.5212443759797463,
    "score": 6.4,
    "strength": "limited",
-   "rank": 859,
+   "rank": 858,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22494,7 +22468,7 @@
    "rcr": 3.517023061716079,
    "score": 6.4,
    "strength": "limited",
-   "rank": 860,
+   "rank": 859,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22520,7 +22494,7 @@
    "rcr": 3.662580146525849,
    "score": 6.4,
    "strength": "limited",
-   "rank": 861,
+   "rank": 860,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22546,7 +22520,7 @@
    "rcr": 2.2287950332864686,
    "score": 6.4,
    "strength": "moderate",
-   "rank": 862,
+   "rank": 861,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22572,7 +22546,7 @@
    "rcr": 3.6269300323947067,
    "score": 6.4,
    "strength": "limited",
-   "rank": 863,
+   "rank": 862,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22598,7 +22572,7 @@
    "rcr": 3.55838732571093,
    "score": 6.4,
    "strength": "limited",
-   "rank": 864,
+   "rank": 863,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22624,7 +22598,7 @@
    "rcr": 3.526483075928704,
    "score": 6.4,
    "strength": "limited",
-   "rank": 865,
+   "rank": 864,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22650,7 +22624,7 @@
    "rcr": 3.6376454326188647,
    "score": 6.4,
    "strength": "limited",
-   "rank": 866,
+   "rank": 865,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22676,7 +22650,7 @@
    "rcr": 2.298625786764437,
    "score": 6.4,
    "strength": "moderate",
-   "rank": 867,
+   "rank": 866,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22702,7 +22676,7 @@
    "rcr": 3.4592803349269348,
    "score": 6.3,
    "strength": "limited",
-   "rank": 868,
+   "rank": 867,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22728,7 +22702,7 @@
    "rcr": 3.383242251869546,
    "score": 6.3,
    "strength": "limited",
-   "rank": 869,
+   "rank": 868,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22754,7 +22728,7 @@
    "rcr": 3.36529385454891,
    "score": 6.3,
    "strength": "limited",
-   "rank": 870,
+   "rank": 869,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22780,7 +22754,7 @@
    "rcr": 3.423925094438162,
    "score": 6.3,
    "strength": "limited",
-   "rank": 871,
+   "rank": 870,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22806,7 +22780,7 @@
    "rcr": 3.452038081535664,
    "score": 6.3,
    "strength": "limited",
-   "rank": 872,
+   "rank": 871,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22832,7 +22806,7 @@
    "rcr": 3.5091806245200727,
    "score": 6.3,
    "strength": "limited",
-   "rank": 873,
+   "rank": 872,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22858,7 +22832,7 @@
    "rcr": 3.4208385307472295,
    "score": 6.3,
    "strength": "limited",
-   "rank": 874,
+   "rank": 873,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22884,7 +22858,7 @@
    "rcr": 7.781185737579095,
    "score": 6.3,
    "strength": "limited",
-   "rank": 875,
+   "rank": 874,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22910,7 +22884,7 @@
    "rcr": 2.146018693084763,
    "score": 6.3,
    "strength": "moderate",
-   "rank": 876,
+   "rank": 875,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22936,7 +22910,7 @@
    "rcr": 1.2376195984812808,
    "score": 6.3,
    "strength": "limited",
-   "rank": 877,
+   "rank": 876,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22962,7 +22936,7 @@
    "rcr": 2.1076087130232204,
    "score": 6.3,
    "strength": "moderate",
-   "rank": 878,
+   "rank": 877,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -22988,7 +22962,7 @@
    "rcr": 3.5042570977897047,
    "score": 6.3,
    "strength": "limited",
-   "rank": 879,
+   "rank": 878,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23014,7 +22988,7 @@
    "rcr": 3.4479386801466556,
    "score": 6.3,
    "strength": "limited",
-   "rank": 880,
+   "rank": 879,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23040,7 +23014,7 @@
    "rcr": 3.408793887448788,
    "score": 6.3,
    "strength": "limited",
-   "rank": 881,
+   "rank": 880,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23066,7 +23040,7 @@
    "rcr": 3.397199350416649,
    "score": 6.3,
    "strength": "limited",
-   "rank": 882,
+   "rank": 881,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23092,7 +23066,7 @@
    "rcr": 2.1258168894597356,
    "score": 6.3,
    "strength": "moderate",
-   "rank": 883,
+   "rank": 882,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23118,7 +23092,7 @@
    "rcr": 3.3980165218307974,
    "score": 6.3,
    "strength": "limited",
-   "rank": 884,
+   "rank": 883,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23144,7 +23118,7 @@
    "rcr": 3.513057734088751,
    "score": 6.3,
    "strength": "limited",
-   "rank": 885,
+   "rank": 884,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23170,7 +23144,7 @@
    "rcr": 3.3782121310593913,
    "score": 6.3,
    "strength": "limited",
-   "rank": 886,
+   "rank": 885,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23196,7 +23170,7 @@
    "rcr": 2.1143101159428004,
    "score": 6.3,
    "strength": "moderate",
-   "rank": 887,
+   "rank": 886,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23222,7 +23196,7 @@
    "rcr": 3.3665085226982723,
    "score": 6.3,
    "strength": "limited",
-   "rank": 888,
+   "rank": 887,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23248,7 +23222,7 @@
    "rcr": 1.2386744039531223,
    "score": 6.3,
    "strength": "limited",
-   "rank": 889,
+   "rank": 888,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23274,7 +23248,7 @@
    "rcr": 3.3877727166400935,
    "score": 6.3,
    "strength": "limited",
-   "rank": 890,
+   "rank": 889,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23300,7 +23274,7 @@
    "rcr": 2.1318179533979125,
    "score": 6.3,
    "strength": "moderate",
-   "rank": 891,
+   "rank": 890,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23326,7 +23300,7 @@
    "rcr": 2.1235055258651667,
    "score": 6.3,
    "strength": "moderate",
-   "rank": 892,
+   "rank": 891,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23352,7 +23326,7 @@
    "rcr": 2.1184223289151607,
    "score": 6.3,
    "strength": "moderate",
-   "rank": 893,
+   "rank": 892,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23378,7 +23352,7 @@
    "rcr": 0.5825530669986395,
    "score": 6.3,
    "strength": "moderate",
-   "rank": 894,
+   "rank": 893,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23404,7 +23378,7 @@
    "rcr": 3.2471562910320717,
    "score": 6.2,
    "strength": "limited",
-   "rank": 895,
+   "rank": 894,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23430,7 +23404,7 @@
    "rcr": 3.3175918078328457,
    "score": 6.2,
    "strength": "limited",
-   "rank": 896,
+   "rank": 895,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23456,7 +23430,7 @@
    "rcr": 3.3015699061724075,
    "score": 6.2,
    "strength": "limited",
-   "rank": 897,
+   "rank": 896,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23482,7 +23456,7 @@
    "rcr": 3.2657640977113758,
    "score": 6.2,
    "strength": "limited",
-   "rank": 898,
+   "rank": 897,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23508,7 +23482,7 @@
    "rcr": 3.217180493841053,
    "score": 6.2,
    "strength": "limited",
-   "rank": 899,
+   "rank": 898,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23534,7 +23508,7 @@
    "rcr": 3.3430112950530324,
    "score": 6.2,
    "strength": "limited",
-   "rank": 900,
+   "rank": 899,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23560,7 +23534,7 @@
    "rcr": 3.3182717041072505,
    "score": 6.2,
    "strength": "limited",
-   "rank": 901,
+   "rank": 900,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23586,7 +23560,7 @@
    "rcr": 3.225556722008598,
    "score": 6.2,
    "strength": "limited",
-   "rank": 902,
+   "rank": 901,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23612,7 +23586,7 @@
    "rcr": 3.2143303740155624,
    "score": 6.2,
    "strength": "limited",
-   "rank": 903,
+   "rank": 902,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23638,7 +23612,7 @@
    "rcr": 3.3591796085569214,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 904,
+   "rank": 903,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23664,7 +23638,7 @@
    "rcr": 3.320908694497014,
    "score": 6.2,
    "strength": "limited",
-   "rank": 905,
+   "rank": 904,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23690,7 +23664,7 @@
    "rcr": 3.24367924782014,
    "score": 6.2,
    "strength": "limited",
-   "rank": 906,
+   "rank": 905,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23716,7 +23690,7 @@
    "rcr": 3.3287623855844637,
    "score": 6.2,
    "strength": "limited",
-   "rank": 907,
+   "rank": 906,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23742,7 +23716,7 @@
    "rcr": 2.051037382153765,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 908,
+   "rank": 907,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23768,7 +23742,7 @@
    "rcr": 3.3234451446240083,
    "score": 6.2,
    "strength": "limited",
-   "rank": 909,
+   "rank": 908,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23794,7 +23768,7 @@
    "rcr": 3.2992620718460794,
    "score": 6.2,
    "strength": "limited",
-   "rank": 910,
+   "rank": 909,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23820,7 +23794,7 @@
    "rcr": 3.357838617757825,
    "score": 6.2,
    "strength": "limited",
-   "rank": 911,
+   "rank": 910,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23846,7 +23820,7 @@
    "rcr": 3.3554990394020887,
    "score": 6.2,
    "strength": "limited",
-   "rank": 912,
+   "rank": 911,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "16"
@@ -23875,7 +23849,7 @@
    "rcr": 3.321706031518502,
    "score": 6.2,
    "strength": "limited",
-   "rank": 913,
+   "rank": 912,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23901,7 +23875,7 @@
    "rcr": 2.0585955506806144,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 914,
+   "rank": 913,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23927,7 +23901,7 @@
    "rcr": 3.3569309735583053,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 915,
+   "rank": 914,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23953,7 +23927,7 @@
    "rcr": 3.2746380310982732,
    "score": 6.2,
    "strength": "limited",
-   "rank": 916,
+   "rank": 915,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -23979,7 +23953,7 @@
    "rcr": 2.0527014854260557,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 917,
+   "rank": 916,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24005,7 +23979,7 @@
    "rcr": 3.289854750573637,
    "score": 6.2,
    "strength": "limited",
-   "rank": 918,
+   "rank": 917,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24031,7 +24005,7 @@
    "rcr": 3.285274906373303,
    "score": 6.2,
    "strength": "limited",
-   "rank": 919,
+   "rank": 918,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24057,7 +24031,7 @@
    "rcr": 2.0055755201254915,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 920,
+   "rank": 919,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24083,7 +24057,7 @@
    "rcr": 2.0711975376614786,
    "score": 6.2,
    "strength": "limited",
-   "rank": 921,
+   "rank": 920,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24109,7 +24083,7 @@
    "rcr": 2.060347891052461,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 922,
+   "rank": 921,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24135,7 +24109,7 @@
    "rcr": 1.128393647514339,
    "score": 6.2,
    "strength": "limited",
-   "rank": 923,
+   "rank": 922,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24161,7 +24135,7 @@
    "rcr": 2.0098130424216394,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 924,
+   "rank": 923,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24187,7 +24161,7 @@
    "rcr": 2.025684527391836,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 925,
+   "rank": 924,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24213,7 +24187,7 @@
    "rcr": 3.0708272997417385,
    "score": 6.1,
    "strength": "limited",
-   "rank": 926,
+   "rank": 925,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24239,7 +24213,7 @@
    "rcr": 3.1475555648896845,
    "score": 6.1,
    "strength": "limited",
-   "rank": 927,
+   "rank": 926,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24265,7 +24239,7 @@
    "rcr": 3.1763915214390614,
    "score": 6.1,
    "strength": "limited",
-   "rank": 928,
+   "rank": 927,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24291,7 +24265,7 @@
    "rcr": 3.163051390351656,
    "score": 6.1,
    "strength": "limited",
-   "rank": 929,
+   "rank": 928,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24317,7 +24291,7 @@
    "rcr": 3.0769458072165583,
    "score": 6.1,
    "strength": "limited",
-   "rank": 930,
+   "rank": 929,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24343,7 +24317,7 @@
    "rcr": 3.208218046210379,
    "score": 6.1,
    "strength": "limited",
-   "rank": 931,
+   "rank": 930,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24369,7 +24343,7 @@
    "rcr": 3.1226343015097187,
    "score": 6.1,
    "strength": "limited",
-   "rank": 932,
+   "rank": 931,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24395,7 +24369,7 @@
    "rcr": 3.1189957872601495,
    "score": 6.1,
    "strength": "limited",
-   "rank": 933,
+   "rank": 932,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24421,7 +24395,7 @@
    "rcr": 3.1164546360743968,
    "score": 6.1,
    "strength": "limited",
-   "rank": 934,
+   "rank": 933,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24447,7 +24421,7 @@
    "rcr": 3.1847279988514905,
    "score": 6.1,
    "strength": "limited",
-   "rank": 935,
+   "rank": 934,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24473,7 +24447,7 @@
    "rcr": 3.0754749158100076,
    "score": 6.1,
    "strength": "limited",
-   "rank": 936,
+   "rank": 935,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24499,7 +24473,7 @@
    "rcr": 3.082515477624673,
    "score": 6.1,
    "strength": "limited",
-   "rank": 937,
+   "rank": 936,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24525,7 +24499,7 @@
    "rcr": 3.188941918973483,
    "score": 6.1,
    "strength": "limited",
-   "rank": 938,
+   "rank": 937,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24551,7 +24525,7 @@
    "rcr": 3.0787565361489264,
    "score": 6.1,
    "strength": "limited",
-   "rank": 939,
+   "rank": 938,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24577,7 +24551,7 @@
    "rcr": 3.1679765568764253,
    "score": 6.1,
    "strength": "limited",
-   "rank": 940,
+   "rank": 939,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "30"
@@ -24606,7 +24580,7 @@
    "rcr": 3.1482320221355238,
    "score": 6.1,
    "strength": "limited",
-   "rank": 941,
+   "rank": 940,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24632,7 +24606,7 @@
    "rcr": 3.09237314131045,
    "score": 6.1,
    "strength": "limited",
-   "rank": 942,
+   "rank": 941,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24658,7 +24632,7 @@
    "rcr": 3.1076145304338803,
    "score": 6.1,
    "strength": "limited",
-   "rank": 943,
+   "rank": 942,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24684,7 +24658,7 @@
    "rcr": 3.0953862466047863,
    "score": 6.1,
    "strength": "limited",
-   "rank": 944,
+   "rank": 943,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24710,7 +24684,7 @@
    "rcr": 3.1288332441650497,
    "score": 6.1,
    "strength": "limited",
-   "rank": 945,
+   "rank": 944,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24736,7 +24710,7 @@
    "rcr": 7.108210199131834,
    "score": 6.0,
    "strength": "limited",
-   "rank": 946,
+   "rank": 945,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24762,7 +24736,7 @@
    "rcr": 2.9929561887731633,
    "score": 6.0,
    "strength": "limited",
-   "rank": 947,
+   "rank": 946,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24788,7 +24762,7 @@
    "rcr": 2.932332358127847,
    "score": 6.0,
    "strength": "limited",
-   "rank": 948,
+   "rank": 947,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24814,7 +24788,7 @@
    "rcr": 3.034388996337142,
    "score": 6.0,
    "strength": "limited",
-   "rank": 949,
+   "rank": 948,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24840,7 +24814,7 @@
    "rcr": 2.945980942809435,
    "score": 6.0,
    "strength": "limited",
-   "rank": 950,
+   "rank": 949,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24866,7 +24840,7 @@
    "rcr": 3.0249291572817847,
    "score": 6.0,
    "strength": "limited",
-   "rank": 951,
+   "rank": 950,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24892,7 +24866,7 @@
    "rcr": 3.0695964271057856,
    "score": 6.0,
    "strength": "limited",
-   "rank": 952,
+   "rank": 951,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24918,7 +24892,7 @@
    "rcr": 2.957289761578593,
    "score": 6.0,
    "strength": "limited",
-   "rank": 953,
+   "rank": 952,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "55"
@@ -24947,7 +24921,7 @@
    "rcr": 2.9822320030530522,
    "score": 6.0,
    "strength": "limited",
-   "rank": 954,
+   "rank": 953,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24973,7 +24947,7 @@
    "rcr": 2.982011244151353,
    "score": 6.0,
    "strength": "limited",
-   "rank": 955,
+   "rank": 954,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -24999,7 +24973,7 @@
    "rcr": 2.962929530541382,
    "score": 6.0,
    "strength": "limited",
-   "rank": 956,
+   "rank": 955,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25025,7 +24999,7 @@
    "rcr": 3.0328320956292227,
    "score": 6.0,
    "strength": "limited",
-   "rank": 957,
+   "rank": 956,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25051,7 +25025,7 @@
    "rcr": 3.0279678901831453,
    "score": 6.0,
    "strength": "limited",
-   "rank": 958,
+   "rank": 957,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25077,7 +25051,7 @@
    "rcr": 2.938882284447682,
    "score": 6.0,
    "strength": "limited",
-   "rank": 959,
+   "rank": 958,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25103,7 +25077,7 @@
    "rcr": 3.0461842745492205,
    "score": 6.0,
    "strength": "limited",
-   "rank": 960,
+   "rank": 959,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25129,7 +25103,7 @@
    "rcr": 2.970591138442802,
    "score": 6.0,
    "strength": "limited",
-   "rank": 961,
+   "rank": 960,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25155,7 +25129,7 @@
    "rcr": 2.947797523354822,
    "score": 6.0,
    "strength": "limited",
-   "rank": 962,
+   "rank": 961,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25181,7 +25155,7 @@
    "rcr": 3.015297584206483,
    "score": 6.0,
    "strength": "limited",
-   "rank": 963,
+   "rank": 962,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25207,7 +25181,7 @@
    "rcr": 3.0148209443199905,
    "score": 6.0,
    "strength": "limited",
-   "rank": 964,
+   "rank": 963,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25233,7 +25207,7 @@
    "rcr": 3.0113780996927146,
    "score": 6.0,
    "strength": "limited",
-   "rank": 965,
+   "rank": 964,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25259,7 +25233,7 @@
    "rcr": 2.9969006613688607,
    "score": 6.0,
    "strength": "limited",
-   "rank": 966,
+   "rank": 965,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "499"
@@ -25288,7 +25262,7 @@
    "rcr": 2.954211317852897,
    "score": 6.0,
    "strength": "limited",
-   "rank": 967,
+   "rank": 966,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25314,7 +25288,7 @@
    "rcr": 2.936444389562201,
    "score": 6.0,
    "strength": "limited",
-   "rank": 968,
+   "rank": 967,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "80"
@@ -25343,7 +25317,7 @@
    "rcr": 3.0648343823525828,
    "score": 6.0,
    "strength": "limited",
-   "rank": 969,
+   "rank": 968,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25369,7 +25343,7 @@
    "rcr": 2.972194552155527,
    "score": 6.0,
    "strength": "limited",
-   "rank": 970,
+   "rank": 969,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25395,7 +25369,7 @@
    "rcr": 2.94328071141368,
    "score": 6.0,
    "strength": "limited",
-   "rank": 971,
+   "rank": 970,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25421,7 +25395,7 @@
    "rcr": 3.0460438520961457,
    "score": 6.0,
    "strength": "limited",
-   "rank": 972,
+   "rank": 971,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25447,7 +25421,7 @@
    "rcr": 0.9855596050998076,
    "score": 6.0,
    "strength": "limited",
-   "rank": 973,
+   "rank": 972,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25473,7 +25447,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "moderate",
-   "rank": 974,
+   "rank": 973,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25499,7 +25473,7 @@
    "rcr": 3.0229579091522063,
    "score": 6.0,
    "strength": "limited",
-   "rank": 975,
+   "rank": 974,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25525,7 +25499,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "moderate",
-   "rank": 976,
+   "rank": 975,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25551,7 +25525,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "moderate",
-   "rank": 977,
+   "rank": 976,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25577,7 +25551,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "limited",
-   "rank": 978,
+   "rank": 977,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25603,7 +25577,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "limited",
-   "rank": 979,
+   "rank": 978,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25629,7 +25603,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "limited",
-   "rank": 980,
+   "rank": 979,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25655,7 +25629,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "moderate",
-   "rank": 981,
+   "rank": 980,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25681,7 +25655,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "limited",
-   "rank": 982,
+   "rank": 981,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25707,7 +25681,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "moderate",
-   "rank": 983,
+   "rank": 982,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25733,7 +25707,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "strong",
-   "rank": 984,
+   "rank": 983,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25759,7 +25733,7 @@
    "rcr": 0.0,
    "score": 6.0,
    "strength": "moderate",
-   "rank": 985,
+   "rank": 984,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25785,7 +25759,7 @@
    "rcr": 2.9233093786810085,
    "score": 5.9,
    "strength": "limited",
-   "rank": 986,
+   "rank": 985,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25811,7 +25785,7 @@
    "rcr": 2.887957017170495,
    "score": 5.9,
    "strength": "limited",
-   "rank": 987,
+   "rank": 986,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25837,7 +25811,7 @@
    "rcr": 2.810916477190294,
    "score": 5.9,
    "strength": "limited",
-   "rank": 988,
+   "rank": 987,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25863,7 +25837,7 @@
    "rcr": 2.847458826947415,
    "score": 5.9,
    "strength": "limited",
-   "rank": 989,
+   "rank": 988,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25889,7 +25863,7 @@
    "rcr": 2.8696290846484915,
    "score": 5.9,
    "strength": "limited",
-   "rank": 990,
+   "rank": 989,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25915,7 +25889,7 @@
    "rcr": 2.838899922286161,
    "score": 5.9,
    "strength": "limited",
-   "rank": 991,
+   "rank": 990,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25941,7 +25915,7 @@
    "rcr": 2.8094981969690425,
    "score": 5.9,
    "strength": "limited",
-   "rank": 992,
+   "rank": 991,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25967,7 +25941,7 @@
    "rcr": 2.8033131749097078,
    "score": 5.9,
    "strength": "limited",
-   "rank": 993,
+   "rank": 992,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -25993,7 +25967,7 @@
    "rcr": 2.8908496517574904,
    "score": 5.9,
    "strength": "limited",
-   "rank": 994,
+   "rank": 993,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26019,7 +25993,7 @@
    "rcr": 2.908262067950524,
    "score": 5.9,
    "strength": "limited",
-   "rank": 995,
+   "rank": 994,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26045,7 +26019,7 @@
    "rcr": 2.812734946043892,
    "score": 5.9,
    "strength": "limited",
-   "rank": 996,
+   "rank": 995,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26071,7 +26045,7 @@
    "rcr": 2.924597428325465,
    "score": 5.9,
    "strength": "limited",
-   "rank": 997,
+   "rank": 996,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26097,7 +26071,7 @@
    "rcr": 2.9106508502218627,
    "score": 5.9,
    "strength": "limited",
-   "rank": 998,
+   "rank": 997,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26123,7 +26097,7 @@
    "rcr": 2.837809613289428,
    "score": 5.9,
    "strength": "limited",
-   "rank": 999,
+   "rank": 998,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26149,7 +26123,7 @@
    "rcr": 2.9188898879548413,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1000,
+   "rank": 999,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26175,7 +26149,7 @@
    "rcr": 2.8484278508285925,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1001,
+   "rank": 1000,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26201,7 +26175,7 @@
    "rcr": 2.8340122355258917,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1002,
+   "rank": 1001,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26227,7 +26201,7 @@
    "rcr": 2.7999871161694547,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1003,
+   "rank": 1002,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26253,7 +26227,7 @@
    "rcr": 0.9559760489392728,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1004,
+   "rank": 1003,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26279,7 +26253,7 @@
    "rcr": 2.897032254372071,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1005,
+   "rank": 1004,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26305,7 +26279,7 @@
    "rcr": 2.8154646557044725,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1006,
+   "rank": 1005,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26331,7 +26305,7 @@
    "rcr": 2.8709519153424443,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1007,
+   "rank": 1006,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26357,7 +26331,7 @@
    "rcr": 0.9403954869143212,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1008,
+   "rank": 1007,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26383,7 +26357,7 @@
    "rcr": 0.9274601982359948,
    "score": 5.9,
    "strength": "limited",
-   "rank": 1009,
+   "rank": 1008,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26409,7 +26383,7 @@
    "rcr": 2.7142829881231454,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1010,
+   "rank": 1009,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26435,7 +26409,7 @@
    "rcr": 2.682000630463618,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1011,
+   "rank": 1010,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26461,7 +26435,7 @@
    "rcr": 2.702533415438962,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1012,
+   "rank": 1011,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26487,7 +26461,7 @@
    "rcr": 2.7210082974667626,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1013,
+   "rank": 1012,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26513,7 +26487,7 @@
    "rcr": 2.7948141933460455,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1014,
+   "rank": 1013,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26539,7 +26513,7 @@
    "rcr": 2.7244568929179507,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1015,
+   "rank": 1014,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26565,7 +26539,7 @@
    "rcr": 2.6714984228631984,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1016,
+   "rank": 1015,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26591,7 +26565,7 @@
    "rcr": 2.668773762868713,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1017,
+   "rank": 1016,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26617,7 +26591,7 @@
    "rcr": 2.7884120626795057,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1018,
+   "rank": 1017,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26643,7 +26617,7 @@
    "rcr": 2.7161757044123793,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1019,
+   "rank": 1018,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26669,7 +26643,7 @@
    "rcr": 2.7570275478769353,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1020,
+   "rank": 1019,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26695,7 +26669,7 @@
    "rcr": 2.783340984038874,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1021,
+   "rank": 1020,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26721,7 +26695,7 @@
    "rcr": 2.767940329779744,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1022,
+   "rank": 1021,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26747,7 +26721,7 @@
    "rcr": 2.7049124010260344,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1023,
+   "rank": 1022,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26773,7 +26747,7 @@
    "rcr": 2.7863410345542587,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1024,
+   "rank": 1023,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26799,7 +26773,7 @@
    "rcr": 2.699396240601337,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1025,
+   "rank": 1024,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "11"
@@ -26828,7 +26802,7 @@
    "rcr": 2.6851294288326626,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1026,
+   "rank": 1025,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26854,7 +26828,7 @@
    "rcr": 2.7054466624435674,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1027,
+   "rank": 1026,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26880,7 +26854,7 @@
    "rcr": 2.724559331627657,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1028,
+   "rank": 1027,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26906,7 +26880,7 @@
    "rcr": 2.6932068181586177,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1029,
+   "rank": 1028,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26932,7 +26906,7 @@
    "rcr": 2.668840796620287,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1030,
+   "rank": 1029,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26958,7 +26932,7 @@
    "rcr": 2.7042656314875733,
    "score": 5.8,
    "strength": "limited",
-   "rank": 1031,
+   "rank": 1030,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -26984,7 +26958,7 @@
    "rcr": 2.6638859586175307,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1032,
+   "rank": 1031,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27010,7 +26984,7 @@
    "rcr": 2.6300619421938123,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1033,
+   "rank": 1032,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27036,7 +27010,7 @@
    "rcr": 2.6345438752500696,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1034,
+   "rank": 1033,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27062,7 +27036,7 @@
    "rcr": 2.6330050505970326,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1035,
+   "rank": 1034,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27088,7 +27062,7 @@
    "rcr": 2.623808633171519,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1036,
+   "rank": 1035,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27114,7 +27088,7 @@
    "rcr": 4.1805535419158355,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1037,
+   "rank": 1036,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27140,7 +27114,7 @@
    "rcr": 2.6573092038813866,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1038,
+   "rank": 1037,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27166,7 +27140,7 @@
    "rcr": 2.5758233001117663,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1039,
+   "rank": 1038,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27192,7 +27166,7 @@
    "rcr": 2.6167780634148965,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1040,
+   "rank": 1039,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27218,7 +27192,7 @@
    "rcr": 2.593979954490117,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1041,
+   "rank": 1040,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27244,7 +27218,7 @@
    "rcr": 2.54795860276153,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1042,
+   "rank": 1041,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27270,7 +27244,7 @@
    "rcr": 2.603493781527752,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1043,
+   "rank": 1042,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27296,7 +27270,7 @@
    "rcr": 2.6646154795810078,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1044,
+   "rank": 1043,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27322,7 +27296,7 @@
    "rcr": 2.5801362569787036,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1045,
+   "rank": 1044,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27348,7 +27322,7 @@
    "rcr": 2.545833089849946,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1046,
+   "rank": 1045,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27374,7 +27348,7 @@
    "rcr": 2.628449328231727,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1047,
+   "rank": 1046,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27400,7 +27374,7 @@
    "rcr": 2.578481824405958,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1048,
+   "rank": 1047,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27426,7 +27400,7 @@
    "rcr": 2.565133124360314,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1049,
+   "rank": 1048,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27452,7 +27426,7 @@
    "rcr": 2.66006666287224,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1050,
+   "rank": 1049,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27478,7 +27452,7 @@
    "rcr": 2.556334148125823,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1051,
+   "rank": 1050,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27504,7 +27478,7 @@
    "rcr": 2.658767997309023,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1052,
+   "rank": 1051,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27530,7 +27504,7 @@
    "rcr": 2.5798551237075587,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1053,
+   "rank": 1052,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27556,7 +27530,7 @@
    "rcr": 2.633107363360099,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1054,
+   "rank": 1053,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27582,7 +27556,7 @@
    "rcr": 0.8167234727155179,
    "score": 5.7,
    "strength": "limited",
-   "rank": 1055,
+   "rank": 1054,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "30"
@@ -27611,7 +27585,7 @@
    "rcr": 2.5409522748770743,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1056,
+   "rank": 1055,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27637,7 +27611,7 @@
    "rcr": 2.4376050830349905,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1057,
+   "rank": 1056,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27663,7 +27637,7 @@
    "rcr": 2.455189956240112,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1058,
+   "rank": 1057,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27689,7 +27663,7 @@
    "rcr": 2.4695450076278656,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1059,
+   "rank": 1058,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27715,7 +27689,7 @@
    "rcr": 2.428401276305954,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1060,
+   "rank": 1059,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27741,7 +27715,7 @@
    "rcr": 2.510750651137493,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1061,
+   "rank": 1060,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27767,7 +27741,7 @@
    "rcr": 2.4975954430075666,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1062,
+   "rank": 1061,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27793,7 +27767,7 @@
    "rcr": 2.5316515903604393,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1063,
+   "rank": 1062,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27819,7 +27793,7 @@
    "rcr": 2.4822334832480304,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1064,
+   "rank": 1063,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27845,7 +27819,7 @@
    "rcr": 2.4537225458955763,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1065,
+   "rank": 1064,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27871,7 +27845,7 @@
    "rcr": 2.462798184094921,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1066,
+   "rank": 1065,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27897,7 +27871,7 @@
    "rcr": 2.438744217369022,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1067,
+   "rank": 1066,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27923,7 +27897,7 @@
    "rcr": 2.5162920519239025,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1068,
+   "rank": 1067,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27949,7 +27923,7 @@
    "rcr": 2.494255974766786,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1069,
+   "rank": 1068,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -27975,7 +27949,7 @@
    "rcr": 2.427582035818564,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1070,
+   "rank": 1069,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28001,7 +27975,7 @@
    "rcr": 2.4386668852971876,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1071,
+   "rank": 1070,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "82"
@@ -28030,7 +28004,7 @@
    "rcr": 2.5334648141830263,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1072,
+   "rank": 1071,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28056,7 +28030,7 @@
    "rcr": 2.471123009854962,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1073,
+   "rank": 1072,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28082,7 +28056,7 @@
    "rcr": 2.432074003172266,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1074,
+   "rank": 1073,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28108,7 +28082,7 @@
    "rcr": 2.444713551234411,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1075,
+   "rank": 1074,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28134,7 +28108,7 @@
    "rcr": 2.5169821612750525,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1076,
+   "rank": 1075,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28160,7 +28134,7 @@
    "rcr": 2.5140661119165983,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1077,
+   "rank": 1076,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28186,7 +28160,7 @@
    "rcr": 2.513187824388258,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1078,
+   "rank": 1077,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28212,7 +28186,7 @@
    "rcr": 2.508954363609918,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1079,
+   "rank": 1078,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28238,7 +28212,7 @@
    "rcr": 2.5065401948658854,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1080,
+   "rank": 1079,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28264,7 +28238,7 @@
    "rcr": 2.5055789679522618,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1081,
+   "rank": 1080,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28290,7 +28264,7 @@
    "rcr": 2.4546728462778122,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1082,
+   "rank": 1081,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28316,7 +28290,7 @@
    "rcr": 2.45008562542721,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1083,
+   "rank": 1082,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28342,7 +28316,7 @@
    "rcr": 2.5192660522140264,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1084,
+   "rank": 1083,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28368,7 +28342,7 @@
    "rcr": 2.5355062846215297,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1085,
+   "rank": 1084,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28394,7 +28368,7 @@
    "rcr": 2.4750104608405756,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1086,
+   "rank": 1085,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28420,7 +28394,7 @@
    "rcr": 0.7404328547814695,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1087,
+   "rank": 1086,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28446,7 +28420,7 @@
    "rcr": 0.7353310576687231,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1088,
+   "rank": 1087,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28472,7 +28446,7 @@
    "rcr": 2.5221829081704548,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1089,
+   "rank": 1088,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "100"
@@ -28501,7 +28475,7 @@
    "rcr": 0.7204770185960888,
    "score": 5.6,
    "strength": "limited",
-   "rank": 1090,
+   "rank": 1089,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28527,7 +28501,7 @@
    "rcr": 2.393671506665079,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1091,
+   "rank": 1090,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28553,7 +28527,7 @@
    "rcr": 2.3422488558008387,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1092,
+   "rank": 1091,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28579,7 +28553,7 @@
    "rcr": 2.353675675616631,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1093,
+   "rank": 1092,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28605,7 +28579,7 @@
    "rcr": 2.386640731557875,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1094,
+   "rank": 1093,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28631,7 +28605,7 @@
    "rcr": 2.3105242269710713,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1095,
+   "rank": 1094,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28657,7 +28631,7 @@
    "rcr": 2.4031121133774938,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1096,
+   "rank": 1095,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28683,7 +28657,7 @@
    "rcr": 2.4148901416084056,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1097,
+   "rank": 1096,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28709,7 +28683,7 @@
    "rcr": 2.3551002570734068,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1098,
+   "rank": 1097,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28735,7 +28709,7 @@
    "rcr": 2.3623163359130124,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1099,
+   "rank": 1098,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28761,7 +28735,7 @@
    "rcr": 2.3587431028600587,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1100,
+   "rank": 1099,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28787,7 +28761,7 @@
    "rcr": 2.319714096734753,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1101,
+   "rank": 1100,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28813,7 +28787,7 @@
    "rcr": 2.4019567169582583,
    "score": 5.5,
    "strength": "limited",
-   "rank": 1102,
+   "rank": 1101,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28839,7 +28813,7 @@
    "rcr": 2.2981854319202264,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1103,
+   "rank": 1102,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28865,7 +28839,7 @@
    "rcr": 2.254690410804462,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1104,
+   "rank": 1103,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28891,7 +28865,7 @@
    "rcr": 2.2042740458343246,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1105,
+   "rank": 1104,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28917,7 +28891,7 @@
    "rcr": 2.240779665357423,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1106,
+   "rank": 1105,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28943,7 +28917,7 @@
    "rcr": 2.2950862868091306,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1107,
+   "rank": 1106,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28969,7 +28943,7 @@
    "rcr": 2.2696118900614457,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1108,
+   "rank": 1107,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -28995,7 +28969,7 @@
    "rcr": 2.241628742413784,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1109,
+   "rank": 1108,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29021,7 +28995,7 @@
    "rcr": 2.2114400697296417,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1110,
+   "rank": 1109,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29047,7 +29021,7 @@
    "rcr": 2.3051745781797206,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1111,
+   "rank": 1110,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29073,7 +29047,7 @@
    "rcr": 2.2060504551638127,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1112,
+   "rank": 1111,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29099,7 +29073,7 @@
    "rcr": 0.5998786157629611,
    "score": 5.4,
    "strength": "limited",
-   "rank": 1113,
+   "rank": 1112,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29125,7 +29099,7 @@
    "rcr": 2.174735560847631,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1114,
+   "rank": 1113,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29151,7 +29125,7 @@
    "rcr": 2.1797532247783233,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1115,
+   "rank": 1114,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29177,7 +29151,7 @@
    "rcr": 2.1716127850318108,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1116,
+   "rank": 1115,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29203,7 +29177,7 @@
    "rcr": 2.1140447352261407,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1117,
+   "rank": 1116,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29229,7 +29203,7 @@
    "rcr": 2.1788565562426587,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1118,
+   "rank": 1117,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29255,7 +29229,7 @@
    "rcr": 2.129794067897149,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1119,
+   "rank": 1118,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29281,7 +29255,7 @@
    "rcr": 2.1805185470373014,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1120,
+   "rank": 1119,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29307,7 +29281,7 @@
    "rcr": 2.14376470879835,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1121,
+   "rank": 1120,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29333,7 +29307,7 @@
    "rcr": 2.1775981225171024,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1122,
+   "rank": 1121,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29359,7 +29333,7 @@
    "rcr": 2.128724894168285,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1123,
+   "rank": 1122,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29385,7 +29359,7 @@
    "rcr": 2.1799550723292005,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1124,
+   "rank": 1123,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29411,7 +29385,7 @@
    "rcr": 2.1024848811822805,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1125,
+   "rank": 1124,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29437,7 +29411,7 @@
    "rcr": 2.109703117879541,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1126,
+   "rank": 1125,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29463,7 +29437,7 @@
    "rcr": 2.1490472163109744,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1127,
+   "rank": 1126,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29489,7 +29463,7 @@
    "rcr": 2.169354853029029,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1128,
+   "rank": 1127,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29515,7 +29489,7 @@
    "rcr": 2.156305615569824,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1129,
+   "rank": 1128,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29541,7 +29515,7 @@
    "rcr": 2.131817953397912,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1130,
+   "rank": 1129,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29567,7 +29541,7 @@
    "rcr": 2.1405192511668836,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1131,
+   "rank": 1130,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29593,7 +29567,7 @@
    "rcr": 2.1146258731285745,
    "score": 5.3,
    "strength": "limited",
-   "rank": 1132,
+   "rank": 1131,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29619,7 +29593,7 @@
    "rcr": 2.0489518872176946,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1133,
+   "rank": 1132,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29645,7 +29619,7 @@
    "rcr": 2.0501464797910605,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1134,
+   "rank": 1133,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29671,7 +29645,7 @@
    "rcr": 2.025682583004438,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1135,
+   "rank": 1134,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29697,7 +29671,7 @@
    "rcr": 2.003162071846159,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1136,
+   "rank": 1135,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29723,7 +29697,7 @@
    "rcr": 2.078422758086917,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1137,
+   "rank": 1136,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29749,7 +29723,7 @@
    "rcr": 2.019585055008721,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1138,
+   "rank": 1137,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29775,7 +29749,7 @@
    "rcr": 2.0290496016339903,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1139,
+   "rank": 1138,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29801,7 +29775,7 @@
    "rcr": 2.0043020287406477,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1140,
+   "rank": 1139,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29827,7 +29801,7 @@
    "rcr": 2.006980600277053,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1141,
+   "rank": 1140,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29853,7 +29827,7 @@
    "rcr": 2.02858665422191,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1142,
+   "rank": 1141,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29879,7 +29853,7 @@
    "rcr": 2.037225892965719,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1143,
+   "rank": 1142,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29905,7 +29879,7 @@
    "rcr": 2.0361712462566772,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1144,
+   "rank": 1143,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29931,7 +29905,7 @@
    "rcr": 2.0743531858290263,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1145,
+   "rank": 1144,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -29957,7 +29931,7 @@
    "rcr": 2.0737455838413785,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1146,
+   "rank": 1145,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "19"
@@ -29986,7 +29960,7 @@
    "rcr": 2.0509175617712825,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1147,
+   "rank": 1146,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30012,7 +29986,7 @@
    "rcr": 2.019328985520384,
    "score": 5.2,
    "strength": "limited",
-   "rank": 1148,
+   "rank": 1147,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30038,7 +30012,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1149,
+   "rank": 1148,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30064,7 +30038,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1150,
+   "rank": 1149,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30090,7 +30064,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1151,
+   "rank": 1150,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30116,7 +30090,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1152,
+   "rank": 1151,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30142,7 +30116,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1153,
+   "rank": 1152,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30168,7 +30142,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1154,
+   "rank": 1153,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30194,7 +30168,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "limited",
-   "rank": 1155,
+   "rank": 1154,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30220,7 +30194,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "limited",
-   "rank": 1156,
+   "rank": 1155,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30246,7 +30220,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1157,
+   "rank": 1156,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30272,7 +30246,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1158,
+   "rank": 1157,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30298,7 +30272,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1159,
+   "rank": 1158,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30324,7 +30298,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1160,
+   "rank": 1159,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30350,7 +30324,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1161,
+   "rank": 1160,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30376,7 +30350,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "limited",
-   "rank": 1162,
+   "rank": 1161,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30402,7 +30376,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1163,
+   "rank": 1162,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30428,7 +30402,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1164,
+   "rank": 1163,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30454,7 +30428,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1165,
+   "rank": 1164,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30480,7 +30454,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "limited",
-   "rank": 1166,
+   "rank": 1165,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30506,7 +30480,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "limited",
-   "rank": 1167,
+   "rank": 1166,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30532,7 +30506,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1168,
+   "rank": 1167,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30558,7 +30532,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1169,
+   "rank": 1168,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30584,7 +30558,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1170,
+   "rank": 1169,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30610,7 +30584,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "limited",
-   "rank": 1171,
+   "rank": 1170,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30636,7 +30610,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "moderate",
-   "rank": 1172,
+   "rank": 1171,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30662,7 +30636,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "limited",
-   "rank": 1173,
+   "rank": 1172,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30688,7 +30662,7 @@
    "rcr": 0.0,
    "score": 5.0,
    "strength": "strong",
-   "rank": 1174,
+   "rank": 1173,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30714,7 +30688,7 @@
    "rcr": 4.238719765242082,
    "score": 4.8,
    "strength": "limited",
-   "rank": 1175,
+   "rank": 1174,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30740,7 +30714,7 @@
    "rcr": 2.782389378323315,
    "score": 4.8,
    "strength": "limited",
-   "rank": 1176,
+   "rank": 1175,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30766,7 +30740,7 @@
    "rcr": 0.12280955398219812,
    "score": 4.3,
    "strength": "limited",
-   "rank": 1177,
+   "rank": 1176,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30792,7 +30766,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1178,
+   "rank": 1177,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30818,7 +30792,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1179,
+   "rank": 1178,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30844,7 +30818,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1180,
+   "rank": 1179,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30870,7 +30844,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1181,
+   "rank": 1180,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30896,7 +30870,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1182,
+   "rank": 1181,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30922,7 +30896,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1183,
+   "rank": 1182,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30948,7 +30922,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1184,
+   "rank": 1183,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -30974,7 +30948,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1185,
+   "rank": 1184,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31000,7 +30974,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1186,
+   "rank": 1185,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31026,7 +31000,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1187,
+   "rank": 1186,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31052,7 +31026,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1188,
+   "rank": 1187,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31078,7 +31052,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1189,
+   "rank": 1188,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31104,7 +31078,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1190,
+   "rank": 1189,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31130,7 +31104,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1191,
+   "rank": 1190,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31156,7 +31130,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "moderate",
-   "rank": 1192,
+   "rank": 1191,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31182,7 +31156,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1193,
+   "rank": 1192,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31208,7 +31182,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1194,
+   "rank": 1193,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31234,7 +31208,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1195,
+   "rank": 1194,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31260,7 +31234,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1196,
+   "rank": 1195,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31286,7 +31260,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1197,
+   "rank": 1196,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31312,7 +31286,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1198,
+   "rank": 1197,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31338,7 +31312,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1199,
+   "rank": 1198,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31364,7 +31338,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1200,
+   "rank": 1199,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31390,7 +31364,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1201,
+   "rank": 1200,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31416,7 +31390,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1202,
+   "rank": 1201,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31442,7 +31416,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1203,
+   "rank": 1202,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31468,7 +31442,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1204,
+   "rank": 1203,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31494,7 +31468,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1205,
+   "rank": 1204,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31520,7 +31494,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1206,
+   "rank": 1205,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31546,7 +31520,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1207,
+   "rank": 1206,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31572,7 +31546,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1208,
+   "rank": 1207,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31598,7 +31572,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1209,
+   "rank": 1208,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31624,7 +31598,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1210,
+   "rank": 1209,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31650,7 +31624,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "limited",
-   "rank": 1211,
+   "rank": 1210,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31676,7 +31650,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "moderate",
-   "rank": 1212,
+   "rank": 1211,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "50"
@@ -31705,7 +31679,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "moderate",
-   "rank": 1213,
+   "rank": 1212,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31731,7 +31705,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "moderate",
-   "rank": 1214,
+   "rank": 1213,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31757,7 +31731,7 @@
    "rcr": 0.0,
    "score": 4.0,
    "strength": "moderate",
-   "rank": 1215,
+   "rank": 1214,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31783,7 +31757,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "limited",
-   "rank": 1216,
+   "rank": 1215,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31809,7 +31783,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1217,
+   "rank": 1216,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31835,7 +31809,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1218,
+   "rank": 1217,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31861,7 +31835,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1219,
+   "rank": 1218,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31887,7 +31861,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1220,
+   "rank": 1219,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31913,7 +31887,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "limited",
-   "rank": 1221,
+   "rank": 1220,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31939,7 +31913,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "limited",
-   "rank": 1222,
+   "rank": 1221,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31965,7 +31939,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1223,
+   "rank": 1222,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -31991,7 +31965,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "limited",
-   "rank": 1224,
+   "rank": 1223,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32017,7 +31991,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1225,
+   "rank": 1224,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32043,7 +32017,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "limited",
-   "rank": 1226,
+   "rank": 1225,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32069,7 +32043,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1227,
+   "rank": 1226,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32095,7 +32069,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1228,
+   "rank": 1227,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32121,7 +32095,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1229,
+   "rank": 1228,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32147,7 +32121,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1230,
+   "rank": 1229,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32173,7 +32147,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1231,
+   "rank": 1230,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32199,7 +32173,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1232,
+   "rank": 1231,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32225,7 +32199,7 @@
    "rcr": 0.0,
    "score": 3.0,
    "strength": "moderate",
-   "rank": 1233,
+   "rank": 1232,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32251,7 +32225,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1234,
+   "rank": 1233,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32277,7 +32251,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1235,
+   "rank": 1234,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "50"
@@ -32306,7 +32280,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1236,
+   "rank": 1235,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32332,7 +32306,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1237,
+   "rank": 1236,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32358,7 +32332,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1238,
+   "rank": 1237,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32384,7 +32358,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1239,
+   "rank": 1238,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32410,7 +32384,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "moderate",
-   "rank": 1240,
+   "rank": 1239,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32436,7 +32410,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1241,
+   "rank": 1240,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32462,7 +32436,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1242,
+   "rank": 1241,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32488,7 +32462,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1243,
+   "rank": 1242,
    "proposed_tier": "appendix",
    "unverified_numbers": [
     "20"
@@ -32517,7 +32491,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1244,
+   "rank": 1243,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32543,7 +32517,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1245,
+   "rank": 1244,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32569,7 +32543,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1246,
+   "rank": 1245,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32595,7 +32569,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1247,
+   "rank": 1246,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32621,7 +32595,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1248,
+   "rank": 1247,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32647,7 +32621,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1249,
+   "rank": 1248,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32673,7 +32647,7 @@
    "rcr": 0.0,
    "score": 2.0,
    "strength": "limited",
-   "rank": 1250,
+   "rank": 1249,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -32699,7 +32673,7 @@
    "rcr": 0.0,
    "score": 1.0,
    "strength": "limited",
-   "rank": 1251,
+   "rank": 1250,
    "proposed_tier": "appendix",
    "group": "clinical"
   },
@@ -38970,6 +38944,33 @@
   },
   {
    "domain": "diagnosis",
+   "comparison": "both",
+   "design": "Multi-center randomized clinical vignette study",
+   "ai_system": "GPT-4",
+   "humans": "Resident and attending physicians in family, internal or emergency medicine",
+   "finding": "Physicians diagnosed up to six clinical vignettes with GPT-4 plus conventional resources or conventional resources alone. Median diagnostic reasoning score per case was 76.3 percent with GPT-4 vs 73.7 percent with conventional resources (adjusted difference 1.6 percentage points, 95% CI -4.4 to 7.6; p=0.60). GPT-4 alone scored 15.5 percentage points (95% CI 1.5 to 29, p=0.03) higher than the conventional resources group.",
+   "limitation": "Preprint; small sample of 50 physicians using vignettes rather than real patients.",
+   "verdict": "ai_help_no_benefit",
+   "design_class": "rct",
+   "setting": "simulated",
+   "reach": "broad",
+   "humans_n": 50,
+   "title": "Influence of a Large Language Model on Diagnostic Reasoning: A Randomized Clinical Vignette Study.",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/38559045/",
+   "source": "medRxiv : the preprint server for health sciences",
+   "published": "2024-03-14",
+   "doi": "10.1101/2024.03.12.24303785",
+   "citations": 19,
+   "rcr": 3.326708600843077,
+   "score": 8.2,
+   "strength": "moderate",
+   "rank": 22,
+   "proposed_tier": "excluded",
+   "group": "excluded",
+   "excluded": "preprint of S29 (Large Language Model Influence on Diagnostic Reasoning, JAMA Netw Open 2024), already in the paper (editor, 2026-11-08)"
+  },
+  {
+   "domain": "diagnosis",
    "comparison": "ai_alone",
    "design": "Deep learning model development with ophthalmologist survey comparison",
    "ai_system": "Ensemble neural network on external photographs",
@@ -38990,7 +38991,7 @@
    "rcr": 4.926537435455504,
    "score": 8.1,
    "strength": "limited",
-   "rank": 22,
+   "rank": 23,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-09-08, before the start date 2023-01-01"
@@ -39017,7 +39018,7 @@
    "rcr": 2.814600750441294,
    "score": 7.9,
    "strength": "limited",
-   "rank": 23,
+   "rank": 24,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-10, before the start date 2023-01-01"
@@ -39044,7 +39045,7 @@
    "rcr": 4.2182205805900574,
    "score": 7.8,
    "strength": "moderate",
-   "rank": 24,
+   "rank": 25,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-21, before the start date 2023-01-01"
@@ -39071,7 +39072,7 @@
    "rcr": 6.004673503899155,
    "score": 7.6,
    "strength": "limited",
-   "rank": 25,
+   "rank": 26,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-26, before the start date 2023-01-01"
@@ -39098,7 +39099,7 @@
    "rcr": 3.712034346858458,
    "score": 7.5,
    "strength": "moderate",
-   "rank": 26,
+   "rank": 27,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-10-13, before the start date 2023-01-01"
@@ -39125,7 +39126,7 @@
    "rcr": 3.524663860656053,
    "score": 7.4,
    "strength": "moderate",
-   "rank": 27,
+   "rank": 28,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-08-12, before the start date 2023-01-01"
@@ -39152,7 +39153,7 @@
    "rcr": 2.1184779816846238,
    "score": 7.3,
    "strength": "limited",
-   "rank": 28,
+   "rank": 29,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-06, before the start date 2023-01-01"
@@ -39179,7 +39180,7 @@
    "rcr": 3.2574191775477166,
    "score": 7.2,
    "strength": "moderate",
-   "rank": 29,
+   "rank": 30,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-28, before the start date 2023-01-01"
@@ -39206,7 +39207,7 @@
    "rcr": 4.955413490335393,
    "score": 7.1,
    "strength": "limited",
-   "rank": 30,
+   "rank": 31,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-05-16, before the start date 2023-01-01"
@@ -39233,7 +39234,7 @@
    "rcr": 4.780568559191371,
    "score": 7.1,
    "strength": "limited",
-   "rank": 31,
+   "rank": 32,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-10-07, before the start date 2023-01-01"
@@ -39260,7 +39261,7 @@
    "rcr": 3.1710040608409042,
    "score": 7.1,
    "strength": "moderate",
-   "rank": 32,
+   "rank": 33,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-06-23, before the start date 2023-01-01"
@@ -39287,7 +39288,7 @@
    "rcr": 4.6944533604731165,
    "score": 7.0,
    "strength": "limited",
-   "rank": 33,
+   "rank": 34,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-07-28, before the start date 2023-01-01"
@@ -39314,7 +39315,7 @@
    "rcr": 4.631223520471043,
    "score": 7.0,
    "strength": "limited",
-   "rank": 34,
+   "rank": 35,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-11, before the start date 2023-01-01"
@@ -39341,7 +39342,7 @@
    "rcr": 2.977261856781319,
    "score": 7.0,
    "strength": "moderate",
-   "rank": 35,
+   "rank": 36,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-10-26, before the start date 2023-01-01"
@@ -39368,7 +39369,7 @@
    "rcr": 2.8420302351766975,
    "score": 6.9,
    "strength": "moderate",
-   "rank": 36,
+   "rank": 37,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-25, before the start date 2023-01-01"
@@ -39395,7 +39396,7 @@
    "rcr": 2.788941145057863,
    "score": 6.8,
    "strength": "moderate",
-   "rank": 37,
+   "rank": 38,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-23, before the start date 2023-01-01"
@@ -39422,7 +39423,7 @@
    "rcr": 4.357843165113559,
    "score": 6.8,
    "strength": "limited",
-   "rank": 38,
+   "rank": 39,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-08-19, before the start date 2023-01-01"
@@ -39449,7 +39450,7 @@
    "rcr": 4.181191121661605,
    "score": 6.7,
    "strength": "limited",
-   "rank": 39,
+   "rank": 40,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-10-19, before the start date 2023-01-01"
@@ -39476,7 +39477,7 @@
    "rcr": 3.4466412837220477,
    "score": 6.3,
    "strength": "limited",
-   "rank": 40,
+   "rank": 41,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-10-11, before the start date 2023-01-01"
@@ -39503,7 +39504,7 @@
    "rcr": 3.478359909384206,
    "score": 6.3,
    "strength": "limited",
-   "rank": 41,
+   "rank": 42,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-06-01, before the start date 2023-01-01"
@@ -39530,7 +39531,7 @@
    "rcr": 3.3001477677433537,
    "score": 6.2,
    "strength": "limited",
-   "rank": 42,
+   "rank": 43,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-15, before the start date 2023-01-01"
@@ -39557,7 +39558,7 @@
    "rcr": 2.0563210786517176,
    "score": 6.2,
    "strength": "limited",
-   "rank": 43,
+   "rank": 44,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-10-12, before the start date 2023-01-01"
@@ -39584,7 +39585,7 @@
    "rcr": 2.022980593454449,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 44,
+   "rank": 45,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-19, before the start date 2023-01-01"
@@ -39611,7 +39612,7 @@
    "rcr": 2.0120980542548312,
    "score": 6.2,
    "strength": "moderate",
-   "rank": 45,
+   "rank": 46,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-15, before the start date 2023-01-01"
@@ -39638,7 +39639,7 @@
    "rcr": 3.0242484835931904,
    "score": 6.0,
    "strength": "limited",
-   "rank": 46,
+   "rank": 47,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-08-19, before the start date 2023-01-01"
@@ -39665,7 +39666,7 @@
    "rcr": 2.8496477303070105,
    "score": 5.9,
    "strength": "limited",
-   "rank": 47,
+   "rank": 48,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-08, before the start date 2023-01-01"
@@ -39692,7 +39693,7 @@
    "rcr": 2.7829764297121375,
    "score": 5.8,
    "strength": "limited",
-   "rank": 48,
+   "rank": 49,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-06-25, before the start date 2023-01-01"
@@ -39719,7 +39720,7 @@
    "rcr": 2.7713047159457957,
    "score": 5.8,
    "strength": "limited",
-   "rank": 49,
+   "rank": 50,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-23, before the start date 2023-01-01"
@@ -39746,7 +39747,7 @@
    "rcr": 2.6559258959765515,
    "score": 5.7,
    "strength": "limited",
-   "rank": 50,
+   "rank": 51,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-09-07, before the start date 2023-01-01"
@@ -39773,7 +39774,7 @@
    "rcr": 2.5434152291321506,
    "score": 5.7,
    "strength": "limited",
-   "rank": 51,
+   "rank": 52,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-07, before the start date 2023-01-01"
@@ -39800,7 +39801,7 @@
    "rcr": 2.452363059088907,
    "score": 5.6,
    "strength": "limited",
-   "rank": 52,
+   "rank": 53,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-09, before the start date 2023-01-01"
@@ -39827,7 +39828,7 @@
    "rcr": 2.486047251950094,
    "score": 5.6,
    "strength": "limited",
-   "rank": 53,
+   "rank": 54,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-15, before the start date 2023-01-01"
@@ -39854,7 +39855,7 @@
    "rcr": 2.400848823295036,
    "score": 5.5,
    "strength": "limited",
-   "rank": 54,
+   "rank": 55,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-12, before the start date 2023-01-01"
@@ -39881,7 +39882,7 @@
    "rcr": 2.349823842724835,
    "score": 5.5,
    "strength": "limited",
-   "rank": 55,
+   "rank": 56,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-12-16, before the start date 2023-01-01"
@@ -39908,7 +39909,7 @@
    "rcr": 0.5534722394600886,
    "score": 5.3,
    "strength": "limited",
-   "rank": 56,
+   "rank": 57,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-12, before the start date 2023-01-01"
@@ -39935,7 +39936,7 @@
    "rcr": 2.241040851319524,
    "score": 4.4,
    "strength": "limited",
-   "rank": 57,
+   "rank": 58,
    "proposed_tier": "excluded",
    "group": "excluded",
    "excluded": "published 2022-11-11, before the start date 2023-01-01"

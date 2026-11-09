@@ -313,6 +313,7 @@ def verify_studies(result: dict, found_urls: set[str], studies: list[dict], limi
 VERIFY_WORKERS = 4
 MAX_PAPER_CHARS = 80000    # about 20,000 tokens of full text per study
 MONTHLY_PROMOTE = 8        # studies added from the shortlists each month
+MONTHLY_PREPRINTS = 1      # of those, places kept for the best preprints (owner's choice, 2026-11-06)
 MONTHLY_SWEEP_BUDGET = 8.0  # dollars for reading new abstracts each month
 VERIFY_BUDGET = 15.0        # dollars for checking studies against their papers
 EUTILS = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -334,9 +335,12 @@ the main limitation. Plain language for clinicians.
 ai_ahead, humans_ahead or comparable; for clinicians with and without AI use \
 ai_help_improved, ai_help_no_benefit or ai_help_harmed; mixed when the \
 answer depends on the subgroup, task or measure.
-- "status": confirmed (the record was right), corrected (you fixed it) or \
+- "status": confirmed (the record was right), corrected (you fixed it), \
 does_not_qualify (the paper does not compare AI with clinicians as defined \
-above, for example the comparator is not AI or no clinicians took part).
+above, for example the comparator is not AI or no clinicians took part) or \
+duplicate (it is the same study as one already in the paper, for example a \
+preprint of a study later published under another title: same trial, same \
+authors' design and sample; say which in the note).
 - "note": one sentence for the editors on what you corrected or why it does \
 not qualify. Never published.
 - Never include patient-identifiable information.
@@ -348,7 +352,7 @@ def verify_schema() -> dict:
     fields = ["status", "note", *[k for k in STUDY_FIELDS if k not in ("title", "url", "source", "published")]]
     props = {k: v for k, v in record["properties"].items() if k in fields}
     props.update({
-        "status": {"type": "string", "enum": ["confirmed", "corrected", "does_not_qualify"]},
+        "status": {"type": "string", "enum": ["confirmed", "corrected", "does_not_qualify", "duplicate"]},
         "note": {"type": "string"},
     })
     return {"type": "object", "properties": props, "required": fields, "additionalProperties": False}
@@ -359,11 +363,23 @@ def _text(node) -> str:
 
 
 def paper_text(st: dict) -> tuple[str, str]:
-    """The paper's text from NCBI: ("full_text", text) from PubMed Central when
-    it is open access there, else ("abstract", text) from PubMed, else ("", "")."""
+    """The paper's text: ("full_text", text) from PubMed Central when it is
+    open access there, else ("abstract", text) from PubMed, both through
+    NCBI's API; for a medRxiv preprint, the latest version's abstract from
+    medRxiv's own API; else ("", "")."""
     import time
     import xml.etree.ElementTree as ET
     import deep_sweep  # its get() retries and identifies the client
+    medrxiv = re.search(r"medrxiv\.org/content/(10\.\d+/\d[\d.]*\d)", st.get("url", ""))
+    if medrxiv:  # a medRxiv preprint: the latest version's abstract, from medRxiv's own API
+        try:
+            data = json.loads(deep_sweep.get(f"https://api.biorxiv.org/details/medrxiv/{medrxiv.group(1)}"))
+            versions = data.get("collection") or []
+            abstract = (versions[-1].get("abstract") or "").strip() if versions else ""
+            return ("abstract", abstract) if len(abstract) > 200 else ("", "")
+        except Exception as err:
+            print(f"Could not fetch medRxiv {medrxiv.group(1)}: {err}")
+            return "", ""
     pmid = re.search(r"pubmed\.ncbi\.nlm\.nih\.gov/(\d+)", st.get("url", ""))
     if not pmid:
         return "", ""
@@ -392,18 +408,35 @@ def paper_text(st: dict) -> tuple[str, str]:
         return "", ""
 
 
-def verify_prompt(st: dict, kind: str, text: str) -> str:
+def is_preprint(study: dict) -> bool:
+    return "preprint" in str(study.get("source", "")).lower()
+
+
+def monthly_choice(waiting: list[dict], count: int, preprints: int) -> list[dict]:
+    """The month's studies from the queue (best first): `preprints` places
+    for the best preprints, which would otherwise rarely reach the top (no
+    citations yet, and a lower score by design), the rest by rank. A place
+    no preprint can fill goes to the next study in the queue."""
+    kept = [st for st in waiting if is_preprint(st)][:max(0, min(preprints, count))]
+    rest = [st for st in waiting if st not in kept][:count - len(kept)]
+    return sorted(rest + kept, key=waiting.index)
+
+
+def verify_prompt(st: dict, kind: str, text: str, already: list[str] | None = None) -> str:
+    known = "\n".join(f"- {t}" for t in (already or []))
     return (
         "Check this study against its paper and return the corrected record.\n\n"
+        + (f"Studies already in the paper (if this is one of them, answer duplicate):\n{known}\n\n" if known else "")
         + json.dumps({"title": st["title"], "journal": st["source"], "published": st["published"],
                       "recorded_from_abstract": {k: st.get(k, "") for k in
                                                  ("domain", "comparison", "design", "ai_system", "humans",
                                                   "finding", "limitation", "verdict")}}, ensure_ascii=False)
-        + f"\n\nThe paper ({'full text from PubMed Central' if kind == 'full_text' else 'abstract only, from PubMed'}):\n"
+        + f"\n\nThe paper ({'full text from PubMed Central' if kind == 'full_text' else 'abstract only'}):\n"
         + text + "\n\nReturn the record in the required JSON format.")
 
 
-def verify_landmarks(chosen: list[dict], budget: float, fixture: dict | None = None):
+def verify_landmarks(chosen: list[dict], budget: float, fixture: dict | None = None,
+                     already: list[dict] | None = None):
     """Check the chosen shortlist studies against their papers. Returns (records
     ready for the register, reasons for the ones left out, usage, the
     (url, reason) of studies found not to qualify)."""
@@ -424,7 +457,8 @@ def verify_landmarks(chosen: list[dict], budget: float, fixture: dict | None = N
     def run(st, kind, text):
         if fixture is not None:
             return fixture["result"], {"input": 1000, "output": 100, "cache_read": 0, "cache_write": 0, "searches": 0}
-        result, _, used = agent.run_claude(verify_prompt(st, kind, text), system=VERIFY_SYSTEM,
+        titles = [f"{s.get('title', '')} ({s.get('source', '')}, {str(s.get('published', ''))[:4]})" for s in (already or [])]
+        result, _, used = agent.run_claude(verify_prompt(st, kind, text, titles), system=VERIFY_SYSTEM,
                                            schema=verify_schema(), tools=[])
         return result, used
 
@@ -449,9 +483,10 @@ def verify_landmarks(chosen: list[dict], budget: float, fixture: dict | None = N
                 usage = agent.add_usage(usage, used)
                 spent = agent.estimate_cost(usage)
                 per_study = max(per_study, spent / max(1, len(kept) + len(rejected) + 1))
-                if row.get("status") == "does_not_qualify":
+                if row.get("status") in ("does_not_qualify", "duplicate"):
                     rejected.append((st["url"], str(row.get("note", "")).strip()))
-                    dropped.append(f"{st['title']}: does not qualify ({row.get('note', '').strip()})")
+                    why = "does not qualify" if row["status"] == "does_not_qualify" else "already in the paper"
+                    dropped.append(f"{st['title']}: {why} ({row.get('note', '').strip()})")
                 elif row.get("verdict") not in VERDICTS or row.get("domain") not in DOMAINS \
                         or row.get("comparison") not in COMPARISONS or not str(row.get("finding", "")).strip():
                     dropped.append(f"{st['title']}: the checked record was incomplete; it stays in the queue")
@@ -610,6 +645,7 @@ def write_pr_body(path: Path, review: dict, new: list[dict], dropped: list[str],
         "- [ ] Each new study: the link works, and the numbers and verdict match the paper",
         "- [ ] The summary and key findings say no more than the studies support",
         "- [ ] No patient information; nothing that reads as clinical advice",
+        "- [ ] A second clinician has read it (approve this PR, or comment that you have)",
         "- [ ] The Instagram slides in `social/review-<date>/` say what the paper says (merging posts them)",
         "",
         "To skip this edition, close this PR without merging.",
@@ -639,6 +675,8 @@ def main() -> int:
                              "landmark study not yet in the paper, no searching; search: web search only")
     parser.add_argument("--promote", type=int, default=MONTHLY_PROMOTE,
                         help=f"monthly mode: how many shortlist studies to add (default {MONTHLY_PROMOTE})")
+    parser.add_argument("--preprints", type=int, default=MONTHLY_PREPRINTS,
+                        help=f"monthly mode: places kept for preprints (default {MONTHLY_PREPRINTS})")
     parser.add_argument("--sweep-budget", type=float, default=MONTHLY_SWEEP_BUDGET,
                         help=f"monthly mode: dollars for reading new abstracts (default {MONTHLY_SWEEP_BUDGET:.0f})")
     args = parser.parse_args()
@@ -669,11 +707,11 @@ def main() -> int:
             deep["sweep"] = sweep
         waiting = deep_sweep.pool(studies)
         chosen = [st for st in waiting if st.get("proposed_tier") == "landmark" or st.get("pin") == "landmark"] \
-            if args.mode == "landmarks" else waiting[:args.promote]
+            if args.mode == "landmarks" else monthly_choice(waiting, args.promote, args.preprints)
         deep["waiting"] = len(waiting) - len(chosen)
         if chosen:
             records, deep["dropped"], used, rejected = verify_landmarks(
-                chosen, VERIFY_BUDGET, fixture.get("verify") if fixture is not None else None)
+                chosen, VERIFY_BUDGET, fixture.get("verify") if fixture is not None else None, studies)
             usage = agent.add_usage(usage, used)
             deep_sweep.record_rejected(rejected, date)
             deep["added"] = []

@@ -154,6 +154,7 @@ function initChatPage() {
     time.dateTime = message.created_at;
     meta.append(el("span", "chat-author", author.full_name || "Member"), time);
     text.append(meta, el("div", "chat-body", message.body));
+    if (author.id && author.id !== me.id) text.append(reportButton("chat", message.id));
     if (message.project_id) {
       const open = el("a", "chat-project-link", "> OPEN IN THE HUB");
       open.href = `hub.html?project=${encodeURIComponent(message.project_id)}`;
