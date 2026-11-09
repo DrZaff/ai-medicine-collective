@@ -1,0 +1,14 @@
+What med students should learn about AI, and how four chest X-ray AI tools did in real use
+
+A conference panel argued that medical training should build judgment and keep learning effortful as AI spreads. A prospective chest radiograph study shows why that matters: with four commercial AI tools, readers worked faster and felt more confident, but they were not more accurate.
+
+Med-ed: As AI takes on a bigger role in medical care, what should medical students learn? (AAMC (AAMCNews))
+AI vs physician: Artificial Intelligence-Assisted Chest Radiography: A Prospective Crossover Multi-Reader Study on Diagnostic Performance and Workflow Efficiency (Academic Radiology (via PubMed))
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-11-09 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #Aamc #AiTutors #AiAssistedReading #AutomationBias #ChestRadiography #Curriculum
