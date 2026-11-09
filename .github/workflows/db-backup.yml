@@ -1,0 +1,113 @@
+# Nightly backup of the Supabase database, encrypted, kept for 30 days as a
+# workflow artifact. The free Supabase plan keeps no backups of its own, so
+# without this a mistaken delete or a lost account would lose every member,
+# post and message. Setup and restore steps: docs/backups.md.
+#
+# Needs two secrets in the "db-backup" environment (Settings > Environments),
+# which only main can use, so no pull request can read them:
+#   SUPABASE_DB_URL     the Session pooler connection string, with the
+#                       database password (GitHub's runners have no IPv6, so
+#                       the direct connection string does not work)
+#   BACKUP_PASSPHRASE   a long random passphrase; keep a copy in the
+#                       organizers' password manager, or the backups cannot
+#                       be opened
+# Without them the job does nothing and says so. The repository is public,
+# so anyone can download the artifact: it is useless without the passphrase.
+# Uploaded files (the project-files bucket) are not included; see the doc.
+
+name: Database backup
+
+on:
+  schedule:
+    - cron: "37 8 * * *" # daily, about 4:37 AM Eastern
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: db-backup
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the secrets are set
+        id: secrets
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ] || [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "::notice::No backup: SUPABASE_DB_URL or BACKUP_PASSPHRASE is not set in the db-backup environment (see docs/backups.md)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          elif [ "${#BACKUP_PASSPHRASE}" -lt 20 ]; then
+            echo "::error::BACKUP_PASSPHRASE is too short: use at least 20 random characters."
+            exit 1
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # pg_dump must be at least as new as the server (Supabase runs Postgres
+      # 15 or 17); version 17 reads both
+      - name: Install pg_dump 17
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+          /usr/lib/postgresql/17/bin/pg_dump --version
+
+      - name: Dump, check and encrypt
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          stamp=$(date -u +%Y-%m-%d)
+          mkdir -p "$RUNNER_TEMP/backup"
+          dump="$RUNNER_TEMP/backup/amc-$stamp.dump"
+          # public: the site's tables; auth: accounts and sign-ins; storage:
+          # the list of uploaded files (not the files themselves)
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
+            --format=custom --no-owner --no-privileges \
+            --schema=public --schema=auth --schema=storage \
+            --file="$dump"
+          # A dump that cannot be listed, or has no profiles table, is not a backup
+          /usr/lib/postgresql/17/bin/pg_restore --list "$dump" > "$RUNNER_TEMP/backup/contents.txt"
+          grep -q "TABLE DATA public profiles" "$RUNNER_TEMP/backup/contents.txt"
+          echo "Backup of $(grep -c 'TABLE DATA' "$RUNNER_TEMP/backup/contents.txt") tables, $(du -h "$dump" | cut -f1)."
+          gpg --batch --yes --quiet --symmetric --cipher-algo AES256 \
+            --pinentry-mode loopback --passphrase-fd 3 \
+            --output "$dump.gpg" "$dump" 3<<<"$BACKUP_PASSPHRASE"
+          rm -f "$dump" "$RUNNER_TEMP/backup/contents.txt"
+          echo "STAMP=$stamp" >> "$GITHUB_ENV"
+
+      - name: Keep for 30 days
+        if: steps.secrets.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ env.STAMP }}
+          path: ${{ runner.temp }}/backup/amc-${{ env.STAMP }}.dump.gpg
+          retention-days: 30
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Email the organizers if it failed
+        if: failure()
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python scripts/blog_agent/notify.py --subject "Action needed: last night's database backup failed" \
+            --body "The nightly database backup did not finish. The run's log says why: $RUN_URL . The most common causes are a changed database password (update SUPABASE_DB_URL in the db-backup environment) or a paused Supabase project. Older backups are still kept for 30 days."
