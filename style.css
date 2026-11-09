@@ -5934,3 +5934,225 @@ button.meeting-undo {
 .mod-guide-list li + li {
   margin-top: 4px;
 }
+
+/* === SIGNATURE CARD STUDIO (signature-card-studio.html, card-studio.js) ===
+   An editor (details on the left, design and preview on the right), a
+   gallery of made-up examples, and a shared-card view. The cards themselves
+   are SVG artwork in their own palettes, the same in both themes. */
+
+.studio-lede {
+  max-width: 72ch;
+}
+
+.studio-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
+  gap: 18px;
+  margin: 16px 0 32px;
+}
+
+.studio-panel {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+}
+
+.studio-heading {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.studio-fields,
+.studio-choices {
+  display: grid;
+  gap: 10px;
+}
+
+.studio-choices {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.studio-field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.studio-field input,
+.studio-field select,
+.studio .studio-more textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--body);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.studio-field select option {
+  background: var(--bg);
+  color: var(--body);
+}
+
+.studio-layout-note {
+  min-height: 3em;
+  margin: 10px 0;
+}
+
+.studio-preview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 8px 0 12px;
+}
+
+.studio-face {
+  margin: 0;
+  min-width: 0;
+}
+
+.studio-face figcaption {
+  margin-bottom: 4px;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.studio-face svg,
+.studio-example svg,
+.studio-shared-cards svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+}
+
+.studio-warning {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--error);
+  color: var(--error);
+  font-family: var(--font-read);
+}
+
+.studio-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-family: var(--font-read);
+}
+
+.studio-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.studio-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.studio-buttons .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.studio-status {
+  min-height: 1.5em;
+  margin: 0;
+  color: var(--text);
+}
+
+.studio-more {
+  margin-top: 12px;
+  border-top: 1px var(--rule-style) var(--line-strong);
+  padding-top: 10px;
+}
+
+.studio-more summary {
+  cursor: pointer;
+  color: var(--text);
+  font-weight: bold;
+}
+
+.studio-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 18px;
+  margin: 12px 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.studio-example {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+}
+
+.studio-example-caption {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.studio-example .btn {
+  justify-self: start;
+}
+
+.studio-shared {
+  max-width: 640px;
+}
+
+.studio-shared-title {
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--text);
+}
+
+.studio-shared-sub {
+  margin: 4px 0 16px;
+  color: var(--muted);
+}
+
+.studio-shared-cards {
+  display: grid;
+  gap: 14px;
+}
+
+/* A shared card shows only the card */
+.studio--shared .studio-lede,
+.studio--shared .studio-editor,
+.studio--shared .studio-gallery-section,
+.studio--shared .studio-credit {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .studio-editor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .studio-choices,
+  .studio-preview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
