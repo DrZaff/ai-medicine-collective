@@ -204,7 +204,7 @@ h2{font-size:clamp(24px,6vw,34px)}
 .matchup-moves{margin-top:8px;padding-top:7px;border-top:1px solid var(--line)}
 .matchup-moves dd{font-weight:700;overflow-wrap:anywhere}
 .matchup-vs{position:absolute;top:clamp(49px,10vh,93px);left:50%;transform:translateX(-50%) skew(-8deg);background:#a41f3d;border:1px solid #ff93a4;padding:4px 9px;color:white;font:900 italic 19px var(--body);box-shadow:0 4px 15px #0009;pointer-events:none}
-#matchupStart{align-self:center;min-height:44px;min-width:160px}
+#matchupStart{align-self:center;min-height:44px;min-width:160px;touch-action:none}
 @media(max-height:480px) and (orientation:landscape){
  .matchup{gap:6px;padding-block:6px}
  .matchup header .edition{display:none}
@@ -2152,9 +2152,17 @@ function syncMatchup() {
   </section>`);
   drawMatchupPortraits();
   const start = $('#matchupStart');
-  if (start) start.onclick = () => {
-    if (!landscapeBlocked()) beginRoundCountdown();
+  if (!start) return;
+  const enterArena = () => {
+    if (!inMatchup() || landscapeBlocked()) return;
+    beginRoundCountdown();
+    syncMatchup();
   };
+  start.onclick = enterArena;
+  // Use the completed touch directly if the browser suppresses its synthetic click.
+  start.addEventListener('pointerup', event => {
+    if (event.pointerType === 'touch') enterArena();
+  });
 }
 
 let shownOver=-1;
