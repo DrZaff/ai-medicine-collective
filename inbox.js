@@ -79,7 +79,24 @@ function initInboxPage() {
       time.dateTime = message.created_at;
       meta.append(el("span", "chat-author", mine ? "You" : personName(message.sender)), time);
       text.append(meta, el("div", "chat-body", message.body));
+      if (!mine) text.append(reportButton("message", message.id));
       item.append(avatar(mine ? me : message.sender || {}), text);
+      // Either person can delete a message (it goes for both), for example
+      // one that should not contain patient information (migration 022)
+      const remove = button("×", "chat-delete", async () => {
+        if (!window.confirm("Delete this message for both of you? This can't be undone.")) return;
+        const { error } = await db.rpc("delete_private_message", { p_message: message.id });
+        if (error) {
+          console.error(error);
+          window.alert(error.code === "PGRST202"
+            ? "Deleting messages isn't switched on yet. Please ask a moderator."
+            : "Could not delete the message. Please try again.");
+          return;
+        }
+        load(thread.key);
+      });
+      remove.setAttribute("aria-label", "Delete this message");
+      item.append(remove);
       list.append(item);
     }
     body.append(list);

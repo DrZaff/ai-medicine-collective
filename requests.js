@@ -168,6 +168,7 @@ function initRequestsPage() {
       }));
     }
 
+    if (request.author && request.author.id !== me.id) actions.append(reportButton("request", request.id));
     body.append(actions);
     card.append(vote, body);
     return card;
