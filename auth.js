@@ -189,6 +189,95 @@ function emptyState(title, text, linkText, href) {
   return wrap;
 }
 
+/* ========= REPORTING CONTENT (migration 022) ========= */
+
+// Every member page puts reportButton(kind, id) beside content written by
+// someone else: chat messages, comments, tools, requests, private messages
+// and profiles. The database copies the reported text for the moderators
+// (report_content), so a private message can be judged without opening
+// anyone's inbox. Kinds and reasons must match the CHECKs in 022.
+const REPORT_REASONS = [
+  ["patient_information", "Patient information"],
+  ["harassment", "Harassment or abuse"],
+  ["misinformation", "Misleading or unsafe clinical content"],
+  ["spam", "Spam or advertising"],
+  ["impersonation", "Pretending to be someone else"],
+  ["other", "Something else"],
+];
+const REPORT_KIND_LABELS = {
+  chat: "Chat message", comment: "Comment", project: "Tool or material",
+  request: "Tool request", message: "Private message", profile: "Profile",
+};
+
+function reportButton(kind, targetId, label = "Report") {
+  const wrap = el("div", "report-wrap");
+  const open = el("button", "report-link", label);
+  open.type = "button";
+  open.setAttribute("aria-expanded", "false");
+  wrap.append(open);
+  let form = null;
+
+  open.addEventListener("click", () => {
+    if (form) {
+      form.remove();
+      form = null;
+      open.setAttribute("aria-expanded", "false");
+      return;
+    }
+    const id = `report-${kind}-${targetId}`;
+    form = el("form", "report-form");
+    const reasonLabel = el("label", "join-label", "Why are you reporting this?");
+    reasonLabel.htmlFor = `${id}-reason`;
+    const reason = el("select", "join-input");
+    reason.id = `${id}-reason`;
+    REPORT_REASONS.forEach(([value, text]) => reason.add(new Option(text, value)));
+    const detailsLabel = el("label", "join-label", "Anything a moderator should know (optional). Don't repeat patient details.");
+    detailsLabel.htmlFor = `${id}-details`;
+    const details = el("textarea", "join-input");
+    details.id = `${id}-details`;
+    details.rows = 2;
+    details.maxLength = 500;
+    const send = el("button", "join-submit", "> Send report");
+    send.type = "submit";
+    const cancel = button("Cancel", "report-cancel", () => open.click());
+    cancel.type = "button";
+    const status = el("p", "join-status");
+    status.setAttribute("role", "status");
+    const actions = el("div", "report-actions");
+    actions.append(send, cancel);
+    form.append(
+      el("p", "note", "// Reports go to the moderators only. The person you report is not told who reported them."),
+      reasonLabel, reason, detailsLabel, details, actions, status);
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      send.disabled = true;
+      status.classList.remove("is-error");
+      status.textContent = "> SENDING...";
+      const { error } = await db.rpc("report_content", {
+        p_kind: kind, p_target: targetId, p_reason: reason.value, p_details: details.value.trim() || null,
+      });
+      if (error) {
+        console.error(error);
+        send.disabled = false;
+        status.classList.add("is-error");
+        status.textContent = error.code === "54000" || error.code === "P0002"
+          ? `> ${error.message}`
+          : error.code === "PGRST202"
+            ? "> Reporting isn't switched on yet. Please tell a moderator directly."
+            : "> COULD NOT SEND THE REPORT. Please try again.";
+        return;
+      }
+      const done = el("p", "note report-done", "// Reported. A moderator will review it. Thank you.");
+      done.setAttribute("role", "status");
+      wrap.replaceChildren(done);
+    });
+    wrap.append(form);
+    open.setAttribute("aria-expanded", "true");
+    reason.focus();
+  });
+  return wrap;
+}
+
 async function getSessionAndProfile() {
   const { data: { session } } = await db.auth.getSession();
   if (!session) {
@@ -439,13 +528,18 @@ function initAccountPage() {
       if (!captchaReady()) return;
       forgot.disabled = true;
       say("> SENDING...");
+      // shouldCreateUser: false — "Forgot password" must never create an
+      // account (otherwise anyone could make the site email any address)
       const { error } = await db.auth.signInWithOtp({
         email: address,
-        options: { emailRedirectTo: new URL("account.html", window.location.href).href, captchaToken },
+        options: { emailRedirectTo: new URL("account.html", window.location.href).href, captchaToken, shouldCreateUser: false },
       });
       forgot.disabled = false;
       resetCaptcha();
-      if (error) {
+      // An address with no account gets the same answer as a real one, so the
+      // form never reveals who is a member
+      const noAccount = error && (error.code === "otp_disabled" || /signups? not allowed/i.test(error.message || ""));
+      if (error && !noAccount) {
         console.error(error);
         return say(error.status === 429
           ? "> TOO MANY TRIES. Please wait a minute and try again."
@@ -1158,7 +1252,10 @@ function initAccountPage() {
       save.disabled = false;
       if (error) {
         console.error(error);
-        status.textContent = "> COULD NOT SAVE. Check the contact email and link, then try again.";
+        // The database explains a refused display name (migration 021)
+        status.textContent = error.code === "23514" && /Display names/.test(error.message || "")
+          ? `> ${error.message}`
+          : "> COULD NOT SAVE. Check the contact email and link, then try again.";
         status.classList.add("is-error");
         return;
       }
@@ -1347,6 +1444,112 @@ function initModerationPage() {
   // they stay as they were left while the page redraws after a change.
   const openFolds = new Set();
 
+  // Reports from members (migration 022), patient information first
+  const REASON_LABELS = Object.fromEntries(REPORT_REASONS);
+  function reportLink(report) {
+    const target = {
+      chat: "chat.html",
+      comment: report.project_id && `hub.html?project=${encodeURIComponent(report.project_id)}`,
+      project: `hub.html?project=${encodeURIComponent(report.target_id)}`,
+      request: "requests.html",
+      profile: `profile.html?id=${encodeURIComponent(report.target_id)}`,
+    }[report.kind];
+    if (!target) return null;
+    const link = el("a", "account-mod-link", "> Open where it was posted");
+    link.href = target;
+    return link;
+  }
+
+  function reportRow(report, status) {
+    const row = el("li", "mod-row report-row");
+    if (report.reason === "patient_information") row.classList.add("report-row--phi");
+    const who = el("div", "account-who");
+    who.append(
+      el("span", "account-name", `${REPORT_KIND_LABELS[report.kind] || report.kind} · ${REASON_LABELS[report.reason] || report.reason}`),
+      el("span", "note", `// Reported by ${report.reporter_name || "a member"} on ${formatDate(report.created_at)}`
+        + (report.reports_on_item > 1 ? ` · ${report.reports_on_item} reports on this item` : "")),
+      el("span", "note", `// Written by ${report.author_name || "a member"}`)
+    );
+    if (report.snapshot) who.append(el("blockquote", "report-snapshot", report.snapshot));
+    if (report.details) who.append(el("span", "report-details", `Reporter's note: ${report.details}`));
+    const link = reportLink(report);
+    if (link) who.append(link);
+
+    const actions = el("div", "mod-actions");
+    const removeLabel = report.kind === "profile" ? "CLEAR PROFILE" : "REMOVE IT";
+    actions.append(
+      button(removeLabel, "mod-decline", async () => {
+        const what = report.kind === "profile"
+          ? "Clear this person's profile text and leave them off the member list?"
+          : "Remove this content for everyone? This can't be undone.";
+        if (!window.confirm(what)) return;
+        status.textContent = "> REMOVING...";
+        const { data: filePath, error } = await db.rpc("resolve_report", { p_report: report.id, p_action: "remove" });
+        if (error) {
+          status.textContent = `> FAILED: ${error.message}`;
+          status.classList.add("is-error");
+          return;
+        }
+        if (filePath) await db.storage.from("project-files").remove([filePath]);
+        await load("> DONE: removed");
+      }),
+      button("DISMISS", "mod-approve", () =>
+        act(status, "DISMISSING THE REPORT", "resolve_report", { p_report: report.id, p_action: "dismiss" }))
+    );
+    row.append(who, actions);
+    return row;
+  }
+
+  function reportsSection(reports, status) {
+    const wrap = el("section", "mod-section mod-reports");
+    wrap.append(el("h3", "subsection-title", `// Reports (${reports.length})`));
+    if (!reports.length) {
+      wrap.append(el("p", "note", "// Nothing reported. Members can report any post, message or profile."));
+      return wrap;
+    }
+    if (reports.some((r) => r.reason === "patient_information")) {
+      wrap.append(el("p", "account-status is-error",
+        "> Patient information has been reported. Remove it first, today (see the guide below)."));
+    }
+    const list = el("ul", "mod-list");
+    reports.forEach((report) => list.append(reportRow(report, status)));
+    wrap.append(list);
+    return wrap;
+  }
+
+  // The written guide: who to approve, and what to do about patient
+  // information. The full version is docs/moderation.md.
+  function guideFold() {
+    const fold = el("details", "resource-group mod-section mod-fold mod-guide");
+    fold.open = openFolds.has("guide");
+    fold.addEventListener("toggle", () => (fold.open ? openFolds.add("guide") : openFolds.delete("guide")));
+    const body = el("div", "resource-body");
+    const list = (items) => {
+      const ul = el("ul", "mod-guide-list");
+      items.forEach((text) => ul.append(el("li", null, text)));
+      return ul;
+    };
+    body.append(
+      el("h4", "subsection-title", "// Approving a request"),
+      list([
+        "Approve people who work or train in health care or a related field (students, residents, fellows, faculty, clinicians, researchers, staff), and anyone a current member vouches for.",
+        "Check the request: a real name, a role and a program or institution. A work or school email address is the strongest sign.",
+        "Decline empty or one-word requests, sales or recruiting accounts, and anyone who has broken the community rules before. Ask by email when unsure; don't approve to clear the queue.",
+        "Two moderators should agree before anyone is made a moderator.",
+      ]),
+      el("h4", "subsection-title", "// If patient information is posted"),
+      list([
+        "Remove it at once: REMOVE IT on the report, or the delete button where it was posted. Aim for within 24 hours of seeing it, and sooner for names, dates of birth, record numbers or photos.",
+        "Don't copy, forward or screenshot it. The report keeps a copy only until the report is closed.",
+        "Tell the person who posted it, privately and without blame, what was removed and why.",
+        "Tell the owner the same day, with the date, where it was posted and how long it was up. Keep that note; don't keep the information itself.",
+        "If it came from a hospital's records, the person who posted it may need to report it to their own institution's privacy office. Point them there.",
+      ])
+    );
+    fold.append(el("summary", "resource-summary", "// Moderator guide: approvals and patient information"), body);
+    return fold;
+  }
+
   function section(title, people, status, emptyText, folded) {
     const list = el("ul", "mod-list");
     people.forEach((person) => list.append(personRow(person, status)));
@@ -1407,9 +1610,14 @@ function initModerationPage() {
     status.setAttribute("role", "status");
     const by = (roles) => people.filter((p) => roles.includes(p.role));
 
+    // Reports arrive with migration 022; before that, the queue is left out
+    const reports = await db.rpc("moderation_reports");
+
     show(
       el("p", "note", `// Signed in as ${me.email} (${ROLE_LABELS[me.role]})`),
       status,
+      ...(reports.error ? [] : [reportsSection(reports.data || [], status)]),
+      guideFold(),
       section("Pending requests", by(["pending"]), status, "No requests waiting."),
       section("Members", by(APPROVED_ROLES), status, "No approved members yet.", true),
       section("Declined", by(["rejected"]), status, "None.", true)
