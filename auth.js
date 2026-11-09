@@ -1744,10 +1744,18 @@ function initDigestSender() {
     const { profile } = await getSessionAndProfile();
     if (!profile || profile.role !== "admin") return;
 
-    const { data: sent, error: sentError } = await db
-      .from("digest_sends").select("issue_date, sent_at, recipients")
+    // queued (migration 023): how many copies were due; recipients is how
+    // many have gone so far, a day's allowance at a time
+    const sends = (columns) => db.from("digest_sends").select(columns)
       .order("issue_date", { ascending: false }).limit(5);
+    let { data: sent, error: sentError } = await sends("issue_date, sent_at, recipients, queued");
+    if (sentError) ({ data: sent, error: sentError } = await sends("issue_date, sent_at, recipients"));
     if (sentError) return; // before migration 013: no panel
+    const sendLine = (entry, when) => {
+      const due = entry.queued || 0;
+      const count = due > entry.recipients ? `${entry.recipients} of ${due} members so far` : `${entry.recipients} members`;
+      return `${entry.issue_date} · ${count} · ${when}`;
+    };
 
     const firstName = (profile.full_name || "").trim().split(/\s+/)[0] || "";
     const section = el("section", "mod-section digest-panel");
@@ -1950,10 +1958,18 @@ function initDigestSender() {
         console.error(error);
         return say(`> NOT SENT: ${error.message}`, true);
       }
-      say(testOnly
-        ? `> TEST SENT to ${profile.email}. Check your inbox (and junk).`
-        : `> SENT to ${data} member${data === 1 ? "" : "s"}.`);
-      if (!testOnly) history.append(el("li", null, `${loaded.issue} · ${data} members · just now`));
+      if (testOnly) return say(`> TEST SENT to ${profile.email}. Check your inbox (and junk).`);
+      // After migration 023 a large digest goes out over a few days, so the
+      // daily email allowance always leaves room for sign-in codes
+      const { data: row } = await db.from("digest_sends").select("issue_date, recipients, queued")
+        .eq("issue_date", loaded.issue).maybeSingle();
+      if (row && row.queued > row.recipients) {
+        say(`> SENT to ${row.recipients} of ${row.queued} members now. The rest go out automatically over the next ` +
+          `${Math.ceil((row.queued - row.recipients) / Math.max(row.recipients, 1))} day(s), so sign-in emails keep working.`);
+      } else {
+        say(`> SENT to ${data} member${data === 1 ? "" : "s"}.`);
+      }
+      history.append(el("li", null, sendLine(row || { issue_date: loaded.issue, recipients: data }, "just now")));
     }
 
     const top = el("div", "digest-row");
@@ -2002,7 +2018,7 @@ function initDigestSender() {
 
     const history = el("ul", "dash-list digest-history");
     for (const entry of sent) {
-      history.append(el("li", null, `${entry.issue_date} · ${entry.recipients} members · sent ${formatDate(entry.sent_at)}`));
+      history.append(el("li", null, sendLine(entry, `sent ${formatDate(entry.sent_at)}`)));
     }
 
     section.append(top, status, compose);
