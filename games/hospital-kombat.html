@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Hospital Kombat – AI Medicine Collective</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="description" content="A two-player fighting game for medical specialties: nine fighters, five hospital stages and a signature Final Procedure for each." />
   <meta name="theme-color" content="#081315" />
   <link rel="apple-touch-icon" href="../images/icon-192.png" />
@@ -34,7 +34,7 @@
   color-scheme:dark;
 }
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden;touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 #app{height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);display:flex;flex-direction:column;max-width:900px;margin:0 auto;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px));box-sizing:border-box;position:relative}
 #top{display:flex;align-items:center;gap:8px;padding-block:6px;flex:0 0 auto}
 #top .brand{font-family:var(--display);font-size:15px;letter-spacing:.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1909,6 +1909,40 @@ document.addEventListener('visibilitychange', () => {
   syncSnd();
 });
 syncSnd();
+
+
+/* Keep game touches from becoming browser zoom gestures on iOS. */
+function cancelGameZoom(event) {
+  if (event.cancelable) event.preventDefault();
+}
+const zoomListener = {capture:true, passive:false};
+for (const type of ['gesturestart', 'gesturechange']) {
+  document.addEventListener(type, cancelGameZoom, zoomListener);
+}
+document.addEventListener('touchmove', event => {
+  if (event.touches.length > 1) cancelGameZoom(event);
+}, zoomListener);
+let lastTap = null;
+document.addEventListener('touchend', event => {
+  if (event.changedTouches.length !== 1 || event.touches.length) return;
+  const touch = event.changedTouches[0];
+  const target = touch.target;
+  if (target.closest('#pad, #view')) {
+    // Combat handles pointer events directly and does not need a synthetic click.
+    cancelGameZoom(event);
+    lastTap = null;
+    return;
+  }
+  const control = target.closest('button, a, input');
+  const time = event.timeStamp;
+  if (lastTap && time - lastTap.time < 350 &&
+      Math.hypot(touch.clientX - lastTap.x, touch.clientY - lastTap.y) < 32 &&
+      lastTap.control === control) cancelGameZoom(event);
+  lastTap = {time, x:touch.clientX, y:touch.clientY, control};
+}, zoomListener);
+document.addEventListener('wheel', event => {
+  if (event.ctrlKey) cancelGameZoom(event);
+}, zoomListener);
 
 /* ---------------- layout ---------------- */
 const isTouch=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
