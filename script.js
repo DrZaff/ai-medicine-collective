@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", initThemeToggle);
 
 // The footer repeats the menu (the header's own links, so the paths are right
 // on every page), with the Collective's name and Instagram in the light design
-const LEGAL_PAGES = [["terms.html", "Terms of use"], ["privacy.html", "Privacy"]];
+const LEGAL_PAGES = [["terms.html", "Terms of use"], ["privacy.html", "Privacy"], ["corrections.html", "Corrections"]];
 
 function initFooterNav() {
   const footer = document.querySelector(".terminal-frame .footer");
@@ -907,6 +907,24 @@ document.addEventListener("DOMContentLoaded", initRosterFilter);
 // Reads blog/index.json (built on deploy by scripts/blog_agent/build_index.py)
 // and renders one post from blog/posts/<date>.json. Post text comes from an
 // AI draft, so everything is inserted as text, never as HTML.
+// "Report an error" under each briefing and the AI vs Physician paper: an
+// email to the editors naming what is wrong, and the corrections policy
+const CORRECTIONS_EMAIL = "zaffutbn@ucmail.uc.edu";
+
+function errorReportNote(what) {
+  const note = document.createElement("p");
+  note.className = "note error-report";
+  const mail = document.createElement("a");
+  mail.href = `mailto:${CORRECTIONS_EMAIL}?subject=${encodeURIComponent(`Correction: ${what}`)}` +
+    `&body=${encodeURIComponent(`Page: ${location.href}\n\nWhat is wrong, and the source that shows it:\n`)}`;
+  mail.textContent = "Report an error";
+  const policy = document.createElement("a");
+  policy.href = "corrections.html";
+  policy.textContent = "how we handle corrections";
+  note.append("// Spotted a mistake? ", mail, " (", policy, ").");
+  return note;
+}
+
 function initBlog() {
   const app = document.getElementById("blog-app");
   if (!app) return; // not on blog page
@@ -991,6 +1009,7 @@ function initBlog() {
       post.tags.forEach((tag) => tags.append(el("span", "blog-tag", tag)));
       article.append(tags);
     }
+    article.append(errorReportNote(`briefing of ${niceDate(post.date)}`));
     return article;
   }
 
@@ -1269,6 +1288,7 @@ function initLivingReview() {
       }
 
       article.append(el("p", "note", "// Drafted by an AI agent from the studies listed above and reviewed by the Collective before publishing. It is a summary of research, not clinical guidance: read the original paper before relying on any result."));
+      article.append(errorReportNote(`AI vs Physician, edition ${review.edition || ""}`.trim()));
       app.replaceChildren(article);
     });
 }
