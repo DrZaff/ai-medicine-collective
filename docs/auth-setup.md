@@ -91,12 +91,20 @@ Keep a private note open (a password manager is ideal) for anything marked 🔒.
 ### 3b. Allow the site's addresses
 
 6. Under **Authentication**, click **URL Configuration**.
-7. Set **Site URL** to `https://ai-medicine-collective.netlify.app`.
+7. Set **Site URL** to `https://www.aimedicinecollective.com`.
 8. Under **Redirect URLs**, click **Add URL** and add each of these, one at a time:
+   - `https://www.aimedicinecollective.com/**`
    - `https://ai-medicine-collective.netlify.app/**`
-   - `https://deploy-preview-*--ai-medicine-collective.netlify.app/**`
-     (lets the preview site for each pull request use login)
    - `http://localhost:8000/**` (local testing)
+
+   **Do not add** `https://deploy-preview-*--ai-medicine-collective.netlify.app/**`
+   (removed 2026-11-08 after the national-readiness audit). The repository is
+   public, so a stranger's pull request can produce a preview site on that
+   address; with the wildcard allowed, a member who signed in there would hand
+   their session to the stranger's code. To test sign-in on one preview, add
+   that preview's exact address, test, then remove it. Also, in Netlify, under
+   **Site configuration > Build & deploy > Deploy Previews**, set previews for
+   pull requests from forks to **off** (or "require approval").
 9. Click **Save**.
 
 ---
