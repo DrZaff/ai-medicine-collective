@@ -3341,6 +3341,17 @@ html.terminal::view-transition-new(root) {
   text-decoration: none;
 }
 
+.modern .footer-legal {
+  margin-top: 10px;
+}
+
+.modern .footer-legal a,
+.modern .footer-legal a:visited {
+  font-family: var(--font-body, inherit);
+  font-size: 0.75rem;
+  color: rgb(255 255 255 / 0.6);
+}
+
 /* Instagram is in the footer now, and so is Home */
 .modern .site-social {
   display: none;

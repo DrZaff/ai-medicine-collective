@@ -374,7 +374,9 @@ function initAccountPage() {
     );
     const link = el("a", null, "privacy policy");
     link.href = "privacy.html";
-    note.append(link, ".");
+    const terms = el("a", null, "terms of use");
+    terms.href = "terms.html";
+    note.append(link, " and ", terms, ". By joining you agree to the terms, including never posting patient information.");
     panel.append(note);
     show(panel);
   }

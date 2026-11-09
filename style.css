@@ -841,6 +841,17 @@ button:hover {
   color: var(--text);
 }
 
+/* Terms and privacy: a quieter second row under the footer menu */
+.footer-legal {
+  margin-top: 8px;
+}
+
+.footer-legal a,
+.footer-legal a:visited {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
 /* "Members" beside pages only members can use, in the menu and footer */
 .nav-members-tag {
   margin-left: 2px;
