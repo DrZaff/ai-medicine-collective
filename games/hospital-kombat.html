@@ -1002,7 +1002,7 @@ const mkF=(c,x,face)=>({c,x,y:GY,vx:0,vy:0,face,hp:CH[c].hp,st:'idle',atk:null,t
 function newMatch(c0,c1,stage,mode,opt={}){
  g={mode,stage,round:1,wins:[0,0],f:[mkF(c0,110,1),mkF(c1,290,-1)],proj:[],fx:[],fin:null,cmb:null,evs:[],evId:0,T:0,shake:0,lvl:opt.lvl||0,score:opt.score||0,mid:(Math.random()*1e9)|0,win:-1,tout:0,perfect:0};
  newRound();
- if (mode !== 'demo') g.phase = 'matchup';
+ if (mode !== 'demo') g.phaseT = ROUND_INTRO_TICKS;
 }
 function newRound(){
  const f=g.f;g.f=[mkF(f[0].c,110,1),mkF(f[1].c,290,-1)];
@@ -1129,8 +1129,8 @@ function endRound(w,how){
  ev(how==='time'?'beep':'ko');
 }
 function sim(){
- if (g.phase === 'matchup') {
-  if (++g.phaseT >= MATCHUP_TICKS) beginRoundCountdown();
+ if (inMatchup()) {
+  if (++g.phaseT >= ROUND_INTRO_TICKS + MATCHUP_TICKS) beginRoundCountdown();
   return;
  }
  g.T++;if(g.shake>0)g.shake--;
@@ -1153,7 +1153,7 @@ function sim(){
  g.proj=g.proj.filter(p=>!p.dead);
  // phases
  g.phaseT++;
- if(g.phase==='intro'){if(g.phaseT===2)ev('beep');if(g.phaseT>=100){g.phase='fight';g.phaseT=0;ev('fight')}}
+ if(g.phase==='intro'){if(g.phaseT===2)ev('beep');if(g.phaseT>=ROUND_INTRO_TICKS){g.phase='fight';g.phaseT=0;ev('fight')}}
  else if(g.phase==='fight'){
   if(g.mode!=='demo')g.timer--;
   const d0=a.hp<=0,d1=b.hp<=0;
@@ -1686,7 +1686,7 @@ function drawHUD(c,T){
  if(g.cmb&&g.mode!=='demo'){const i=g.cmb.i;txt(c,g.cmb.n+' HIT COMBO',i?388:12,80,11,'#ffd166','#5a0d18',i?'right':'left')}
  // banner
  let b='',sub='';
- if(g.phase==='intro')b=g.phaseT<60?(g.wins[0]===1&&g.wins[1]===1?'FINAL ROUND':'ROUND '+g.round):'FIGHT!';
+ if(g.phase==='intro'&&!inMatchup())b=g.phaseT<60?(g.wins[0]===1&&g.wins[1]===1?'FINAL ROUND':'ROUND '+g.round):'FIGHT!';
  else if(g.phase==='final'&&g.fin.t>100)b=CH[g.f[g.fin.by].c].fn.toUpperCase();
  else if(g.phase==='ko'){if(g.phaseT<75)b=g.fin?CH[g.f[g.fin.by].c].fn.toUpperCase():g.tout?'TIME!':'CODE BLUE!';else{b=g.win<0?'DRAW':CH[g.f[g.win].c].name.toUpperCase()+' WINS';if(g.perfect&&g.win>=0)sub='CLEAN BILL OF HEALTH'}}
  else if(g.phase==='over')b=CH[g.f[g.wins[0]>=2?0:1].c].name.toUpperCase()+' WINS';
@@ -2022,6 +2022,14 @@ function arcadeFight(){newMatch(run.pc,run.order[run.lvl],(run.stage0+run.lvl)%5
 function startLocal(){newMatch(localSel[0],localSel[1],stageSel,'local');fightScreen()}
 function fightScreen(){screen='fight';paused=false;hide();resize();updateLandscapeGate();syncMatchup();try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}}
 const MATCHUP_TICKS = 360;
+const ROUND_INTRO_TICKS = 100;
+
+// The relay already carries the intro timer. The matchup uses the next tick
+// range, then hands off to the ordinary Round 1 countdown at tick zero.
+function inMatchup() {
+  return g?.phase === 'intro' && g.round === 1 &&
+    g.phaseT >= ROUND_INTRO_TICKS && g.phaseT < ROUND_INTRO_TICKS + MATCHUP_TICKS;
+}
 function beginRoundCountdown() {
   g.phase = 'intro';
   g.phaseT = 0;
@@ -2052,7 +2060,7 @@ function drawMatchupPortraits() {
 
 let matchupOverlay = false;
 function syncMatchup() {
-  const visible = screen === 'fight' && g?.phase === 'matchup';
+  const visible = screen === 'fight' && inMatchup();
   if (visible === matchupOverlay) return;
   matchupOverlay = visible;
   if (!visible) {
@@ -2200,7 +2208,7 @@ function netTick(){
 
 /* ---------------- pad state & main loop ---------------- */
 const finBtn=$('#finBtn'),spBtn=$('#spBtn');let lastFin=null,lastCd=-1;
-function padUpdate(){if(!g||!isTouch)return;const i=me(),F=g.f[i],O=g.f[1-i];const r=screen==='fight'&&g.phase!=='matchup'&&g.mode!=='demo'&&finalReady(F,O);if(r!==lastFin){finBtn.classList.toggle('ready',r);lastFin=r}
+function padUpdate(){if(!g||!isTouch)return;const i=me(),F=g.f[i],O=g.f[1-i];const r=screen==='fight'&&!inMatchup()&&g.mode!=='demo'&&finalReady(F,O);if(r!==lastFin){finBtn.classList.toggle('ready',r);lastFin=r}
  const cd=Math.round((F.cd||0)/SPEC_CD*20)/20;if(cd!==lastCd){spBtn.style.setProperty('--cd',cd);lastCd=cd}}
 function gather(){
  if(!g)return;
