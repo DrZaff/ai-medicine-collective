@@ -526,13 +526,18 @@ function initAccountPage() {
       if (!captchaReady()) return;
       forgot.disabled = true;
       say("> SENDING...");
+      // shouldCreateUser: false — "Forgot password" must never create an
+      // account (otherwise anyone could make the site email any address)
       const { error } = await db.auth.signInWithOtp({
         email: address,
-        options: { emailRedirectTo: new URL("account.html", window.location.href).href, captchaToken },
+        options: { emailRedirectTo: new URL("account.html", window.location.href).href, captchaToken, shouldCreateUser: false },
       });
       forgot.disabled = false;
       resetCaptcha();
-      if (error) {
+      // An address with no account gets the same answer as a real one, so the
+      // form never reveals who is a member
+      const noAccount = error && (error.code === "otp_disabled" || /signups? not allowed/i.test(error.message || ""));
+      if (error && !noAccount) {
         console.error(error);
         return say(error.status === 429
           ? "> TOO MANY TRIES. Please wait a minute and try again."
@@ -1245,7 +1250,10 @@ function initAccountPage() {
       save.disabled = false;
       if (error) {
         console.error(error);
-        status.textContent = "> COULD NOT SAVE. Check the contact email and link, then try again.";
+        // The database explains a refused display name (migration 021)
+        status.textContent = error.code === "23514" && /Display names/.test(error.message || "")
+          ? `> ${error.message}`
+          : "> COULD NOT SAVE. Check the contact email and link, then try again.";
         status.classList.add("is-error");
         return;
       }
