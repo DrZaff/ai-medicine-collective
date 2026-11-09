@@ -48,6 +48,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);over
 /* touch pad */
 #pad{flex:1 1 auto;display:none;grid-template-columns:1fr 1fr;gap:12px;padding-block:10px;min-height:0;touch-action:none}
 body.touch #pad{display:grid}
+body.touch #app:has(#ov[hidden]):has(#rotationGate[hidden]),
+body.touch #view,body.touch #top .ib{touch-action:none}
 body.touch #keys{display:none}
 .dpad{position:relative;align-self:center;justify-self:center;width:min(44vw,230px,34vh);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--panel) 30%,#0c1d21 70%);border:2px solid var(--line);touch-action:none}
 .dpad i{position:absolute;width:34%;height:34%;display:flex;align-items:center;justify-content:center;font-style:normal;color:var(--mute);font-size:22px;border-radius:12px;transition:background .05s}
@@ -63,9 +65,9 @@ body.touch #keys{display:none}
 .ab.f.ready{background:var(--code);color:#fff;animation:pulse .6s infinite alternate}
 @keyframes pulse{to{box-shadow:0 0 22px var(--code);transform:scale(1.03)}}
 @media (orientation:landscape){
-  body.touch #pad{position:absolute;inset:auto 0 0 0;padding:0 max(10px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));pointer-events:none;align-items:end}
+  body.touch #pad{position:absolute;inset:0;padding:max(10px,env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));pointer-events:none;align-items:center}
   body.touch #pad>*{pointer-events:auto;opacity:.78}
-  body.touch .dpad{width:min(30vh,170px);justify-self:start}
+  body.touch .dpad{width:min(25vw,36vh,170px);justify-self:start}
   body.touch .acts{justify-self:end;max-width:200px}
   body.touch .ab{min-height:52px}
 }
@@ -161,7 +163,7 @@ h2{font-size:clamp(24px,6vw,34px)}
 @media(max-width:440px){.scr{padding:12px 12px 18px;gap:8px}.card canvas{height:59px}.card{min-height:73px}.info{padding:7px 10px}.stats{gap:2px 9px}#top .brand{font-size:12px}.ib{font-size:11px;min-width:42px;padding-inline:7px}}
 .subspecialty{color:var(--mint);font-size:11px;letter-spacing:.04em}
 .gallery{max-width:900px}.gallery img{display:block;width:100%;aspect-ratio:3/2;object-fit:contain;border:1px solid #4d6678;box-sizing:border-box;border-radius:4px;background:#0b111a}.gallery .row{gap:6px}.gallery .row .btn{min-height:44px;padding:6px;font-size:13px}.gallery .btn[aria-pressed=true]{border-color:var(--amber);color:var(--amber)}
-@media(orientation:landscape) and (max-height:460px){body.touch .ab{min-height:44px}.acts{gap:5px}body.touch .acts{max-width:164px}}
+@media(orientation:landscape) and (max-height:460px){body.touch .ab{min-height:clamp(48px,14vh,56px)}body.touch .acts{gap:6px;max-width:180px}}
 
 #rotationGate{position:absolute;inset:0;z-index:20;display:grid;place-items:center;overflow:auto;padding:24px;background:linear-gradient(155deg,#0d1e30,#060b13 70%);text-align:center}
 #rotationGate[hidden]{display:none} #rotationGate section{display:grid;justify-items:center;gap:14px;max-width:310px}
@@ -223,7 +225,7 @@ h2{font-size:clamp(24px,6vw,34px)}
 <div id="app">
   <div id="top">
     <div class="brand">HOSPITAL <b>KOMBAT</b></div>
-    <button class="ib" id="snd" aria-label="Sound on">Sound on</button>
+    <button class="ib" id="snd" aria-label="Enable sound">Enable sound</button>
     <button class="ib" id="menuBtn" aria-label="Menu">Menu</button>
   </div>
   <div id="view"><canvas id="cv" width="400" height="300" aria-label="Fight arena"></canvas></div>
@@ -1028,13 +1030,13 @@ addEventListener('blur',()=>{for(const c of local)for(const k in c.h)c.h[k]=0});
 const dpad=$('#dpad'),dp=new Map();
 function dpadUpdate(){const h=local[2].h;h.l=h.r=h.u=h.d=0;const r=dpad.getBoundingClientRect();for(const [,p] of dp){const dx=(p.x-r.left)/r.width-.5,dy=(p.y-r.top)/r.height-.5;if(Math.hypot(dx,dy)<.08)continue;if(dx>.14)h.r=1;if(dx<-.14)h.l=1;if(dy<-.17)h.u=1;if(dy>.17)h.d=1}
  for(const k of['u','d','l','r'])dpad.querySelector('.'+k).classList.toggle('on',!!h[k])}
-dpad.addEventListener('pointerdown',e=>{e.preventDefault();unlockAudio();dpad.setPointerCapture(e.pointerId);dp.set(e.pointerId,{x:e.clientX,y:e.clientY});dpadUpdate()});
+dpad.addEventListener('pointerdown',e=>{e.preventDefault();dpad.setPointerCapture(e.pointerId);dp.set(e.pointerId,{x:e.clientX,y:e.clientY});dpadUpdate()});
 dpad.addEventListener('pointermove',e=>{if(dp.has(e.pointerId)){dp.set(e.pointerId,{x:e.clientX,y:e.clientY});dpadUpdate()}});
 for(const t of['pointerup','pointercancel','lostpointercapture'])dpad.addEventListener(t,e=>{dp.delete(e.pointerId);dpadUpdate()});
 document.querySelectorAll('.ab').forEach(b=>{const k=b.dataset.k;
- b.addEventListener('pointerdown',e=>{e.preventDefault();unlockAudio();b.setPointerCapture(e.pointerId);b.classList.add('on');if(k==='b')local[2].h.b=1;else local[2].pc[k]++;if(navigator.vibrate)try{navigator.vibrate(8)}catch(_){}});
+ b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);b.classList.add('on');if(k==='b')local[2].h.b=1;else local[2].pc[k]++;if(navigator.vibrate)try{navigator.vibrate(8)}catch(_){}});
  const up=()=>{b.classList.remove('on');if(k==='b')local[2].h.b=0};
- b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('contextmenu',e=>e.preventDefault());
+ b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);b.addEventListener('contextmenu',e=>e.preventDefault());
 });
 // merge local sources into a slot controller
 function mergeInto(c,srcs){for(const k in c.h)c.h[k]=0;let pc={p:0,k:0,s:0,f:0};for(const s of srcs){for(const k in c.h)c.h[k]=c.h[k]||s.h[k];for(const k in pc)pc[k]+=s.pc[k]}c.pc=pc}
@@ -1786,7 +1788,7 @@ function updateMusicControls() {
     : soundtrackFailed ? 'Track unavailable. Try the next one.' : 'Loading soundtrack…';
 }
 
-function playSoundtrack(key, loop) {
+function playSoundtrack(key, loop, retries = ROUND_SCORE.length - 1) {
   const request = ++soundtrackRequest;
   soundtrackKey = key;
   soundtrackFailed = false;
@@ -1796,6 +1798,10 @@ function playSoundtrack(key, loop) {
   decodeSoundtrackTrack(track).then(buffer => {
     if (request !== soundtrackRequest) return;
     if (!buffer) {
+      if (retries > 0) {
+        playSoundtrack(key, loop, retries - 1);
+        return;
+      }
       soundtrackFailed = true;
       updateMusicControls();
       return;
@@ -1838,9 +1844,29 @@ function enableSoundtrack() {
     soundtrackBus.connect(AC.destination);
   }
   if (AC.state === 'running') syncRoundSoundtrack();
-  else AC.resume().then(() => { syncRoundSoundtrack(); updateMusicControls(); }).catch(() => {});
+  else AC.resume().catch(() => {});
 }
-function unlockAudio(){if(muted)return;if(AC){enableSoundtrack();return;}try{AC=new(window.AudioContext||window.webkitAudioContext)();const n=AC.sampleRate*.5;noiseB=AC.createBuffer(1,n,AC.sampleRate);const d=noiseB.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;enableSoundtrack()}catch(e){AC=null}}
+function unlockAudio() {
+  if (muted) return;
+  if (!AC) {
+    try {
+      // iOS otherwise treats Web Audio as ambient and can mute it in Silent Mode.
+      if (navigator.audioSession) navigator.audioSession.type = 'playback';
+    } catch {}
+    try {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      noiseB = AC.createBuffer(1, Math.floor(AC.sampleRate * .5), AC.sampleRate);
+      const samples = noiseB.getChannelData(0);
+      for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;
+      AC.onstatechange = () => { syncRoundSoundtrack(); syncSnd(); };
+    } catch {
+      AC = null;
+      return;
+    }
+  }
+  enableSoundtrack();
+  syncSnd();
+}
 function tone(type,f1,f2,dur,vol){const o=AC.createOscillator(),gn=AC.createGain(),t=AC.currentTime;o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f2),t+dur);gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(gn).connect(AC.destination);o.start(t);o.stop(t+dur)}
 function noise(dur,vol,freq){const s=AC.createBufferSource(),f=AC.createBiquadFilter(),gn=AC.createGain(),t=AC.currentTime;s.buffer=noiseB;f.type='lowpass';f.frequency.value=freq;gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f).connect(gn).connect(AC.destination);s.start(t);s.stop(t+dur)}
 function sfx(n){if(!AC||muted||screen!=='fight')return;try{
@@ -1851,7 +1877,7 @@ function sfx(n){if(!AC||muted||screen!=='fight')return;try{
 
 const sndBtn = $('#snd');
 function syncSnd() {
-  sndBtn.textContent = muted ? 'Sound off' : 'Sound on';
+  sndBtn.textContent = muted ? 'Sound off' : AC?.state === 'running' ? 'Sound on' : 'Enable sound';
   sndBtn.setAttribute('aria-label', sndBtn.textContent);
   updateMusicControls();
 }
@@ -1859,13 +1885,29 @@ function setMuted(value) {
   muted = value;
   store.set('hk_mute', muted);
   if (muted) updateMusicGain(0, .022);
-  else unlockAudio();
+  else {
+    if (soundtrackFailed) soundtrackKey = '';
+    unlockAudio();
+  }
   syncSnd();
 }
-sndBtn.onclick = () => setMuted(!muted);
-addEventListener('pointerdown', event => {
+sndBtn.onclick = () => setMuted(!muted && AC?.state === 'running');
+function unlockFromTap(event) {
   if (!event.target.closest('#snd, #musicAction, #musicMute')) unlockAudio();
+}
+addEventListener('pointerdown', event => {
+  if (event.pointerType === 'mouse') unlockFromTap(event);
 }, {passive:true});
+addEventListener('pointerup', event => {
+  if (event.pointerType !== 'mouse') unlockFromTap(event);
+}, {passive:true});
+addEventListener('touchend', unlockFromTap, {passive:true});
+addEventListener('click', unlockFromTap, {passive:true});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && AC && !muted) enableSoundtrack();
+  syncRoundSoundtrack();
+  syncSnd();
+});
 syncSnd();
 
 /* ---------------- layout ---------------- */
