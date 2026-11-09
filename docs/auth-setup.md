@@ -253,6 +253,27 @@ protection on in Supabase. Protection on with no site key in the code would
 block every email sign-in (Google would still work). To switch the check off,
 turn protection off in Supabase first, then empty the site key.
 
+### Before opening sign-up to everyone (national-readiness audit, 2026-11-08)
+
+The captcha on the page only helps if Supabase **enforces** it: a script can
+call Supabase's sign-up and code endpoints directly, skipping the page. Check
+these in the Supabase dashboard:
+
+1. **Authentication > Attack Protection:** CAPTCHA protection is **on**, with
+   the Turnstile secret saved. Then try "Forgot password" on the live site
+   once to confirm codes still arrive.
+2. **Authentication > Rate Limits:** keep emails sent per hour low (about 30
+   is plenty for this site) and keep the limits on sign-ups and code
+   verifications. Every email counts against Resend's daily allowance, which
+   sign-in codes share with alerts and the digest.
+3. **Authentication > Providers > Email:** "Secure password change" **on**
+   (asks for a recent sign-in before a password changes) and "Confirm email"
+   **on**.
+
+The site's side is done: "Forgot password" never creates an account
+(`shouldCreateUser: false`) and answers the same for unknown addresses, and
+display names cannot carry web addresses or claim a role (migration 021).
+
 ## Action emails and the dependable schedule (October 2026)
 
 **Emails when a person is needed.** The blog and digest workflows email the
