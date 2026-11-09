@@ -629,6 +629,10 @@ function initHubPage() {
     } else if (project.author && project.status === "published") {
       article.append(contactForm(project));
     }
+    // Signed-in members can report someone else's item to the moderators
+    if (me && project.author && project.author.id !== me.id) {
+      article.append(reportButton("project", project.id, "Report this item"));
+    }
 
     // Authors can fix an item that isn't published yet
     if (me && project.author && project.author.id === me.id && project.status !== "published") {
@@ -748,6 +752,7 @@ function initHubPage() {
         el("span", "note", `// ${formatDate(comment.created_at)}`),
         el("span", "hub-comment-body", comment.body)
       );
+      if (author.id && author.id !== me.id) who.append(reportButton("comment", comment.id));
       item.append(avatar(author), who);
       if (isModerator() || author.id === me.id) {
         item.append(button("DELETE", "mod-decline", async () => {

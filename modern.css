@@ -3341,6 +3341,17 @@ html.terminal::view-transition-new(root) {
   text-decoration: none;
 }
 
+.modern .footer-legal {
+  margin-top: 10px;
+}
+
+.modern .footer-legal a,
+.modern .footer-legal a:visited {
+  font-family: var(--font-body, inherit);
+  font-size: 0.75rem;
+  color: rgb(255 255 255 / 0.6);
+}
+
 /* Instagram is in the footer now, and so is Home */
 .modern .site-social {
   display: none;
@@ -4538,4 +4549,35 @@ html.terminal::view-transition-new(root) {
 
 .modern .spot-word:hover {
   background: rgb(16 185 129 / 0.12);
+}
+
+
+/* === REPORTING CONTENT (2026-11-08) =========================== */
+
+.modern .report-link {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.modern .report-link:hover,
+.modern .report-link:focus-visible,
+.modern .report-link[aria-expanded="true"] {
+  color: var(--error);
+}
+
+.modern .report-form {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .report-row--phi {
+  border-left: 3px solid var(--error);
+}
+
+.modern .report-snapshot {
+  border-left: 3px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--page);
 }

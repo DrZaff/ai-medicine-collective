@@ -841,6 +841,17 @@ button:hover {
   color: var(--text);
 }
 
+/* Terms and privacy: a quieter second row under the footer menu */
+.footer-legal {
+  margin-top: 8px;
+}
+
+.footer-legal a,
+.footer-legal a:visited {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
 /* "Members" beside pages only members can use, in the menu and footer */
 .nav-members-tag {
   margin-left: 2px;
@@ -5832,4 +5843,94 @@ button.meeting-undo {
   .exercise {
     padding: 12px;
   }
+}
+
+
+/* === REPORTING CONTENT (auth.js: reportButton; migration 022) =========
+   A quiet "Report" link under content written by someone else, opening a
+   small form; on the Moderation page, the reports queue (patient
+   information first) and the moderator guide. */
+
+.report-wrap {
+  margin-top: 4px;
+}
+
+.report-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.report-link:hover,
+.report-link:focus-visible,
+.report-link[aria-expanded="true"] {
+  color: var(--error);
+}
+
+.report-form {
+  display: grid;
+  gap: 6px;
+  max-width: 480px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px var(--rule-style) var(--line-strong);
+  background: var(--panel);
+}
+
+.report-form .join-input {
+  width: 100%;
+  min-width: 0;
+}
+
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.report-cancel {
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.report-done {
+  margin: 4px 0 0;
+}
+
+.report-row--phi {
+  border-left: 3px solid var(--error);
+  padding-left: 10px;
+}
+
+.report-snapshot {
+  margin: 6px 0;
+  padding: 8px 10px;
+  border-left: 2px solid var(--line-strong);
+  background: rgb(var(--green-rgb) / 0.05);
+  font-family: var(--font-read);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.report-details {
+  font-family: var(--font-read);
+  font-size: 0.9rem;
+}
+
+.mod-guide-list {
+  margin: 0 0 12px;
+  padding-left: 1.2em;
+  font-family: var(--font-read);
+  line-height: 1.55;
+}
+
+.mod-guide-list li + li {
+  margin-top: 4px;
 }

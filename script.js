@@ -149,6 +149,8 @@ document.addEventListener("DOMContentLoaded", initThemeToggle);
 
 // The footer repeats the menu (the header's own links, so the paths are right
 // on every page), with the Collective's name and Instagram in the light design
+const LEGAL_PAGES = [["terms.html", "Terms of use"], ["privacy.html", "Privacy"], ["corrections.html", "Corrections"]];
+
 function initFooterNav() {
   const footer = document.querySelector(".terminal-frame .footer");
   const links = [...document.querySelectorAll(".terminal-frame header .nav a")]
@@ -188,6 +190,18 @@ function initFooterNav() {
   instagram.textContent = "Instagram";
   row.append(instagram);
   nav.append(row);
+
+  // Terms and privacy, on every page
+  const prefix = brand ? brand.getAttribute("href").replace(/[^/]*$/, "") : "";
+  const legal = document.createElement("div");
+  legal.className = "footer-links footer-legal";
+  LEGAL_PAGES.forEach(([page, label]) => {
+    const a = document.createElement("a");
+    a.href = prefix + page;
+    a.textContent = label;
+    legal.append(a);
+  });
+  nav.append(legal);
   footer.prepend(nav);
 
   // The independence note and disclaimer sit at the very bottom, inside the footer
