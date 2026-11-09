@@ -14,7 +14,11 @@
   <meta property="og:description" content="Nine specialties. One call room. Settle it." />
   <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <!-- Source: the Claude Artifact version of this game. This copy uses the site's own font and leaves out online play. -->
+  <!-- Source: the Claude Artifact version of this game, built by its build_site.py. This copy uses the site's own font and plays online through the site's Supabase project. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"
+    integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok"
+    crossorigin="anonymous"></script>
+  <script>window.HK_RELAY = {url: 'https://ahwnarhmuzxgjindreuz.supabase.co', key: 'sb_publishable_3C4xXn0j3GiunX-t6cd0HQ_ze_yTErT'};</script>
 
 <style>
 @font-face{font-family:"Inter";font-style:normal;font-weight:400 700;font-display:swap;src:url("../fonts/inter.woff2") format("woff2")}
@@ -109,6 +113,9 @@ h2{font-family:var(--display);font-weight:400;font-size:22px;margin:4px 0 0;text
 .scorebox{display:grid;grid-template-columns:1fr auto;gap:4px 12px;background:var(--panel);border-radius:12px;padding:12px 16px;font-variant-numeric:tabular-nums}
 .scorebox b{text-align:right}
 .code{font-family:var(--display);font-size:44px;text-align:center;letter-spacing:8px;color:var(--amber);margin:0}
+.invite{display:grid;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.invurl{font:500 14px var(--body);width:100%;box-sizing:border-box;min-height:44px;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:#061012;color:var(--ink)}
+.linkbtn{background:none;border:0;padding:0;color:var(--mint);font:inherit;text-decoration:underline;cursor:pointer}
 input.codein{font:400 26px var(--display);text-align:center;letter-spacing:6px;text-transform:uppercase;background:#061012;color:var(--ink);border:2px solid var(--line);border-radius:12px;min-height:54px;width:100%;box-sizing:border-box}
 .note{color:var(--mute);font-size:13px;text-align:center;margin:0;line-height:1.5}
 .status{text-align:center;font-weight:700;margin:0}
@@ -1870,12 +1877,12 @@ function menu(){
  show(`<div class="scr"><p class="edition">Night Shift Edition</p><div class="logo"><span class="a">HOSPITAL</span><span class="b">KOMBAT</span></div>${ecg}
  <p class="tag">Nine specialties. One call room. Settle it.</p>
  <button class="btn pri" data-a="arcade">Arcade<small>Beat all 8 rivals. They get tougher.</small></button>
- ${inClaude?'<button class="btn alt" data-a="online">Online vs a friend<small>Each player on their own phone or computer</small></button>':''}
+ ${RELAY?'<button class="btn alt" data-a="online">Play with a friend<small>Send a link. They open it and join your game.</small></button>':inClaude?'<button class="btn alt" data-a="online">Online vs a friend<small>Each player on their own phone or computer</small></button>':''}
  <button class="btn" data-a="local">Same keyboard<small>2 players, one computer</small></button>
  <div class="row"><button class="btn ghost" data-a="howto">How to play</button><button class="btn ghost" data-a="gallery">Roster art</button></div>
  ${best?`<p class="best">Best arcade score: ${best.toLocaleString()}</p>`:''}</div>`);
  ov.querySelector('[data-a=arcade]').onclick=()=>selectScreen('arcade');
- if(inClaude)ov.querySelector('[data-a=online]').onclick=onlineScreen;
+ if(RELAY||inClaude)ov.querySelector('[data-a=online]').onclick=onlineScreen;
  ov.querySelector('[data-a=local]').onclick=()=>selectScreen('local1');
  ov.querySelector('[data-a=howto]').onclick=howto;
  ov.querySelector('[data-a=gallery]').onclick=()=>rosterGallery(0);
@@ -1916,19 +1923,19 @@ function selectScreen(kind,opts={}){
   <button class="btn pri" id="go">${kind==='arcade'?'Start arcade':kind==='local1'?'Next: Player 2':kind==='local2'?'Fight!':'Ready'}</button>
   <button class="btn ghost" id="back">Back</button></div>`);
  ov.querySelectorAll('.card').forEach(b=>portrait(b.querySelector('canvas'),+b.dataset.i));
- const upd=()=>{ov.querySelectorAll('.card').forEach(b=>{b.classList.toggle('sel',+b.dataset.i===cur);b.classList.toggle('opp',kind==='online'&&NET.oppCh!=null&&+b.dataset.i===NET.oppCh)});const C=CH[cur];
+ const upd=()=>{ov.querySelectorAll('.card').forEach(b=>{b.classList.toggle('sel',+b.dataset.i===cur);const op=kind==='online'&&NET.link&&NET.link.peer();b.classList.toggle('opp',!!(op&&op.lobby)&&+b.dataset.i===op.lobby.ch)});const C=CH[cur];
   $('#info').innerHTML=`<div class="nm">${C.name}</div><div class="subspecialty">${C.tag}</div><div class="q">“${C.q}”</div><div class="mv">Special: <b>${C.sp.n}</b></div><div class="mv">Final Procedure: <b>${C.fn}</b></div>
   <div class="stats">Power<span><i style="width:${(C.pow-.8)/.45*100}%"></i></span>Speed<span><i style="width:${(C.spd-.85)/.3*100}%"></i></span>Stamina<span><i style="width:${(C.hp-90)/25*100}%"></i></span></div>`;
   const s=$('#stg');if(s)s.innerHTML=`<small>Stage</small>${STAGES[stageSel]}`;
   if(kind==='online')netSelUpdate(cur)};
  ov.querySelectorAll('.card').forEach(b=>b.onclick=()=>{cur=+b.dataset.i;if(kind==='online'&&NET.ready)return;upd()});
- ov.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{stageSel=(stageSel+ +b.dataset.s+5)%5;if(g&&g.mode==='demo'){g.stage=stageSel}upd()});
- $('#back').onclick=kind==='local2'?()=>selectScreen('local1'):kind==='online'?()=>{netLeave();onlineScreen()}:menu;
+ ov.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{stageSel=(stageSel+ +b.dataset.s+5)%5;if(g&&g.mode==='demo'){g.stage=stageSel}if(kind==='online'&&NET.link)NET.link.lobby({sg:stageSel});upd()});
+ $('#back').onclick=kind==='local2'?()=>selectScreen('local1'):kind==='online'?()=>{const relayed=NET.link&&NET.link.kind==='relay';netLeave();relayed?menu():onlineScreen()}:menu;
  $('#go').onclick=()=>{
   if(kind==='arcade'){localSel[0]=cur;startArcade(cur)}
   else if(kind==='local1'){localSel[0]=cur;selectScreen('local2')}
   else if(kind==='local2'){localSel[1]=cur;startLocal()}
-  else{NET.ready=!NET.ready;netSelUpdate(cur);$('#go').textContent=NET.ready?'Not ready':'Ready'}
+  else{NET.ready=!NET.ready;if(NET.link)NET.link.lobby({ch:cur,rdy:NET.ready});netSelUpdate(cur);$('#go').textContent=NET.ready?'Not ready':'Ready'}
  };
  if(g&&g.mode==='demo')g.stage=stageSel;
  upd();
@@ -1967,10 +1974,13 @@ function results(){
  }else{
   const won=w===me();
   show(`<div class="scr"><p class="big ${won?'win':'lose'}">${won?'YOU WIN':'YOU LOSE'}</p><p class="sub">${Wc.name}: “${Wc.q}”</p>
-   <p class="status wait" id="rmS">Rematch? Both players tap it.</p>
+   <p class="status wait" id="rmS" role="status">Rematch? Both players tap it.</p>
    <button class="btn pri" id="a1">Rematch</button><button class="btn" id="a2">Change fighters</button><button class="btn ghost" id="a3">Leave</button></div>`);
-  $('#a1').onclick=()=>{NET.rm=g.mid;NET.nr&&NET.nr.presence({rm:g.mid}).catch(()=>{});$('#rmS').textContent='Waiting for your rival…'};
-  $('#a2').onclick=()=>{NET.ready=false;NET.nr&&NET.nr.presence({rdy:false,s:null,rm:null}).catch(()=>{});g=null;startDemo();selectScreen('online')};
+  const mid=g.mid,rmS=$('#rmS');
+  const rmText=()=>{if(!rmS.isConnected)return;const op=NET.link&&NET.link.peer(),theirs=!!(op&&op.lobby&&op.lobby.rm===mid);rmS.textContent=NET.rm===mid?(theirs?'Starting the rematch…':'Waiting for your rival to tap Rematch…'):theirs?'Your rival wants a rematch.':'Rematch? Both players tap it.'};
+  if(NET.link)NET.unsub.push(NET.link.onChange(rmText));rmText();
+  $('#a1').onclick=()=>{NET.rm=mid;if(NET.link)NET.link.lobby({rm:mid});rmText()};
+  $('#a2').onclick=()=>{NET.ready=false;NET.rm=null;if(NET.link)NET.link.lobby({rdy:false,rm:null});g=null;startDemo();selectScreen('online')};
   $('#a3').onclick=menu;
  }
 }
@@ -1989,52 +1999,345 @@ function pauseMenu(){
 $('#menuBtn').onclick=pauseMenu;
 addEventListener('keydown',e=>{if(e.code==='Escape'&&!landscapeBlocked()){if(screen==='fight')pauseMenu();else if(screen==='paused'){paused=false;screen='fight';hide()}}});
 
-/* ---------------- online (room capability) ---------------- */
-let roomNS=null,roomTried=false;
-try{if(window.claude&&claude.use)claude.use('room').then(r=>{roomNS=r;roomTried=true;if(screen==='online')onlineScreen()}).catch(()=>{roomTried=true});else roomTried=true}catch(e){roomTried=true}
-const NET={nr:null,role:null,code:'',ch:0,ready:false,oppCh:null,unsub:[],rm:null,lastEv:0,inKey:'',joinedAt:0};
-function oppPeer(){if(!NET.nr)return null;const want=NET.role==='host'?'guest':'host';return NET.nr.peers().find(p=>!p.sameTab&&p.presence&&p.presence.role===want)||null}
-function onlineScreen(){
- screen='online';
- if(!roomNS){show(`<div class="scr"><h2>Online vs a friend</h2>
-  <p class="note">${roomTried?'Online play needs the game opened from its Claude link while signed in. Share the artifact with your friend, then both of you open it, choose Online, and one of you creates a game.':'Connecting…'}</p>
-  <p class="note">Meanwhile, Arcade and Same keyboard work anywhere.</p><button class="btn ghost" id="b">Back</button></div>`);$('#b').onclick=menu;return}
- show(`<div class="scr"><h2>Online vs a friend</h2><p class="note">Both players open this same link. One creates a game and shares the 4-letter code; the other joins with it.</p>
+/* ---------------- online: play with a friend ---------------- */
+// One lobby, two ways to connect. Inside Claude the Artifact's room capability
+// carries the match and friends join with a 4-letter code. On the website,
+// Supabase Realtime carries it (window.HK_RELAY, set by build_site.py): the
+// host makes a room and gets an invite link, and whoever opens it first takes
+// the second seat. Either way the host's browser runs the fight; the guest's
+// sends button presses and draws the host's state. Everything that arrives
+// from the other browser is checked before it is used.
+const RELAY = window.HK_RELAY && window.supabase && window.supabase.createClient ? window.HK_RELAY : null;
+const SEAT_STORE = 'hk_online_seat';
+const STATE_EVERY = RELAY ? 3 : 1; // host sends the match 20 times a second over the relay
+const DROP_GRACE = 4000;           // ms without the other player before a match counts as dropped
+let roomNS = null, roomTried = false;
+try { if (window.claude && claude.use) claude.use('room').then(r => { roomNS = r; roomTried = true; if (screen === 'online') onlineScreen(); }).catch(() => { roomTried = true; }); else roomTried = true; } catch (e) { roomTried = true; }
+const NET = {link: null, role: null, seat: null, code: '', ch: 0, ready: false, rm: null, lastEv: 0, joinedAt: 0,
+  lostAt: 0, inviteUrl: '', inviteExpires: 0, lastMid: -1, tick: 0, lastState: null, boxKey: '', unsub: [], busy: false};
+
+/* Message checks: shape, ranges and size, before anything reaches the game. */
+const PHASES = ['intro', 'fight', 'ko', 'final', 'over'];
+const STATES = ['idle', 'walk', 'crouch', 'air', 'block', 'atk', 'hit', 'down', 'ko', 'win', 'fin', 'fvic'];
+const isInt = (v, a, b) => Number.isInteger(v) && v >= a && v <= b;
+const isNum = (v, a, b) => typeof v === 'number' && Number.isFinite(v) && v >= a && v <= b;
+const isFlag = v => v === 0 || v === 1 || v === true || v === false;
+const plain = v => !!v && typeof v === 'object' && !Array.isArray(v);
+function jsonSize(v) { try { return JSON.stringify(v).length; } catch (e) { return Infinity; } }
+function validLobby(p, role) {
+  return plain(p) && jsonSize(p) <= 200 && p.role === role && isInt(p.ch, 0, CH.length - 1) && typeof p.rdy === 'boolean'
+    && (p.rm == null || isInt(p.rm, 0, 1e9)) && (p.sg == null || isInt(p.sg, 0, STAGES.length - 1));
+}
+function validInput(p) {
+  return plain(p) && jsonSize(p) <= 120 && p.role === 'guest' && isInt(p.bits, 0, 31)
+    && Array.isArray(p.pc) && p.pc.length === 4 && p.pc.every(n => isInt(n, 0, 1e7));
+}
+function validFighter(a) {
+  return Array.isArray(a) && a.length === 15 && isInt(a[0], 0, CH.length - 1) && isNum(a[1], -60, W + 60) && isNum(a[2], -400, H + 60)
+    && (a[3] === 1 || a[3] === -1) && isNum(a[4], 0, 300) && STATES.includes(a[5]) && (a[6] === 0 || Object.hasOwn(ATK, a[6]))
+    && isInt(a[7], 0, 1e6) && [8, 9, 10, 11].every(i => isInt(a[i], 0, 1e5)) && isFlag(a[12]) && isFlag(a[13]) && isFlag(a[14]);
+}
+function validState(s) {
+  if (!plain(s) || jsonSize(s) > 4000) return false;
+  if (!isInt(s.m, 0, 1e9) || !PHASES.includes(s.p) || !isInt(s.pt, 0, 1e6) || !isInt(s.r, 1, 99) || !isInt(s.T, 0, 1e9)) return false;
+  if (!Array.isArray(s.w) || s.w.length !== 2 || !s.w.every(n => isInt(n, 0, 3))) return false;
+  if (!isNum(s.tm, -10, 1e5) || !isInt(s.wn, -1, 1) || !isFlag(s.to) || !isFlag(s.pf) || !isInt(s.sg, 0, STAGES.length - 1) || !isNum(s.sk, 0, 100)) return false;
+  if (!Array.isArray(s.f) || s.f.length !== 2 || !s.f.every(validFighter)) return false;
+  if (!Array.isArray(s.pr) || s.pr.length > 12 || !s.pr.every(p => Array.isArray(p) && p.length === 5 && isNum(p[0], -100, W + 100) && isNum(p[1], -200, H + 100) && isInt(p[2], 0, CH.length - 1) && isInt(p[3], 0, 1e5) && (p[4] === 1 || p[4] === -1))) return false;
+  if (!Array.isArray(s.fx) || s.fx.length > 12 || !s.fx.every(e => Array.isArray(e) && e.length === 4 && isNum(e[0], -100, W + 100) && isNum(e[1], -100, H + 100) && isInt(e[2], 0, 100) && ['b', 'h', 'H'].includes(e[3]))) return false;
+  if (!(s.fn === 0 || (Array.isArray(s.fn) && s.fn.length === 2 && isInt(s.fn[0], 0, 1) && isInt(s.fn[1], 0, FIN_LEN)))) return false;
+  if (!(s.cm === 0 || (Array.isArray(s.cm) && s.cm.length === 3 && isInt(s.cm[0], 0, 1) && isInt(s.cm[1], 0, 999) && isInt(s.cm[2], 0, 1000)))) return false;
+  return Array.isArray(s.ev) && s.ev.length <= 8 && s.ev.every(e => Array.isArray(e) && e.length === 2 && isInt(e[0], 0, 1e9) && typeof e[1] === 'string' && /^[a-z0-9]{1,12}$/.test(e[1]));
+}
+
+/* Link inside Claude: the Artifact's named room, with presence carrying everything. */
+function claudeLink(nr, role) {
+  const peerRole = role === 'host' ? 'guest' : 'host';
+  const other = () => nr.peers().find(p => !p.sameTab && p.presence && p.presence.role === peerRole);
+  nr.presence({role, ch: NET.ch, rdy: false, s: null, rm: null, sg: null, in: 0, pc: [0, 0, 0, 0]}).catch(() => {});
+  return {
+    role, kind: 'claude',
+    lobby(o) { nr.presence(o).catch(() => {}); },
+    resendLobby() {},
+    sendState(s) { nr.presence({s}).catch(() => {}); },
+    sendInput(i) { nr.presence({in: i.bits, pc: i.pc}).catch(() => {}); },
+    peer() {
+      const p = other(); if (!p) return null;
+      const q = p.presence, lobby = {role: peerRole, ch: q.ch, rdy: !!q.rdy, rm: q.rm ?? null, sg: q.sg ?? null};
+      const input = {role: 'guest', bits: q.in, pc: q.pc};
+      return {lobby: validLobby(lobby, peerRole) ? lobby : null, state: role === 'guest' && validState(q.s) ? q.s : null,
+        input: role === 'host' && validInput(input) ? input : {bits: 0, pc: [0, 0, 0, 0]}, left: false};
+    },
+    crowded() { return nr.peers().some(p => !p.sameTab && p.presence && p.presence.role === role); },
+    connected() { return nr.connected(); },
+    onChange(fn) { return nr.onPeers(fn, () => {}); },
+    close() { try { nr.leave(); } catch (e) {} },
+  };
+}
+
+/* Link on the website: a private Supabase Realtime channel for this room only. */
+let relayClient = null;
+function relay() {
+  if (!relayClient) relayClient = window.supabase.createClient(RELAY.url, RELAY.key, {
+    auth: {persistSession: false, autoRefreshToken: false, detectSessionInUrl: false},
+    realtime: {params: {eventsPerSecond: 40}},
+  });
+  return relayClient;
+}
+async function relayCall(fn, args) {
+  const {data, error} = await relay().rpc(fn, args || {});
+  if (error) throw error;
+  return data;
+}
+function relayLink(seat) {
+  return new Promise((resolve, reject) => {
+    const peerRole = seat.role === 'host' ? 'guest' : 'host';
+    const st = {present: false, crowded: false, left: false, conn: false, lobby: null, state: null, input: {bits: 0, pc: [0, 0, 0, 0]}};
+    const listeners = new Set(), fire = () => listeners.forEach(fn => { try { fn(); } catch (e) {} });
+    let mine = {role: seat.role, ch: NET.ch, rdy: false, rm: null, sg: null}, settled = false;
+    const ch = relay().channel(seat.channel, {config: {private: true, broadcast: {self: false, ack: false}, presence: {key: seat.role}}});
+    const send = (event, payload) => { if (st.conn) ch.send({type: 'broadcast', event, payload}).catch(() => {}); };
+    ch.on('presence', {event: 'sync'}, () => {
+      const ps = ch.presenceState(), was = st.present;
+      st.present = !!(ps[peerRole] && ps[peerRole].length);
+      st.crowded = (ps[seat.role] || []).length > 1;
+      if (st.present) st.left = false;
+      if (st.present && !was) send('lobby', mine); // a newcomer needs our current choice
+      if (!st.present) { st.lobby = null; st.input = {bits: 0, pc: [0, 0, 0, 0]}; }
+      fire();
+    });
+    ch.on('broadcast', {event: 'lobby'}, ({payload}) => { if (validLobby(payload, peerRole)) { st.lobby = payload; fire(); } });
+    ch.on('broadcast', {event: 's'}, ({payload}) => { if (seat.role === 'guest' && validState(payload)) st.state = payload; });
+    ch.on('broadcast', {event: 'in'}, ({payload}) => { if (seat.role === 'host' && validInput(payload)) st.input = {bits: payload.bits, pc: payload.pc}; });
+    ch.on('broadcast', {event: 'bye'}, ({payload}) => { if (plain(payload) && payload.role === peerRole) { st.present = false; st.left = true; st.lobby = null; fire(); } });
+    const timer = setTimeout(() => { if (!settled) { settled = true; relay().removeChannel(ch); reject(new Error('timeout')); } }, 12000);
+    ch.subscribe(status => {
+      if (status === 'SUBSCRIBED') {
+        st.conn = true;
+        ch.track({role: seat.role}).catch(() => {});
+        send('lobby', mine);
+        if (!settled) { settled = true; clearTimeout(timer); resolve(link); }
+        fire();
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+        st.conn = false;
+        if (!settled) { settled = true; clearTimeout(timer); relay().removeChannel(ch); reject(new Error(status)); }
+        fire();
+      }
+    });
+    const link = {
+      role: seat.role, kind: 'relay',
+      lobby(o) { mine = {...mine, ...o, role: seat.role}; send('lobby', mine); },
+      resendLobby() { send('lobby', mine); },
+      sendState(s) { send('s', s); },
+      sendInput(i) { send('in', {role: 'guest', bits: i.bits, pc: i.pc}); },
+      peer() { return st.present ? {lobby: st.lobby, state: st.state, input: st.input, left: false} : null; },
+      peerLeft() { return st.left; },
+      crowded() { return st.crowded; },
+      connected() { return st.conn; },
+      onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+      close() { send('bye', {role: seat.role}); setTimeout(() => relay().removeChannel(ch).catch(() => {}), 200); },
+    };
+  });
+}
+
+/* The seat key stays in this tab so a reload can get back into the room. */
+function saveSeat(seat) { try { sessionStorage.setItem(SEAT_STORE, JSON.stringify(seat)); } catch (e) {} }
+function loadSeat() { try { const s = JSON.parse(sessionStorage.getItem(SEAT_STORE) || 'null'); return plain(s) && typeof s.seat_key === 'string' ? s : null; } catch (e) { return null; } }
+function clearSeat() { try { sessionStorage.removeItem(SEAT_STORE); } catch (e) {} }
+function inviteLink(token) { return location.origin + location.pathname + '#join=' + token; }
+function escText(s) { return String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c])); }
+
+function onlineScreen() {
+  if (RELAY) { hostOnline(); return; }
+  screen = 'online';
+  if (!roomNS) {
+    show(`<div class="scr"><h2>Online vs a friend</h2>
+  <p class="note">${roomTried ? 'Online play needs the game opened from its Claude link while signed in, or from the AI Medicine Collective website. Share the artifact with your friend, then both of you open it, choose Online, and one of you creates a game.' : 'Connecting…'}</p>
+  <p class="note">Meanwhile, Arcade and Same keyboard work anywhere.</p><button class="btn ghost" id="b">Back</button></div>`);
+    $('#b').onclick = menu; return;
+  }
+  show(`<div class="scr"><h2>Online vs a friend</h2><p class="note">Both players open this same link. One creates a game and shares the 4-letter code; the other joins with it.</p>
   <button class="btn pri" id="mk">Create a game</button>
   <div class="row"><input class="codein" id="cin" maxlength="4" placeholder="CODE" autocomplete="off" autocapitalize="characters" aria-label="Game code"><button class="btn alt" id="jn">Join</button></div>
   <p class="status wait" id="err"></p><button class="btn ghost" id="b">Back</button></div>`);
- $('#b').onclick=menu;
- $('#mk').onclick=()=>{const A='ABCDEFGHJKMNPQRSTUVWXYZ';let s='';for(let i=0;i<4;i++)s+=A[(Math.random()*A.length)|0];netJoin(s,'host')};
- $('#jn').onclick=()=>{const s=($('#cin').value||'').toUpperCase().replace(/[^A-Z]/g,'');if(s.length!==4){$('#err').textContent='Enter the 4-letter code from your friend.';return}netJoin(s,'guest')};
- $('#cin').addEventListener('keydown',e=>{if(e.key==='Enter')$('#jn').click()});
+  $('#b').onclick = menu;
+  $('#mk').onclick = () => { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ'; let s = ''; const r = crypto.getRandomValues(new Uint8Array(4)); for (let i = 0; i < 4; i++) s += A[r[i] % A.length]; claudeJoin(s, 'host'); };
+  $('#jn').onclick = () => { const s = ($('#cin').value || '').toUpperCase().replace(/[^A-Z]/g, ''); if (s.length !== 4) { $('#err').textContent = 'Enter the 4-letter code from your friend.'; return; } claudeJoin(s, 'guest'); };
+  $('#cin').addEventListener('keydown', e => { if (e.key === 'Enter') $('#jn').click(); });
 }
-async function netJoin(code,role){
- const e=$('#err');if(e)e.textContent='Connecting…';
- try{NET.nr=await roomNS.join('hk-'+code.toLowerCase())}catch(err){if(e)e.textContent='Could not connect ('+(err&&err.code||'error')+'). Try again in a moment.';return}
- NET.role=role;NET.code=code;NET.ready=false;NET.oppCh=null;NET.rm=null;NET.joinedAt=Date.now();NET.ch=localSel[0];
- NET.nr.presence({role,ch:NET.ch,rdy:false,s:null,rm:null,in:0,pc:[0,0,0,0]}).catch(()=>{});
- NET.unsub.push(NET.nr.onPeers(netPeers,()=>{}));
- selectScreen('online');
+async function claudeJoin(code, role) {
+  const e = $('#err'); if (e) e.textContent = 'Connecting…';
+  let nr;
+  try { nr = await roomNS.join('hk-' + code.toLowerCase()); } catch (err) { if (e) e.textContent = 'Could not connect (' + (err && err.code || 'error') + '). Try again in a moment.'; return; }
+  NET.code = code; NET.role = role;
+  attachLink(claudeLink(nr, role));
 }
-function netSelUpdate(cur){
- NET.ch=cur;if(NET.nr)NET.nr.presence({ch:cur,rdy:NET.ready}).catch(()=>{});
- const box=$('#netInfo');if(!box)return;const op=oppPeer();
- const full=NET.nr&&NET.nr.peers().filter(p=>!p.sameTab&&p.presence&&p.presence.role===NET.role).length>0;
- box.innerHTML=`${NET.role==='host'?`<p class="sub">Game code. Send it to your friend:</p><p class="code">${NET.code}</p>`:`<p class="sub">Game ${NET.code}</p>`}
-  <p class="status ${op?'ok':'wait'}">${full?'Someone else already took your seat in this game. Go back and use a new code.':op?`Rival connected: ${CH[op.presence.ch|0].name}${op.presence.rdy?' · READY':' · choosing…'}`:NET.role==='host'?'Waiting for your friend to join…':(Date.now()-NET.joinedAt>4000?'No game found with that code yet. Check it, or wait for your friend to create it.':'Looking for the game…')}</p>
-  ${NET.ready?'<p class="note">You are ready. '+(NET.role==='host'?'The match starts when your rival is ready.':'Waiting for the host to start…')+'</p>':''}`;
+
+function onlineWait(text) {
+  screen = 'online';
+  show(`<div class="scr"><h2>Play with a friend</h2><p class="status wait" role="status">${escText(text)}</p><button class="btn ghost" id="b">Cancel</button></div>`);
+  $('#b').onclick = menu;
 }
-function netPeers(){
- const op=oppPeer();NET.oppCh=op?op.presence.ch|0:null;
- if(screen==='select'&&NET.nr){ov.querySelectorAll('.card').forEach(b=>b.classList.toggle('opp',NET.oppCh!=null&&+b.dataset.i===NET.oppCh));netSelUpdate(NET.ch)}
- if(NET.role==='host'&&screen==='select'&&NET.ready&&op&&op.presence.rdy){ // start
-  newMatch(NET.ch,op.presence.ch|0,stageSel,'host');fightScreen();
- }
- if((screen==='fight'||screen==='results'||screen==='paused')&&(g&&(g.mode==='host'||g.mode==='guest'))&&!op){
-  screen='results';show(`<div class="scr"><p class="big lose">DISCONNECTED</p><p class="note">Your rival left the game.</p><button class="btn pri" id="a3">Main menu</button></div>`);$('#a3').onclick=menu;
- }
+// Clear messages for each way a link or connection can fail.
+function onlineProblem(kind, retry) {
+  screen = 'online';
+  const text = {
+    invalid: ['That invite link doesn’t work', 'Check that you opened the whole link. If it still fails, ask your friend to send a new one.'],
+    expired: ['That invite has expired', 'Invite links work for 15 minutes, and a game ends when its host leaves. Ask your friend to send a new link.'],
+    full: ['That game already has two players', 'Someone else opened this link first. Ask your friend for a new link.'],
+    own: ['This is your own invite', 'Send the link to a friend. When they open it, they’ll join your game.'],
+    busy: ['Lots of games are starting right now', 'Please try again in a minute.'],
+    unavailable: ['Online play isn’t switched on yet', 'Arcade and Same keyboard work now. Online matches will appear here once the site’s game server is set up.'],
+    network: ['Couldn’t reach the game server', 'Check your connection and try again.'],
+    lost: ['Lost the connection to the game', 'Check your connection and try again. Your seat is kept for a while.'],
+  }[kind] || ['Something went wrong', 'Please try again.'];
+  show(`<div class="scr"><h2>${text[0]}</h2><p class="note">${text[1]}</p>
+  ${retry ? '<button class="btn pri" id="rt">Try again</button>' : ''}
+  ${kind === 'busy' || kind === 'unavailable' || kind === 'network' || kind === 'lost' ? '' : '<button class="btn alt" id="mine">Start your own game</button>'}
+  <button class="btn ghost" id="b">Main menu</button></div>`);
+  if (retry) $('#rt').onclick = retry;
+  const mine = $('#mine'); if (mine) mine.onclick = () => { netLeave(); hostOnline(); };
+  $('#b').onclick = menu;
 }
-function netLeave(){for(const u of NET.unsub)try{u()}catch(e){}NET.unsub=[];if(NET.nr){try{NET.nr.leave()}catch(e){}}NET.nr=null;NET.role=null;NET.ready=false}
+const problemKind = err => err && /PGRST202|Could not find the function|404/.test((err.code || '') + ' ' + (err.message || '')) ? 'unavailable' : 'network';
+
+async function hostOnline() {
+  if (NET.busy) return; NET.busy = true;
+  netLeave();
+  onlineWait('Setting up your game…');
+  let r;
+  try { r = await relayCall('kombat_create_room'); } catch (err) { NET.busy = false; onlineProblem(problemKind(err), hostOnline); return; }
+  NET.busy = false;
+  if (!plain(r) || r.status !== 'ok') { onlineProblem(plain(r) && r.status === 'busy' ? 'busy' : 'network', hostOnline); return; }
+  enterRoom(r);
+}
+async function joinOnline(invite) {
+  if (NET.busy) return; NET.busy = true;
+  onlineWait('Joining your friend’s game…');
+  const saved = loadSeat();
+  let r;
+  try { r = await relayCall('kombat_join_room', {p_invite: invite, p_seat_key: saved && saved.invite === invite ? saved.seat_key : null}); }
+  catch (err) { NET.busy = false; onlineProblem(problemKind(err), () => joinOnline(invite)); return; }
+  NET.busy = false;
+  if (!plain(r) || r.status !== 'ok') { onlineProblem(plain(r) && ['invalid', 'expired', 'full', 'own'].includes(r.status) ? r.status : 'network', plain(r) ? null : () => joinOnline(invite)); return; }
+  enterRoom({...r, invite});
+}
+async function resumeOnline(saved) {
+  onlineWait('Getting you back into your game…');
+  let r;
+  try { r = await relayCall('kombat_resume', {p_room: saved.room, p_seat_key: saved.seat_key}); } catch (err) { onlineProblem(problemKind(err), () => resumeOnline(saved)); return; }
+  if (!plain(r) || r.status !== 'ok') { clearSeat(); menu(); return; }
+  enterRoom({...r, invite: saved.invite});
+}
+async function enterRoom(r) {
+  const seat = {role: r.role, room: r.room, seat_key: r.seat_key, channel: r.channel, invite: r.invite || null, expires: Date.parse(r.expires_at) || 0};
+  saveSeat(seat);
+  NET.seat = seat; NET.role = seat.role;
+  NET.inviteUrl = seat.role === 'host' && seat.invite ? inviteLink(seat.invite) : '';
+  NET.inviteExpires = Date.parse(r.invite_expires_at) || 0;
+  onlineWait('Connecting…');
+  let link;
+  try { link = await relayLink(seat); } catch (err) { onlineProblem('lost', () => resumeOnline(seat)); return; }
+  if (NET.seat !== seat) { link.close(); return; } // left while connecting
+  attachLink(link);
+}
+function attachLink(link) {
+  NET.link = link; NET.ready = false; NET.rm = null; NET.joinedAt = Date.now(); NET.lostAt = 0; NET.lastMid = -1; NET.lastState = null; NET.boxKey = '';
+  NET.ch = localSel[0];
+  NET.unsub.push(link.onChange(netPeers));
+  link.lobby({ch: NET.ch, rdy: false, rm: null, sg: NET.role === 'host' ? stageSel : null});
+  selectScreen('online');
+}
+async function newInvite() {
+  const seat = NET.seat; if (!seat || seat.role !== 'host') return;
+  const st = $('#netStatus'); if (st) st.textContent = 'Making a new link…';
+  let r;
+  try { r = await relayCall('kombat_new_invite', {p_room: seat.room, p_seat_key: seat.seat_key}); } catch (err) { if (st) st.textContent = 'Couldn’t make a new link. Check your connection and try again.'; return; }
+  if (!plain(r) || r.status !== 'ok') { onlineProblem('expired'); return; }
+  // The room moved to a new channel, which shuts out whoever held the old seat.
+  const next = {...seat, invite: r.invite, channel: r.channel};
+  for (const u of NET.unsub) try { u(); } catch (e) {}
+  NET.unsub = [];
+  if (NET.link) NET.link.close();
+  NET.link = null;
+  enterRoom({role: 'host', room: next.room, seat_key: next.seat_key, channel: next.channel, invite: next.invite,
+    expires_at: new Date(next.expires).toISOString(), invite_expires_at: r.invite_expires_at});
+}
+function copyInvite() {
+  const input = $('#invUrl'), st = $('#copyStatus');
+  const done = ok => { if (st) st.textContent = ok ? 'Link copied. Send it to your friend.' : 'Select the link above and copy it.'; if (!ok && input) { input.focus(); input.select(); } };
+  try { navigator.clipboard.writeText(NET.inviteUrl).then(() => done(true), () => done(false)); } catch (e) { done(false); }
+}
+function shareInvite() {
+  navigator.share({title: 'Hospital Kombat', text: 'Fight me in Hospital Kombat. Open this link to join my game:', url: NET.inviteUrl}).catch(() => {});
+}
+
+function minutesLeft(t) { const m = Math.ceil((t - Date.now()) / 60000); return m <= 1 ? 'less than a minute' : m + ' minutes'; }
+function netSelUpdate(cur) {
+  if (cur != null && cur !== NET.ch) { NET.ch = cur; if (NET.link) NET.link.lobby({ch: cur, rdy: NET.ready, sg: NET.role === 'host' ? stageSel : null}); }
+  const box = $('#netInfo'); if (!box || !NET.link) return;
+  const link = NET.link, op = link.peer(), lob = op && op.lobby;
+  const invite = link.kind === 'relay' && NET.role === 'host' && !op;
+  const expired = invite && NET.inviteExpires && Date.now() > NET.inviteExpires;
+  const key = [link.kind, NET.role, invite, expired, NET.inviteUrl, NET.code].join('|');
+  if (key !== NET.boxKey || !box.firstChild) { // a freshly drawn lobby always needs its box
+    NET.boxKey = key;
+    let html = '';
+    if (link.kind === 'claude') html = NET.role === 'host' ? `<p class="sub">Game code. Send it to your friend:</p><p class="code">${escText(NET.code)}</p>` : `<p class="sub">Game ${escText(NET.code)}</p>`;
+    else if (invite && !expired) html = `<div class="invite"><p class="sub">Send this link to your friend. When they open it, they join this game.</p>
+      <input id="invUrl" class="invurl" readonly value="${escText(NET.inviteUrl)}" aria-label="Invite link" onfocus="this.select()">
+      <div class="row"><button class="btn alt" id="copyBtn">Copy link</button>${navigator.share ? '<button class="btn" id="shareBtn">Share…</button>' : ''}</div>
+      <p class="note" id="copyStatus" role="status"></p></div>`;
+    else if (expired) html = `<div class="invite"><p class="note">Your invite link has expired.</p><button class="btn alt" id="newLink">Make a new link</button></div>`;
+    else if (link.kind === 'relay' && NET.role === 'guest') html = '<p class="sub">You’re in your friend’s game.</p>';
+    html += '<p class="status" id="netStatus" role="status"></p>';
+    if (link.kind === 'relay' && NET.role === 'host' && !invite) html += '<p class="note"><button class="linkbtn" id="newLink2">Make a new invite link</button> if the wrong person joined.</p>';
+    box.innerHTML = html;
+    const c = $('#copyBtn'); if (c) c.onclick = copyInvite;
+    const s = $('#shareBtn'); if (s) s.onclick = shareInvite;
+    for (const id of ['#newLink', '#newLink2']) { const b = $(id); if (b) b.onclick = newInvite; }
+  }
+  const st = $('#netStatus');
+  let text, cls = 'wait';
+  if (link.crowded()) text = 'This game is also open in another tab or device. Close the other one to keep playing here.';
+  else if (!link.connected()) text = 'Connection lost. Reconnecting…';
+  else if (op) { cls = 'ok'; text = lob ? `Your friend is here: ${CH[lob.ch].name}${lob.rdy ? ' · READY' : ' · choosing…'}` : 'Your friend is here.'; }
+  else if (NET.role === 'host') text = invite && !expired ? `Waiting for your friend to open the link… (it works for ${minutesLeft(NET.inviteExpires)})` : 'Waiting for your friend…';
+  else text = 'Waiting for the host to come back…';
+  if (NET.ready) text += NET.role === 'host' ? ' You’re ready: the match starts when your friend is.' : ' You’re ready: waiting for the host.';
+  if (st) { st.textContent = text; st.className = 'status ' + cls; }
+}
+
+function netPeers() {
+  const link = NET.link; if (!link) return;
+  const op = link.peer();
+  if (screen === 'select') {
+    ov.querySelectorAll('.card').forEach(b => b.classList.toggle('opp', !!(op && op.lobby) && +b.dataset.i === op.lobby.ch));
+    netSelUpdate();
+  }
+}
+function netDropped(kind) {
+  screen = 'results';
+  const host = NET.role === 'host';
+  const title = kind === 'self' ? 'CONNECTION LOST' : 'DISCONNECTED';
+  const note = kind === 'self' ? 'Your connection to the game dropped. Your seat is kept: go back to the lobby to reconnect.'
+    : host ? 'Your friend’s connection dropped or they left. They can come back from the same browser, or you can send a new link from the lobby.'
+      : 'The host’s connection dropped or they left the game.';
+  show(`<div class="scr"><p class="big lose">${title}</p><p class="note">${note}</p>
+  <button class="btn pri" id="a1">Back to the lobby</button><button class="btn ghost" id="a3">Main menu</button></div>`);
+  $('#a1').onclick = () => { NET.ready = false; NET.rm = null; NET.lostAt = 0; if (NET.link) NET.link.lobby({rdy: false, rm: null}); g = null; startDemo(); selectScreen('online'); };
+  $('#a3').onclick = menu;
+}
+function netLeave() {
+  for (const u of NET.unsub) try { u(); } catch (e) {}
+  NET.unsub = [];
+  if (NET.link) NET.link.close();
+  if (NET.seat && RELAY) relayCall('kombat_leave', {p_room: NET.seat.room, p_seat_key: NET.seat.seat_key}).catch(() => {});
+  if (NET.seat) clearSeat();
+  Object.assign(NET, {link: null, role: null, seat: null, ready: false, rm: null, inviteUrl: '', lostAt: 0, lastState: null});
+}
+addEventListener('pagehide', () => { if (NET.link) NET.link.close(); }); // a reload keeps the seat; leaving properly frees it
+
 function encS(){const r=v=>Math.round(v*10)/10;return{m:g.mid,p:g.phase,pt:g.phaseT,r:g.round,w:g.wins,tm:g.timer,wn:g.win,to:g.tout,pf:g.perfect,sg:g.stage,sk:g.shake,T:g.T,
  f:g.f.map(F=>[F.c,r(F.x),r(F.y),F.face,r(F.hp),F.st,F.atk||0,F.t,F.frz,F.slow,F.cd,F.inv,F.kd,F.crouchB?1:0,F.usedAir]),
  pr:g.proj.map(p=>[r(p.x),r(p.y),p.c,p.t,p.d]),fx:g.fx.map(e=>[r(e.x),r(e.y),e.t,e.k]),fn:g.fin?[g.fin.by,g.fin.t]:0,cm:g.cmb?[g.cmb.i,g.cmb.n,g.cmb.t]:0,ev:g.evs}}
@@ -2043,25 +2346,43 @@ function decS(s){
  const old=g&&g.mode==='guest'?g:null;
  g={mode:'guest',mid:s.m,phase:s.p,phaseT:s.pt,round:s.r,wins:s.w,timer:s.tm,win:s.wn,tout:s.to,perfect:s.pf,stage:s.sg,shake:s.sk,T:s.T,f:s.f.map(F),
   proj:s.pr.map(p=>({x:p[0],y:p[1],c:p[2],t:p[3],d:p[4],vx:p[4]})),fx:s.fx.map(e=>({x:e[0],y:e[1],t:e[2],k:e[3]})),fin:s.fn?{by:s.fn[0],t:s.fn[1]}:null,cmb:s.cm?{i:s.cm[0],n:s.cm[1],t:s.cm[2]}:null,evs:s.ev||[],rshake:old?old.rshake:0,lvl:0,score:0};
+ // Between relay updates the guest glides each fighter from where it was drawn to the new spot.
+ if(old&&old.mid===g.mid&&STATE_EVERY>1){const now=performance.now();g.f.forEach((F,i)=>{const O=old.f[i];if(O&&Math.abs(O.x-F.x)<40&&Math.abs(O.y-F.y)<80){Object.assign(F,{tx:F.x,ty:F.y,px:O.x,py:O.y,x:O.x,y:O.y,rt:now})}})}
  for(const [id,n] of g.evs)if(id>NET.lastEv){NET.lastEv=id;sfx(n)}
 }
 let lastGuestIn='';
 function netTick(){
- if(!NET.nr)return;
- if(NET.role==='host'&&g&&g.mode==='host'){
-  const op=oppPeer();if(op){const pr=op.presence,bits=pr.in|0,pc=pr.pc||[0,0,0,0];const c=ctl[1];c.h={l:bits&1,r:bits>>1&1,u:bits>>2&1,d:bits>>3&1,b:bits>>4&1};c.pc={p:pc[0]|0,k:pc[1]|0,s:pc[2]|0,f:pc[3]|0};
-   if(g.phase==='over'&&g.phaseT>100&&pr.rm===g.mid&&NET.rm===g.mid){NET.rm=null;NET.nr.presence({rm:null}).catch(()=>{});newMatch(g.f[0].c,g.f[1].c,g.stage,'host');fightScreen()}}
-  NET.nr.presence({s:encS()}).catch(()=>{});
+ const link=NET.link; if(!link)return;
+ NET.tick++;
+ const op=link.peer();
+ const inMatch=g&&(g.mode==='host'||g.mode==='guest')&&(screen==='fight'||screen==='paused'||screen==='results');
+ // A match whose other player has gone quiet for a few seconds is over.
+ if(inMatch){
+  if(!link.connected()){if(!NET.lostAt)NET.lostAt=Date.now();else if(Date.now()-NET.lostAt>15000){NET.lostAt=0;netDropped('self');return}}
+  else if(!op){if(!NET.lostAt)NET.lostAt=Date.now();if((link.peerLeft&&link.peerLeft())||Date.now()-NET.lostAt>DROP_GRACE){NET.lostAt=0;netDropped('peer');return}}
+  else NET.lostAt=0;
+ }
+ if(link.kind==='relay'&&NET.tick%120===0)link.resendLobby();
+ if(screen==='select'&&NET.tick%30===0)netSelUpdate();
+ if(NET.role==='host'){
+  // Start when both have pressed Ready.
+  if(screen==='select'&&NET.ready&&op&&op.lobby&&op.lobby.rdy){newMatch(NET.ch,op.lobby.ch,stageSel,'host');NET.lastMid=g.mid;fightScreen();return}
+  if(g&&g.mode==='host'){
+   if(op){const {bits,pc}=op.input;const c=ctl[1];c.h={l:bits&1,r:bits>>1&1,u:bits>>2&1,d:bits>>3&1,b:bits>>4&1};c.pc={p:pc[0],k:pc[1],s:pc[2],f:pc[3]};
+    if(g.phase==='over'&&g.phaseT>100&&op.lobby&&op.lobby.rm===g.mid&&NET.rm===g.mid){NET.rm=null;link.lobby({rm:null});newMatch(g.f[0].c,g.f[1].c,g.stage,'host');NET.lastMid=g.mid;fightScreen();return}}
+   if(NET.tick%STATE_EVERY===0)link.sendState(encS());
+  }
  }
  if(NET.role==='guest'){
   const c=ctl[1],bits=c.h.l|c.h.r<<1|c.h.u<<2|c.h.d<<3|c.h.b<<4,pc=[c.pc.p,c.pc.k,c.pc.s,c.pc.f],key=bits+'|'+pc.join(',');
-  if(key!==lastGuestIn){lastGuestIn=key;NET.nr.presence({in:bits,pc}).catch(()=>{})}
-  const hp=oppPeer();const s=hp&&hp.presence.s;
-  if(s&&s.m){
-   if(screen==='select'&&NET.ready){NET.lastEv=0;decS(s);fightScreen()}
-   else if(screen==='results'&&g&&s.m!==g.mid){NET.rm=null;NET.nr.presence({rm:null}).catch(()=>{});decS(s);fightScreen()}
-   else if(screen==='fight'||screen==='paused'||screen==='results')decS(s);
+  if(key!==lastGuestIn||NET.tick%30===0){lastGuestIn=key;link.sendInput({bits,pc})}
+  const s=op&&op.state;
+  if(s&&s!==NET.lastState){
+   NET.lastState=s;
+   if(s.m!==NET.lastMid&&(screen==='select'&&NET.ready||screen==='results')){NET.lastMid=s.m;NET.rm=null;link.lobby({rm:null});NET.lastEv=0;decS(s);fightScreen()}
+   else if(s.m===NET.lastMid&&(screen==='fight'||screen==='paused'||screen==='results'))decS(s);
   }
+  if(g&&g.mode==='guest'){const now=performance.now();for(const F of g.f)if(F.rt){const u=clamp((now-F.rt)/(STATE_EVERY*1000/60),0,1);F.x=lerp(F.px,F.tx,u);F.y=lerp(F.py,F.ty,u)}}
  }
 }
 
@@ -2089,7 +2410,15 @@ function frame(ts){
  updateLandscapeGate();syncRoundSoundtrack();render();padUpdate();
 }
 const fontsReady=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve();
-resize();menu();loadArt();loadFighterArt();requestAnimationFrame(frame);fontsReady.then(()=>{if(screen==='select'||screen==='menu')ov.querySelectorAll('.card canvas').forEach((cn,i)=>portrait(cn,i))});
+resize();menu();loadArt();loadFighterArt();requestAnimationFrame(frame);
+{const hash=location.hash;
+ if(/^#join=/.test(hash)){
+  // Take the invite out of the address bar so it isn't shared or reused by accident.
+  try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+  const token=(hash.match(/^#join=([A-Za-z0-9_-]{16,64})$/)||[])[1];
+  if(!RELAY)onlineProblem('unavailable');else if(token)joinOnline(token);else onlineProblem('invalid');
+ }else if(RELAY){const saved=loadSeat();if(saved&&saved.expires>Date.now())resumeOnline(saved);else if(saved)clearSeat()}}
+fontsReady.then(()=>{if(screen==='select'||screen==='menu')ov.querySelectorAll('.card canvas').forEach((cn,i)=>portrait(cn,i))});
 })();
 </script>
 
