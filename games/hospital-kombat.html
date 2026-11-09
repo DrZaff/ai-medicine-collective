@@ -219,6 +219,16 @@ h2{font-size:clamp(24px,6vw,34px)}
  .matchup-moves{margin-top:4px;padding-top:4px}
 }
 
+
+@media (orientation:landscape) and (max-height:500px) {
+  body.touch #view{flex:1 1 0;min-height:0;align-items:center}
+  body.touch #top{position:absolute;z-index:2;inset:max(6px,env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));padding:0;pointer-events:none}
+  body.touch #top .brand{display:none}
+  body.touch #top .ib{position:absolute;pointer-events:auto}
+  body.touch #snd{top:0;left:0}
+  body.touch #menuBtn{top:0;right:0}
+  body.touch #top>a{bottom:0;left:0}
+}
 </style>
 </head>
 <body>
@@ -1947,12 +1957,28 @@ document.addEventListener('wheel', event => {
 /* ---------------- layout ---------------- */
 const isTouch=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
 if(isTouch)document.body.classList.add('touch');
+const compactLandscape = matchMedia('(orientation: landscape) and (max-height: 500px)');
 function resize(){
  const app=$('#app'),top=$('#top').offsetHeight,land=innerWidth>innerHeight;
- let availH=app.clientHeight-top-8,availW=app.clientWidth-20+ (innerWidth<600?0:0);
- availW=$('#app').clientWidth-parseFloat(getComputedStyle(app).paddingLeft)-parseFloat(getComputedStyle(app).paddingRight);
- if(isTouch&&!land)availH-=Math.max(250,availH*.42);else if(!isTouch)availH-=$('#keys').offsetHeight+4;
+ const padding=getComputedStyle(app);
+ let availH=app.clientHeight-top-8;
+ let availW=app.clientWidth-parseFloat(padding.paddingLeft)-parseFloat(padding.paddingRight);
+ let shift=0;
+ if(isTouch&&compactLandscape.matches){
+  const view=$('#view').getBoundingClientRect();
+  const left=$('#dpad').getBoundingClientRect().right;
+  const right=$('.acts').getBoundingClientRect().left;
+  availH=view.height-12;
+  // Let the arena reach slightly behind the controls, without reducing the old fit on narrow screens.
+  const oldFit=Math.min(availW,(app.clientHeight-$('#snd').offsetHeight-24)*W/H);
+  availW=Math.max(oldFit,Math.min(view.width-12,right-left+64));
+  const width=Math.min(availW,availH*W/H);
+  const limit=Math.max(0,(view.width-width)/2-6);
+  shift=clamp((left+right-view.left-view.right)/2,-limit,limit);
+ }else if(isTouch&&!land)availH-=Math.max(250,availH*.42);
+ else if(!isTouch)availH-=$('#keys').offsetHeight+4;
  scale=Math.max(.5,Math.min(availW/W,availH/H));dpr=Math.min(2,devicePixelRatio||1);
+ cv.style.transform=shift?'translateX('+shift+'px)':'';
  cv.style.width=W*scale+'px';cv.style.height=H*scale+'px';cv.width=Math.round(W*scale*dpr);cv.height=Math.round(H*scale*dpr);
 }
 addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,200));
