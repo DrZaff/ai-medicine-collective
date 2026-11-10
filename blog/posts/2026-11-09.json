@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-09",
+  "headline": "What med students should learn about AI, and how four chest X-ray AI tools did in real use",
+  "intro": "A conference panel argued that medical training should build judgment and keep learning effortful as AI spreads. A prospective chest radiograph study shows why that matters: with four commercial AI tools, readers worked faster and felt more confident, but they were not more accurate.",
+  "items": [
+    {
+      "title": "As AI takes on a bigger role in medical care, what should medical students learn?",
+      "source": "AAMC (AAMCNews)",
+      "url": "https://www.aamc.org/learn-network/learn-serve-lead/ai-takes-bigger-role-medical-care-what-should-medical-students-learn",
+      "published": "2026-11-07",
+      "category": "news",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "This AAMCNews report covers a panel at Learn Serve Lead 2026 with Marc Triola (NYU Grossman), Robert Wachter (UCSF) and Karan Singhal (OpenAI). They argued that schools will likely cut back on rote memorization and focus more on judgment, the human side of care and comfort with AI tools. They also said AI should be set up as a Socratic tutor that keeps learning effortful ('points of friction'), not as an answer machine. The piece reports opinions from a conference session. It is not a research study.",
+      "why_it_matters": "Curriculum leaders are openly asking which traditional skills are still worth teaching, and they warn that AI curricula need to change on a timescale of semesters, not decades. Educators can use the 'friction' idea when deciding how students should use AI tutors."
+    },
+    {
+      "title": "Artificial Intelligence-Assisted Chest Radiography: A Prospective Crossover Multi-Reader Study on Diagnostic Performance and Workflow Efficiency",
+      "source": "Academic Radiology (via PubMed)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42629289/",
+      "published": "2026-08-21",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_no_benefit",
+      "summary": "The task was reading routine chest radiographs for pulmonary infiltrates, pleural effusions, mediastinal masses, pneumothorax and pulmonary nodules. Four commercially available chest radiography AI tools were tested, and the abstract does not name them. Five readers with one to six years of experience read the images of 1200 consecutive patients (1861 radiographs) five times: once without AI and once with each tool, with a 14-day washout between sessions. Diagnostic accuracy, the main measure, did not improve with any tool. For pleural effusions and pulmonary nodules, accuracy fell in several reader-tool pairings because of more false positives, and Medscape reports that 71% of AI-prompted revisions changed a correct reading to an incorrect one. AI did shorten reading times for three of the five readers and raised confidence for four of them. The biggest limitation is that this was a single-centre study with only five readers, and the reference standard was the final clinical report, checked against CT only when CT was available.",
+      "why_it_matters": "Feeling faster and more confident with an AI tool is not the same as being more accurate. Trainees and educators should treat AI flags as prompts to check the image again, not as reasons to change a reading."
+    }
+  ],
+  "tags": [
+    "aamc",
+    "ai tutors",
+    "ai-assisted reading",
+    "automation bias",
+    "chest radiography",
+    "curriculum",
+    "learn serve lead 2026",
+    "medical education",
+    "prospective study",
+    "radiology",
+    "reader study"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
