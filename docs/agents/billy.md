@@ -36,8 +36,8 @@ GitHub carries the work between the three; nothing is copied by hand.
    sudo -H -u agent env PATH="$N:/usr/local/bin:/usr/bin:/bin" python3 /opt/billy/handoff.py review <branch> <sha> && \
    sudo -H -u billy-pub python3 /opt/billy/handoff.py publish <branch> <sha> [--issue N]
    ```
-3. **Codex reviews the exact commit** (`review`, as `agent`). The script refuses to start if it can read Billy's key, clones without credentials, stops unless the branch is at exactly that commit, and runs `codex exec` in a read-only sandbox on the diff against `main`. The report follows `review-schema.json` (each finding with severity, file and line, problem, reproduction, confidence and fix, and a verdict) and is recorded for that commit.
-4. **Billy publishes only after a passing review** (`publish`, as `billy-pub`). It re-clones on its own, re-checks the commit, and requires a passing record for exactly that commit, less than an hour old. It refuses any PR text containing something key- or token-shaped. Then it pushes that same commit to a **new** branch `agent/[<issue>-]<name>-<sha7>` (GitHub refuses the push if the branch already exists) and opens a **draft** PR into `main` carrying the report. With blocking findings, nothing is pushed.
+3. **Codex reviews the exact commit** (`review`, as `agent`). The script refuses to start if it can read Billy's key, clones without credentials, stops unless the branch is at exactly that commit, and runs `codex exec` in a read-only sandbox on the diff against `main`. A report containing anything key- or token-shaped is neither printed nor saved, and the run stops. The report follows `review-schema.json` (each finding with severity, file and line, problem, reproduction, confidence and fix, and a verdict) and is recorded for that commit.
+4. **Billy publishes only after a passing review** (`publish`, as `billy-pub`). It re-clones on its own, re-checks the commit, and requires a passing record for exactly that commit, less than an hour old. It refuses any PR text containing something key- or token-shaped. Then it pushes that same commit to a **new** branch `agent/[<issue>-]<name>-<sha7>` (GitHub refuses the push if the branch already exists) and opens a **draft** PR into `main` carrying the report. If the PR's head is not the reviewed commit, the step fails and says not to approve it. With blocking findings, nothing is pushed.
 5. **Stop for the owner.** The PR stays a draft until Site checks pass. The owner reviews, approves and merges on GitHub. Billy never merges, never pushes to `main`, never force-pushes over a branch and never reuses one. A new commit means a new run and a new approval.
 
 The Codex review is a report, not a GitHub approval, so it can never satisfy the human-approval rule.
@@ -65,6 +65,8 @@ GitHub is the shared record. Each party reads it before acting, and nothing pass
 | Preflight: identity, exact permissions, one-repository token, revocation | Passed |
 | Billy pushes a branch and opens a PR as the app | Passed (#154, #155) |
 | Codex blocks publication on a blocking finding | Passed (review of `f89810c`; nothing pushed) |
+| Key isolation: `agent` cannot read the key after `install.sh` | Passed (`agent_cannot_read_key=yes`) |
+| End to end: Codex review of the exact commit, then Billy's draft PR into `main` | Passed (#156, head = reviewed commit `42e73de`); Site checks started on Billy's PR and passed |
 | With a ruleset requiring a PR and 1 approval: direct push, merge before approval and branch deletion are refused | Passed on `billy-test/protected-target` (ruleset 26928012, PR #155): "Changes must be made through a pull request.", HTTP 405 "New changes require approval from someone other than the last pusher.", "Cannot delete this branch" |
 
 ## Remaining setup
@@ -72,8 +74,7 @@ GitHub is the shared record. Each party reads it before acting, and nothing pass
 | Step | Who | State |
 | --- | --- | --- |
 | Confirm the app reaches no other repository (GitHub > Settings > Applications > Billy > Configure) | Owner | Open |
-| First supervised handoff run, end to end | Owner launches; Codex reviews; Billy opens the draft PR | First review (commit `f89810c`) correctly blocked publication: the reviewer could read the key. Fixed by the two-user split; next run open |
-| Check that Site checks start on Billy's PRs (an app token, unlike `GITHUB_TOKEN`, should start them) | Owner, on that PR | Open |
+| First supervised handoff run, end to end | Owner launches; Codex reviews; Billy opens the draft PR | Done (#156). Its three should-fix findings are fixed in the next commit; close #156 once the PR for that commit is open |
 | Review the two `main` rulesets against [dell-setup.md](dell-setup.md) A.4 before enabling them; Billy must not be on a bypass list | Owner | Open; both stay **disabled** until the owner decides |
 | Remove the test ruleset and the `billy-test/*` branches; close test PR #155 | Owner | After the negative test (passed on #155) |
 

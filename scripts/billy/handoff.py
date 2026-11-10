@@ -165,6 +165,10 @@ def review(a):
                 or not isinstance(report.get('findings'), list)
                 or not isinstance(report.get('summary'), str)):
             raise p.SafeFailure('Codex returned a report in the wrong shape.')
+        # Screen before anything is printed, recorded or journaled.
+        if SECRET_RE.search(json.dumps(report)):
+            raise p.SafeFailure('Codex\'s report contains something key- or token-shaped; it was '
+                                'not printed or saved, and nothing will be published.')
         if git(repo, 'rev-parse', 'HEAD') != a.sha or git(repo, 'status', '--porcelain'):
             raise p.SafeFailure('The checkout changed during the review.')
     finally:
@@ -279,14 +283,20 @@ def publish(a):
             print('PASS: pushed %s as %s' % (a.sha[:12], name))
             pr = p.api('POST', '/repos/%s/pulls' % p.REPO, token, {
                 'title': title, 'head': name, 'base': 'main', 'draft': True, 'body': body})
-            print('PASS: opened draft PR as %s: %s' % (pr['user']['login'], pr['html_url']))
-            if pr['head']['sha'] != a.sha:
-                print('WARN: the PR head is %s, not the reviewed commit.' % pr['head']['sha'][:12])
+            print('INFO: opened draft PR as %s: %s' % (pr['user']['login'], pr['html_url']))
         finally:
             p.revoke(token)
     finally:
         shutil.rmtree(base, ignore_errors=True)
-    journal({'step': 'publish', 'sha': a.sha, 'source': a.source, 'branch': name, 'pr': pr['html_url']})
+    entry = {'step': 'publish', 'sha': a.sha, 'source': a.source, 'branch': name, 'pr': pr['html_url'],
+             'pr_head': pr['head']['sha']}
+    if pr['head']['sha'] != a.sha:
+        entry['failed'] = 'PR head is not the reviewed commit'
+        journal(entry)
+        raise p.SafeFailure('The PR head is %s, not the reviewed commit %s. Do not approve %s; close it.'
+                            % (pr['head']['sha'][:12], a.sha[:12], pr['html_url']))
+    print('PASS: draft PR head is the reviewed commit: ' + pr['html_url'])
+    journal(entry)
     print('DONE: stopped for human approval. Review, approve and merge on GitHub yourself.')
     return 0
 

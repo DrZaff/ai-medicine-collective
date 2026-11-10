@@ -120,6 +120,12 @@ def negative(slug, token, g):
     print('INFO: active rules on ' + TARGET + ': ' + (', '.join(types) or 'none'))
     if 'pull_request' not in types:
         raise p.SafeFailure('No pull-request rule on the target yet; configure the test ruleset first.')
+    # The merge attempt below is real, so make sure the rules require an approval first.
+    approvals = max((r.get('parameters') or {}).get('required_approving_review_count', 0)
+                    for r in rules if r['type'] == 'pull_request')
+    if approvals < 1:
+        raise p.SafeFailure('The pull-request rule requires no approval, so the merge test could '
+                            'really merge; set required approvals to at least 1.')
     stamp = time.strftime('%Y%m%d-%H%M%S', time.gmtime())
     name, email = identity(slug, token)
     g.clone_at(TARGET)
