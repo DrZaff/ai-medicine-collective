@@ -2,7 +2,7 @@
 
 Approved GitHub issues become draft pull requests: Claude Code implements each one in a throwaway container, Codex reviews it independently, and the owner merges. GitHub holds the shared state; a small trusted orchestrator on the owner's Dell schedules the work, enforces limits and keeps a local run journal. No framework: one service, one config file, a timer.
 
-Status: **design**, revised 2026-11-06 after an outside review. Nothing here runs yet. Setup steps are in [dell-setup.md](dell-setup.md).
+Status: **design**, revised 2026-11-06 after an outside review. Nothing here runs unattended. Setup steps are in [dell-setup.md](dell-setup.md); the supervised pilot of the publishing identity, the Billy app, is in [billy.md](billy.md).
 
 **Scope.** This is the agent system only ("Program A"). Moving hosting off Netlify, Supabase, Render, Neon or Firebase is a separate, later project ("Program B"). Until then every project stays on its current hosting, and agents never need production credentials.
 
