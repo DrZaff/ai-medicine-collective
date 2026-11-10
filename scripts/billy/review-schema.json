@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "summary", "findings"],
+  "properties": {
+    "verdict": {"type": "string", "enum": ["no_blocking_findings", "changes_needed"]},
+    "summary": {"type": "string"},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["severity", "file", "line", "problem", "reproduce", "confidence", "fix"],
+        "properties": {
+          "severity": {"type": "string", "enum": ["blocking", "should_fix", "note"]},
+          "file": {"type": "string"},
+          "line": {"type": "integer"},
+          "problem": {"type": "string"},
+          "reproduce": {"type": "string"},
+          "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+          "fix": {"type": "string"}
+        }
+      }
+    }
+  }
+}
