@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """Disposable PR test for Billy. Pushes only to billy-test/ branches, never main.
 Merges only as a negative test that must be refused. Prints no key or token.
-Install next to preflight.py in /home/agent/.local/lib/billy/ (it imports it).
+Installed in /opt/billy next to preflight.py; run as billy-pub, which holds the key.
 Usage: pr_test.py setup | negative"""
-import json, os, shutil, subprocess, sys, tempfile, time, urllib.error, urllib.parse
+import json, os, pwd, shutil, subprocess, sys, tempfile, time, urllib.error, urllib.parse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import preflight as p
 
 TARGET = 'billy-test/protected-target'
 PREFIX = 'refs/heads/billy-test/'
 GIT_URL = 'https://github.com/' + p.REPO + '.git'
-WORK = '/home/agent/.cache/billy-test'
+WORK = os.path.join(pwd.getpwuid(os.getuid()).pw_dir, '.cache', 'billy-test')
 FAILS = []
 
 
