@@ -4656,6 +4656,10 @@ html.terminal::view-transition-new(root) {
   color: var(--ink);
 }
 
+.modern .course-sources {
+  font-size: 0.875rem;
+}
+
 .modern .exercise {
   padding: 20px 22px;
   border: 0;
