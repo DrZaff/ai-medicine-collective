@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-11",
+  "headline": "Simulated patients, real gains: AI virtual cases for students and a live diagnostic copilot for family doctors",
+  "intro": "Both reviews use simulated patients to test AI. In one, AI virtual patient cases improved surgery students' exam and OSCE results. In the other, a real-time AI assistant helped experienced family physicians include the right diagnosis in their top three more often, though there were signs that doctors may lean too hard on its suggestions.",
+  "items": [
+    {
+      "title": "The impact of AI-Based Virtual Patient Simulation on Medical Student Performance: A Randomized Assessor-Blind Trial",
+      "source": "Surgery (ScienceDirect)",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0039606026007324",
+      "published": "2026-11-05",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "In an assessor-blind randomized trial, 59 fourth-year medical students taking a core surgery course volunteered to take part. Half worked through ten text-based virtual patient cases built with OpenAI models, while the control group got the same content as plain text. After adjusting for prior academic performance, the virtual patient group ranked higher on both the final multiple-choice exam (p=0.017) and the OSCE (p=0.044), and had nearly three times the odds of reaching a higher letter grade (OR 2.95, 95% CI 1.02 to 8.56). Ratings of the learning environment were similar in both groups.",
+      "why_it_matters": "This is one of the few randomized trials linking LLM-generated practice cases to real course grades, including a practical OSCE, not just to student satisfaction. However, the trial is small, all participants volunteered, and the adjusted results came from post-hoc analyses with a wide confidence interval, so programmes should treat it as promising rather than settled."
+    },
+    {
+      "title": "Real-Time Artificial Intelligence Diagnostic Copilot in Simulated Primary Care Consultations: Randomized Simulation Study",
+      "source": "JMIR Formative Research (via PubMed)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42771885/",
+      "published": "2026-09-22",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_improved",
+      "summary": "The task was diagnosis during difficult primary care consultations, carried out by voice with simulated patients in a web-based virtual clinic. The AI was a real-time, voice-based diagnostic assistant (the Clinical Assistant from the Spanish company Medsys AI). It follows the consultation and suggests possible diagnoses, questions to ask and examinations to do. Thirteen board-certified family and community medicine physicians from Madrid's regional health service completed 260 consultations, and each case was randomly assigned to be done with or without the AI. Three adjudicators who did not know which arm a consultation came from scored the diagnoses. The main measure was whether the correct diagnosis was among the physician's top three. Adjusted Top-3 accuracy was 62.3% (95% CI 49.1% to 75.7%) without the AI and 74.6% (95% CI 63.7% to 85.4%) with it (adjusted odds ratio 2.68, 95% CI 1.24 to 6.12; P=.01). There was no statistically conclusive improvement in whether the physician's first diagnosis was correct (Top-1). The authors also saw a possible sign of overreliance: when the AI suggested a wrong diagnosis, assisted physicians sometimes adopted it, but the difference between arms was not statistically significant. The most important limitation is that this was a small simulation with virtual patients, not real ones. In addition, the unassisted physicians were not allowed any outside resources, such as reference tools or search engines, which is not how doctors normally work.",
+      "why_it_matters": "The study tested doctors working with the AI rather than the AI on its own, which is the comparison that matters in real practice. It also tracked how often doctors adopted wrong AI suggestions, a good habit to teach trainees when they use any diagnostic assistant."
+    }
+  ],
+  "tags": [
+    "automation bias",
+    "diagnostic decision support",
+    "family medicine",
+    "human-ai collaboration",
+    "large language models",
+    "medical education",
+    "osce",
+    "primary care",
+    "randomized study",
+    "randomized trial",
+    "simulation",
+    "surgery clerkship",
+    "virtual patients"
+  ],
+  "generated_by": "claude-opus-5-5"
+}

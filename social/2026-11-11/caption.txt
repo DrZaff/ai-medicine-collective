@@ -1,0 +1,14 @@
+Simulated patients, real gains: AI virtual cases for students and a live diagnostic copilot for family doctors
+
+Both reviews use simulated patients to test AI. In one, AI virtual patient cases improved surgery students' exam and OSCE results. In the other, a real-time AI assistant helped experienced family physicians include the right diagnosis in their top three more often, though there were signs that doctors may lean too hard on its suggestions.
+
+Med-ed: The impact of AI-Based Virtual Patient Simulation on Medical Student Performance: A Randomized Assessor-Blind Trial (Surgery (ScienceDirect))
+AI vs physician: Real-Time Artificial Intelligence Diagnostic Copilot in Simulated Primary Care Consultations: Randomized Simulation Study (JMIR Formative Research (via PubMed))
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-11-11 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AutomationBias #DiagnosticDecisionSupport #FamilyMedicine #HumanAiCollaboration #LargeLanguageModels #Osce
