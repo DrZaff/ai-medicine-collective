@@ -70,7 +70,7 @@ Recommendation: **one ruleset, "Main - Owner Merge Only" (26914500)**, and leave
 - the key exists only as a `digest-publish` environment secret, and only jobs running on `main` can use that environment;
 - `main` changes only through PRs the owner merges, and CODEOWNERS makes `.github/` owner-reviewed, so a job that misuses the environment has to get past the owner first;
 - the environment's secrets can't be read back, even by an admin.
-Residual risks: a future workflow on `main` naming `digest-publish`; the `create-github-app-token` action itself (it receives the key; see proposal 1); and the owner's own account. This has not been tested yet; phase 4 checks it.
+Residual risks: a future workflow on `main` naming `digest-publish`; the `create-github-app-token` action itself (it receives the key; it is pinned to an exact commit, and its token is limited to this repository and Contents); and the owner's own account. This has not been tested yet; phase 4 checks it.
 
 **Lockouts and rollback.** The owner, as repository admin, can always open Settings > Rules and set the ruleset to **Disabled**; rulesets never stop an admin from editing rulesets. If the digest job fails after the switch, the organizers get the failure email; disable the ruleset, re-run the job, then investigate. If the owner's account is unavailable, nobody can merge: `docs/operations.md` describes adding a second organizer, who would need their own bypass.
 
@@ -101,7 +101,7 @@ A commit's author is just text the job writes; the pusher is what matters.
 ## Optional workflow changes (separate proposals, not in this PR)
 
 Each changes `.github/workflows/`, which Billy cannot publish (no Workflows permission). If approved: Claude builds it, the owner runs only the Codex review step, Claude opens the PR, the owner merges.
-1. **Pin `actions/create-github-app-token` to a full commit SHA** instead of `@v1`, and pass `repositories: ai-medicine-collective` so the token is limited to this repository. Recommended before the key is added, because that action receives the key.
+1. ~~Pin `actions/create-github-app-token` to a full commit SHA~~ **Done:** pinned to release v1.12.0 (`d72941d`), with the token limited to this repository and Contents.
 2. **Author the digest commits as the app's bot user**, so history shows who made them.
 3. **Check out with `persist-credentials: false`** and give the token only to the push step, so `newsletter.py` never runs with a token on disk.
 4. **Open the automations' PRs with an app token**, so Site checks run on them and the owner's bypass isn't needed for routine merges.
