@@ -1744,7 +1744,7 @@ function initDigestSender() {
     const { profile } = await getSessionAndProfile();
     if (!profile || profile.role !== "admin") return;
 
-    // queued (migration 023): how many copies were due; recipients is how
+    // queued (migration 024): how many copies were due; recipients is how
     // many have gone so far, a day's allowance at a time
     const sends = (columns) => db.from("digest_sends").select(columns)
       .order("issue_date", { ascending: false }).limit(5);
@@ -1959,7 +1959,7 @@ function initDigestSender() {
         return say(`> NOT SENT: ${error.message}`, true);
       }
       if (testOnly) return say(`> TEST SENT to ${profile.email}. Check your inbox (and junk).`);
-      // After migration 023 a large digest goes out over a few days, so the
+      // After migration 024 a large digest goes out over a few days, so the
       // daily email allowance always leaves room for sign-in codes
       const { data: row } = await db.from("digest_sends").select("issue_date, recipients, queued")
         .eq("issue_date", loaded.issue).maybeSingle();
