@@ -139,6 +139,10 @@ def negative(slug, token, g):
         report('find the open test PR', False)
     else:
         n = prs[0]['number']
+        reviews = p.api('GET', '/repos/%s/pulls/%d/reviews?per_page=100' % (p.REPO, n), token)
+        if any(r.get('state') == 'APPROVED' for r in reviews):
+            raise p.SafeFailure('Test PR #%d has an approval, so the merge test could really merge. '
+                                'Close it and run setup for a fresh one.' % n)
         try:
             p.api('PUT', '/repos/%s/pulls/%d/merge' % (p.REPO, n), token, {'merge_method': 'squash'})
             report('merge of PR #%d by Billy is refused' % n, False, 'GitHub merged it.')

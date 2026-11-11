@@ -78,6 +78,11 @@ Commit messages:
 """
 
 
+def redact(text):
+    """Hide anything key- or token-shaped before it reaches the terminal."""
+    return SECRET_RE.sub('[redacted]', text)
+
+
 def tail(text, n=300):
     return ' | '.join(l.strip() for l in text.strip().splitlines()[-4:])[-n:]
 
@@ -158,7 +163,7 @@ def review(a):
         except subprocess.TimeoutExpired:
             raise p.SafeFailure('Codex did not finish within %d minutes.' % (CODEX_TIMEOUT // 60))
         if r.returncode or not os.path.exists(out):
-            raise p.SafeFailure('Codex review did not finish (exit %d): %s' % (r.returncode, tail(r.stderr)))
+            raise p.SafeFailure('Codex review did not finish (exit %d): %s' % (r.returncode, redact(tail(r.stderr))))
         with open(out) as f:
             report = json.load(f)
         if (report.get('verdict') not in ('no_blocking_findings', 'changes_needed')
@@ -328,7 +333,7 @@ if __name__ == '__main__':
     try:
         sys.exit(main())
     except p.SafeFailure as error:
-        print('STOP: ' + str(error), file=sys.stderr)
+        print('STOP: ' + redact(str(error)), file=sys.stderr)
         sys.exit(1)
     except urllib.error.HTTPError as error:
         print('STOP: GitHub HTTP %d' % error.code, file=sys.stderr)
