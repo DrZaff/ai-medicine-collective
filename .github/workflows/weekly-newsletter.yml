@@ -69,10 +69,18 @@ jobs:
       - name: Get a token for the digest publisher App
         id: token
         if: steps.app.outputs.ok == 'true'
-        uses: actions/create-github-app-token@v1
+        # This action receives the App's private key, so it is pinned to an
+        # exact commit (release v1.12.0, the code "@v1" pointed to on
+        # 2026-11-11) rather than a tag that could be moved. To upgrade, look
+        # up the new release's commit and change both the hash and the note.
+        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
         with:
           app-id: ${{ secrets.DIGEST_APP_ID }}
           private-key: ${{ secrets.DIGEST_APP_PRIVATE_KEY }}
+          # Only this repository (the default, written out) and only file
+          # contents: the job checks out, commits and pushes, nothing else.
+          repositories: ai-medicine-collective
+          permission-contents: write
 
       # The push at the end uses whichever token checked the code out.
       - uses: actions/checkout@v4
