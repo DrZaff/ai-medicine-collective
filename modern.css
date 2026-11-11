@@ -2508,6 +2508,188 @@ html.terminal::view-transition-new(root) {
   color: #92400e;
 }
 
+/* The paper's redesign (2026-11-11): questions at a glance, confidence,
+   evidence badges, the evidence map, landmark cards and the appendix */
+.modern .review-tool {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+}
+
+.modern .glance-grid {
+  gap: 14px;
+}
+
+.modern .glance-card,
+.modern .glance-card:visited {
+  gap: 10px;
+  padding: 18px 20px;
+  border: 0;
+  border-top: 4px solid var(--ev-limited);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .glance-card--high { border-top-color: var(--ev-strong); }
+.modern .glance-card--moderate { border-top-color: var(--ev-moderate); }
+
+.modern .glance-card:hover {
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-2px);
+}
+
+.modern .glance-q {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.modern .glance-line {
+  color: #334155;
+  font-size: 1rem;
+}
+
+.modern .confidence {
+  border: 0;
+  background: color-mix(in srgb, var(--ev-limited) 14%, transparent);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.modern .confidence--high {
+  background: var(--brand-soft);
+}
+
+.modern .confidence--moderate {
+  background: color-mix(in srgb, var(--ev-moderate) 12%, transparent);
+}
+
+.modern .confidence--outlook {
+  border: 1px dashed var(--line-strong);
+  background: transparent;
+}
+
+.modern .ev-badge--strong {
+  background: var(--brand-soft);
+  color: var(--ev-strong);
+}
+
+.modern .ev-badge--moderate {
+  background: color-mix(in srgb, var(--ev-moderate) 12%, transparent);
+  color: var(--ev-moderate);
+}
+
+.modern .review-eyebrow {
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+}
+
+.modern .review-answer {
+  margin-bottom: 22px;
+  padding: 18px 22px;
+  border-left: 4px solid var(--spark);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--brand-soft);
+}
+
+.modern .review-bottom-line {
+  color: var(--ink);
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.modern .evidence-map {
+  gap: 6px;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .evidence-map-row {
+  gap: 6px;
+}
+
+.modern .evidence-map-col,
+.modern .evidence-map-label {
+  font-size: 0.8125rem;
+}
+
+.modern .evidence-map-label {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.modern .evidence-map-cell {
+  border: 0;
+  border-radius: 10px;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.modern button.evidence-map-cell:hover {
+  background: color-mix(in srgb, var(--spark) 22%, var(--card));
+}
+
+.modern .evidence-map-cell--empty {
+  border: 1px dashed var(--line-strong);
+  background: transparent;
+  color: var(--muted);
+}
+
+.modern .review-study-more > summary {
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.modern .review-appendix > summary,
+.modern .review-method > summary {
+  list-style-position: outside;
+}
+
+.modern .review-citation {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: #334155;
+}
+
+.modern .review-faq,
+.modern .review-faq:visited {
+  padding: 24px 26px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--night);
+  box-shadow: var(--shadow);
+  color: #d1fae5;
+}
+
+.modern .review-faq:hover {
+  box-shadow: var(--shadow-lift);
+  color: #d1fae5;
+}
+
+.modern .review-faq-kicker {
+  color: var(--spark-soft);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+}
+
+.modern .review-faq-title {
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
 @media (max-width: 600px) {
   .modern .review-study {
     padding: 18px 18px 8px;
@@ -3091,6 +3273,9 @@ html.terminal::view-transition-new(root) {
   --v-even: #0ea5e9;
   --v-down: #d97706;
   --v-mixed: #94a3b8;
+  --ev-strong: var(--brand);
+  --ev-moderate: #0369a1;
+  --ev-limited: var(--muted);
 }
 
 /* --- the chart --- */

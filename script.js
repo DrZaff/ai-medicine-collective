@@ -1178,11 +1178,23 @@ function initLivingReview() {
         return;
       }
 
-      // Studies are numbered in the order they are listed: newest first
-      const studies = [...review.studies].sort((a, b) => String(b.published).localeCompare(String(a.published)));
+      // Landmark studies first (newest first), then the rest; studies are
+      // numbered in that order, so a citation's number finds its card
+      const newest = (a, b) => String(b.published).localeCompare(String(a.published));
+      const landmarks = review.studies.filter((study) => study.tier === "landmark").sort(newest);
+      const others = review.studies.filter((study) => study.tier !== "landmark").sort(newest);
+      const studies = [...landmarks, ...others];
       const number = new Map(studies.map((study, i) => [study.id, i + 1]));
+      const byId = new Map(studies.map((study) => [study.id, study]));
 
-      // "... performance [S4][S9]." -> text with numbered links to the study list
+      const STRENGTH = { strong: "Strong evidence", moderate: "Moderate evidence", limited: "Limited evidence" };
+      const DESIGN = { rct: "Randomised trial", prospective: "Prospective study", retrospective: "Retrospective study",
+        cross_sectional: "Reader or vignette study", other: "Other design" };
+      const SETTING = { real_patients: "Real patients", real_records: "Real records", images: "Images", simulated: "Written cases" };
+      const COMPARED = { ai_alone: "AI alone vs physicians", clinician_with_ai: "Physicians with vs without AI", both: "Both comparisons" };
+      const CHECKED = { full_text: "Checked against the full paper", abstract: "Checked against the abstract" };
+
+      // "... performance [S4][S9]." -> text with numbered links to the studies
       const cited = (tag, className, text) => {
         const node = el(tag, className);
         String(text).split(/(\[S\d+\])/).forEach((part) => {
@@ -1195,13 +1207,68 @@ function initLivingReview() {
         });
         return node;
       };
+      const citedIds = (...texts) => [...new Set(texts.join(" ").match(/S\d+/g) || [])].filter((id) => byId.has(id));
+      const firstSentence = (text) => (String(text).match(/^.*?[.!?](?=\s+[A-Z]|\s*$)/) || [String(text)])[0];
+
+      // How sure a section can be: from the design of the landmark studies it
+      // cites (strength: randomised or prospective, with real patients or records)
+      const confidence = (ids) => {
+        const cites = ids.map((id) => byId.get(id)).filter((study) => study.tier === "landmark");
+        const strong = cites.filter((study) => study.strength === "strong").length;
+        if (strong >= 3 && strong / cites.length >= 0.7) return ["high", "High confidence", cites.length];
+        if (strong >= 1) return ["moderate", "Moderate confidence", cites.length];
+        return ["low", "Low confidence", cites.length];
+      };
+      const sectionIds = review.sections.map((section, i) => `q-${i + 1}`);
 
       const article = el("article", "review");
       article.append(
-        el("p", "review-meta", `// Edition ${review.edition} · Updated ${longDate(review.updated)} · ${studies.length} studies`),
+        el("p", "review-meta", `// Edition ${review.edition} · Updated ${longDate(review.updated)} · ${landmarks.length} landmark studies · ${studies.length} studies in all`),
         el("h3", "review-title", review.title),
         cited("p", "review-summary", review.summary)
       );
+
+      // Print, cite and the FAQ, at the top
+      const citation = `AI Medicine Collective. ${review.title}. Edition ${review.edition}, updated ${longDate(review.updated)}. ` +
+        "https://www.aimedicinecollective.com/ai-vs-physician.html";
+      const tools = el("div", "review-tools");
+      const print = el("button", "btn review-tool", "Print or save as PDF");
+      print.type = "button";
+      print.addEventListener("click", () => {
+        article.querySelectorAll("details").forEach((fold) => { fold.dataset.wasOpen = fold.open ? "1" : ""; fold.open = true; });
+        document.body.classList.add("print-review");
+        window.print();
+      });
+      window.addEventListener("afterprint", () => {
+        document.body.classList.remove("print-review");
+        article.querySelectorAll("details[data-was-open]").forEach((fold) => { fold.open = fold.dataset.wasOpen === "1"; });
+      });
+      const cite = el("a", "btn review-tool", "Cite this edition");
+      cite.href = "#cite";
+      const faq = el("a", "btn review-tool", "FAQs");
+      faq.href = "faq.html";
+      tools.append(print, cite, faq);
+      article.append(tools);
+
+      // The questions at a glance: each section's question, bottom line and confidence
+      const glance = el("section", "review-section review-glance");
+      glance.append(el("h4", "review-heading", "The questions at a glance"));
+      const cards = el("div", "glance-grid");
+      review.sections.forEach((section, i) => {
+        const line = section.bottom_line || firstSentence((section.paragraphs || [])[0] || "");
+        const outlook = /heading/i.test(section.heading);
+        const [level, label, n] = confidence(citedIds(line, ...(section.paragraphs || [])));
+        const card = el("a", `glance-card glance-card--${outlook ? "outlook" : level}`);
+        card.href = `#${sectionIds[i]}`;
+        card.append(
+          el("span", "glance-q", section.question || section.heading),
+          el("span", "glance-line", line.replace(/\s*\[S\d+\]/g, "")),
+          el("span", `confidence confidence--${outlook ? "outlook" : level}`, outlook ? "Interpretation" : `${label} · ${n} landmark ${n === 1 ? "study" : "studies"}`)
+        );
+        cards.append(card);
+      });
+      glance.append(cards, el("p", "note", "// Confidence comes from the landmark studies each answer cites: high when most are randomised or prospective studies with real patients or real records, moderate when at least one is, low when none is."));
+      article.append(glance);
 
       // How the studies came out: one dot per study, a row per kind of study
       const count = (...verdicts) => studies.filter((study) => verdicts.includes(study.verdict)).length;
@@ -1219,9 +1286,75 @@ function initLivingReview() {
         article.append(box);
       }
 
-      review.sections.forEach((section) => {
+      // The evidence map: where the landmark studies are, by comparison and
+      // setting; a cell shows its studies in the list below
+      const MAP_ROWS = [["ai_alone", "AI alone vs physicians"], ["clinician_with_ai", "Physicians with vs without AI"], ["both", "Both comparisons"]];
+      const MAP_COLS = ["real_patients", "real_records", "images", "simulated"];
+      const mapBlock = el("section", "review-section");
+      mapBlock.append(el("h4", "review-heading", "The evidence map"),
+        el("p", "review-text", "Where the landmark studies are: what was compared, and how close to real care. Empty cells are gaps in the evidence. Choose a cell to see its studies."));
+      const map = el("div", "evidence-map");
+      map.setAttribute("role", "table");
+      map.setAttribute("aria-label", "Landmark studies by comparison and setting");
+      const head = el("div", "evidence-map-row");
+      head.setAttribute("role", "row");
+      head.append(el("span", "evidence-map-corner"));
+      MAP_COLS.forEach((col) => {
+        const th = el("span", "evidence-map-col", SETTING[col]);
+        th.setAttribute("role", "columnheader");
+        head.append(th);
+      });
+      map.append(head);
+      let showCell = () => {};
+      MAP_ROWS.forEach(([comparison, name]) => {
+        const row = el("div", "evidence-map-row");
+        row.setAttribute("role", "row");
+        const th = el("span", "evidence-map-label", name);
+        th.setAttribute("role", "rowheader");
+        row.append(th);
+        MAP_COLS.forEach((setting) => {
+          const these = landmarks.filter((study) => study.comparison === comparison && study.setting === setting);
+          const cell = el(these.length ? "button" : "span", `evidence-map-cell${these.length ? "" : " evidence-map-cell--empty"}`);
+          cell.setAttribute("role", "cell");
+          if (these.length) {
+            cell.type = "button";
+            cell.append(el("b", null, String(these.length)));
+            const marks = el("span", "evidence-map-marks");
+            these.forEach((study) => marks.append(el("i", `ev-mark ev-mark--${study.strength || "limited"}`)));
+            cell.append(marks);
+            cell.setAttribute("aria-label", `${these.length} ${these.length === 1 ? "study" : "studies"}: ${name}, ${SETTING[setting]}`);
+            cell.addEventListener("click", () => showCell(comparison, setting, `${name} · ${SETTING[setting]}`));
+          } else {
+            cell.textContent = "–";
+            cell.setAttribute("aria-label", `No landmark studies: ${name}, ${SETTING[setting]}`);
+          }
+          row.append(cell);
+        });
+        map.append(row);
+      });
+      const key = el("p", "evidence-map-key");
+      Object.entries(STRENGTH).forEach(([level, label]) => {
+        const item = el("span", null);
+        item.append(el("i", `ev-mark ev-mark--${level}`), label);
+        key.append(item);
+      });
+      mapBlock.append(map, key);
+      article.append(mapBlock);
+
+      // The sections, each answering a question
+      review.sections.forEach((section, i) => {
         const block = el("section", "review-section");
-        block.append(el("h4", "review-heading", section.heading));
+        block.id = sectionIds[i];
+        const line = section.bottom_line || "";
+        const outlook = /heading/i.test(section.heading);
+        const ids = citedIds(line, ...(section.paragraphs || []));
+        const [level, label, n] = confidence(ids);
+        block.append(el("p", "review-eyebrow", section.heading), el("h4", "review-heading", section.question || section.heading));
+        const answer = el("div", "review-answer");
+        answer.append(el("span", `confidence confidence--${outlook ? "outlook" : level}`,
+          outlook ? "Interpretation, not direct evidence" : `${label} · ${n} landmark ${n === 1 ? "study" : "studies"}`));
+        if (line) answer.append(cited("p", "review-bottom-line", line));
+        block.append(answer);
         (section.paragraphs || []).forEach((paragraph) => block.append(cited("p", "review-text", paragraph)));
         article.append(block);
       });
@@ -1235,13 +1368,12 @@ function initLivingReview() {
         article.append(block);
       }
 
-      // The register: every study the paper draws on
-      const register = el("section", "review-section");
-      register.append(el("h4", "review-heading", `The studies (${studies.length})`));
-      const list = el("ol", "review-studies");
-      studies.forEach((study) => {
+      // One study, as a card
+      const studyCard = (study) => {
         const item = el("li", "review-study");
         item.id = `study-${study.id}`;
+        item.dataset.comparison = study.comparison || "";
+        item.dataset.setting = study.setting || "";
         let safe = null;
         try {
           const url = new URL(study.url);
@@ -1256,23 +1388,91 @@ function initLivingReview() {
           title.rel = "noopener noreferrer";
         }
         const labels = el("div", "review-study-labels");
+        if (STRENGTH[study.strength]) labels.append(el("span", `blog-cat ev-badge ev-badge--${study.strength}`, STRENGTH[study.strength]));
         if (VERDICTS[study.verdict]) labels.append(el("span", `blog-cat review-verdict review-verdict--${study.verdict}`, VERDICTS[study.verdict]));
-        const COMPARED = { ai_alone: "AI alone vs physicians", clinician_with_ai: "Physicians with vs without AI", both: "Both comparisons" };
+        if (DESIGN[study.design_class]) labels.append(el("span", "blog-cat", DESIGN[study.design_class]));
+        if (SETTING[study.setting]) labels.append(el("span", "blog-cat", SETTING[study.setting]));
+        if (!study.tier && DOMAINS[study.domain]) labels.append(el("span", "blog-cat", DOMAINS[study.domain]));
         if (COMPARED[study.comparison]) labels.append(el("span", "blog-compare", COMPARED[study.comparison]));
-        if (DOMAINS[study.domain]) labels.append(el("span", "blog-cat", DOMAINS[study.domain]));
-        item.append(title, el("p", "blog-source", [study.source, niceDate(study.published), study.design].filter(Boolean).join(" · ")), labels);
-        const who = [study.ai_system && `AI: ${study.ai_system}`, study.humans && `Humans: ${study.humans}`].filter(Boolean).join(" · ");
-        if (who) item.append(el("p", "review-study-who", who));
-        item.append(el("p", "review-text", study.finding));
+        const source = [study.source, niceDate(study.published),
+          study.citations ? `cited ${Number(study.citations).toLocaleString("en-US")} times` : "",
+          CHECKED[study.checked] || ""].filter(Boolean).join(" · ");
+        item.append(title, el("p", "blog-source", source), labels);
+        const fold = el("details", "review-study-more");
+        fold.append(el("summary", null, "What it found"));
+        if (study.design) fold.append(el("p", "review-study-who", `Design: ${study.design}`));
+        const who = [study.ai_system && `AI: ${study.ai_system}`, study.humans && `Clinicians: ${study.humans}`].filter(Boolean).join(" · ");
+        if (who) fold.append(el("p", "review-study-who", who));
+        fold.append(el("p", "review-text", study.finding));
         if (study.limitation) {
           const limit = el("p", "review-study-limit");
           limit.append(el("span", "blog-why-label", "The catch"), study.limitation);
-          item.append(limit);
+          fold.append(limit);
         }
-        list.append(item);
-      });
-      register.append(list);
+        item.append(fold);
+        return item;
+      };
+
+      // The landmark studies, which the paper is built on
+      const register = el("section", "review-section");
+      register.id = "landmarks";
+      register.append(el("h4", "review-heading", `The landmark studies (${landmarks.length})`),
+        el("p", "review-text", "The strongest and most influential studies: randomised or prospective where possible, with real patients, in leading journals, and widely cited. Each was checked against its paper before it joined the review."));
+      const filter = el("p", "review-filter");
+      filter.hidden = true;
+      const list = el("ol", "review-studies");
+      landmarks.forEach((study) => list.append(studyCard(study)));
+      register.append(filter, list);
       article.append(register);
+
+      showCell = (comparison, setting, label) => {
+        list.querySelectorAll(".review-study").forEach((item) => {
+          item.hidden = !(item.dataset.comparison === comparison && item.dataset.setting === setting);
+        });
+        const clear = el("button", "btn review-tool", "Show all");
+        clear.type = "button";
+        clear.addEventListener("click", () => {
+          list.querySelectorAll(".review-study").forEach((item) => { item.hidden = false; });
+          filter.hidden = true;
+        });
+        filter.replaceChildren(`Showing: ${label}. `, clear);
+        filter.hidden = false;
+        register.scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+
+      // The appendix: every other study the paper draws on
+      if (others.length) {
+        const appendix = el("details", "review-section review-appendix");
+        appendix.id = "appendix";
+        appendix.append(el("summary", "review-heading", `Appendix: other studies (${others.length})`));
+        appendix.append(el("p", "review-text", "Newer, smaller or more specialised studies the paper also cites. They add detail and counter-examples; the conclusions rest on the landmark studies."));
+        const more = el("ol", "review-studies");
+        more.style.counterReset = `study ${landmarks.length}`;
+        others.forEach((study) => more.append(studyCard(study)));
+        appendix.append(more);
+        article.append(appendix);
+      }
+
+      // A citation to a study inside a closed fold opens the fold first
+      const reveal = () => {
+        const target = /^#study-S\d+$/.test(location.hash) && document.getElementById(location.hash.slice(1));
+        if (!target) return;
+        target.hidden = false;
+        for (let node = target.parentElement; node; node = node.parentElement) {
+          if (node.tagName === "DETAILS") node.open = true;
+        }
+        target.scrollIntoView({ block: "start" });
+      };
+      window.addEventListener("hashchange", reveal);
+
+      const method = el("details", "review-section review-method");
+      method.append(el("summary", "review-heading", "How the landmark studies are chosen"));
+      [
+        "Every month an AI agent reads new PubMed abstracts and preprints that compare AI with clinicians, and grades each study on its design (randomised, prospective, retrospective, or a one-off reader or vignette study), its setting (real patients, real records, images or written cases) and its journal and citations (NIH iCite). Studies are ranked on those grades.",
+        "Only studies of clinical decisions (diagnosis, imaging, management, procedures, and AI answering patients' medical questions) can become landmark studies. Studies of workflow and education are cited from the appendix.",
+        "Before a study joins the review, its record is checked against its full text where it is openly available, otherwise its abstract, and corrected where needed. The editors approve the list, and every edition is reviewed by a person before it is published.",
+      ].forEach((text) => method.append(el("p", "review-text", text)));
+      article.append(method);
 
       if (review.changes && review.changes.length) {
         const block = el("section", "review-section");
@@ -1287,9 +1487,31 @@ function initLivingReview() {
         article.append(block);
       }
 
+      // Cite this edition
+      const citeBlock = el("section", "review-section review-cite-block");
+      citeBlock.id = "cite";
+      const copy = el("button", "btn review-tool", "Copy citation");
+      copy.type = "button";
+      copy.addEventListener("click", () => {
+        copyText(`${citation} Accessed ${longDate(new Date().toISOString().slice(0, 10))}.`)
+          .then(() => { copy.textContent = "Copied"; })
+          .catch(() => { copy.textContent = "Select the text to copy it"; });
+      });
+      citeBlock.append(el("h4", "review-heading", "Cite this edition"), el("p", "review-citation", citation), copy);
+      article.append(citeBlock);
+
+      // The FAQ, at the end of the article
+      const faqLink = el("a", "review-faq");
+      faqLink.href = "faq.html";
+      faqLink.append(el("span", "review-faq-kicker", "Next"),
+        el("span", "review-faq-title", "FAQs: AI in medicine, answered from the evidence"),
+        el("span", "review-faq-text", "Short, sourced answers to the questions clinicians, trainees and builders ask most."));
+      article.append(faqLink);
+
       article.append(el("p", "note", "// Drafted by an AI agent from the studies listed above and reviewed by the Collective before publishing. It is a summary of research, not clinical guidance: read the original paper before relying on any result."));
       article.append(errorReportNote(`AI vs Physician, edition ${review.edition || ""}`.trim()));
       app.replaceChildren(article);
+      reveal();
     });
 }
 
