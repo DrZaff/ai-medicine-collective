@@ -77,6 +77,6 @@ GitHub is the shared record. Each party reads it before acting, and nothing pass
 | Every Codex finding from the setup reviews (#156, #157, #158) | Claude builds; Codex reviews; owner merges | Done (#166: no findings) |
 | Test ruleset, `billy-test/*` branches and test PRs | Owner | Removed 2026-11-11 |
 | Both `main` rulesets: owner on each bypass list (pull requests only), Billy on neither, CodeQL rule removed | Owner | Done; both stay **disabled** until the owner decides |
-| Digest publisher app on both `main` rulesets' bypass lists (mode Always), before enabling them | Owner | Open: steps at the top of `.github/workflows/weekly-newsletter.yml` |
+| Digest publisher app, then turning on protection for `main` | Owner | Open: checklist, ruleset decision and test order in [digest-publisher.md](digest-publisher.md) |
 
 Not part of the pilot: unattended runs, timers, issue labels (Billy has no Issues permission), Netlify production publishing (stays locked), and anything in architecture.md's sandbox and credential sections, which apply before any unattended run.
