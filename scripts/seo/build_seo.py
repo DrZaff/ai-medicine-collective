@@ -305,7 +305,8 @@ def llms_txt(posts: list[dict], faq: dict | None, review: dict | None) -> str:
         "working with AI, compare with physicians, built on randomized and prospective landmark studies; rewritten monthly"
         + (f" (edition {review.get('edition')}, updated {review.get('updated')}, {len(review.get('studies', []))} studies)" if review else ""),
         f"- [FAQ: AI in medicine]({SITE}/faq.html): short, sourced answers about AI accuracy, automation bias, "
-        "deskilling, ambient scribes, HIPAA, FDA rules, medical education and building medical apps with AI",
+        "deskilling, ambient scribes, HIPAA, FDA rules, medical education, AI in residency and fellowship "
+        "applications (ERAS, personal statements, AI detectors) and building medical apps with AI",
         f"- [Evidence briefings]({SITE}/blog.html): two reviews per post, one on AI in medical education and one "
         "study comparing AI with clinicians",
         f"- [Tools]({SITE}/hub.html): apps and calculators built by members",

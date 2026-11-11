@@ -68,8 +68,10 @@ strongest studies or official guidance, with their key numbers, and the \
 main limitation. End with one practical sentence where that helps. 80 to 180 \
 words in total.
 - Prefer, in order: randomized trials and large prospective studies in major \
-journals, systematic reviews, official guidance (FDA, HHS, WHO, AAMC and \
-similar), then other peer-reviewed studies. Say so plainly when evidence is \
+journals, systematic reviews, official guidance (FDA, HHS, WHO, AAMC, NRMP and \
+similar), then other peer-reviewed studies. For application questions, say \
+exactly who does what (ERAS, the AAMC, programs, vendors such as Thalamus) and \
+say plainly what is not publicly documented. Say so plainly when evidence is \
 from written cases, a preprint, or a single centre. Never cite news stories, \
 vendor marketing or blogs.
 - Cite sources with [1], [2] markers that match the order of "sources". \
@@ -201,8 +203,8 @@ def build_prompt(target: dict | None, faq: dict, known: dict[str, dict], date: d
         task = (f"ANSWER this question (you may tighten its wording): {target['question']}\n"
                 f"Category: {target.get('category', '')}. People search for: {', '.join(target.get('keywords', []))}")
     else:
-        task = ("CHOOSE one question about AI in medicine, medical education with AI, or building medical apps "
-                "with AI that clinicians or trainees often ask search engines or AI assistants, that the FAQ does "
+        task = ("CHOOSE one question about AI in medicine, medical education with AI, AI in residency and "
+                "fellowship applications, or building medical apps with AI that clinicians or trainees often ask search engines or AI assistants, that the FAQ does "
                 "not answer yet, and that good evidence can answer. Prefer specific, long-tail questions. Then answer it.")
     return (f"Today is {date.isoformat()}.\n\n{task}\n\n"
             f"Categories:\n{categories}\n\n"

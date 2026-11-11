@@ -11,6 +11,10 @@
       "name": "Medical education and training"
     },
     {
+      "id": "applications",
+      "name": "Residency and fellowship applications"
+    },
+    {
       "id": "building",
       "name": "Building medical apps with AI"
     },
@@ -820,6 +824,185 @@
         "AI-written medical blog accuracy",
         "how AI evidence briefings are checked",
         "AI medicine news reviewed"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "how-does-eras-use-ai-to-screen-applications",
+      "category": "applications",
+      "question": "How does ERAS use AI to screen residency and fellowship applications?",
+      "answer": "ERAS itself does not: the AAMC says the ERAS platform does not use AI to analyze, sort or evaluate applications, and passes them to programs exactly as submitted [1]. The AI comes from Thalamus Cortex, review software the AAMC began providing at no cost to all ERAS residency and fellowship programs from July 2025 [2]. According to the AAMC, Cortex uses optical character recognition to pull core clerkship grades from transcripts and place them on a normalized percentile within and across medical schools, and uses AI to read personal statements to assess certain applicant characteristics, starting with academic career interest for the 2026 season [1]. The AAMC states that Thalamus does not use AI to score applications, automatically filter out, sort, select or reject applicants, or decide whether an essay was written with AI [1]. Programs can still filter, search and blind applications themselves [3]; how each program uses these tools is not publicly documented.",
+      "sources": [
+        {
+          "title": "Use of Artificial Intelligence in AAMC Service Programs",
+          "url": "https://www.aamc.org/services/use-artificial-intelligence-aamc-service-programs",
+          "source": "AAMC",
+          "published": ""
+        },
+        {
+          "title": "AAMC and Thalamus Expand Strategic Collaboration to Offer Technology-Assisted Holistic Application Review Platform",
+          "url": "https://www.aamc.org/news/press-releases/aamc-and-thalamus-expand-strategic-collaboration-offer-technology-assisted-holistic-application",
+          "source": "AAMC",
+          "published": "2024-11-07"
+        },
+        {
+          "title": "Cortex Application Screening",
+          "url": "https://thalamusgme.com/cortex-application-screening/",
+          "source": "Thalamus",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "does ERAS use AI",
+        "Thalamus Cortex AI screening",
+        "AI residency application screening",
+        "grade normalization Cortex"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "can-i-use-ai-for-my-personal-statement",
+      "category": "applications",
+      "question": "Can I use AI to help write my residency or fellowship personal statement?",
+      "answer": "Yes, as a helper, but not as the author. The AAMC's guidance on the ERAS personal statement, as quoted by the American Medical Association, says AI tools are acceptable for brainstorming, proofreading or editing, but the final submission should represent your own work [1]. Residency and fellowship applicants alike must acknowledge a certification statement in MyERAS before their application is submitted [2]. The NRMP has said it has taken no stance on AI-generated content and gives programs no guidance on screening for it [3], so individual programs may set their own expectations, and other application services, such as the SF Match, may have rules of their own. A practical line: let AI help you brainstorm themes, tighten wording and catch errors, but write the story and reflections yourself, keep every detail true, and be ready to talk about anything in the statement at interview.",
+      "sources": [
+        {
+          "title": "How to use AI in residency applications? Learn the rules of the road",
+          "url": "https://www.ama-assn.org/medical-students/preparing-residency/how-use-ai-residency-applications-learn-rules-road",
+          "source": "American Medical Association",
+          "published": ""
+        },
+        {
+          "title": "MyERAS Certify and Submit (fellowship applicants)",
+          "url": "https://students-residents.aamc.org/applying-fellowships-eras/myeras-certify-and-submit",
+          "source": "AAMC",
+          "published": ""
+        },
+        {
+          "title": "NRMP Response to the Fake Statement on Integrity Screening for Residency Applications",
+          "url": "https://www.nrmp.org/about/news/2024/09/nrmp-response-to-the-fake-statement-on-integrity-screening-for-residency-applications",
+          "source": "National Resident Matching Program",
+          "published": "2024-09-13"
+        }
+      ],
+      "keywords": [
+        "AI ERAS personal statement",
+        "ChatGPT residency personal statement allowed",
+        "AAMC AI policy personal statement",
+        "fellowship personal statement AI"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "can-programs-tell-ai-written-personal-statements",
+      "category": "applications",
+      "question": "Can program directors tell an AI-written personal statement from one written by the applicant?",
+      "answer": "Usually not reliably, in the studies so far. When 31 anesthesiology program directors read two ChatGPT-written statements, 90% and 97% found them acceptable, and 61% and 80% saw nothing to suggest they were not written by an applicant [1]. Four surgeons on residency selection committees identified the author of AI-written and human statements with an overall accuracy of 0.55, and their agreement with the true authorship was only slight [2]. In a blinded orthopaedic surgery study, 8 committee members could not reliably tell AI from human statements, which scored similarly for readability, originality, authenticity and overall quality [3]. Perception still matters: in the surgical study, a statement the reviewers believed was human-written had 7 times the odds of an interview offer [2]. All three were small, single-specialty studies using statements prepared for the research.",
+      "sources": [
+        {
+          "title": "Artificial intelligence software can generate residency application personal statements that program directors find acceptable and difficult to distinguish from applicant compositions",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37336139/",
+          "source": "Journal of Clinical Anesthesia",
+          "published": "2023-06-19"
+        },
+        {
+          "title": "Residency Application Selection Committee Discriminatory Ability in Identifying Artificial Intelligence-Generated Personal Statements",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38679494/",
+          "source": "Journal of Surgical Education",
+          "published": "2024-04-27"
+        },
+        {
+          "title": "Indistinguishable Narratives: A Blinded Comparison of AI- Versus Human-Written Personal Statements in Application to Orthopaedic Surgery Residency",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42005879/",
+          "source": "Journal of Graduate Medical Education",
+          "published": "2026-04-15"
+        }
+      ],
+      "keywords": [
+        "can program directors detect ChatGPT",
+        "AI personal statement detection residency",
+        "AI vs human personal statement study"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "do-ai-detectors-work-on-personal-statements",
+      "category": "applications",
+      "question": "Do AI detectors work on residency personal statements?",
+      "answer": "Not well enough to judge an applicant. A 2025 study in the Journal of Graduate Medical Education ran 25 human-written, 25 ChatGPT-written and 25 mixed personal statements through four detectors: some gave high AI scores to human writing, up to 84% with one tool, and none reliably separated mixed from fully AI-written statements [1]. In an obstetrics and gynecology study, human-written statements from before ChatGPT existed had 64% to 100% of their content flagged as AI by the detectors tested [2]. An orthopaedic study, by contrast, found GPTZero labelled all 200 submitted statements human and the AI-written ones AI [3], so results vary by tool and text. Detectors also frequently misclassify writing by non-native English speakers as AI-generated [4], a particular risk for international medical graduates. The AAMC says Thalamus does not try to determine whether essays were written with AI [5].",
+      "sources": [
+        {
+          "title": "Accuracy of Artificial Intelligence Detection Software for Residency Personal Statements",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41415993/",
+          "source": "Journal of Graduate Medical Education",
+          "published": "2025-12-16"
+        },
+        {
+          "title": "Can Residency Programs Detect Artificial Intelligence Use in Personal Statements?",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40895899/",
+          "source": "Cureus",
+          "published": "2025-07-29"
+        },
+        {
+          "title": "Artificial Intelligence in Personal Statements Within Orthopaedic Surgery Residency Applications",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40101179/",
+          "source": "Journal of the American Academy of Orthopaedic Surgeons",
+          "published": "2025-05-15"
+        },
+        {
+          "title": "GPT detectors are biased against non-native English writers",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37521038/",
+          "source": "Patterns",
+          "published": "2023-07-10"
+        },
+        {
+          "title": "Use of Artificial Intelligence in AAMC Service Programs",
+          "url": "https://www.aamc.org/services/use-artificial-intelligence-aamc-service-programs",
+          "source": "AAMC",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "AI detector personal statement",
+        "GPTZero residency application",
+        "AI detection false positives IMG"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "can-letter-writers-use-ai",
+      "category": "applications",
+      "question": "Can my letter writers use AI to draft my letter of recommendation?",
+      "answer": "Yes, as a drafting aid, with the writer remaining the author. The AAMC says generative AI can help draft and edit letters of evaluation and recommendation, but the writer is responsible for the content, accuracy and assessment, should not rely on AI to form that assessment, and should not enter identifiable applicant information into personal AI tools that do not keep data private [1]. A framework published in Academic Medicine sets out ethical use, privacy and disclosure for letter writers who use generative AI [2]. Bias is a real concern: when ChatGPT drafted paired letters for hypothetical orthopaedic applicants that differed only in gender, letters for women used more auxiliary verbs, communication-related words and personal pronouns [3]. The AAMC advises writers to compare AI drafts across applicants for consistent tone and strength of language [1].",
+      "sources": [
+        {
+          "title": "Use of Artificial Intelligence in AAMC Service Programs",
+          "url": "https://www.aamc.org/services/use-artificial-intelligence-aamc-service-programs",
+          "source": "AAMC",
+          "published": ""
+        },
+        {
+          "title": "Using Generative Artificial Intelligence When Writing Letters of Recommendation",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40127307/",
+          "source": "Academic Medicine",
+          "published": "2025-03-24"
+        },
+        {
+          "title": "Does ChatGPT Show Gender Bias When Drafting Letters of Recommendation for Applicants to Orthopaedic Surgery Residency Programs?",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41869487/",
+          "source": "JB & JS Open Access",
+          "published": "2026-03-24"
+        }
+      ],
+      "keywords": [
+        "AI letter of recommendation residency",
+        "ChatGPT letter of recommendation bias",
+        "AAMC AI letters guidance"
       ],
       "added": "2026-11-11",
       "updated": "2026-11-11"

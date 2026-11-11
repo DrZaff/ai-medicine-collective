@@ -153,8 +153,10 @@
         "ChatGPT ERAS personal statement",
         "detect AI writing residency"
       ],
-      "status": "open",
-      "added": "2026-11-11"
+      "status": "answered",
+      "added": "2026-11-11",
+      "answered_id": "can-programs-tell-ai-written-personal-statements",
+      "answered": "2026-11-11"
     },
     {
       "question": "Can AI give useful feedback on trainees' clinical notes or OSCE performance?",
@@ -212,6 +214,66 @@
         "AI hallucination drug dosing",
         "verify AI clinical recommendations",
         "LLM guideline accuracy"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "How should international medical graduates use AI on their ERAS application?",
+      "category": "applications",
+      "priority": 4,
+      "keywords": [
+        "IMG ERAS AI",
+        "ChatGPT English editing ERAS",
+        "international medical graduate personal statement AI"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Can I use AI to prepare for residency or fellowship interviews?",
+      "category": "applications",
+      "priority": 4,
+      "keywords": [
+        "AI mock interview residency",
+        "ChatGPT interview prep residency",
+        "AI interview practice"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Can I use AI to write my ERAS experience descriptions?",
+      "category": "applications",
+      "priority": 3,
+      "keywords": [
+        "AI ERAS experiences",
+        "ChatGPT most meaningful experience",
+        "ERAS activities AI"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Do residency programs use AI to rank applicants for the Match?",
+      "category": "applications",
+      "priority": 3,
+      "keywords": [
+        "AI rank list residency",
+        "AI Match ranking",
+        "programs AI ranking applicants"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Can I use AI to write a letter of intent or thank-you note to a residency program?",
+      "category": "applications",
+      "priority": 2,
+      "keywords": [
+        "AI letter of intent residency",
+        "ChatGPT thank you email program",
+        "letter of intent AI"
       ],
       "status": "open",
       "added": "2026-11-11"

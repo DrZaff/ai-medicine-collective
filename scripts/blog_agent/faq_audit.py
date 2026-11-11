@@ -50,7 +50,8 @@ TOOLS = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 5}]
 
 SYSTEM = """\
 You audit the AI Medicine Collective's FAQ about AI in medicine, medical \
-education and building medical apps with AI. Its goal is to be the most \
+education, residency and fellowship applications, and building medical apps \
+with AI. Its goal is to be the most \
 useful, citable source that clinicians, trainees and search engines and AI \
 assistants find for these questions.
 
