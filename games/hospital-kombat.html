@@ -1344,7 +1344,7 @@ function finisherAfter() {
 }
 
 function procedureChair(c, x, y, facing, spin) {
-  // A wheelchair whose back sits behind a patient facing `facing`.
+  // A wheelchair whose back sits behind an opponent facing `facing`.
   c.save();
   c.translate(x, y - 1);
   c.scale(facing, 1);
@@ -1424,7 +1424,7 @@ function drawFin(c, T) {
       break;
     }
     case 'salt': {
-      // Shake the salt over the patient, who stiffens, mineralizes and sinks into the pile.
+      // Shake the salt over the opponent, who stiffens, mineralizes and sinks into the pile.
       const mineral = progress(24, 116), sink = smooth01(progress(127, 178));
       const pour = t >= 26 && t < 112 ? clamp(Math.min(t - 26, 112 - t) / 6, 0, 1) : 0;
       const pose = keyPose(t, [[0, S.special], [8, S.guard, {lean: -.04}], [16, S.upperCut, {arm: 0}],
@@ -1455,7 +1455,7 @@ function drawFin(c, T) {
       break;
     }
     case 'sleep': {
-      // Push the syringe; the patient sways, buckles at the knees and lies down asleep.
+      // Push the syringe; the opponent sways, buckles at the knees and lies down asleep.
       const depth = progress(14, 91);
       hero([[0, S.special], [10, S.guard, {lean: -.04}], [16, S.special, {lean: .05, nudge: 1}], [62, S.special, {lean: .03}],
         [74, S.guard], [96, S.idle], [130, S.special]]);
@@ -1482,7 +1482,7 @@ function drawFin(c, T) {
       break;
     }
     case 'discharge': {
-      // Point at the door; the chair rolls in behind, the patient sits, and is wheeled out.
+      // Point at the door; the chair rolls in behind, the opponent sits, and is wheeled out.
       const cx = t < 53 ? lerp(x + dir * 150, x, 1 - (1 - progress(4, 53)) ** 3)
         : t < 77 ? x : x + dir * Math.pow(t - 77, 1.6) * .75;
       hero([[0, S.special], [8, S.guard], [16, S.jab, {nudge: 1}], [40, S.jab], [46, S.guard], [70, S.guard],
@@ -1507,7 +1507,7 @@ function drawFin(c, T) {
       break;
     }
     case 'apple': {
-      // Toss the apple high; it drops on the patient's head, they topple, it rolls to a stop.
+      // Toss the apple high; it drops on the opponent's head, they topple, it rolls to a stop.
       const hit = 53;
       hero([[0, S.special], [8, S.guard], [12, S.crouch, {stretch: .97}], [17, S.upperCut, {arm: -14}],
         [22, S.upperCut, {arm: 62, lift: -3, stretch: 1.03}], [30, S.upperCut, {arm: 54, lift: -1}], [40, S.guard], [62, S.idle], [100, S.special]]);
@@ -1572,7 +1572,7 @@ function drawFin(c, T) {
       break;
     }
     case 'stork': {
-      // Signal the courier; the patient curls up, is swaddled and lifted, and flown away.
+      // Signal the courier; the opponent curls up, is swaddled and lifted, and flown away.
       let sx, sy;
       if (t < 60) { const u = 1 - (1 - progress(0, 60)) ** 3; sx = lerp(x + dir * 170, x, u); sy = lerp(60, y - 100, u); }
       else if (t < 80) { sx = x; sy = y - 100 + Math.sin(life * .2) * 2; }
@@ -1601,7 +1601,7 @@ function drawFin(c, T) {
       break;
     }
     case 'sun': {
-      // Point at the sky; the patient shields their eyes, burns, kneels and crumbles to ash.
+      // Point at the sky; the opponent shields their eyes, burns, kneels and crumbles to ash.
       const exposure = progress(20, 151), sink = smooth01(progress(151, 188));
       const ux = 325, uy = 71, spread = 22 * progress(0, 36) * (1 - .5 * settle);
       procedureGlow(c, ux, uy, 68, color, .64 * (1 - .5 * settle));
@@ -1694,7 +1694,7 @@ function drawHUD(c,T){
   if(g.mode!=='demo'&&finalReady(F,g.f[1-i])&&T%30<20)txt(c,'FINAL PROCEDURE READY',i?x0+w:x0,y+36,7,'#ff3b4f','#071014',i?'right':'left');
  }
  c.fillStyle='#0b1725';rr(c,185,6,30,23,4);c.strokeStyle='#7a9aa8';c.lineWidth=.7;c.strokeRect(187,8,26,19);txt(c,g.mode==='demo'?'--':String(Math.max(0,Math.ceil(g.timer/60))),200,22,14,'#ffe2a9');
- if(g.mode==='arcade'){txt(c,'SCORE '+String(g.score).padStart(6,'0'),12,58,8,'#ffc23d','#071014','left');txt(c,'PATIENT '+(g.lvl+1)+'/8',388,58,8,'#e9f6f2','#071014','right')}
+ if(g.mode==='arcade'){txt(c,'SCORE '+String(g.score).padStart(6,'0'),12,58,8,'#ffc23d','#071014','left');txt(c,'OPPONENT '+(g.lvl+1)+'/8',388,58,8,'#e9f6f2','#071014','right')}
  if(g.cmb&&g.mode!=='demo'){const i=g.cmb.i;txt(c,g.cmb.n+' HIT COMBO',i?388:12,80,11,'#ffd166','#5a0d18',i?'right':'left')}
  // banner
  let b='',sub='';
@@ -2200,13 +2200,13 @@ function results(){
   if(w===0){run.score+=1500*(run.lvl+1);run.lvl++;const champ=run.lvl>=run.order.length;if(run.score>best){best=run.score;store.set('hk_best',best)}
    const nx=champ?null:CH[run.order[run.lvl]];
    show(`<div class="scr"><p class="big win">${champ?'CHIEF OF STAFF':'VICTORY'}</p><p class="sub">“${C0.q}”</p>
-    <div class="scorebox"><span>Patients beaten</span><b>${run.lvl} / 8</b><span>Match bonus</span><b>+${(1500*run.lvl).toLocaleString()}</b><span>Score</span><b>${run.score.toLocaleString()}</b><span>Best</span><b>${best.toLocaleString()}</b></div>
+    <div class="scorebox"><span>Opponents beaten</span><b>${run.lvl} / 8</b><span>Match bonus</span><b>+${(1500*run.lvl).toLocaleString()}</b><span>Score</span><b>${run.score.toLocaleString()}</b><span>Best</span><b>${best.toLocaleString()}</b></div>
     ${champ?'<p class="note">You beat every specialty. The whole hospital answers to you now.</p>':`<p class="note">Next up: <b>${nx.name}</b> in the ${STAGES[(run.stage0+run.lvl)%5]}. They hit harder and react faster.</p>`}
     <button class="btn pri" id="a1">${champ?'Play again':'Next opponent'}</button><button class="btn" id="a2">Change fighter</button><button class="btn ghost" id="a3">Main menu</button></div>`);
    $('#a1').onclick=champ?()=>startArcade(run.pc):arcadeFight;
   }else{if(run.score>best){best=run.score;store.set('hk_best',best)}
    show(`<div class="scr"><p class="big lose">CODE BLUE</p><p class="sub">${C1.name}: “${C1.q}”</p>
-    <div class="scorebox"><span>Patients beaten</span><b>${run.lvl} / 8</b><span>Final score</span><b>${run.score.toLocaleString()}</b><span>Best</span><b>${best.toLocaleString()}</b></div>
+    <div class="scorebox"><span>Opponents beaten</span><b>${run.lvl} / 8</b><span>Final score</span><b>${run.score.toLocaleString()}</b><span>Best</span><b>${best.toLocaleString()}</b></div>
     <button class="btn pri" id="a1">Restart run</button><button class="btn" id="a2">Change fighter</button><button class="btn ghost" id="a3">Main menu</button></div>`);
    $('#a1').onclick=()=>startArcade(run.pc);
   }
