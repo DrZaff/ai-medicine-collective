@@ -1,0 +1,828 @@
+{
+  "_about": "Frequently asked questions about AI in medicine, shown on faq.html (faq.js) and built into the page as static HTML and FAQPage data at deploy time (scripts/seo/build_seo.py). Answers are plain text; [1] marks cite the item's sources in order. The FAQ agent (scripts/blog_agent/faq_agent.py) proposes one new item every other day and the monthly audit (faq_audit.py) proposes refreshes, both by pull request: merging publishes. Every number in an answer must appear in a cited source.",
+  "updated": "2026-11-11",
+  "categories": [
+    {
+      "id": "general",
+      "name": "AI in medicine"
+    },
+    {
+      "id": "education",
+      "name": "Medical education and training"
+    },
+    {
+      "id": "building",
+      "name": "Building medical apps with AI"
+    },
+    {
+      "id": "collective",
+      "name": "About the Collective"
+    }
+  ],
+  "items": [
+    {
+      "id": "is-ai-more-accurate-than-doctors",
+      "category": "general",
+      "question": "Is AI more accurate than doctors at diagnosis?",
+      "answer": "Sometimes, on some tasks, but not consistently, and rarely in studies with real patients. In a 2026 study in Science, the o1 model included the correct or a very close diagnosis in 67.1% of 76 real emergency department cases at triage, against 55.3% and 50.0% for two attending physicians [1]. Other studies point the other way: open-source language models diagnosed real patients with acute abdominal pain less accurately than doctors [2], and in a prospective study of critically ill emergency patients, emergency physicians beat ChatGPT, Claude and Gemini at every stage [3]. Results depend on the model, the task, and whether the case is written up neatly or unfolds at the bedside. Strong results on written cases do not yet show better outcomes for patients. Our AI vs Physician review keeps a running, sourced tally of these head-to-head studies.",
+      "sources": [
+        {
+          "title": "Performance of a large language model on the reasoning tasks of a physician",
+          "url": "https://www.science.org/doi/10.1126/science.adz4433",
+          "source": "Science",
+          "published": "2026-04-30"
+        },
+        {
+          "title": "Evaluation and mitigation of the limitations of large language models in clinical decision-making",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38965432/",
+          "source": "Nature Medicine",
+          "published": "2024-07-04"
+        },
+        {
+          "title": "Diagnostic capability of large language models in critically ill patients: a prospective single-centre study comparing ChatGPT, Claude, and Gemini with emergency physicians",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42449247/",
+          "source": "BMC Emergency Medicine",
+          "published": "2026-07-14"
+        }
+      ],
+      "keywords": [
+        "AI vs doctors accuracy",
+        "is AI better than doctors at diagnosis",
+        "LLM diagnostic accuracy"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "do-doctors-decide-better-with-chatgpt",
+      "category": "general",
+      "question": "Do doctors make better decisions when they use ChatGPT or another AI chatbot?",
+      "answer": "On written cases, often a little better, but the gains vary and the evidence from real patient care is thin. In a randomized trial of 50 physicians working through challenging vignettes, access to GPT-4 did not improve diagnostic reasoning: the median score was 76% with the chatbot and 74% without, while GPT-4 on its own had a median of 92% [1]. In a randomized trial of 92 physicians on management cases, GPT-4 access raised scores from 35.7% to 43.0% [2], and a trial of 249 physicians in Kenya, Indonesia and the Netherlands found gains in every country [3]. All three used written cases. Benefits seem to depend on how the tool is used, and the physicians in most trials had no training in prompting it.",
+      "sources": [
+        {
+          "title": "Large Language Model Influence on Diagnostic Reasoning: A Randomized Clinical Trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39466245/",
+          "source": "JAMA Network Open",
+          "published": "2024-10-01"
+        },
+        {
+          "title": "GPT-4 assistance for improvement of physician performance on patient care tasks: a randomized controlled trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39910272/",
+          "source": "Nature Medicine",
+          "published": "2025-02-05"
+        },
+        {
+          "title": "Impact of LLM assistance on physician decision-making: a multi-country randomized controlled trial",
+          "url": "https://www.nature.com/articles/s41746-026-03111-5",
+          "source": "npj Digital Medicine",
+          "published": "2026-09-09"
+        }
+      ],
+      "keywords": [
+        "doctors using ChatGPT",
+        "GPT-4 physician randomized trial",
+        "LLM clinical decision support"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "what-is-automation-bias",
+      "category": "general",
+      "question": "What is automation bias, and does it happen with medical AI?",
+      "answer": "Automation bias is the tendency to follow a machine's suggestion even when it is wrong, and it is one of the best-documented risks of clinical AI. In a reader study, radiologists rated mammograms while a purported AI suggested categories; when the suggestion was wrong, inexperienced readers' correct ratings fell from 79.7% to 19.8%, and even very experienced readers fell from 82.3% to 45.5% [1]. In a 2026 randomized trial, physicians who had been trained in AI literacy still lost accuracy when an LLM gave deliberately wrong suggestions: 73.3% against 84.9% with error-free ones [2]. Training alone does not seem to protect against it. Practical safeguards include forming your own impression before looking at the AI output and checking its reasoning against the primary data.",
+      "sources": [
+        {
+          "title": "Automation Bias in Mammography: The Impact of Artificial Intelligence BI-RADS Suggestions on Reader Performance",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37129490/",
+          "source": "Radiology",
+          "published": "2023-05-02"
+        },
+        {
+          "title": "Automation Bias in Large Language Model–Assisted Diagnostic Reasoning among Physicians Trained in AI Literacy — A Randomized Clinical Trial",
+          "url": "https://ai.nejm.org/doi/full/10.1056/AIoa2501001",
+          "source": "NEJM AI",
+          "published": "2026-04-23"
+        }
+      ],
+      "keywords": [
+        "automation bias medicine",
+        "over-reliance on AI doctors",
+        "AI wrong suggestions physicians"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "does-ai-deskill-doctors",
+      "category": "general",
+      "question": "Can using AI make doctors worse at their own skills (deskilling)?",
+      "answer": "There is early evidence that it can. A multicentre study in four Polish endoscopy centres compared standard colonoscopies, done without AI, in the three months before and after the centres introduced an AI polyp detection tool. The adenoma detection rate of those standard colonoscopies fell from 28.4% to 22.4%, and AI exposure was independently associated with a lower detection rate [1]. The study was observational, with short before-and-after windows, so other changes over time could explain part of the drop. No randomized trial has yet tested deskilling directly. Until one does, a sensible approach is to keep practising core skills without AI and to watch your own unaided performance after a tool is introduced.",
+      "sources": [
+        {
+          "title": "Endoscopist deskilling risk after exposure to artificial intelligence in colonoscopy: a multicentre, observational study",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40816301/",
+          "source": "The Lancet Gastroenterology & Hepatology",
+          "published": "2025-08-12"
+        }
+      ],
+      "keywords": [
+        "AI deskilling doctors",
+        "colonoscopy AI deskilling",
+        "does AI make clinicians worse"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "has-ai-improved-patient-outcomes",
+      "category": "general",
+      "question": "Has AI actually improved patient outcomes in randomized trials?",
+      "answer": "Yes, in a handful of trials, though many others found no benefit. In a pragmatic randomized trial of 15,965 hospitalized patients, alerts from an AI-enabled ECG lowered 90-day mortality from 4.3% to 3.6% [1]. In stroke care, automated large vessel occlusion detection shortened door-to-groin time by an adjusted 11.2 minutes, without a difference in 90-day functional independence [2]. In Sweden's MASAI screening trial, AI-supported mammography had an interval cancer rate no worse than double reading, 1.55 against 1.76 per 1000 [3]. Against these, an AI stethoscope did not increase heart failure diagnoses in UK primary care [4]. Most trials measure process or detection rather than survival, so outcome evidence is still narrow.",
+      "sources": [
+        {
+          "title": "AI-enabled electrocardiography alert intervention and all-cause mortality: a pragmatic randomized clinical trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38684860/",
+          "source": "Nature Medicine",
+          "published": "2024-04-29"
+        },
+        {
+          "title": "Automated Large Vessel Occlusion Detection Software and Thrombectomy Treatment Times: A Cluster Randomized Clinical Trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37721738/",
+          "source": "JAMA Neurology",
+          "published": "2023-11-01"
+        },
+        {
+          "title": "Interval cancer, sensitivity, and specificity comparing AI-supported mammography screening with standard double reading without AI in the MASAI study",
+          "url": "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(25)02464-X/abstract",
+          "source": "The Lancet",
+          "published": "2026-01-31"
+        },
+        {
+          "title": "Triple cardiovascular disease detection with an artificial intelligence-enabled stethoscope (TRICORDER) in the UK: a cluster-randomised controlled implementation trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41619752/",
+          "source": "The Lancet",
+          "published": "2026-01-28"
+        }
+      ],
+      "keywords": [
+        "AI randomized controlled trial outcomes",
+        "does AI save lives",
+        "AI ECG mortality trial"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "do-ambient-ai-scribes-work",
+      "category": "general",
+      "question": "Do ambient AI scribes reduce documentation time and burnout?",
+      "answer": "Modestly, according to the first randomized trials. In a 24-week pragmatic trial of 66 practitioners, ambient AI reduced work exhaustion and interpersonal disengagement and cut time on notes by 0.36 hours a day, without harming note quality, though professional fulfilment did not significantly improve [1]. A trial comparing two commercial scribes found a 9.5% drop in writing time with one and no significant change with the other, while both improved scores on the Mini-Z burnout survey [2]. Earlier, in a prospective study of 45 physicians, median time per note fell by 0.57 minutes [3]. Gains vary widely between clinicians and products, so a local pilot that measures your own documentation time is worth doing before a wide rollout.",
+      "sources": [
+        {
+          "title": "A Pragmatic Randomized Controlled Trial of Ambient Artificial Intelligence to Improve Health Practitioner Well-Being",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41625485/",
+          "source": "NEJM AI",
+          "published": "2025-11-26"
+        },
+        {
+          "title": "Ambient AI Scribes in Clinical Practice: A Randomized Trial",
+          "url": "https://ai.nejm.org/doi/abs/10.1056/AIoa2501000",
+          "source": "NEJM AI",
+          "published": "2025-11-26"
+        },
+        {
+          "title": "Ambient artificial intelligence scribes: utilization and impact on documentation time",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39688515/",
+          "source": "Journal of the American Medical Informatics Association",
+          "published": "2025-02-01"
+        }
+      ],
+      "keywords": [
+        "ambient AI scribe evidence",
+        "AI scribe burnout trial",
+        "DAX Nabla randomized trial"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "is-chatgpt-more-empathetic-than-doctors",
+      "category": "general",
+      "question": "Is ChatGPT more empathetic than doctors when answering patient questions?",
+      "answer": "In written answers to online questions, evaluators have often rated it so, but that is a narrow setting. In a widely cited JAMA Internal Medicine study of 195 questions from a public forum, blinded health professionals preferred the chatbot's answer in 78.6% of evaluations and rated 45.1% of its answers empathetic or very empathetic, against 4.6% of physicians' [1]. The physician answers were short replies written by volunteers on social media, not answers from a patient's own doctor. In a study of 200 eye care questions, ophthalmologists' and ChatGPT's answers did not differ significantly in incorrect content or likelihood of harm [2]. These studies measure how answers read, not whether patients do better.",
+      "sources": [
+        {
+          "title": "Comparing Physician and Artificial Intelligence Chatbot Responses to Patient Questions Posted to a Public Social Media Forum",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37115527/",
+          "source": "JAMA Internal Medicine",
+          "published": "2023-06-01"
+        },
+        {
+          "title": "Comparison of Ophthalmologist and Large Language Model Chatbot Responses to Online Patient Eye Care Questions",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37606922/",
+          "source": "JAMA Network Open",
+          "published": "2023-08-01"
+        }
+      ],
+      "keywords": [
+        "ChatGPT empathy patients",
+        "AI answering patient messages",
+        "chatbot vs physician responses"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "how-does-fda-regulate-ai",
+      "category": "general",
+      "question": "How does the FDA regulate AI in medicine?",
+      "answer": "Through its medical device rules: AI software that is intended to diagnose, treat or prevent disease is generally a medical device, while some clinical decision support software is excluded. The FDA keeps a public list of AI-enabled medical devices it has authorized [1]. Its clinical decision support guidance explains which software functions fall outside the device definition under criteria added by the 21st Century Cures Act [2]. Authorization does not always mean strong clinical evidence: a 2026 study of 903 FDA-authorized AI-enabled devices found that 43 (4.8%) were recalled, and devices without published clinical studies had a higher estimated hazard of recall, though that estimate was uncertain [3]. This is general information, not regulatory or legal advice.",
+      "sources": [
+        {
+          "title": "List of Artificial Intelligence-Enabled Medical Devices",
+          "url": "https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices",
+          "source": "US Food and Drug Administration",
+          "published": ""
+        },
+        {
+          "title": "Clinical Decision Support Software (guidance)",
+          "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software",
+          "source": "US Food and Drug Administration",
+          "published": ""
+        },
+        {
+          "title": "Clinical Evidence and FDA Recalls of Artificial Intelligence-Enabled Medical Devices",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42275062/",
+          "source": "JAMA Network Open",
+          "published": "2026-06-01"
+        }
+      ],
+      "keywords": [
+        "FDA AI medical devices",
+        "FDA regulation of AI",
+        "AI device recalls"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "can-i-put-patient-information-into-chatgpt",
+      "category": "general",
+      "question": "Can I put patient information into ChatGPT or another AI tool?",
+      "answer": "Not identifiable patient information into a consumer AI tool; only into a tool your organization has approved for that purpose. Under the HIPAA Privacy Rule, covered entities may share protected health information with a vendor that handles it on their behalf only under a business associate agreement [1][2]. A personal chatbot account has no such agreement with your hospital. Information that has been properly de-identified, by the Safe Harbor or Expert Determination methods described by HHS, is no longer protected health information [3], but removing a name is not enough on its own. Check your institution's AI policy before using any tool with clinical data. This is general information, not legal advice.",
+      "sources": [
+        {
+          "title": "Summary of the HIPAA Privacy Rule",
+          "url": "https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html",
+          "source": "US Department of Health and Human Services",
+          "published": ""
+        },
+        {
+          "title": "Business Associate Contracts (sample provisions)",
+          "url": "https://www.hhs.gov/hipaa/for-professionals/covered-entities/sample-business-associate-agreement-provisions/index.html",
+          "source": "US Department of Health and Human Services",
+          "published": ""
+        },
+        {
+          "title": "Guidance Regarding Methods for De-identification of Protected Health Information",
+          "url": "https://www.hhs.gov/hipaa/for-professionals/special-topics/de-identification/index.html",
+          "source": "US Department of Health and Human Services",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "HIPAA ChatGPT",
+        "patient data in AI",
+        "is ChatGPT HIPAA compliant"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "do-ai-chatbots-make-up-references",
+      "category": "general",
+      "question": "Do AI chatbots make up medical references?",
+      "answer": "They can, so every citation an AI gives you needs checking. In a 2023 study, ChatGPT-3.5 wrote 30 short medical papers with 115 references: 47% were fabricated, 46% were real but inaccurate, and only 7% were both real and accurate [1]. Newer models, and tools that search the web or a literature database, make this less common, but the risk has not gone away. Look up every reference in PubMed or the journal before you cite it, and read the abstract to confirm it says what the AI claims. The Collective's own agents keep a study only if its link appeared in what the agent actually read during that run.",
+      "sources": [
+        {
+          "title": "High Rates of Fabricated and Inaccurate References in ChatGPT-Generated Medical Content",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37337480/",
+          "source": "Cureus",
+          "published": "2023-05-19"
+        }
+      ],
+      "keywords": [
+        "ChatGPT fake references",
+        "AI hallucinated citations medicine",
+        "can I trust AI citations"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "does-ai-help-mammography-screening",
+      "category": "general",
+      "question": "Does AI help radiologists find breast cancer on screening mammograms?",
+      "answer": "Yes. Breast screening has some of the strongest evidence for AI. In Sweden's randomized MASAI trial of 80,033 women, AI-supported reading detected 6.1 cancers per 1000 against 5.1 with standard double reading, and cut screen-reading workload by 44.3% [1]; the later primary analysis found the interval cancer rate was no worse [2]. In Germany's nationwide programme, AI-supported reading of 463,094 women's mammograms had a detection rate of 6.7 against 5.7 per 1000, but radiologists chose when to use the AI, so that study was not randomized [3]. Programmes still differ in how AI is used: as a second reader, a triage tool or a safety net.",
+      "sources": [
+        {
+          "title": "Artificial intelligence-supported screen reading versus standard double reading in the Mammography Screening with Artificial Intelligence trial (MASAI)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37541274/",
+          "source": "The Lancet Oncology",
+          "published": "2023-08-01"
+        },
+        {
+          "title": "Interval cancer, sensitivity, and specificity comparing AI-supported mammography screening with standard double reading without AI in the MASAI study",
+          "url": "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(25)02464-X/abstract",
+          "source": "The Lancet",
+          "published": "2026-01-31"
+        },
+        {
+          "title": "Nationwide real-world implementation of AI for cancer detection in population-based mammography screening",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39775040/",
+          "source": "Nature Medicine",
+          "published": "2025-01-07"
+        }
+      ],
+      "keywords": [
+        "AI mammography screening evidence",
+        "MASAI trial",
+        "AI breast cancer detection radiologists"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "does-ai-find-more-polyps",
+      "category": "general",
+      "question": "Does AI help endoscopists find more polyps during colonoscopy?",
+      "answer": "Less than early trials suggested, especially where endoscopists already detect well. In a randomized trial of 3213 people after a positive stool test in Spain, computer-aided detection did not change the advanced neoplasia detection rate (34.8% against 34.6%) [1]. In a randomized trial in private practices, adenoma detection was 34.5% with AI and 32.9% without, not a significant difference [2]. In a high-risk population where endoscopists already had high detection rates, AI was non-inferior but not superior [3]. A separate observational study raised the possibility that regular AI use lowers endoscopists' unaided detection rate [4]. Benefit seems to depend on the baseline skill of the endoscopist.",
+      "sources": [
+        {
+          "title": "Role of Artificial Intelligence in Colonoscopy Detection of Advanced Neoplasias: A Randomized Trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37639723/",
+          "source": "Annals of Internal Medicine",
+          "published": "2023-08-29"
+        },
+        {
+          "title": "Artificial intelligence assisted colorectal lesion detection in private practices a randomized controlled study",
+          "url": "https://www.nature.com/articles/s41746-026-02576-8",
+          "source": "npj Digital Medicine",
+          "published": "2026-04-01"
+        },
+        {
+          "title": "Computer-Assisted Colonoscopy in High–Adenoma Detection Rate Settings in a High-Risk Population: A Randomized Clinical Trial",
+          "url": "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2847778",
+          "source": "JAMA Network Open",
+          "published": "2026-04-15"
+        },
+        {
+          "title": "Endoscopist deskilling risk after exposure to artificial intelligence in colonoscopy: a multicentre, observational study",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40816301/",
+          "source": "The Lancet Gastroenterology & Hepatology",
+          "published": "2025-08-12"
+        }
+      ],
+      "keywords": [
+        "AI colonoscopy adenoma detection",
+        "CADe colonoscopy trial",
+        "does AI find more polyps"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "can-chatgpt-pass-the-usmle",
+      "category": "education",
+      "question": "Can ChatGPT pass the USMLE?",
+      "answer": "Large language models now score at or above passing level on USMLE-style questions, but that says little about clinical skill. In early 2023, ChatGPT performed at or near the passing threshold on all three Steps [1], and scored 64.4% on the NBME's free Step 1 questions but 44% on harder AMBOSS questions [2]. Google's Med-PaLM reached 67.6% on MedQA, a set of USMLE-style questions [3], and Med-PaLM 2 later scored up to 86.5% [4]. Multiple-choice exams give the model all the information at once. When models must work up real patients, results are weaker: open models diagnosed real emergency abdominal pain cases less accurately than doctors [5].",
+      "sources": [
+        {
+          "title": "Performance of ChatGPT on USMLE: Potential for AI-assisted medical education using large language models",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36812645/",
+          "source": "PLOS Digital Health",
+          "published": "2023-02-09"
+        },
+        {
+          "title": "How Does ChatGPT Perform on the United States Medical Licensing Examination (USMLE)? The Implications of Large Language Models for Medical Education and Knowledge Assessment",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36753318/",
+          "source": "JMIR Medical Education",
+          "published": "2023-02-08"
+        },
+        {
+          "title": "Large language models encode clinical knowledge",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37438534/",
+          "source": "Nature",
+          "published": "2023-07-12"
+        },
+        {
+          "title": "Toward expert-level medical question answering with large language models",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39779926/",
+          "source": "Nature Medicine",
+          "published": "2025-01-08"
+        },
+        {
+          "title": "Evaluation and mitigation of the limitations of large language models in clinical decision-making",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38965432/",
+          "source": "Nature Medicine",
+          "published": "2024-07-04"
+        }
+      ],
+      "keywords": [
+        "ChatGPT USMLE score",
+        "AI pass medical licensing exam",
+        "Med-PaLM MedQA"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "how-should-medical-schools-teach-ai",
+      "category": "education",
+      "question": "How should medical schools and residencies teach AI?",
+      "answer": "Start from published principles and teach critical use, not just tools. The AAMC's principles for AI in medical education call for keeping a human-centered focus, using AI ethically and transparently, and giving every learner equal access, among seven principles [1]. The World Health Organization's guidance on large multi-modal models sets out risks and governance that trainees should understand [2]. Evidence also shows what to teach: physicians lose accuracy when an AI is confidently wrong, even after AI literacy training [3], so curricula should practise checking AI output against primary data, recognising automation bias, protecting patient privacy, and knowing when not to use AI at all.",
+      "sources": [
+        {
+          "title": "Principles for the Responsible Use of Artificial Intelligence in and for Medical Education",
+          "url": "https://www.aamc.org/about-us/mission-areas/medical-education/principles-ai-use",
+          "source": "AAMC",
+          "published": ""
+        },
+        {
+          "title": "Ethics and governance of artificial intelligence for health: Guidance on large multi-modal models",
+          "url": "https://www.who.int/publications/i/item/9789240084759",
+          "source": "World Health Organization",
+          "published": "2024"
+        },
+        {
+          "title": "Automation Bias in Large Language Model–Assisted Diagnostic Reasoning among Physicians Trained in AI Literacy — A Randomized Clinical Trial",
+          "url": "https://ai.nejm.org/doi/full/10.1056/AIoa2501001",
+          "source": "NEJM AI",
+          "published": "2026-04-23"
+        }
+      ],
+      "keywords": [
+        "teaching AI in medical school",
+        "AI curriculum residency",
+        "AAMC AI principles"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "should-residents-use-ai-chatbots",
+      "category": "education",
+      "question": "Should medical students and residents use AI chatbots to study or on rotations?",
+      "answer": "Many already do, and it can help, but only with verification and never with patient identifiers. In a survey of 614 medical students, 78.5% had already used ChatGPT and about half trusted the accuracy of its information, while around 60% worried about its accuracy on complex topics [1]. Randomized trials show physicians score modestly higher on written management cases with GPT-4 [2], but also that wrong AI suggestions pull accuracy down [3]. Good habits: commit to your own answer first, ask the AI to explain its reasoning, check claims against a trusted reference, and follow your school's or program's AI policy. Keep identifiable patient information out of consumer tools.",
+      "sources": [
+        {
+          "title": "Medical students and ChatGPT: analyzing attitudes, practices, and academic perceptions",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39910593/",
+          "source": "BMC Medical Education",
+          "published": "2025-02-05"
+        },
+        {
+          "title": "GPT-4 assistance for improvement of physician performance on patient care tasks: a randomized controlled trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39910272/",
+          "source": "Nature Medicine",
+          "published": "2025-02-05"
+        },
+        {
+          "title": "Automation Bias in Large Language Model–Assisted Diagnostic Reasoning among Physicians Trained in AI Literacy — A Randomized Clinical Trial",
+          "url": "https://ai.nejm.org/doi/full/10.1056/AIoa2501001",
+          "source": "NEJM AI",
+          "published": "2026-04-23"
+        }
+      ],
+      "keywords": [
+        "residents using ChatGPT",
+        "medical students AI study tools",
+        "AI on clinical rotations"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "does-ai-help-novices-more-than-experts",
+      "category": "education",
+      "question": "Does AI help less experienced clinicians more than experts?",
+      "answer": "Often, yes, but novices are also the most vulnerable when the AI is wrong. In a crossover trial on pancreatic lesions seen on endoscopic ultrasound, AI help raised novice endoscopists' accuracy from 0.69 to 0.90, while experts and senior endoscopists did not benefit [1]. In South Korean breast screening, general radiologists' cancer detection rose from 3.87 to 4.89 per 1000 with AI, but so did their recall rate [2]. The flip side: when an AI gave wrong mammography suggestions, inexperienced readers' correct ratings fell from 79.7% to 19.8%, far more than experts' [3]. For trainees, AI can be a useful second look, but it should not replace building your own judgment.",
+      "sources": [
+        {
+          "title": "Diagnosing Solid Lesions in the Pancreas With Multimodal Artificial Intelligence: A Randomized Crossover Trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39028670/",
+          "source": "JAMA Network Open",
+          "published": "2024-07-01"
+        },
+        {
+          "title": "Artificial intelligence for breast cancer screening in mammography (AI-STREAM): preliminary analysis of a prospective multicenter cohort study",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40050619/",
+          "source": "Nature Communications",
+          "published": "2025-03-06"
+        },
+        {
+          "title": "Automation Bias in Mammography: The Impact of Artificial Intelligence BI-RADS Suggestions on Reader Performance",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37129490/",
+          "source": "Radiology",
+          "published": "2023-05-02"
+        }
+      ],
+      "keywords": [
+        "AI novices vs experts",
+        "AI benefit by experience level",
+        "AI for trainees"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "what-is-ai-literacy-for-clinicians",
+      "category": "education",
+      "question": "What does AI literacy mean for doctors and trainees?",
+      "answer": "Knowing what a tool was built and tested to do, how it fails, and how to check it, not just how to write prompts. In practice that means reading the evidence behind a tool, spotting fabricated or inaccurate citations, keeping patient data out of unapproved tools, and noticing when you are deferring to the machine. The AAMC lists ethical and transparent use, and preparing learners to explain technology use to patients, among its principles [1]. Literacy training is not a cure on its own: in a 2026 randomized trial, AI-literate physicians still lost accuracy when an LLM's suggestions were deliberately wrong [2]. Literacy has to come with habits and workflows that keep a human check in place.",
+      "sources": [
+        {
+          "title": "Principles for the Responsible Use of Artificial Intelligence in and for Medical Education",
+          "url": "https://www.aamc.org/about-us/mission-areas/medical-education/principles-ai-use",
+          "source": "AAMC",
+          "published": ""
+        },
+        {
+          "title": "Automation Bias in Large Language Model–Assisted Diagnostic Reasoning among Physicians Trained in AI Literacy — A Randomized Clinical Trial",
+          "url": "https://ai.nejm.org/doi/full/10.1056/AIoa2501001",
+          "source": "NEJM AI",
+          "published": "2026-04-23"
+        }
+      ],
+      "keywords": [
+        "AI literacy physicians",
+        "AI competencies for doctors",
+        "AI skills residents"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "can-doctors-build-apps-without-coding",
+      "category": "building",
+      "question": "Can a doctor build a medical app with AI without knowing how to code?",
+      "answer": "Yes, for prototypes, calculators and teaching tools, as long as you stay inside the rules on patient data and medical devices. AI coding assistants can now turn a plain-language description into a working web app, and members of the AI Medicine Collective, who have no special technical background, have published tools this way on the Collective's Tools page [1]. Two limits matter. First, test with synthetic data, never real patient information. Second, software intended to diagnose or treat can be a regulated medical device; the FDA's policy on device software functions explains where that line falls [2]. Have a colleague check the clinical logic, and say plainly what the tool is for and what it is not.",
+      "sources": [
+        {
+          "title": "Tools built by Collective members",
+          "url": "https://www.aimedicinecollective.com/hub.html",
+          "source": "AI Medicine Collective",
+          "published": ""
+        },
+        {
+          "title": "Policy for Device Software Functions and Mobile Medical Applications",
+          "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/policy-device-software-functions-and-mobile-medical-applications",
+          "source": "US Food and Drug Administration",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "build medical app without coding",
+        "doctor vibe coding",
+        "clinician app development AI"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "does-my-medical-app-need-fda-approval",
+      "category": "building",
+      "question": "Does my medical calculator or AI app need FDA clearance?",
+      "answer": "It depends on what it is intended to do. Software that only encourages a healthy lifestyle, unrelated to diagnosing or treating a disease, falls under the FDA's low-risk general wellness policy [1]. Some clinical decision support software is excluded from the device definition if it meets the criteria in the 21st Century Cures Act, which FDA guidance explains, including that a clinician can independently review the basis for its recommendations [2]. Software intended to diagnose, treat or prevent disease, especially by analysing images or signals, is generally a device [3]. Write down your app's intended use before you build it, and get regulatory advice before using a tool in patient care. This is not legal advice.",
+      "sources": [
+        {
+          "title": "General Wellness: Policy for Low Risk Devices",
+          "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/general-wellness-policy-low-risk-devices",
+          "source": "US Food and Drug Administration",
+          "published": ""
+        },
+        {
+          "title": "Clinical Decision Support Software (guidance)",
+          "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software",
+          "source": "US Food and Drug Administration",
+          "published": ""
+        },
+        {
+          "title": "Policy for Device Software Functions and Mobile Medical Applications",
+          "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/policy-device-software-functions-and-mobile-medical-applications",
+          "source": "US Food and Drug Administration",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "does my app need FDA approval",
+        "software as a medical device",
+        "clinical decision support FDA criteria"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "how-to-validate-clinical-ai",
+      "category": "building",
+      "question": "How should I evaluate a clinical AI tool before using it with patients?",
+      "answer": "Move in stages, and report each stage against a published guideline. Accuracy on a test set is only the start. DECIDE-AI covers the early clinical evaluation of AI decision support, when it is first used by real clinicians [1]. CONSORT-AI sets out what to report when an AI intervention is tested in a randomized trial [2]. TRIPOD-LLM, for studies using large language models, is a checklist of 19 main items and 50 subitems [3]. Stages matter because tools that look accurate can still fail to help: in a trial of 972 clinical users, an AI stethoscope did not increase heart failure diagnoses overall [4]. Plan to measure what happens to clinicians' decisions and to patients, not just the model.",
+      "sources": [
+        {
+          "title": "Reporting guideline for the early-stage clinical evaluation of decision support systems driven by artificial intelligence: DECIDE-AI",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35585198/",
+          "source": "Nature Medicine",
+          "published": "2022-05"
+        },
+        {
+          "title": "Reporting guidelines for clinical trial reports for interventions involving artificial intelligence: the CONSORT-AI extension",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32908283/",
+          "source": "Nature Medicine",
+          "published": "2020-09"
+        },
+        {
+          "title": "The TRIPOD-LLM reporting guideline for studies using large language models",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39779929/",
+          "source": "Nature Medicine",
+          "published": "2025-01-08"
+        },
+        {
+          "title": "Triple cardiovascular disease detection with an artificial intelligence-enabled stethoscope (TRICORDER) in the UK: a cluster-randomised controlled implementation trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41619752/",
+          "source": "The Lancet",
+          "published": "2026-01-28"
+        }
+      ],
+      "keywords": [
+        "validate clinical AI tool",
+        "TRIPOD-LLM CONSORT-AI DECIDE-AI",
+        "how to evaluate medical AI"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "how-to-test-medical-app-without-patient-data",
+      "category": "building",
+      "question": "How do I test a medical AI app without using real patient data?",
+      "answer": "Use synthetic cases you write yourself, or data that has been formally de-identified and that you are allowed to use. Made-up cases, built to cover normal, abnormal, borderline and invalid inputs, are enough to test most calculators and teaching tools, and they carry no privacy risk. If you need real data, HHS recognises two de-identification methods, Safe Harbor and Expert Determination [1]; data that meets one of them is no longer protected health information. Any vendor that processes protected health information for a covered entity needs a business associate agreement [2], which most consumer AI accounts do not have. The Collective's rule is simple: no patient information anywhere, including test data.",
+      "sources": [
+        {
+          "title": "Guidance Regarding Methods for De-identification of Protected Health Information",
+          "url": "https://www.hhs.gov/hipaa/for-professionals/special-topics/de-identification/index.html",
+          "source": "US Department of Health and Human Services",
+          "published": ""
+        },
+        {
+          "title": "Business Associate Contracts (sample provisions)",
+          "url": "https://www.hhs.gov/hipaa/for-professionals/covered-entities/sample-business-associate-agreement-provisions/index.html",
+          "source": "US Department of Health and Human Services",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "synthetic patient data testing",
+        "de-identified data medical app",
+        "test health app without PHI"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "why-accurate-ai-fails-in-practice",
+      "category": "building",
+      "question": "Why do medical AI tools that look accurate in studies fail in real practice?",
+      "answer": "Because accuracy is not the same as changing what clinicians do. Several large randomized trials of tools with good test performance found no benefit in practice. An AI stethoscope used in 12,725 examinations did not increase heart failure diagnoses [1]. Emailing oncologists about AI-detected cancer progression did not raise trial enrolment: 2.20% against 2.03% [2]. A gastric neoplasm detection aid tested in 29,514 patients did not improve detection after pathological review, 1.42% against 1.25% [3]. Common reasons include clinicians not acting on alerts, workflow friction, and populations where existing care already does well. Builders should design for the workflow and test outcomes, not only accuracy.",
+      "sources": [
+        {
+          "title": "Triple cardiovascular disease detection with an artificial intelligence-enabled stethoscope (TRICORDER) in the UK: a cluster-randomised controlled implementation trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41619752/",
+          "source": "The Lancet",
+          "published": "2026-01-28"
+        },
+        {
+          "title": "Clinical Trial Notifications Triggered by Artificial Intelligence-Detected Cancer Progression: A Randomized Trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40257799/",
+          "source": "JAMA Network Open",
+          "published": "2025-04-01"
+        },
+        {
+          "title": "Effect of a Computer-Aided Device for Detecting Gastric Neoplasms: A Multicenter, Randomized Controlled Trial",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41801173/",
+          "source": "Gastroenterology",
+          "published": "2026-03-09"
+        }
+      ],
+      "keywords": [
+        "why medical AI fails in practice",
+        "AI implementation trials negative",
+        "AI accuracy vs outcomes"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "what-is-the-ai-medicine-collective",
+      "category": "collective",
+      "question": "What is the AI Medicine Collective?",
+      "answer": "The AI Medicine Collective is an independent, volunteer-run community of clinicians and trainees who build and evaluate AI tools for medicine. Its site publishes tools made by members [1], evidence briefings on AI in medicine three times a week, and AI vs Physician, a living review of studies that compare AI with clinicians, updated monthly [2]. Members share projects, chat by topic, meet monthly, and take the Collective's courses. Everything on the site is educational and is not medical advice. No technical background is needed to take part.",
+      "sources": [
+        {
+          "title": "Tools",
+          "url": "https://www.aimedicinecollective.com/hub.html",
+          "source": "AI Medicine Collective",
+          "published": ""
+        },
+        {
+          "title": "AI vs Physician: a living review",
+          "url": "https://www.aimedicinecollective.com/ai-vs-physician.html",
+          "source": "AI Medicine Collective",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "AI Medicine Collective",
+        "physician AI community",
+        "residents building AI tools"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "how-to-join-the-collective",
+      "category": "collective",
+      "question": "How do I join the AI Medicine Collective?",
+      "answer": "Request membership on the Join page; anyone interested in AI in medicine can ask, and no technical background is required [1]. Students, residents, faculty and staff all take part. You sign in with a Google account or an email and password, tell us your role, program and interests in about a minute, and a moderator reviews your request; you can check its status on your account page. Approved members can submit tools and learning materials, comment and message other members, chat by topic, vote on the monthly meeting time, and open the members' learning library and courses.",
+      "sources": [
+        {
+          "title": "Request membership",
+          "url": "https://www.aimedicinecollective.com/join.html",
+          "source": "AI Medicine Collective",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "join AI in medicine community",
+        "AI medicine club for residents",
+        "physician AI group membership"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "how-is-the-ai-vs-physician-review-made",
+      "category": "collective",
+      "question": "How is the AI vs Physician review made?",
+      "answer": "It is a living review, rewritten every month from a register of studies, with every claim tied to its source [1]. Studies are found by a monthly AI search and by a sweep of PubMed and preprint servers that ranks candidates by design, setting, journal and citations; the most important ones are marked as landmark studies and checked against the paper before they are used. An AI agent drafts each edition, citations to anything outside the register are removed, and a person reviews the draft before it is published. Mistakes can be reported from the page, and corrections follow the Collective's published policy [2]. It summarizes research and is not clinical guidance.",
+      "sources": [
+        {
+          "title": "AI vs Physician: a living review",
+          "url": "https://www.aimedicinecollective.com/ai-vs-physician.html",
+          "source": "AI Medicine Collective",
+          "published": ""
+        },
+        {
+          "title": "Corrections and editorial standards",
+          "url": "https://www.aimedicinecollective.com/corrections.html",
+          "source": "AI Medicine Collective",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "AI vs physician living review",
+        "AI vs doctor evidence review",
+        "living systematic review AI"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    },
+    {
+      "id": "how-are-the-briefings-checked",
+      "category": "collective",
+      "question": "How are the Collective's AI-written evidence briefings checked?",
+      "answer": "Every briefing is drafted by an AI agent and reviewed by a person before it is published. The agent writes three times a week from studies it finds and opens that day, and an item is kept only if its link appeared in what the agent actually read, which blocks invented references [1]. A second AI model is asked to appraise and check the drafts, and the editors settle any disagreement. Nothing is published until an editor approves it. If you spot a mistake, each briefing has a \"Report an error\" link, and corrections are handled under the Collective's published policy [2].",
+      "sources": [
+        {
+          "title": "Briefings",
+          "url": "https://www.aimedicinecollective.com/blog.html",
+          "source": "AI Medicine Collective",
+          "published": ""
+        },
+        {
+          "title": "Corrections and editorial standards",
+          "url": "https://www.aimedicinecollective.com/corrections.html",
+          "source": "AI Medicine Collective",
+          "published": ""
+        }
+      ],
+      "keywords": [
+        "AI-written medical blog accuracy",
+        "how AI evidence briefings are checked",
+        "AI medicine news reviewed"
+      ],
+      "added": "2026-11-11",
+      "updated": "2026-11-11"
+    }
+  ]
+}

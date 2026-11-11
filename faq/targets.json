@@ -1,0 +1,220 @@
+{
+  "_about": "Questions the FAQ agent (scripts/blog_agent/faq_agent.py) answers next, one every other day, highest priority first (5 = most wanted). status: open, answered (answered_id is the FAQ item) or skipped (note says why). A target with refresh_id asks the agent to rewrite that existing answer from newer evidence. The monthly audit (faq_audit.py) adds targets by pull request; editors can add, reorder or remove them by hand.",
+  "targets": [
+    {
+      "question": "Will AI replace doctors?",
+      "category": "general",
+      "priority": 5,
+      "keywords": [
+        "will AI replace doctors",
+        "AI replacing physicians",
+        "future of doctors AI"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Will AI replace radiologists?",
+      "category": "general",
+      "priority": 5,
+      "keywords": [
+        "will AI replace radiologists",
+        "radiology AI jobs",
+        "AI radiology future"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Is it safe for patients to use ChatGPT for medical advice?",
+      "category": "general",
+      "priority": 5,
+      "keywords": [
+        "ChatGPT medical advice safe",
+        "patients using AI chatbots",
+        "Dr Google ChatGPT"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Does AI work equally well for patients of every skin tone, sex and background?",
+      "category": "general",
+      "priority": 4,
+      "keywords": [
+        "AI bias in medicine",
+        "algorithmic bias skin tone",
+        "health equity AI"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Do AI-drafted replies to patient portal messages save physicians time?",
+      "category": "general",
+      "priority": 4,
+      "keywords": [
+        "AI inbox replies patient messages",
+        "LLM drafted patient portal responses",
+        "in-basket AI"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Can AI read ECGs better than cardiologists?",
+      "category": "general",
+      "priority": 4,
+      "keywords": [
+        "AI ECG accuracy",
+        "AI electrocardiogram vs cardiologist",
+        "AI-ECG"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Do AI scribes make errors in clinical notes?",
+      "category": "general",
+      "priority": 3,
+      "keywords": [
+        "AI scribe errors",
+        "ambient documentation hallucinations",
+        "AI note accuracy"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "How accurate is AI at triage in the emergency department?",
+      "category": "general",
+      "priority": 3,
+      "keywords": [
+        "AI triage emergency department",
+        "ChatGPT ESI triage",
+        "AI vs triage nurses"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "What is the difference between a large language model and traditional clinical AI?",
+      "category": "general",
+      "priority": 3,
+      "keywords": [
+        "LLM vs machine learning medicine",
+        "generative AI vs predictive AI healthcare"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Can AI help me study for board exams?",
+      "category": "education",
+      "priority": 4,
+      "keywords": [
+        "AI board exam studying",
+        "ChatGPT for USMLE prep",
+        "AI question bank"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "How do I write good prompts for clinical questions?",
+      "category": "education",
+      "priority": 4,
+      "keywords": [
+        "prompting for doctors",
+        "clinical prompt engineering",
+        "how to ask ChatGPT medical questions"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Do AI virtual patients improve how students learn clinical skills?",
+      "category": "education",
+      "priority": 3,
+      "keywords": [
+        "AI virtual patient simulation",
+        "AI standardized patient",
+        "LLM simulated patient education"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Can program directors tell when a residency personal statement was written by AI?",
+      "category": "education",
+      "priority": 3,
+      "keywords": [
+        "AI personal statement residency",
+        "ChatGPT ERAS personal statement",
+        "detect AI writing residency"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Can AI give useful feedback on trainees' clinical notes or OSCE performance?",
+      "category": "education",
+      "priority": 3,
+      "keywords": [
+        "AI feedback clinical notes",
+        "AI OSCE assessment",
+        "automated feedback medical education"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "What is a business associate agreement, and when does my AI tool need one?",
+      "category": "building",
+      "priority": 4,
+      "keywords": [
+        "business associate agreement AI",
+        "BAA ChatGPT",
+        "HIPAA vendor AI app"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "Do I need IRB approval to study an AI tool I built?",
+      "category": "building",
+      "priority": 3,
+      "keywords": [
+        "IRB AI study",
+        "research approval clinical AI tool",
+        "quality improvement vs research AI"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "What should a clinician-built medical app say about its limits and intended use?",
+      "category": "building",
+      "priority": 3,
+      "keywords": [
+        "medical app disclaimer",
+        "intended use statement software",
+        "model card clinical AI"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    },
+    {
+      "question": "How do I check that an AI tool is not hallucinating drug doses or guideline recommendations?",
+      "category": "building",
+      "priority": 3,
+      "keywords": [
+        "AI hallucination drug dosing",
+        "verify AI clinical recommendations",
+        "LLM guideline accuracy"
+      ],
+      "status": "open",
+      "added": "2026-11-11"
+    }
+  ]
+}

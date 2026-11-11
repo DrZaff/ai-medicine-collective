@@ -35,6 +35,7 @@ JSON_GLOBS = [
     "blog/posts/*.json",
     "blog/editorial-queue.json",
     "evidence/*.json",
+    "faq/*.json",
     "newsletter/*.json",
     "manifest.webmanifest",
 ]

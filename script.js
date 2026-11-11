@@ -303,6 +303,7 @@ const TERMINAL_MARK = /^(\s*)(\/\/ |> |< )/;
 const RAW_TEXT = ".t-only, .chat-body, .hub-description, .hub-comment-body, .request-details, .member-profile-text, " +
   ".blog-headline, .blog-intro, .blog-item-title, .blog-summary, .blog-why, .blog-archive-list a, .inbox-thread, " +
   ".review-title, .review-summary, .review-text, .review-list, .review-study-title, " +
+  ".faq-question, .faq-text, .faq-source-title, " +
   "textarea, script, style, code, pre, [contenteditable], [contenteditable] *";
 
 function markTerminalText(textNode) {
@@ -473,7 +474,8 @@ const MENU_GROUPS = [
   {
     menu: "blog",
     label: "Evidence",
-    tabs: [["blog", "BRIEFINGS", "Briefings"], ["ai-vs-physician", "AI VS PHYSICIAN", "AI vs Physician"]],
+    tabs: [["blog", "BRIEFINGS", "Briefings"], ["ai-vs-physician", "AI VS PHYSICIAN", "AI vs Physician"],
+      ["faq", "FAQS", "FAQs"]],
     also: [],
   },
   {

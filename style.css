@@ -5440,6 +5440,139 @@ button.meeting-undo {
 }
 
 
+/* === FAQ PAGE (faq.html, faq.js) ============================== */
+
+.faq-tools {
+  margin: 14px 0 6px;
+}
+
+.faq-search-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.faq-search {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+}
+
+.faq-count {
+  min-height: 1.2em;
+  margin: 6px 0 0;
+}
+
+.faq-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+
+.faq-cat {
+  padding: 4px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-size: 0.82rem;
+}
+
+.faq-cat:hover,
+.faq-cat:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgb(var(--glow-rgb) / 0.4);
+}
+
+.faq-group {
+  margin-top: 22px;
+}
+
+.faq-group .faq-item + .faq-item {
+  margin-top: 10px;
+}
+
+/* Links to an answer or a source stop below the sticky header */
+.faq-item,
+.faq-sources li,
+.faq-group {
+  scroll-margin-top: 96px;
+}
+
+/* Questions are read, not scanned like labels: plain case, reading font */
+.faq-question {
+  font-family: var(--font-read);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.faq-text {
+  max-width: 72ch;
+  margin: 6px 0 12px;
+  font-family: var(--font-read);
+  line-height: 1.6;
+}
+
+.faq-sources-label {
+  margin: 12px 0 4px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.faq-sources {
+  margin: 0 0 12px;
+  padding-left: 22px;
+  font-family: var(--font-read);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.faq-sources li {
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.faq-source-meta {
+  color: var(--muted);
+}
+
+.faq-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 2px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.faq-share {
+  padding: 3px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.faq-share:hover,
+.faq-share:focus-visible {
+  border-color: var(--accent);
+  background: rgb(var(--green-rgb) / 0.08);
+}
+
+.faq-ask {
+  margin-top: 24px;
+}
+
+
 /* === TOOLS PAGE: ONE CARD PER TOOL ============================ */
 
 .toolbox-card {
