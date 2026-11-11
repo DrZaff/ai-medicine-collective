@@ -174,8 +174,10 @@ register has no evidence for: "AI on its own against clinicians"; \
 "Clinicians working with AI"; "Reading images and other pattern tasks"; \
 "Diagnosis, reasoning and management"; "Communication and documentation"; \
 "Training, examinations and skill"; "Risks: over-reliance, lost skill and \
-bias"; "Where this is heading". Each has 1 to 3 paragraphs. "Where this is \
-heading" is interpretation: say so in its first sentence, tie every point to \
+bias"; "Where this is heading". Each has 1 to 3 paragraphs and a \
+"bottom_line": one sentence that answers the section's question for a busy \
+clinician, as strong as the evidence allows and no stronger, with citations. \
+"Where this is heading" is interpretation: say so in its first sentence, tie every point to \
 a trend in the cited studies, and make no predictions the evidence does not \
 support.
 - "open_questions": 3 to 6 questions the evidence cannot answer yet.
@@ -218,9 +220,10 @@ WRITE_SCHEMA = {
                 "type": "object",
                 "properties": {
                     "heading": {"type": "string"},
+                    "bottom_line": {"type": "string"},
                     "paragraphs": {"type": "array", "items": {"type": "string"}},
                 },
-                "required": ["heading", "paragraphs"],
+                "required": ["heading", "bottom_line", "paragraphs"],
                 "additionalProperties": False,
             },
         },
@@ -230,6 +233,24 @@ WRITE_SCHEMA = {
     "required": ["title", "summary", "key_findings", "sections", "open_questions", "what_changed"],
     "additionalProperties": False,
 }
+
+
+# The question each section answers, shown on the page above its bottom line.
+# The headings are fixed by WRITE_SYSTEM, so the questions are kept here
+# rather than left to the model.
+SECTION_QUESTIONS = {
+    "AI on its own against clinicians": "Does AI on its own outperform physicians?",
+    "Clinicians working with AI": "Do clinicians do better with AI than without it?",
+    "Reading images and other pattern tasks": "Does AI help with reading images and other pattern tasks?",
+    "Diagnosis, reasoning and management": "Does AI improve diagnosis and treatment decisions?",
+    "Communication and documentation": "Can AI help with communication and documentation?",
+    "Training, examinations and skill": "What does AI mean for training and clinical skill?",
+    "Risks: over-reliance, lost skill and bias": "What are the risks: over-reliance, lost skill and bias?",
+    "Where this is heading": "Where is this heading?",
+}
+# Grades the deep sweep gave a study, kept on landmark studies for the page's
+# evidence badges and evidence map
+GRADE_FIELDS = ["design_class", "setting", "reach", "humans_n", "citations", "rcr", "strength"]
 
 
 # ---------------------------------------------------------------- register
@@ -494,7 +515,8 @@ def verify_landmarks(chosen: list[dict], budget: float, fixture: dict | None = N
                     kept.append({**{k: row.get(k, "") for k in STUDY_FIELDS},
                                  "title": st["title"], "url": st["url"], "source": st["source"],
                                  "published": st["published"],
-                                 "_extra": {"tier": "landmark", "checked": kind,
+                                 "_extra": {**{k: st[k] for k in GRADE_FIELDS if k in st},
+                                            "tier": "landmark", "checked": kind,
                                             "check_status": row.get("status"),
                                             "check_note": str(row.get("note", "")).strip()}})
     dropped += [f"{st['title']}: not checked this time (budget reached); it stays in the queue" for st, _, _ in queue]
@@ -570,7 +592,10 @@ def clean_citations(paper: dict, studies: list[dict]) -> list[str]:
     paper["key_findings"] = [fix(t) for t in paper.get("key_findings", []) if str(t).strip()]
     paper["open_questions"] = [fix(t) for t in paper.get("open_questions", []) if str(t).strip()]
     paper["sections"] = [
-        {"heading": str(sec.get("heading", "")).strip(), "paragraphs": [fix(p) for p in sec.get("paragraphs", []) if str(p).strip()]}
+        {"heading": str(sec.get("heading", "")).strip(),
+         "question": SECTION_QUESTIONS.get(str(sec.get("heading", "")).strip(), ""),
+         "bottom_line": fix(sec.get("bottom_line", "")),
+         "paragraphs": [fix(p) for p in sec.get("paragraphs", []) if str(p).strip()]}
         for sec in paper.get("sections", [])
     ]
     paper["sections"] = [sec for sec in paper["sections"] if sec["heading"] and sec["paragraphs"]]
@@ -580,7 +605,8 @@ def clean_citations(paper: dict, studies: list[dict]) -> list[str]:
 def uncited(paper: dict) -> list[str]:
     """Key findings and paragraphs that carry no citation at all: listed in
     the pull request so the reviewer looks at them first."""
-    texts = [*paper["key_findings"], *(p for sec in paper["sections"] for p in sec["paragraphs"])]
+    texts = [*paper["key_findings"], *(sec["bottom_line"] for sec in paper["sections"] if sec.get("bottom_line")),
+             *(p for sec in paper["sections"] for p in sec["paragraphs"])]
     return [agent_short(t) for t in texts if not CITE.search(t)]
 
 

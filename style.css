@@ -68,6 +68,11 @@
   --v-even: var(--cyan);     /* no difference */
   --v-down: var(--yellow);   /* against AI */
   --v-mixed: var(--muted);   /* mixed (drawn as a ring) */
+
+  /* AI vs Physician: evidence strength and confidence */
+  --ev-strong: var(--text);
+  --ev-moderate: var(--cyan);
+  --ev-limited: var(--muted);
 }
 
 
@@ -5086,7 +5091,343 @@ button.meeting-undo {
   color: var(--muted);
 }
 
+/* Print, cite and FAQ buttons under the summary */
+.review-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.review-tool {
+  padding: 6px 14px;
+  font-size: 0.78rem;
+}
+
+/* The questions at a glance: one card per section */
+.glance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 12px;
+}
+
+.glance-card,
+.glance-card:visited {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--ev-limited);
+  background: var(--panel);
+  color: var(--body);
+  font-weight: normal;
+  transition: 0.15s ease-out;
+}
+
+.glance-card--high { border-top-color: var(--ev-strong); }
+.glance-card--moderate { border-top-color: var(--ev-moderate); }
+
+.glance-card:hover {
+  color: var(--body);
+  text-shadow: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+.glance-q {
+  font-weight: bold;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.glance-line {
+  flex: 1;
+  font-family: var(--font-read);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Confidence in an answer, and evidence strength on a study */
+.confidence {
+  align-self: flex-start;
+  padding: 2px 10px;
+  border: 1px solid var(--ev-limited);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ev-limited);
+}
+
+.confidence--high,
+.ev-badge--strong {
+  border-color: var(--ev-strong);
+  color: var(--ev-strong);
+}
+
+.confidence--moderate,
+.ev-badge--moderate {
+  border-color: var(--ev-moderate);
+  color: var(--ev-moderate);
+}
+
+.ev-badge--limited {
+  border-color: var(--ev-limited);
+  color: var(--ev-limited);
+}
+
+.confidence--outlook {
+  border-style: var(--rule-style);
+}
+
+/* Each section: the question, its bottom line, then the argument */
+.review-eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.review-section[id^="q-"] {
+  scroll-margin-top: 90px;
+}
+
+.review-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--accent);
+  background: var(--panel);
+}
+
+.review-bottom-line {
+  margin: 0;
+  font-family: var(--font-read);
+  font-size: 1.08rem;
+  font-weight: bold;
+  line-height: 1.55;
+}
+
+/* The evidence map: comparison by setting */
+.evidence-map {
+  display: grid;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.evidence-map-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 1.3fr) repeat(4, minmax(64px, 1fr));
+  gap: 4px;
+}
+
+.evidence-map-col,
+.evidence-map-label {
+  align-self: end;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+.evidence-map-col {
+  text-align: center;
+}
+
+.evidence-map-label {
+  align-self: center;
+  color: var(--body);
+}
+
+.evidence-map-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 58px;
+  padding: 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  color: var(--text);
+  text-transform: none;
+}
+
+.evidence-map-cell b {
+  font-size: 1.15rem;
+}
+
+.evidence-map-cell--empty {
+  border-style: var(--rule-style);
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.evidence-map-marks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+}
+
+.ev-mark {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ev-limited);
+}
+
+.ev-mark--strong { background: var(--ev-strong); }
+.ev-mark--moderate { background: var(--ev-moderate); }
+
+.evidence-map-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.evidence-map-key .ev-mark {
+  margin-right: 6px;
+}
+
+.review-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+/* A study's details fold */
+.review-study-more > summary {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* The appendix and the method note fold away */
+.review-appendix > summary,
+.review-method > summary {
+  cursor: pointer;
+}
+
+.review-appendix .review-studies {
+  margin-top: 12px;
+}
+
+.review-citation {
+  margin: 0 0 12px;
+  padding: 12px 16px;
+  border: 1px var(--rule-style) var(--line-strong);
+  font-family: var(--font-read);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+/* The FAQ, at the end of the article */
+.review-faq,
+.review-faq:visited {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 32px 0 16px;
+  padding: 18px;
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--cyan);
+  background: var(--panel);
+  color: var(--body);
+  font-weight: normal;
+}
+
+.review-faq:hover {
+  color: var(--body);
+  text-shadow: none;
+  border-color: var(--cyan);
+  box-shadow: var(--glow);
+}
+
+.review-faq-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+.review-faq-title {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.review-faq-text {
+  font-family: var(--font-read);
+}
+
+@media print {
+  body.print-review .terminal-frame > :not(main),
+  body.print-review main > :not(#review-app),
+  body.print-review .section-tabs,
+  body.print-review .vision-dialog,
+  .review-tools,
+  .review-faq,
+  .review-cite-block button,
+  .review-filter,
+  .review-study-more > summary {
+    display: none !important;
+  }
+
+  body.print-review,
+  body.print-review .terminal-frame {
+    border: 0;
+    background: #fff !important;
+    box-shadow: none;
+  }
+
+  body.print-review::after,
+  body.print-review .terminal-frame::before,
+  body.print-review .terminal-frame::after {
+    display: none;
+  }
+
+  body.print-review #review-app *,
+  body.print-review #review-app {
+    color: #000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body.print-review .review-study,
+  body.print-review .glance-card {
+    break-inside: avoid;
+  }
+}
+
 @media (max-width: 600px) {
+  /* the map's row names go above their four cells */
+  .evidence-map-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .evidence-map-corner {
+    display: none;
+  }
+
+  .evidence-map-label {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+  }
+
   .review-study {
     padding-left: 16px;
   }

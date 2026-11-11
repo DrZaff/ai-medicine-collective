@@ -403,7 +403,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Restructured the finding into the required task/AI/clinicians/results/limitation order, added the reported confidence intervals and word-count figures, and clarified that the number of distinct physicians and evaluators is not given in the abstract."
+      "check_note": "Restructured the finding into the required task/AI/clinicians/results/limitation order, added the reported confidence intervals and word-count figures, and clarified that the number of distinct physicians and evaluators is not given in the abstract.",
+      "design_class": "cross_sectional",
+      "setting": "simulated",
+      "reach": "broad",
+      "humans_n": 0,
+      "citations": 1708,
+      "rcr": 257.37073774046934,
+      "strength": "limited"
     },
     {
       "id": "S26",
@@ -423,7 +430,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Named the AI system (Vara MG) instead of the generic label, noted that the detection and recall rates are model-based and that the AI group included exams where only one reader used AI, and restructured the finding to the required order."
+      "check_note": "Named the AI system (Vara MG) instead of the generic label, noted that the detection and recall rates are model-based and that the AI group included exams where only one reader used AI, and restructured the finding to the required order.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 119,
+      "citations": 140,
+      "rcr": 34.76682588841507,
+      "strength": "strong"
     },
     {
       "id": "S27",
@@ -443,7 +457,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Rewrote the finding into the required task/AI/clinicians/results/limitation structure, added the odds ratio confidence interval and patient numbers, and clarified this is a deskilling (post-AI exposure) comparison."
+      "check_note": "Rewrote the finding into the required task/AI/clinicians/results/limitation structure, added the odds ratio confidence interval and patient numbers, and clarified this is a deskilling (post-AI exposure) comparison.",
+      "design_class": "retrospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 190,
+      "rcr": 60.169789336846875,
+      "strength": "moderate"
     },
     {
       "id": "S28",
@@ -463,7 +484,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Restructured the finding to the required order and added the 39 physicians, 15,965 patients and the high-risk subgroup HR = 0.69 (95% CI = 0.53-0.90), and cardiac-death CI; replaced the claim that 39 physicians were randomized, which the abstract does not state."
+      "check_note": "Restructured the finding to the required order and added the 39 physicians, 15,965 patients and the high-risk subgroup HR = 0.69 (95% CI = 0.53-0.90), and cardiac-death CI; replaced the claim that 39 physicians were randomized, which the abstract does not state.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "broad",
+      "humans_n": 39,
+      "citations": 101,
+      "rcr": 15.829172374488122,
+      "strength": "strong"
     },
     {
       "id": "S29",
@@ -483,7 +511,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "The finding was restructured into the required order and now includes the LLM-alone median score of 92% (IQR, 82%-97%), the specific AI product, and the participant breakdown; 'adjusted difference' was replaced with the paper's wording, and the limitation was sharpened to include the lack of prompting training."
+      "check_note": "The finding was restructured into the required order and now includes the LLM-alone median score of 92% (IQR, 82%-97%), the specific AI product, and the participant breakdown; 'adjusted difference' was replaced with the paper's wording, and the limitation was sharpened to include the lack of prompting training.",
+      "design_class": "rct",
+      "setting": "simulated",
+      "reach": "broad",
+      "humans_n": 50,
+      "citations": 502,
+      "rcr": 94.48118057734979,
+      "strength": "moderate"
     },
     {
       "id": "S30",
@@ -503,7 +538,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Added the number and experience of physicians and the specialist rater pool to 'humans', and expanded 'finding' to the required structure with the reported P < 0.05 top-k result and the main limitation; the verdict and other fields were correct."
+      "check_note": "Added the number and experience of physicians and the specialist rater pool to 'humans', and expanded 'finding' to the required structure with the reported P < 0.05 top-k result and the main limitation; the verdict and other fields were correct.",
+      "design_class": "rct",
+      "setting": "simulated",
+      "reach": "broad",
+      "humans_n": 20,
+      "citations": 234,
+      "rcr": 70.41849770623418,
+      "strength": "moderate"
     },
     {
       "id": "S31",
@@ -523,7 +565,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Specified the humans (20 board-certified internists plus 19 specialist raters) and rewrote the finding in the required order; editors should note that Table 1 reports 51.8% and 44.5% for the assisted arms, whereas the abstract and main text report 51.7% and 44.4%."
+      "check_note": "Specified the humans (20 board-certified internists plus 19 specialist raters) and rewrote the finding in the required order; editors should note that Table 1 reports 51.8% and 44.5% for the assisted arms, whereas the abstract and main text report 51.7% and 44.4%.",
+      "design_class": "rct",
+      "setting": "simulated",
+      "reach": "broad",
+      "humans_n": 20,
+      "citations": 218,
+      "rcr": 65.90611061000571,
+      "strength": "moderate"
     },
     {
       "id": "S32",
@@ -543,7 +592,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Expanded the finding to the required structure with the clinician numbers (25 sonographers, 10 cardiologists), added non-inferiority as well as superiority, clarified that the 6.29% vs 7.23% figures are final cardiologist assessments in each arm compared with previous cardiologist reports rather than the AI's own error, and broadened the limitation."
+      "check_note": "Expanded the finding to the required structure with the clinician numbers (25 sonographers, 10 cardiologists), added non-inferiority as well as superiority, clarified that the 6.29% vs 7.23% figures are final cardiologist assessments in each arm compared with previous cardiologist reports rather than the AI's own error, and broadened the limitation.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 204,
+      "rcr": 21.569427504876227,
+      "strength": "strong"
     },
     {
       "id": "S33",
@@ -563,7 +619,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Expanded humans and rewrote finding to the required structure with full-text numbers, including LLM-alone vs conventional comparison (p = 0.074); the LLM-alone vs LLM-assisted difference appears as −0.9% in the abstract but 0.9% in results, and the time difference text says 111.3 s while the table gives 119.3 s, so the table figure was used."
+      "check_note": "Expanded humans and rewrote finding to the required structure with full-text numbers, including LLM-alone vs conventional comparison (p = 0.074); the LLM-alone vs LLM-assisted difference appears as −0.9% in the abstract but 0.9% in results, and the time difference text says 111.3 s while the table gives 119.3 s, so the table figure was used.",
+      "design_class": "rct",
+      "setting": "simulated",
+      "reach": "broad",
+      "humans_n": 92,
+      "citations": 136,
+      "rcr": 37.41978040340008,
+      "strength": "moderate"
     },
     {
       "id": "S34",
@@ -583,7 +646,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Added the number of clinicians randomized (457, split 231/226), rewrote the finding into the required task-AI-clinicians-results-limitation order with all CIs as reported, and kept the verdict as mixed because standard AI helped while biased AI harmed."
+      "check_note": "Added the number of clinicians randomized (457, split 231/226), rewrote the finding into the required task-AI-clinicians-results-limitation order with all CIs as reported, and kept the verdict as mixed because standard AI helped while biased AI harmed.",
+      "design_class": "rct",
+      "setting": "simulated",
+      "reach": "broad",
+      "humans_n": 457,
+      "citations": 168,
+      "rcr": 18.33882472408982,
+      "strength": "moderate"
     },
     {
       "id": "S35",
@@ -603,7 +673,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Restructured the finding into the required order and replaced the limitation's claim of 'low uptake', which the abstract does not state, with limitations the abstract supports."
+      "check_note": "Restructured the finding into the required order and replaced the limitation's claim of 'low uptake', which the abstract does not state, with limitations the abstract supports.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "broad",
+      "humans_n": 972,
+      "citations": 16,
+      "rcr": 8.01791148844322,
+      "strength": "strong"
     },
     {
       "id": "S36",
@@ -623,7 +700,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "The verdict was changed from ai_help_improved to mixed, because the paper reports a similar, not significantly higher, cancer detection rate (p=0·052) together with a 44·3% lower workload; the finding was also restructured into the required order, with the false positive rate and PPV added and the unreported number of readers noted."
+      "check_note": "The verdict was changed from ai_help_improved to mixed, because the paper reports a similar, not significantly higher, cancer detection rate (p=0·052) together with a 44·3% lower workload; the finding was also restructured into the required order, with the false positive rate and PPV added and the unreported number of readers noted.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 428,
+      "rcr": 43.05618635165054,
+      "strength": "strong"
     },
     {
       "id": "S37",
@@ -643,7 +727,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Added clinician numbers from the full text, fixed the design (non-randomised, time-period allocation, same PCPs in both arms), added the AI-alone LLM comparison and the referral figures 77.78% vs 58.44% (P = 0.001), and noted that the 81.0%/92.3% accuracy figures appear only in the abstract."
+      "check_note": "Added clinician numbers from the full text, fixed the design (non-randomised, time-period allocation, same PCPs in both arms), added the AI-alone LLM comparison and the referral figures 77.78% vs 58.44% (P = 0.001), and noted that the 81.0%/92.3% accuracy figures appear only in the abstract.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 145,
+      "rcr": 23.235154916584683,
+      "strength": "strong"
     },
     {
       "id": "S38",
@@ -663,7 +754,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Corrected the finding, which paired the high-risk SIC rates (3.4% vs 13.5%) with the all-encounter aOR of 2.09; the high-risk aOR is 2.62 (95% CI, 1.84-3.72), and the finding was restructured into the required order."
+      "check_note": "Corrected the finding, which paired the high-risk SIC rates (3.4% vs 13.5%) with the all-encounter aOR of 2.09; the high-risk aOR is 2.62 (95% CI, 1.84-3.72), and the finding was restructured into the required order.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 100,
+      "rcr": 12.89249079184777,
+      "strength": "strong"
     },
     {
       "id": "S39",
@@ -683,7 +781,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Rewrote the finding into the required 3-5 sentence structure, adding the 95% CI, the malignant nodule detection result and the positive-report rates; the other fields were consistent with the abstract."
+      "check_note": "Rewrote the finding into the required 3-5 sentence structure, adding the 95% CI, the malignant nodule detection result and the positive-report rates; the other fields were consistent with the abstract.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 3,
+      "citations": 112,
+      "rcr": 11.518113473930692,
+      "strength": "strong"
     },
     {
       "id": "S40",
@@ -703,7 +808,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Rewrote the finding into the required 3-5 sentence structure, added the 98 teams to humans, and restated the ECG-ML-positive subgroup result as 4.4% versus 1.1% with its OR, CI and P value."
+      "check_note": "Rewrote the finding into the required 3-5 sentence structure, added the 98 teams to humans, and restated the ECG-ML-positive subgroup result as 4.4% versus 1.1% with its OR, CI and P value.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "broad",
+      "humans_n": 245,
+      "citations": 11,
+      "rcr": 5.49862995890871,
+      "strength": "strong"
     },
     {
       "id": "S41",
@@ -723,7 +835,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Fixed the operator list (the paper reports 12 nurses, 3 medical assistants, 1 phlebotomist, 1 pharmacy technician and 4 physicians, with no respiratory therapists), named the expert comparators, added the expert 96.6% figure and the zone 6 result, and replaced the inaccurate limitation 'operators were not physicians'; the verdict 'comparable' was kept because the design compares AI-aided nonexperts with unaided experts, so no ai_help verdict can be inferred."
+      "check_note": "Fixed the operator list (the paper reports 12 nurses, 3 medical assistants, 1 phlebotomist, 1 pharmacy technician and 4 physicians, with no respiratory therapists), named the expert comparators, added the expert 96.6% figure and the zone 6 result, and replaced the inaccurate limitation 'operators were not physicians'; the verdict 'comparable' was kept because the design compares AI-aided nonexperts with unaided experts, so no ai_help verdict can be inferred.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 52,
+      "rcr": 20.34753252684421,
+      "strength": "strong"
     },
     {
       "id": "S42",
@@ -743,7 +862,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Numbers and verdict were correct; I rewrote the finding into the required task, AI, clinicians, results, limitation order, added the ROC AUC and subgroup results, and expanded the limitation to include the non-histopathologic reference standard."
+      "check_note": "Numbers and verdict were correct; I rewrote the finding into the required task, AI, clinicians, results, limitation order, added the ROC AUC and subgroup results, and expanded the limitation to include the non-histopathologic reference standard.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 22,
+      "citations": 65,
+      "rcr": 9.631489968028585,
+      "strength": "strong"
     },
     {
       "id": "S43",
@@ -763,7 +889,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Named the AI product and version, specified breast radiologist experience and the five general radiologists, changed comparison to both because standalone AI was also compared with radiologists, and rewrote the finding in the required order with recall-rate numbers."
+      "check_note": "Named the AI product and version, specified breast radiologist experience and the five general radiologists, changed comparison to both because standalone AI was also compared with radiologists, and rewrote the finding in the required order with recall-rate numbers.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 58,
+      "rcr": 14.803753354517236,
+      "strength": "strong"
     },
     {
       "id": "S44",
@@ -783,7 +916,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Added radiologist numbers per phase (31, 37; 26 of 42 in both) and rewrote the finding in the required order, with study counts and the limitation; the numbers and verdict were already correct."
+      "check_note": "Added radiologist numbers per phase (31, 37; 26 of 42 in both) and rewrote the finding in the required order, with study counts and the limitation; the numbers and verdict were already correct.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 42,
+      "citations": 66,
+      "rcr": 8.948155964601801,
+      "strength": "strong"
     },
     {
       "id": "S45",
@@ -803,7 +943,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Added the Physician AMI score AUROC (0.846, 95% CI 0.834–0.857) reported in the full text, named the AI system (AiTiAMI v1.00.00), clarified who the physicians were and that their number was not reported, noted the non-significant STEMI subgroup difference, and replaced the limitation that physician AUROC was missing."
+      "check_note": "Added the Physician AMI score AUROC (0.846, 95% CI 0.834–0.857) reported in the full text, named the AI system (AiTiAMI v1.00.00), clarified who the physicians were and that their number was not reported, noted the non-significant STEMI subgroup difference, and replaced the limitation that physician AUROC was missing.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 43,
+      "rcr": 13.753953157995936,
+      "strength": "strong"
     },
     {
       "id": "S46",
@@ -823,7 +970,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Fixed the garbled AI-alone result to relative proportion 0·98 [0·93-1·04], added the triple-reading CI 1·04-1·11, noted that the abstract does not name the AI product (Lunit appears only as a funder) or the number of radiologists, and restructured the finding."
+      "check_note": "Fixed the garbled AI-alone result to relative proportion 0·98 [0·93-1·04], added the triple-reading CI 1·04-1·11, noted that the abstract does not name the AI product (Lunit appears only as a funder) or the number of radiologists, and restructured the finding.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 253,
+      "rcr": 25.328743741048992,
+      "strength": "strong"
     },
     {
       "id": "S47",
@@ -843,7 +997,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Rewrote the finding into the required task–AI–clinicians–results–limitation structure and added patient/polyp numbers and confidence intervals; verdict kept as comparable because the primary accuracy outcome was noninferior, while the surveillance-interval advantage for AI was a secondary outcome."
+      "check_note": "Rewrote the finding into the required task–AI–clinicians–results–limitation structure and added patient/polyp numbers and confidence intervals; verdict kept as comparable because the primary accuracy outcome was noninferior, while the surveillance-interval advantage for AI was a secondary outcome.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 61,
+      "rcr": 8.804013355588319,
+      "strength": "strong"
     },
     {
       "id": "S48",
@@ -863,7 +1024,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Named the AI system (Viz.AI), added the pre-AI and post-AI patient counts, the median door-to-groin times and the CT-to-groin confidence interval, and restructured the finding and limitation to cite the single-health-system and unblinded design."
+      "check_note": "Named the AI system (Viz.AI), added the pre-AI and post-AI patient counts, the median door-to-groin times and the CT-to-groin confidence interval, and restructured the finding and limitation to cite the single-health-system and unblinded design.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 72,
+      "rcr": 8.31200195381256,
+      "strength": "strong"
     },
     {
       "id": "S49",
@@ -883,7 +1051,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Changed comparison to 'both' because the paper also compares the AI alone with endoscopists, changed the verdict to mixed because AI help improved novices but not experts or senior endoscopists, corrected the design (the prospective trial used 2 hospitals and the endoscopists came from 9 centers) and rewrote the finding in the required order."
+      "check_note": "Changed comparison to 'both' because the paper also compares the AI alone with endoscopists, changed the verdict to mixed because AI help improved novices but not experts or senior endoscopists, corrected the design (the prospective trial used 2 hospitals and the endoscopists came from 9 centers) and rewrote the finding in the required order.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 12,
+      "citations": 48,
+      "rcr": 8.151766053976957,
+      "strength": "strong"
     },
     {
       "id": "S50",
@@ -903,7 +1078,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Restructured the finding into the required order, added CIs and per-colonoscopy numbers as reported, clarified that the number of endoscopists is not given (3213 persons randomised), and dropped the 'industry funded' claim from the limitation because the abstract only names Medtronic without stating its role."
+      "check_note": "Restructured the finding into the required order, added CIs and per-colonoscopy numbers as reported, clarified that the number of endoscopists is not given (3213 persons randomised), and dropped the 'industry funded' claim from the limitation because the abstract only names Medtronic without stating its role.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 77,
+      "rcr": 7.355834608757437,
+      "strength": "strong"
     },
     {
       "id": "S51",
@@ -923,7 +1105,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Numbers verified against the abstract. The finding was rewritten into the required 3 to 5 sentence structure, adding the resect-and-discard result and the authors' stated limitation."
+      "check_note": "Numbers verified against the abstract. The finding was rewritten into the required 3 to 5 sentence structure, adding the resect-and-discard result and the authors' stated limitation.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 49,
+      "citations": 42,
+      "rcr": 7.276544507023569,
+      "strength": "strong"
     },
     {
       "id": "S52",
@@ -943,7 +1132,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Added from the full text the named models, the reader-study design (80 cases, 20 seeds), the 4 hospitalists with their experience, the clinician accuracies (87.50% ± 3.68% and 92.50%), the 16 to 25 point gap and P < 0.001, and replaced the abstract-only limitation."
+      "check_note": "Added from the full text the named models, the reader-study design (80 cases, 20 seeds), the 4 hospitalists with their experience, the clinician accuracies (87.50% ± 3.68% and 92.50%), the 16 to 25 point gap and P < 0.001, and replaced the abstract-only limitation.",
+      "design_class": "retrospective",
+      "setting": "real_records",
+      "reach": "broad",
+      "humans_n": 0,
+      "citations": 494,
+      "rcr": 95.43268262257102,
+      "strength": "moderate"
     },
     {
       "id": "S53",
@@ -963,7 +1159,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Rewrote the finding into the required task/AI/clinicians/results/limitation structure, added the reported SDs, P values and case-set details, and removed 'enriched' from the limitation because the abstract does not describe the case set as enriched."
+      "check_note": "Rewrote the finding into the required task/AI/clinicians/results/limitation structure, added the reported SDs, P values and case-set details, and removed 'enriched' from the limitation because the abstract does not describe the case set as enriched.",
+      "design_class": "cross_sectional",
+      "setting": "images",
+      "reach": "broad",
+      "humans_n": 27,
+      "citations": 252,
+      "rcr": 33.250872396882244,
+      "strength": "limited"
     },
     {
       "id": "S54",
@@ -983,7 +1186,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Specified ChatGPT version 3.5 ('EyeHelp' prompt), added the 9 answering ophthalmologists, the missing 95% CIs for harm likelihood and extent, the consensus measure and the rater accuracy range, and restructured the finding and limitation to the required format."
+      "check_note": "Specified ChatGPT version 3.5 ('EyeHelp' prompt), added the 9 answering ophthalmologists, the missing 95% CIs for harm likelihood and extent, the consensus measure and the rater accuracy range, and restructured the finding and limitation to the required format.",
+      "design_class": "cross_sectional",
+      "setting": "real_records",
+      "reach": "broad",
+      "humans_n": 8,
+      "citations": 205,
+      "rcr": 30.83192486522217,
+      "strength": "moderate"
     },
     {
       "id": "S55",
@@ -1003,7 +1213,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Rewrote the finding into the required task/AI/clinicians/results/limitation structure and added the original-pathology result with its numbers; the existing numbers and the verdict were already accurate."
+      "check_note": "Rewrote the finding into the required task/AI/clinicians/results/limitation structure and added the original-pathology result with its numbers; the existing numbers and the verdict were already accurate.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 14,
+      "rcr": 7.018920076624102,
+      "strength": "strong"
     },
     {
       "id": "S56",
@@ -1023,7 +1240,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Specified the control arm as 3 senior endocrinologists, added the physician review step and the 98.9% adoption rate, restructured the finding into the required order, and broadened the limitation, while the numbers and the comparable verdict were confirmed."
+      "check_note": "Specified the control arm as 3 senior endocrinologists, added the physician review step and the 98.9% adoption rate, restructured the finding into the required order, and broadened the limitation, while the numbers and the comparable verdict were confirmed.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 19,
+      "rcr": 6.924869036883133,
+      "strength": "strong"
     },
     {
       "id": "S57",
@@ -1043,7 +1267,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Specified the AI as a prompt-customised GPT-4, added the breakdown of the 70 physicians by arm and training level, noted that the AI-alone score is 87% in the results but 90% in the abstract, explained that the conventional-resources baseline came from the second-opinion arm's initial answers, and replaced the abstract-based limitation with the paper's stated limitations."
+      "check_note": "Specified the AI as a prompt-customised GPT-4, added the breakdown of the 70 physicians by arm and training level, noted that the AI-alone score is 87% in the results but 90% in the abstract, explained that the conventional-resources baseline came from the second-opinion arm's initial answers, and replaced the abstract-based limitation with the paper's stated limitations.",
+      "design_class": "rct",
+      "setting": "simulated",
+      "reach": "broad",
+      "humans_n": 70,
+      "citations": 20,
+      "rcr": 10.02313900731644,
+      "strength": "moderate"
     },
     {
       "id": "S58",
@@ -1063,7 +1294,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Added the participant count (220), the Padj values, the interaction and null subjective-measure results, and restructured the finding; retained because the study measures how AI advice and explanation type shape physicians' accuracy and reliance on correct versus incorrect AI advice, though there is no unaided arm."
+      "check_note": "Added the participant count (220), the Padj values, the interaction and null subjective-measure results, and restructured the finding; retained because the study measures how AI advice and explanation type shape physicians' accuracy and reliance on correct versus incorrect AI advice, though there is no unaided arm.",
+      "design_class": "rct",
+      "setting": "images",
+      "reach": "broad",
+      "humans_n": 220,
+      "citations": 33,
+      "rcr": 6.639853287826047,
+      "strength": "moderate"
     },
     {
       "id": "S59",
@@ -1083,7 +1321,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Results and verdict were correct; I added the cardiologist count and the evaluators to humans, the Gemini 2.0 Flash base to the AI system, restructured the finding into the required order with the tie rate, and replaced the limitation with the paper's own main caveat."
+      "check_note": "Results and verdict were correct; I added the cardiologist count and the evaluators to humans, the Gemini 2.0 Flash base to the AI system, restructured the finding into the required order with the tie rate, and replaced the limitation with the paper's own main caveat.",
+      "design_class": "rct",
+      "setting": "real_records",
+      "reach": "specialty",
+      "humans_n": 9,
+      "citations": 17,
+      "rcr": 8.512657960113232,
+      "strength": "strong"
     },
     {
       "id": "S60",
@@ -1103,7 +1348,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Added the reported numbers (AI 77.3% accuracy vs cardiologists 64.0% unaided and 69.2% with AI), specified the 13 cardiologists and 3,200 reviews, and changed comparison to 'both' because the paper also tested cardiologists with and without the EchoNext score; the verdict stays ai_ahead because AI alone beat cardiologists with or without help, while AI help also improved them."
+      "check_note": "Added the reported numbers (AI 77.3% accuracy vs cardiologists 64.0% unaided and 69.2% with AI), specified the 13 cardiologists and 3,200 reviews, and changed comparison to 'both' because the paper also tested cardiologists with and without the EchoNext score; the verdict stays ai_ahead because AI alone beat cardiologists with or without help, while AI help also improved them.",
+      "design_class": "retrospective",
+      "setting": "real_records",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 85,
+      "rcr": 25.146472398768527,
+      "strength": "moderate"
     },
     {
       "id": "S61",
@@ -1123,7 +1375,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Rewrote the finding into the required structure, added the subspecialty breakdown of participants and the non-significant case-level accuracy results, and sharpened the limitation; the verdict stays mixed because the chatbot was ahead in glaucoma but comparable in retina accuracy."
+      "check_note": "Rewrote the finding into the required structure, added the subspecialty breakdown of participants and the non-significant case-level accuracy results, and sharpened the limitation; the verdict stays mixed because the chatbot was ahead in glaucoma but comparable in retina accuracy.",
+      "design_class": "cross_sectional",
+      "setting": "real_records",
+      "reach": "specialty",
+      "humans_n": 15,
+      "citations": 115,
+      "rcr": 23.773683515165228,
+      "strength": "moderate"
     },
     {
       "id": "S62",
@@ -1143,7 +1402,14 @@
       "tier": "landmark",
       "checked": "abstract",
       "check_status": "corrected",
-      "check_note": "Rewrote the finding into the required structure and added the kappa results; the number of nurses and patients is not given in the abstract, and the abstract's 'no significant difference (p = 0.000)' is internally inconsistent, so it is not reported as a significance claim."
+      "check_note": "Rewrote the finding into the required structure and added the kappa results; the number of nurses and patients is not given in the abstract, and the abstract's 'no significant difference (p = 0.000)' is internally inconsistent, so it is not reported as a significance claim.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 42,
+      "rcr": 16.594130909975313,
+      "strength": "strong"
     },
     {
       "id": "S63",
@@ -1163,7 +1429,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Added the number of notified physicians (151, including 26 at community sites), which the paper reports, removed the incorrect claim that the number was not stated and that all were academic, and expanded the finding to the required structure with consent results."
+      "check_note": "Added the number of notified physicians (151, including 26 at community sites), which the paper reports, removed the incorrect claim that the number was not stated and that all were academic, and expanded the finding to the required structure with consent results.",
+      "design_class": "rct",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 22,
+      "rcr": 5.359584436569914,
+      "strength": "strong"
     },
     {
       "id": "S64",
@@ -1183,7 +1456,14 @@
       "tier": "landmark",
       "checked": "full_text",
       "check_status": "corrected",
-      "check_note": "Changed comparison to both because the paper also compares ADAE alone against dermatologists (AUC 0.857 vs 0.780, p = 0.007), added the number of dermatologists (11, of whom 5 enrolled 97% of lesions), noted the worsened calibration, and reworked the finding and limitation."
+      "check_note": "Changed comparison to both because the paper also compares ADAE alone against dermatologists (AUC 0.857 vs 0.780, p = 0.007), added the number of dermatologists (11, of whom 5 enrolled 97% of lesions), noted the worsened calibration, and reworked the finding and limitation.",
+      "design_class": "prospective",
+      "setting": "real_patients",
+      "reach": "specialty",
+      "humans_n": 0,
+      "citations": 63,
+      "rcr": 7.690320891293822,
+      "strength": "strong"
     }
   ],
   "changes": [
@@ -1288,6 +1568,8 @@
   "sections": [
     {
       "heading": "AI on its own against clinicians",
+      "question": "Does AI on its own outperform physicians?",
+      "bottom_line": "On narrow, measurable tasks with real patients, such as echocardiography, ECGs and mammography, AI on its own matched or beat clinicians [S32][S45][S46], but language models' strong results on simulated cases have not held up in comparisons with real patients [S30][S52][S10].",
       "paragraphs": [
         "The best head-to-head evidence with real patients comes from narrow, measurable tasks. In a blinded randomised trial of 3,495 echocardiograms at one centre, cardiologists substantially changed the AI's initial ejection fraction less often than the sonographers' (16.8% vs 27.2%) [S32]. In 8,493 emergency patients with suspected heart attack at 18 Korean departments, an AI reading only the ECG separated those with and without myocardial infarction better than the physicians' overall judgement (AUROC 0.878 vs 0.846), though physician judgement was captured as a single 0 to 10 score [S45]. In a single-centre randomised trial, an autonomous AI was non-inferior to AI-assisted endoscopists at judging small polyps (77.2% vs 72.1%), but it was not compared with unaided endoscopists [S47]. In 149 inpatients with type 2 diabetes, AI-recommended insulin doses, almost all confirmed by physicians, kept glucose in range as well as senior endoscrinologists over five days [S56]. As a single mammography reader, AI was non-inferior to two radiologists for screen-detected cancers in one Swedish centre [S46], and in Korea standalone AI found cancers at a similar rate to breast radiologists but recalled more women [S43].",
         "For language models, the picture depends on the material. In a randomised crossover study with patient-actors over text chat, Google's AMIE had higher diagnostic accuracy than 20 primary care physicians and was rated better on most quality measures, though the text-chat format was unfamiliar to the physicians [S30]. Newer reports on curated or simulated cases point the same way [S4][S18][S20], with a neurology preprint scored against autopsy finding the AI comparable to neurologists [S22]. Real-patient comparisons are less favourable: five open-source models were 16 to 25 points less accurate than hospitalists on 80 real abdominal pain cases [S52], and emergency physicians outperformed four commercial LLMs on 180 critically ill patients, although the reference was the physicians' own final diagnosis [S10]. In ICU outcome prediction, AI beat individual clinicians on records but not subspecialists at the bedside, and combining both often worked best [S19]. In emergency triage, chatbots matched nurses overall, but they read physician-written vignettes while nurses saw patients, so the comparison is not like-for-like [S62]."
@@ -1295,6 +1577,8 @@
     },
     {
       "heading": "Clinicians working with AI",
+      "question": "Do clinicians do better with AI than without it?",
+      "bottom_line": "In randomised trials in real care, AI help found more disease in breast screening and chest radiographs and was followed by lower mortality after ECG alerts [S36][S39][S28], but several large trials found no gain on their main outcome [S35][S63], and benefit seems to depend on whether clinicians act on the AI's output [S40][S35].",
       "paragraphs": [
         "Randomised trials in real care give mixed but important results. AI-supported mammography screening was non-inferior to double reading on interval cancers in more than 100,000 Swedish women [S2], after an interim analysis showed more cancers detected (6.1 vs 5.1 per 1000, p=0.052) with 44% less reading work [S36]. A large non-randomised German rollout and a Korean prospective cohort also found higher detection with AI [S26][S43]. In a single-centre randomised trial of 10,476 health-check chest radiographs, AI help more than doubled detection of actionable lung nodules (0.59% vs 0.25%) without more false referrals [S39]. AI-ECG alerts were followed by lower 90-day mortality in hospitalised patients [S28] and by twice as many new diagnoses of advanced liver disease in primary care, though uptake was uneven [S40]. Machine learning prompts quadrupled serious illness conversations in high-risk cancer patients and reduced chemotherapy near death, but did not change hospice use [S38]. Automated stroke detection shortened door-to-groin time by about 11 minutes without changing 90-day function [S48].",
         "Other trials found no gain on their main outcome. An AI stethoscope in 205 UK practices did not increase heart failure diagnoses [S35]. AI-triggered emails about matched cancer trials did not raise enrolment [S63]. AI triage for pulmonary embolism halved waiting times for positive scans but did not significantly change radiologist accuracy in a non-randomised study [S44]. Ambient scribes gave mixed results [S3]. Across these studies, benefit seems to depend on whether clinicians act on the AI's output, which some authors point to as a reason for weaker effects [S40][S35]."
@@ -1302,6 +1586,8 @@
     },
     {
       "heading": "Reading images and other pattern tasks",
+      "question": "Does AI help with reading images and other pattern tasks?",
+      "bottom_line": "Breast screening has the most consistent evidence that AI helps readers [S2][S36][S26][S43], while randomised trials in endoscopy mostly found no gain in clinically important detection [S50][S7][S8][S55].",
       "paragraphs": [
         "Breast screening has the most consistent evidence: one randomised trial with interval cancer follow-up [S2][S36], plus large prospective studies in Germany, Korea and Sweden [S26][S43][S46]. Some caveats: the German study was not randomised and needed statistical adjustment for which exams radiologists chose to read with AI [S26], general radiologists in Korea recalled more women with AI [S43], and the Swedish paired-reader study counted only cancers found within three months [S46].",
         "Endoscopy is less encouraging. Randomised trials in Spain, Germany and a high-detection setting found no significant gain in advanced neoplasia or adenoma detection with computer-aided detection, mostly more small lesions [S50][S7][S8]. A 29,514-patient trial in China found no gain in gastric neoplasm detection, though blind spots fell [S55]. For polyp histology, AI raised specificity modestly in a non-randomised study of 49 general endoscopists [S51]. In skin cancer, dermatologists' accuracy rose with a CNN in a prospective two-centre study with 38 melanomas, and unnecessary excisions fell by 19% [S42]; in another single-centre study accuracy rose slightly but dermatologists overestimated melanoma risk more after seeing the AI [S64]. Online and image-based reader studies show gains on difficult lesions and for primary care physicians [S1][S12].",
@@ -1310,6 +1596,8 @@
     },
     {
       "heading": "Diagnosis, reasoning and management",
+      "question": "Does AI improve diagnosis and treatment decisions?",
+      "bottom_line": "On written cases, LLM access has given physicians anything from no gain to 28 points, and the model alone often scored as high as or higher than physicians using it [S29][S33][S5][S9]; the few studies on real patients' cases measured clinicians' decisions, not patient outcomes [S59][S16].",
       "paragraphs": [
         "On written cases, randomised trials disagree on how much LLM access helps. In 50 US physicians on six vignettes, GPT-4 access did not raise reasoning scores (76% vs 74%), while the model alone scored 92% [S29]. A later trial of 92 physicians on management cases found a 6.5-point gain with GPT-4, with GPT-4 alone scoring about the same as physicians using it [S33]. On 302 published diagnostic puzzles, AMIE raised internists' top-10 accuracy from 36.1% to 51.7%, while AMIE alone reached 59.1% [S31]. A workflow where the AI gave a first or second opinion and critiqued the physician's thinking raised scores from 75% to 82 to 85% [S57]. Newer vignette trials in Pakistan, Kenya, Indonesia, the Netherlands and nephrology found gains of 7 to 28 points [S5][S13][S9], and in several the model alone did better than assisted physicians [S5][S9][S57]. These are written cases, mostly scored with rubrics, not care of real patients.",
         "Closer to practice, general cardiologists given AMIE on 107 real genetic cardiomyopathy cases were preferred by subspecialists more often and made fewer clinically significant errors (13.1% vs 24.3%), though the judging was based on records, not outcomes [S59]. A retinal image tool improved specialists' prediction of the genetic cause of inherited retinal disease in a randomised trial [S16]. In a non-randomised primary care study, patients cared for with an image-plus-language model were more likely to attend eye referral [S37]. Cost is a separate concern: LLM care plans were about three times as costly as treating physicians' plans in a retrospective study [S17]."
@@ -1317,6 +1605,8 @@
     },
     {
       "heading": "Communication and documentation",
+      "question": "Can AI help with communication and documentation?",
+      "bottom_line": "Blinded raters often preferred chatbot answers to patients' written questions, or found them no less accurate [S25][S54], but these were public forum questions, not consultations, and ambient scribes saved time in only one of the two products tested [S3].",
       "paragraphs": [
         "The landmark evidence here is about written answers to patient questions, not consultations. On 195 Reddit questions, blinded health professionals preferred ChatGPT's answers in 78.6% of evaluations and rated them more often empathetic (45.1% vs 4.6%), but the chatbot answers were about four times longer and physician answers came from volunteers on a public forum [S25]. On 200 eye-care forum questions, an ophthalmologist panel found no significant difference in incorrect content or likely harm between ChatGPT and ophthalmologists [S54], a pattern repeated in a later forum study, where ophthalmologists' answers were easier to read [S11]. Against glaucoma specialists GPT-4 was rated more accurate and complete, but for case management it did not differ from glaucoma or retina specialists [S61].",
         "For documentation, evidence is thinner. A randomised trial of two ambient scribes found one cut note-writing time by 9.5% and the other had no significant effect, though both improved a burnout-related score and were used in only about 30% of visits [S3]. Clinicians preferred LLM-written discharge summaries for 95% of 60 long hospital stays, based on ratings rather than any effect on care [S21]."
@@ -1324,6 +1614,8 @@
     },
     {
       "heading": "Training, examinations and skill",
+      "question": "What does AI mean for training and clinical skill?",
+      "bottom_line": "Less experienced clinicians gain most from AI but are also the most likely to follow it when it is wrong [S49][S42][S53][S1], and no study yet tests whether training clinicians to use AI changes the results [S5][S6].",
       "paragraphs": [
         "The register has no studies of AI on medical examinations; the evidence here is about how experience shapes the effect of AI. Less experienced clinicians tend to gain most. On pancreatic ultrasound images, novices' accuracy rose from 0.69 to 0.90 with AI while experts did not benefit [S49]; less experienced dermatologists gained most from a CNN [S42]; general radiologists found more cancers with AI but recalled more women [S43]; and AI-guided novices obtained usable lung ultrasound scans [S41]. The same groups are more exposed to wrong advice: inexperienced radiologists followed incorrect AI ratings more than experts [S53], and medical students relied on wrong AI more than primary care physicians did [S1].",
         "Training to use AI is barely studied. The trial with no gain from GPT-4 gave physicians no training on how to use it [S29], while trials showing large gains in Pakistan gave a 20-hour AI-literacy course [S5]; but that same course did not stop physicians being misled by planted errors [S6]. No study in the register tests whether training itself changes results."
@@ -1331,6 +1623,8 @@
     },
     {
       "heading": "Risks: over-reliance, lost skill and bias",
+      "question": "What are the risks: over-reliance, lost skill and bias?",
+      "bottom_line": "Wrong AI advice consistently pulled clinicians' accuracy down, and explanations did not reliably protect them [S53][S34][S6]; one observational study suggests endoscopists found fewer adenomas without AI after they began using it [S27].",
       "paragraphs": [
         "Automation bias is the best-documented risk. When a simulated AI gave wrong mammography ratings, correct ratings fell from about 80% to 20 to 46% depending on experience [S53]. In a randomised vignette study of 457 hospital clinicians, systematically biased AI lowered diagnostic accuracy by 11.3 points, and explanations did not significantly help [S34]. Planted LLM errors cut physicians' accuracy by 14 points [S6], and citations backing wrong answers weakened physicians' resistance to them [S14]. Explanations that make advice easier to follow raised trust whether or not the advice was correct [S58]. One counter-example: primary care physicians barely changed their answers when a dermatology AI was wrong [S1].",
         "Loss of skill now has a first signal. In four Polish centres, adenoma detection in colonoscopies done without AI fell from 28.4% to 22.4% after endoscopists began using AI, though the observational before-after design is open to confounding [S27]. Other unwanted effects include more intensive surveillance and more small lesions found [S7][S50], higher recall among less specialised readers [S43], worse calibration of melanoma risk [S64] and more costly care plans [S17]. On bias across patient groups, the register shows that a model built to perform evenly across skin tones still depended on how clinicians used it [S1], and that clinicians and LLMs struggle to tell AI-generated chest X-rays from real ones [S15]."
@@ -1338,6 +1632,8 @@
     },
     {
       "heading": "Where this is heading",
+      "question": "Where is this heading?",
+      "bottom_line": "Trials are moving to patient outcomes, null results included [S2][S28][S35], and research is turning to how work is divided between AI and clinicians and how clinicians perform when the AI is wrong [S57][S27].",
       "paragraphs": [
         "This section is interpretation rather than direct evidence. The trials are moving from reader experiments toward randomised studies with patient outcomes, such as interval cancers [S2], mortality [S28] and new diagnoses [S40], and these trials include null results [S35][S63], so claims of benefit can increasingly be tested rather than assumed.",
         "Across vignette studies, the model alone often scores as high as or higher than physicians using it [S29][S33][S5][S9][S57][S60], which points research toward how the work is divided, for example AI as first or second opinion [S57] or AI handling clearly normal cases [S36][S26]. Whether this holds with real patients is unknown, since real-patient diagnostic comparisons remain split [S52][S10][S19]. The repeated findings on automation bias [S53][S34][S6] and the first deskilling signal [S27] suggest that measuring clinicians' performance without AI, and when AI is wrong, will need to be part of future evaluations."
