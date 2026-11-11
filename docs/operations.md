@@ -29,6 +29,8 @@ owner is unavailable.
 | **Anthropic** (API key) | Blog drafts, the AI vs Physician paper, the deep sweep | No new drafts, and the jobs skip quietly | | |
 | **Meta** (Instagram @aimedicinecollective and its Meta app) | Posts each briefing and edition to Instagram | Posts stop (the site is unaffected) | | |
 | **Agent server** (the Dell, see `docs/agents/dell-setup.md`) | The supervised agent pilot | Only the pilot stops | | |
+| **Billy** (GitHub App, ID 5691222, installed on this repository only; `docs/agents/billy.md`) | Opens agents' draft pull requests after a Codex review | Agent PRs stop; nothing on the site is affected | DrZaff (app owner) | |
+| **OpenAI** (Codex, signed in as the `agent` user on the agent server) | Reviews each agent commit before Billy publishes it | Agent PRs stop at the review step | | |
 
 ## Where each secret lives
 
@@ -40,6 +42,8 @@ owner is unavailable.
 | `IG_USER_ID` (optional) | GitHub Actions secret | Instagram posting, when the account id can't be read from the token | No |
 | `SECRETS_WRITE_TOKEN` | GitHub Actions secret | lets the Instagram renewal store a new token | **Yes**, on the date set when it was made |
 | `DIGEST_APP_ID`, `DIGEST_APP_PRIVATE_KEY` | GitHub environment `digest-publish` | the Friday digest job's push to `main` | No |
+| Billy's private key and IDs (`app.pem`, `app.json`) | The agent server only: `/var/lib/billy-pub/.config/billy/`, readable by the `billy-pub` user alone. Not in GitHub | the Billy handoff's publish step and `preflight.py` | No. If the server is lost or the key leaks: GitHub > Settings > Developer settings > GitHub Apps > Billy > revoke the key and generate a new one |
+| Codex sign-in | The agent server, `/home/agent/.codex` (mode 700) | the Billy handoff's review step | Per OpenAI's sign-in rules |
 | `SUPABASE_DB_URL`, `BACKUP_PASSPHRASE` | GitHub environment `db-backup` | nightly backup (`docs/backups.md`) | The URL changes if the database password is reset |
 | `resend_api_key` | Supabase Vault | inbox alerts, meeting emails, digest sending | No |
 | `github_actions_token` | Supabase Vault | the database's timetable starting the GitHub jobs | **Yes**: when it lapses, the jobs quietly fall back to GitHub's late schedule |
