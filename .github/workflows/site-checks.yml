@@ -60,10 +60,25 @@ jobs:
         with:
           node-version: "22"
 
+      # The browser comes from Playwright's own download servers. Its system
+      # libraries are normally already on GitHub's runner image, so Ubuntu's
+      # package servers are used only if the browser can't start, with
+      # retries. (Installing them on every run made this check fail whenever
+      # those servers were unreachable, as on 2026-11-11.)
       - name: Install the test browser
         run: |
           npm install --no-save --no-package-lock playwright@1.63.0
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
+          starts() { node -e "require('playwright').chromium.launch().then(b => b.close())"; }
+          if ! starts; then
+            echo "::notice::The browser needs system libraries; installing them from Ubuntu."
+            for attempt in 1 2 3; do
+              sudo npx playwright install-deps chromium && break
+              echo "::warning::Ubuntu's package servers failed (attempt $attempt of 3); retrying in 30 s."
+              sleep 30
+            done
+            starts
+          fi
 
       - name: Build the blog index (the Netlify build step)
         run: python scripts/blog_agent/build_index.py
