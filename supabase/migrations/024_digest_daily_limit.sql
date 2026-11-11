@@ -1,6 +1,6 @@
--- 023: send the digest a day's allowance at a time
+-- 024: send the digest a day's allowance at a time
 --
--- Run once in the Supabase SQL Editor, after 001-022 (Dashboard > SQL Editor >
+-- Run once in the Supabase SQL Editor, after 001-023 (Dashboard > SQL Editor >
 -- New query > paste this whole file > Run). The site works before and after
 -- this file.
 --
