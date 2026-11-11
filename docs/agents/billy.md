@@ -27,7 +27,7 @@ Each publishing step turns the key into a token that lasts at most an hour, is l
 
 ## The handoff: Claude builds, Codex reviews, Billy publishes
 
-GitHub carries the work between the three; nothing is copied by hand.
+GitHub carries the work between the three; nothing is copied by hand. How a task gets here, from an issue written with ChatGPT's help to the owner's merge, is in [handoff.md](handoff.md).
 
 1. **Claude builds** on a branch named `claude/...` or `agent/...`, runs the AGENTS.md checks, puts their results in the commit message, and reports the branch and the full commit SHA. (The server runs no repository code until the sandbox in architecture.md exists, so these checks run where Claude builds, and again as Site checks on the PR.)
 2. **The owner launches** both steps in a terminal on the server (each refuses to start without one, so neither can be put on a timer by accident):
