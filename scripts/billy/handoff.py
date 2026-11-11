@@ -84,7 +84,9 @@ def redact(text):
 
 
 def tail(text, n=300):
-    return ' | '.join(l.strip() for l in text.strip().splitlines()[-4:])[-n:]
+    # Redact the whole text before shortening it: cutting first could remove a token's
+    # recognisable prefix and leave the rest of it unredacted.
+    return ' | '.join(l.strip() for l in redact(text).strip().splitlines()[-4:])[-n:]
 
 
 def git(cwd, *args, env=None, check=True):
@@ -163,7 +165,7 @@ def review(a):
         except subprocess.TimeoutExpired:
             raise p.SafeFailure('Codex did not finish within %d minutes.' % (CODEX_TIMEOUT // 60))
         if r.returncode or not os.path.exists(out):
-            raise p.SafeFailure('Codex review did not finish (exit %d): %s' % (r.returncode, redact(tail(r.stderr))))
+            raise p.SafeFailure('Codex review did not finish (exit %d): %s' % (r.returncode, tail(r.stderr)))
         with open(out) as f:
             report = json.load(f)
         if (report.get('verdict') not in ('no_blocking_findings', 'changes_needed')

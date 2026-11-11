@@ -139,7 +139,16 @@ def negative(slug, token, g):
         report('find the open test PR', False)
     else:
         n = prs[0]['number']
-        reviews = p.api('GET', '/repos/%s/pulls/%d/reviews?per_page=100' % (p.REPO, n), token)
+        # Read every page of reviews; if there are implausibly many, fail closed.
+        reviews = []
+        for page in range(1, 11):
+            batch = p.api('GET', '/repos/%s/pulls/%d/reviews?per_page=100&page=%d'
+                          % (p.REPO, n, page), token)
+            reviews += batch
+            if len(batch) < 100:
+                break
+        else:
+            raise p.SafeFailure('Test PR #%d has over 1000 reviews; not attempting a merge.' % n)
         if any(r.get('state') == 'APPROVED' for r in reviews):
             raise p.SafeFailure('Test PR #%d has an approval, so the merge test could really merge. '
                                 'Close it and run setup for a fresh one.' % n)
