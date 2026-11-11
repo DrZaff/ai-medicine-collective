@@ -20,8 +20,8 @@ repository.
 ## Set it up (once, about 10 minutes)
 
 1. **Connection string.** Supabase > your project > **Connect** (top of the
-   page) > **Session pooler** > copy the URI. It looks like
-   `postgresql://postgres.ahwnarhmuzxgjindreuz:[YOUR-PASSWORD]@aws-0-<region>.pooler.supabase.com:5432/postgres`.
+   page) > **Session pooler** > copy the URI. It starts with `postgresql://postgres.ahwnarhmuzxgjindreuz`, then has
+   `[YOUR-PASSWORD]`, then ends with `aws-0-<region>.pooler.supabase.com:5432/postgres`.
    Put the database password in place of `[YOUR-PASSWORD]`. If you don't have
    it, reset it under Project Settings > Database (nothing on the site uses
    it). Use the *Session pooler*, not the *Direct connection*: GitHub's
