@@ -25,6 +25,9 @@ concurrency:
 jobs:
   draft:
     runs-on: ubuntu-latest
+    # The branch this run pushed, for the site-checks job below
+    outputs:
+      pushed_branch: ${{ steps.pr.outputs.branch }}
     timeout-minutes: 20
     steps:
       - name: Check for API key
@@ -95,6 +98,7 @@ jobs:
           question=$(python -c "import json,sys; d=json.load(open('faq/faq.json',encoding='utf-8')); i=[x for x in d['items'] if x['id']==sys.argv[1]][0]; print(i['question'])" "$FAQ_ID")
           git commit -m "FAQ draft for $DATE: $question"
           git push -u origin "$branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
           url=$(gh pr create --base main --head "$branch" \
             --title "FAQ draft: $DATE" \
             --body-file "$RUNNER_TEMP/pr-body.md")
@@ -131,3 +135,25 @@ jobs:
         run: |
           python scripts/blog_agent/notify.py --subject "The FAQ draft run failed" \
             --body "Today's FAQ draft run failed, so there is no new answer. Nothing is broken on the site. To try again, tell Claude \"re-run the FAQ draft\", or open the run and press \"Re-run jobs\": $RUN_URL"
+
+  # Pull requests opened with the default token don't start other workflows,
+  # so Site checks would never run on this one. The default token may start
+  # a workflow by hand (workflow_dispatch), so this job asks for a run on the
+  # branch just pushed; its checks land on the pull request's latest commit.
+  # It checks out no code, uses no secrets and is the only job here allowed
+  # to start workflows.
+  site-checks:
+    name: Start Site checks on the pull request
+    needs: draft
+    if: always() && needs.draft.outputs.pushed_branch != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Run Site checks on the branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: ${{ needs.draft.outputs.pushed_branch }}
+        run: gh workflow run site-checks.yml --ref "$BRANCH"

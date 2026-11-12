@@ -29,7 +29,7 @@ Findings that need the owner's attention:
    | Branch must be up to date before merging | no | yes |
 
    Both: a pull request with 1 approval, code-owner review, stale approvals dismissed, no force pushes or deletion, the owner as a pull-request-only bypass, and Billy on neither.
-4. ~~The automations' own pull requests never get Site checks.~~ **Fixed** (proposal 4): the blog, living-review and deep-sweep jobs still open their PRs with the default token, which starts no workflows on its own, but each now starts Site checks by hand on the branch it pushed. Check on the first such PR that both checks show in its Checks tab; until then, assume they may not and merge through the bypass if needed.
+4. ~~The automations' own pull requests never get Site checks.~~ **Fixed** (proposal 4): the blog, living-review, deep-sweep and FAQ draft and audit jobs still open their PRs with the default token, which starts no workflows on its own, but each now starts Site checks by hand on the branch it pushed. Check on the first such PR that both checks show in its Checks tab; until then, assume they may not and merge through the bypass if needed.
 5. ~~The commits will still say "github-actions[bot]".~~ **Fixed** (proposal 2): with the app set up, the job authors its commit as the app's bot account; without it, as github-actions, as before.
 
 None of these needs a workflow change before setup. Optional workflow changes are listed at the end as proposals.
