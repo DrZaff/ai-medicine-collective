@@ -1,0 +1,31 @@
+# AI Medicine Collective. Search engines and AI assistants are welcome to read
+# and cite the public pages. Sign-in and moderation pages hold nothing public.
+# (A crawler that matches a named group below ignores the "*" group, so each
+# group repeats the same rules.)
+
+User-agent: *
+Allow: /
+Disallow: /account.html
+Disallow: /moderate.html
+Disallow: /inbox.html
+
+User-agent: Googlebot
+User-agent: Google-Extended
+User-agent: Bingbot
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /account.html
+Disallow: /moderate.html
+Disallow: /inbox.html
+
+Sitemap: https://www.aimedicinecollective.com/sitemap.xml

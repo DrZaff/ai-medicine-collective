@@ -1,0 +1,104 @@
+# Monthly FAQ audit: checks every answer's links and age, looks for newer
+# evidence, and proposes refreshes and new questions to answer, as a PR.
+# Merging only updates the target list and saves the report; the FAQ draft
+# job then answers the targets one at a time. Branches faq-audit/<date>
+# belong to this job.
+
+name: FAQ audit
+
+on:
+  schedule:
+    - cron: "37 10 2 * *" # the 2nd of each month, about 6 AM Eastern
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Date of the audit (YYYY-MM-DD). Leave empty for today."
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: faq-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/blog_agent/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r scripts/blog_agent/requirements.txt
+
+      # Without the API key the checks that need no AI still run
+      - name: Audit the FAQ
+        id: audit
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DATE_INPUT: ${{ github.event.inputs.date }}
+        run: |
+          args=(--pr-body "$RUNNER_TEMP/pr-body.md")
+          if [ -n "$DATE_INPUT" ]; then args+=(--date "$DATE_INPUT"); fi
+          python scripts/blog_agent/faq_audit.py "${args[@]}"
+
+      - name: Open pull request
+        id: pr
+        if: steps.audit.outputs.created == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DATE: ${{ steps.audit.outputs.date }}
+        run: |
+          branch="faq-audit/$DATE"
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "::notice::An audit for $DATE already exists; not opening another."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add faq/targets.json "faq/audits/$DATE.md"
+          git commit -m "FAQ audit for $DATE"
+          git push -u origin "$branch"
+          url=$(gh pr create --base main --head "$branch" \
+            --title "FAQ audit: $DATE" \
+            --body-file "$RUNNER_TEMP/pr-body.md")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Email - the audit is ready
+        if: steps.pr.outputs.url != ''
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+          DATE: ${{ steps.audit.outputs.date }}
+          PR_URL: ${{ steps.pr.outputs.url }}
+        run: |
+          {
+            echo "This month's FAQ audit is ready: broken links, answers that may need updating, and new questions to answer next."
+            echo
+            echo "WHAT TO DO"
+            echo "1. Skim the report and the new questions: $PR_URL"
+            echo "2. Tell Claude \"merge it\" to accept them (this publishes nothing), or say which questions to drop."
+            echo
+            echo "----- THE REPORT -----"
+            cat "$RUNNER_TEMP/pr-body.md"
+          } > "$RUNNER_TEMP/email.txt"
+          python scripts/blog_agent/notify.py --subject "FAQ audit for $DATE: please review" --body-file "$RUNNER_TEMP/email.txt"
+
+      - name: Email - the run failed
+        if: failure()
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python scripts/blog_agent/notify.py --subject "The FAQ audit run failed" \
+            --body "This month's FAQ audit failed. Nothing is broken on the site. To try again, tell Claude \"re-run the FAQ audit\", or open the run and press \"Re-run jobs\": $RUN_URL"

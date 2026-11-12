@@ -25,7 +25,7 @@ How agent tasks flow from GitHub issues to pull requests is described in [docs/a
   - `blog/posts/` and `evidence/`: written by the blog and living-review agents and published by merging their pull requests
   - `netlify.toml`: the production build
   - `supabase/migrations/` files that already exist (they have been run; add a new numbered file instead)
-- Use the branch prefixes `blog/` or `review/`: the automations own them.
+- Use the branch prefixes `blog/`, `review/`, `faq/` or `faq-audit/`: the automations own them.
 
 ## Clinical content
 

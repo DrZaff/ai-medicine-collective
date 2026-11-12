@@ -1,8 +1,12 @@
-# Netlify build: the site is plain static files; the only build step
-# generates blog/index.json from blog/posts/*.json (standard-library Python).
+# Netlify build: the site is plain static files. The build steps (standard-
+# library Python) generate blog/index.json from blog/posts/*.json, then write
+# the FAQ, the AI vs Physician paper and recent briefings into their pages as
+# plain HTML with structured data, plus sitemap.xml and llms.txt, so search
+# engines and AI assistants that don't run JavaScript can read them
+# (scripts/seo/build_seo.py; its page edits exist only in the deploy).
 [build]
   publish = "."
-  command = "python3 scripts/blog_agent/build_index.py"
+  command = "python3 scripts/blog_agent/build_index.py && python3 scripts/seo/build_seo.py --write"
 
 # Security headers for every page (added 2026-11-08 after the national-
 # readiness audit). The Content Security Policy lists every outside service
