@@ -82,10 +82,12 @@ jobs:
           repositories: ai-medicine-collective
           permission-contents: write
 
-      # The push at the end uses whichever token checked the code out.
+      # No token is left in .git/config: the build and email steps run
+      # repository code, and only the push in "Publish to the site" needs one,
+      # which it is handed for that command alone.
       - uses: actions/checkout@v4
         with:
-          token: ${{ steps.token.outputs.token || github.token }}
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
@@ -115,9 +117,30 @@ jobs:
         if: steps.build.outputs.created == 'true'
         env:
           DATE: ${{ steps.build.outputs.date }}
+          # The digest publisher App's token when it is set up, else the default one.
+          PUSH_TOKEN: ${{ steps.token.outputs.token || github.token }}
+          APP_SLUG: ${{ steps.token.outputs.app-slug }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          # Commit as whoever pushes: the App's own bot account when the App is
+          # set up, so the history shows who published, else github-actions.
+          name="github-actions[bot]"
+          email="41898283+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$APP_SLUG" ]; then
+            if bot_id=$(curl -fsS -H "Authorization: Bearer $PUSH_TOKEN" \
+                "https://api.github.com/users/${APP_SLUG}%5Bbot%5D" \
+                | python -c "import json, sys; print(json.load(sys.stdin)['id'])"); then
+              name="${APP_SLUG}[bot]"
+              email="${bot_id}+${APP_SLUG}[bot]@users.noreply.github.com"
+            else
+              echo "::warning::Could not look up the App's bot account; committing as github-actions[bot]."
+            fi
+          fi
+          git config user.name "$name"
+          git config user.email "$email"
+          # The token is given to git for the pull and push only, never saved.
+          auth=$(printf 'x-access-token:%s' "$PUSH_TOKEN" | base64 -w0)
+          echo "::add-mask::$auth"
+          withtoken() { git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" "$@"; }
           git add "newsletter/$DATE.html" "newsletter/$DATE.txt" "newsletter/$DATE.json" newsletter/latest.json
           if [ -f "newsletter/$DATE.leads.json" ]; then git add "newsletter/$DATE.leads.json"; fi
           if git diff --cached --quiet; then
@@ -126,8 +149,8 @@ jobs:
           fi
           git commit -m "Weekly digest for week ending $DATE"
           # A blog post may have been merged while this ran
-          git pull --rebase origin main
-          git push origin HEAD:main
+          withtoken pull --rebase origin main
+          withtoken push origin HEAD:main
           echo "::notice::Published newsletter/$DATE.html. Send it from the Moderation page."
           echo "published=true" >> "$GITHUB_OUTPUT"
 

@@ -30,7 +30,7 @@ Findings that need the owner's attention:
 
    Both: a pull request with 1 approval, code-owner review, stale approvals dismissed, no force pushes or deletion, the owner as a pull-request-only bypass, and Billy on neither.
 4. **The automations' own pull requests never get Site checks.** The blog, living-review and deep-sweep jobs open their PRs with the default token, and GitHub does not start other workflows for those. With required checks on, those PRs can be merged only through the owner's bypass ("merge without waiting for requirements"). That is workable, but it means the checks are skipped for them, as they are today.
-5. **The commits will still say "github-actions[bot]".** The job sets that author name, so after the switch the commit is authored by github-actions but pushed by the app. The push itself is attributed correctly (see "How to check who pushed").
+5. ~~The commits will still say "github-actions[bot]".~~ **Fixed** (proposal 2): with the app set up, the job authors its commit as the app's bot account; without it, as github-actions, as before.
 
 None of these needs a workflow change before setup. Optional workflow changes are listed at the end as proposals.
 
@@ -80,7 +80,7 @@ Residual risks: a future workflow on `main` naming `digest-publish`; the `create
 
 **Phase 2, publish once with the app, rulesets disabled.** Wait for the normal Friday run (a manual run on another day publishes an extra issue dated that day). Then check:
 - Actions > Weekly digest > that run: the step "Get a token for the digest publisher App" ran, and there is no notice "The digest publisher App is not set up yet".
-- The push was made by the app (see "How to check who pushed").
+- The push was made by the app (see "How to check who pushed"), and the commit's author is the app's bot account, not github-actions. A warning "Could not look up the App's bot account" in the log means the push still worked but the author lookup did not.
 - Organizers got the "ready to send" email; **no member was emailed**. Members are emailed only after an admin loads the issue on the Moderation page and presses Send (this needs the live site, finding 2).
 - If the run fails, the organizers get the failure email and nothing on `main` changes; fix the setup and re-run it. No ruleset is involved yet.
 
@@ -102,6 +102,6 @@ A commit's author is just text the job writes; the pusher is what matters.
 
 Each changes `.github/workflows/`, which Billy cannot publish (no Workflows permission). If approved: Claude builds it, the owner runs only the Codex review step, Claude opens the PR, the owner merges.
 1. ~~Pin `actions/create-github-app-token` to a full commit SHA~~ **Done:** pinned to release v1.12.0 (`d72941d`), with the token limited to this repository and Contents.
-2. **Author the digest commits as the app's bot user**, so history shows who made them.
-3. **Check out with `persist-credentials: false`** and give the token only to the push step, so `newsletter.py` never runs with a token on disk.
+2. ~~Author the digest commits as the app's bot user~~ **Done:** looked up from the app's name; if the lookup fails, the job warns and commits as github-actions.
+3. ~~Check out with `persist-credentials: false`~~ **Done:** no token is saved in the checkout; the publish step hands it to git for its pull and push only.
 4. **Open the automations' PRs with an app token**, so Site checks run on them and the owner's bypass isn't needed for routine merges.
