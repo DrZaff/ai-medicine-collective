@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" class="modern">
+<head>
+  <meta charset="UTF-8" />
+  <title>Writing with AI – AI Medicine Collective</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/png" href="images/icon-192.png" />
+  <meta property="og:site_name" content="AI Medicine Collective" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Writing with AI – AI Medicine Collective" />
+  <meta property="og:description" content="A members' course on using AI to write in medicine: what the rules allow, ways of working that keep you the author, and how to take the AI out of a draft." />
+  <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="modern.css" />
+  <script>try{if(localStorage.getItem("amc-theme")==="terminal")document.documentElement.className="terminal"}catch(e){}</script>
+</head>
+<body>
+  <div class="terminal-frame">
+
+    <div class="horizontal-rule"></div>
+
+    <header>
+      <h1 class="headline"><a href="index.html">:: AI MEDICINE COLLECTIVE ::</a></h1>
+
+      <nav class="nav" aria-label="Main">
+        <a href="index.html">HOME</a>
+        <a href="hub.html">TOOLS</a>
+        <a href="games.html">GAMES</a>
+        <a href="blog.html">EVIDENCE</a>
+        <a href="learn.html">LEARN</a>
+        <a href="members.html">COMMUNITY</a>
+        <a href="index.html#vision" data-vision>OUR VISION</a>
+        <a href="join.html" class="nav-cta" data-signed-out-only>JOIN</a>
+        <a href="account.html" class="nav-account" data-account-link="ACCOUNT">SIGN IN</a>
+      </nav>
+
+      <div class="horizontal-rule"></div>
+    </header>
+
+    <main class="section">
+      <h2 class="section-title section-title--as-written">Writing with AI</h2>
+
+      <!-- A members' course. Its text is ordinary page text (like the Learning
+           library), shown to signed-in members by course.js; nothing private
+           belongs here. Every example is made up: no patient information.
+           Policies were checked against their sources on 2026-11-11; recheck
+           them when this page is edited. -->
+
+      <section id="course-locked" class="empty-state" hidden>
+        <p class="empty-state-title">&gt; THIS COURSE IS FOR MEMBERS</p>
+        <p class="empty-state-text">Writing with AI is a short course on using AI for papers, grants,
+          applications and patient materials without losing your voice or breaking the rules. Membership
+          is free.</p>
+        <p><a class="btn btn--primary" href="join.html" data-signed-out-only>&gt; Join the Collective</a>
+          <a class="btn" href="account.html">&gt; Sign in</a></p>
+      </section>
+
+      <div id="course" class="course" hidden>
+
+        <header class="course-head">
+          <p class="course-kicker">// A Collective course &middot; 6 lessons &middot; about 35 minutes</p>
+          <h3 class="course-title">Writing with AI, and staying the author</h3>
+          <p class="course-lede">AI can help you think, draft and edit faster. It can also put words, facts
+            and references in your mouth that you never checked. This course covers what journals, funders and
+            residency applications generally allow, ways of working that keep the thinking yours, and how to
+            take the AI out of a draft so it reads like you wrote it, because you did.</p>
+          <div class="course-progress" aria-live="polite">
+            <div class="course-progress-bar"><span id="course-progress-fill"></span></div>
+            <p id="course-progress-text" class="course-progress-text">0 of 6 lessons done</p>
+          </div>
+          <p class="course-how">// Each lesson ends with an exercise: tap every phrase that is a problem, then
+            press <strong>Check my answers</strong>. Your progress is saved on this device. Rules change: when
+            something matters, open the source linked in lesson 1.</p>
+        </header>
+
+        <!-- ===================== Lesson 1 ===================== -->
+        <details class="lesson" data-lesson="1" open>
+          <summary class="lesson-summary"><span class="lesson-num">1</span>
+            <span class="lesson-name">What is generally accepted</span></summary>
+          <div class="lesson-body">
+            <p>Journals, funders and application services word their rules differently, but they agree on
+              more than you might expect. Five principles cover most situations:</p>
+            <ul class="lesson-list">
+              <li><strong>You are the author, and you are responsible.</strong> AI cannot be listed as an
+                author, because it cannot take responsibility for the work. Whatever it wrote, you answer for
+                every word, number and reference.</li>
+              <li><strong>Disclose when the venue asks.</strong> Medical journals following the ICMJE
+                recommendations ask you to say at submission whether you used AI and how, in the cover letter
+                and in the relevant part of the manuscript. Failing to disclose can be treated as
+                misconduct.</li>
+              <li><strong>AI is not a source.</strong> Never cite a chatbot for a fact. Find the primary
+                source and cite that.</li>
+              <li><strong>Keep confidential things out of AI tools.</strong> Patient information, a manuscript
+                you are peer reviewing, a grant you are scoring, a colleague's unpublished data. NIH, for
+                example, prohibits its peer reviewers from using generative AI on applications and treats
+                uploading them as a breach of confidentiality.</li>
+              <li><strong>The ideas must be yours.</strong> Help with brainstorming, wording and proofreading
+                is widely accepted. Handing over the thinking is not: NIH will not consider applications
+                substantially developed by AI to be the applicant's original ideas.</li>
+            </ul>
+
+            <p><strong>Where the rules come from.</strong> The details differ by venue, so always read the
+              specific instructions too:</p>
+            <ul class="lesson-list">
+              <li><strong>A journal manuscript.</strong> AI is not an author; disclose use at submission; you check everything. Some journals add stricter rules, for example on AI-made images. (ICMJE)</li>
+              <li><strong>A peer review.</strong> The manuscript is confidential: do not upload it to an AI tool unless the journal says you may.</li>
+              <li><strong>An NIH grant.</strong> Applications substantially developed by AI are not considered original; NIH says it uses AI detection. Reviewers may not use generative AI at all.</li>
+              <li><strong>A residency or fellowship application.</strong> The AAMC accepts AI for brainstorming, proofreading or editing the personal statement, but the final submission should be your own work. (See lesson 5.)</li>
+              <li><strong>Patient messages and handouts.</strong> Only tools your institution has approved for patient information; you sign it, so you check it.</li>
+            </ul>
+            <p class="course-sources">// Sources (checked November 2026):
+              <a href="https://www.icmje.org/recommendations/browse/artificial-intelligence/ai-use-by-authors.html" target="_blank" rel="noopener noreferrer">ICMJE, AI use by authors</a> &middot;
+              <a href="https://grants.nih.gov/grants/guide/notice-files/NOT-OD-23-149.html" target="_blank" rel="noopener noreferrer">NIH NOT-OD-23-149 (peer review, June 2023)</a> &middot;
+              <a href="https://grants.nih.gov/grants/guide/notice-files/NOT-OD-25-132.html" target="_blank" rel="noopener noreferrer">NIH NOT-OD-25-132 (originality, July 2025)</a> &middot;
+              <a href="https://www.ama-assn.org/medical-students/preparing-residency/how-use-ai-residency-applications-learn-rules-road" target="_blank" rel="noopener noreferrer">AMA on the AAMC's personal statement guidance (September 2026)</a></p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 1 &middot; A busy month</p>
+              <p class="exercise-task">Tap what breaks the generally accepted rules. (There are 4.)</p>
+              <p class="spot" data-spot>A resident drafts a case-series paper. They <span data-slop="AI cannot be an author: it cannot take responsibility for the work (ICMJE).">list ChatGPT as the fourth author</span> to be transparent, and ask it to tighten the discussion. Asked to review a manuscript for a journal, they <span data-slop="A manuscript under review is confidential. Uploading it to an AI tool shares it with a third party.">paste the full manuscript into a chatbot</span> to summarise it. For their own paper's background they write <span data-slop="AI is not a source. Find the primary study and cite that.">"(ChatGPT, 2026)"</span> after a statistic, and on submission they <span data-slop="Journals following ICMJE ask you to disclose AI use at submission; not disclosing can be treated as misconduct.">leave the AI-use question blank</span> because it only helped with wording. They used it to fix grammar in the abstract.</p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// What about the last sentence?</p>
+                <p class="spot-clean">Fixing grammar is widely accepted. Many journals still ask you to disclose
+                  it, so say so in the cover letter and wherever the journal's instructions ask.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 1 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 2 ===================== -->
+        <details class="lesson" data-lesson="2">
+          <summary class="lesson-summary"><span class="lesson-num">2</span>
+            <span class="lesson-name">A way of working that keeps you the author</span></summary>
+          <div class="lesson-body">
+            <p>The most useful habit is simple: <strong>think first, then bring in the AI.</strong> If the
+              model writes before you have decided what you want to say, its ideas quietly become yours, and
+              they are usually the most average ideas available. A workflow that works for papers, abstracts,
+              letters and statements:</p>
+            <ol class="lesson-list">
+              <li><strong>Your raw material.</strong> Notes, data, the point you want to make, the story only
+                you can tell. Messy is fine.</li>
+              <li><strong>Your outline.</strong> Three to six lines: what the reader should know, in order.</li>
+              <li><strong>AI as a critic.</strong> Paste your outline or rough draft and ask what is missing,
+                unclear or unsupported. Decide yourself which points to take.</li>
+              <li><strong>Your draft.</strong> Write it, or rewrite any AI wording until it says exactly what
+                you mean.</li>
+              <li><strong>AI as a copy editor.</strong> Ask for a list of suggested edits, not a rewrite, so you
+                accept each one on purpose.</li>
+              <li><strong>Your checks.</strong> Every fact, number and reference against its source (lesson 4),
+                then a read aloud.</li>
+              <li><strong>Your disclosure,</strong> wherever the venue asks for one.</li>
+            </ol>
+            <p>A quick test of whether you are still the author: could you defend every sentence to a
+              reviewer, and explain where each claim came from?</p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 2 &middot; How an abstract got written</p>
+              <p class="exercise-task">Tap the moments where the author handed over the thinking. (There are 3.)</p>
+              <p class="spot" data-spot>A fellow had results from a quality project. <span data-slop="The model wrote before the author decided what the project showed. Start from your own notes and outline.">They asked the AI to "write an abstract about my QI project on sepsis"</span> and pasted their spreadsheet. <span data-slop="The conclusion is the author's judgment. Here the model chose it, and the author adopted it.">The AI decided the main finding was a drop in length of stay, so they led with that</span>, although the project had aimed to cut time to antibiotics. They asked for a list of grammar fixes and accepted four of six. <span data-slop="References must come from sources the author has read, not from the model's suggestions.">They kept the three references the AI suggested</span> and submitted.</p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// The same project, author first</p>
+                <p class="spot-clean">Write down what the project set out to do and what it found, in your own
+                  three lines. Draft from that. Ask the AI what a reviewer would question. Take a list of
+                  edits, choose them, and cite only papers you have opened.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 2 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 3 ===================== -->
+        <details class="lesson" data-lesson="3">
+          <summary class="lesson-summary"><span class="lesson-num">3</span>
+            <span class="lesson-name">Prompts that help, and what never goes in one</span></summary>
+          <div class="lesson-body">
+            <p>Good prompts give the model a narrow job, the facts it may use, and the reader. Some that
+              work well in medicine:</p>
+            <blockquote class="prompt-box"><strong>Critic.</strong> Here is my draft. Do not rewrite it. List
+              the five places a skeptical reviewer would push back, and why.</blockquote>
+            <blockquote class="prompt-box"><strong>Reverse outline.</strong> Summarise each paragraph of my
+              draft in one line. Then tell me where the order or the logic breaks.</blockquote>
+            <blockquote class="prompt-box"><strong>Copy editor.</strong> Suggest edits for grammar, clarity
+              and length as a numbered list with the reason for each. Keep my voice; do not add claims.</blockquote>
+            <blockquote class="prompt-box"><strong>Plain language.</strong> Rewrite this for a patient at a 6th
+              grade reading level. Use only the facts below. If something is missing, ask me instead of
+              guessing.</blockquote>
+            <blockquote class="prompt-box"><strong>Other side.</strong> Give the strongest argument against my
+              conclusion, using only the results I have pasted.</blockquote>
+            <p><strong>What never goes in a prompt,</strong> unless the tool is approved by your institution
+              for exactly that: anything that could identify a patient (names, dates, record numbers,
+              addresses, photos, rare details), confidential manuscripts and grants you are reviewing, and
+              anyone else's unpublished work.</p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 3 &middot; A prompt about to be sent</p>
+              <p class="exercise-task">Tap what should not be in this prompt. (There are 4.) Every detail is made up.</p>
+              <p class="spot" data-spot>Help me write a discharge summary for <span data-slop="A patient's name: identifying information.">Maria Lopez</span>, <span data-slop="A medical record number: identifying information.">MRN 00481927</span>, <span data-slop="A date of birth: identifying information.">born 03/14/1957</span>, admitted with community-acquired pneumonia and treated with ceftriaxone and azithromycin. She <span data-slop="A rare personal detail can identify someone even without a name.">is the only female harbour pilot in the county</span>. Write it at an 8th grade reading level and use only these facts.</p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// A safer prompt</p>
+                <p class="spot-clean">Help me write discharge instructions for an adult treated for
+                  community-acquired pneumonia with ceftriaxone and azithromycin. Write it at an 8th grade
+                  reading level and use only these facts. <span class="spot-note">(And for real patients, use
+                  only the tools your institution has approved.)</span></p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 3 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 4 ===================== -->
+        <details class="lesson" data-lesson="4">
+          <summary class="lesson-summary"><span class="lesson-num">4</span>
+            <span class="lesson-name">Check what the AI gives you</span></summary>
+          <div class="lesson-body">
+            <p>Language models predict likely words; they do not look things up unless the tool says it did,
+              and even then they can misread what they found. In medical writing the failures cluster in four
+              places:</p>
+            <ul class="lesson-list">
+              <li><strong>References.</strong> Real-looking citations to papers that do not exist, or real
+                papers attached to claims they do not make. Open every one and read the part you cite.</li>
+              <li><strong>Numbers.</strong> Effect sizes, percentages and sample sizes with no source. If you
+                cannot find it, delete it.</li>
+              <li><strong>Guidelines and doses.</strong> Old versions, or recommendations stated more broadly
+                than the guideline does. Check the current document.</li>
+              <li><strong>Your own details.</strong> If the draft mentions a date, a place or a result you did
+                not give it, it was invented.</li>
+            </ul>
+            <p>Keep a two-column habit while you check: the claim, and where you confirmed it. It takes ten
+              minutes and is the best protection your name has.</p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 4 &middot; An AI-drafted introduction</p>
+              <p class="exercise-task">Tap what you must verify before submitting. (There are 3.)</p>
+              <p class="spot" data-spot>Burnout is common among residents. <span data-slop="A precise number with no source: find it in a real survey or remove it.">A 2024 national survey found that 63.8% of interns meet criteria for burnout</span>, and <span data-slop="A reference supplied by the model. Open it: it may not exist, or may not say this.">peer coaching reduced burnout by 40% in a randomised trial (Smith et al., JAMA 2022)</span>. Our program introduced monthly coaching in July. <span data-slop="A local detail the author did not supply: the model made it up.">Within six months, 92% of our residents reported feeling more supported.</span></p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// What about the first and fourth sentences?</p>
+                <p class="spot-clean">"Burnout is common among residents" is general enough to stand, though a
+                  reviewer may still want a citation. "Our program introduced monthly coaching in July" is your
+                  own fact, so you can confirm it yourself.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 4 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 5 ===================== -->
+        <details class="lesson" data-lesson="5">
+          <summary class="lesson-summary"><span class="lesson-num">5</span>
+            <span class="lesson-name">Personal statements and applications</span></summary>
+          <div class="lesson-body">
+            <p><strong>What is allowed.</strong> The AAMC, which runs ERAS, accepts AI for brainstorming,
+              proofreading or editing the personal statement, but the final submission should represent your
+              own work. Other application
+              services and individual programs may set their own rules, so read each one.</p>
+            <p><strong>Who reads it.</strong> The AAMC says the ERAS platform itself does not use AI to
+              analyse, sort or evaluate applications. Some programs use other tools: the AAMC describes
+              Thalamus Cortex, a review tool, as using AI to read personal statements and assess certain
+              applicant characteristics, while not scoring, filtering or rejecting applicants. And then there
+              are the faculty who read hundreds of statements a season.</p>
+            <p><strong>Detectors are not a safe bet either way.</strong> In a study of seven AI detectors,
+              essays by non-native English speakers were wrongly flagged as AI-written 61% of the time on
+              average. Do not count on going undetected, and do not assume a flag is proof. The only reliable
+              position is a statement you could talk through, line by line, at your interview.</p>
+            <p><strong>How AI helps here.</strong></p>
+            <ul class="lesson-list">
+              <li>Ask it to <strong>critique your draft</strong>: where is it vague, where does a claim lack a
+                story behind it?</li>
+              <li>Use it as a <strong>copy editor</strong> and take its edits one by one.</li>
+              <li>If English is not your first language, use it to <strong>say clearly what you mean</strong>,
+                and keep the facts and stories yours.</li>
+              <li>Have <strong>a mentor</strong>, not the AI, do the final read.</li>
+            </ul>
+            <p>The test of a good statement: no one else could have written it. AI's default sentences are
+              the ones anyone could have written.</p>
+            <p class="course-sources">// Sources (checked November 2026):
+              <a href="https://www.ama-assn.org/medical-students/preparing-residency/how-use-ai-residency-applications-learn-rules-road" target="_blank" rel="noopener noreferrer">AMA, How to use AI in residency applications (September 2026)</a> &middot;
+              <a href="https://www.aamc.org/services/use-artificial-intelligence-aamc-service-programs" target="_blank" rel="noopener noreferrer">AAMC, use of AI in AAMC service programs</a> &middot;
+              <a href="https://pubmed.ncbi.nlm.nih.gov/37521038/" target="_blank" rel="noopener noreferrer">Liang et al., GPT detectors are biased against non-native English writers (Patterns, 2023)</a></p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 5 &middot; A personal statement paragraph</p>
+              <p class="exercise-task">Tap the sentences anyone could have written. (There are 3.)</p>
+              <p class="spot" data-spot><span data-slop="A generic opening: every applicant could claim it.">I have always been passionate about helping others and making a difference in people's lives.</span> On my sub-internship, a man with heart failure asked me to explain his pills back to him every morning, and by Friday he was explaining them to me. <span data-slop="An abstract lesson with no story attached. The story above already shows it.">This experience taught me the importance of patient education and empathy.</span> <span data-slop="A stock claim about the specialty that fits any program.">Internal medicine offers the perfect blend of intellectual challenge and meaningful patient relationships.</span></p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// What to keep</p>
+                <p class="spot-clean">The second sentence is the statement. Build the paragraph around it: what
+                  you did differently on Monday, what he taught you, what you still do because of it.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 5 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== Lesson 6 ===================== -->
+        <details class="lesson" data-lesson="6">
+          <summary class="lesson-summary"><span class="lesson-num">6</span>
+            <span class="lesson-name">De-AI your writing</span></summary>
+          <div class="lesson-body">
+            <p><strong>What de-AI means here.</strong> Not hiding AI use: where a venue asks you to disclose,
+              disclose. It means editing a draft until it is accurate, specific and in your voice, so it
+              reads like a person who knows the subject wrote it. A short pass:</p>
+            <ol class="lesson-list">
+              <li><strong>Cut the padding:</strong> openers, announcements ("It's important to note"), recaps
+                and stock closers.</li>
+              <li><strong>Swap the stock words</strong> (<em>delve, crucial, landscape, navigate, foster,
+                testament, robust</em>) for plain or specific ones.</li>
+              <li><strong>Break the shape:</strong> automatic threes, "not just X, but Y", bullets that should
+                be sentences, every sentence the same length.</li>
+              <li><strong>Add what only you know:</strong> the real detail, number, date or moment.</li>
+              <li><strong>Take out what you cannot stand behind,</strong> including hedges you do not mean and
+                confidence you have not earned.</li>
+              <li><strong>Read it aloud.</strong> Change anything you would not say.</li>
+            </ol>
+            <p>For a full drill on each step, take the <a href="course-deslopify.html">Deslopify course</a>.</p>
+
+            <div class="exercise">
+              <p class="exercise-label">// Exercise 6 &middot; A cover letter to a journal</p>
+              <p class="exercise-task">Tap the AI tells. (There are 4.)</p>
+              <p class="spot" data-spot>Dear Editor, <span data-slop="A stock opener that delays the point.">I am thrilled to submit our manuscript for your consideration.</span> In this study, we <span data-slop="'Delve' is the best-known AI tell. Say what you did.">delve into</span> how night-float handoffs affect overnight pages. <span data-slop="The contrast slogan: it sounds weighty and says nothing.">This is not just a study about handoffs; it is a study about patient safety.</span> We found that a structured handoff cut overnight pages by a fifth across 14 weeks. <span data-slop="Three empty adjectives: let the result persuade.">Our robust, novel and impactful findings</span> will interest your readers.</p>
+              <div class="spot-tools">
+                <button type="button" class="btn btn--primary" data-spot-check>&gt; Check my answers</button>
+                <button type="button" class="btn" data-spot-reset>&gt; Try again</button>
+              </div>
+              <div class="spot-result" hidden>
+                <p class="spot-score"></p>
+                <ol class="spot-reasons"></ol>
+                <p class="spot-clean-label">// A cleaner version</p>
+                <p class="spot-clean">Dear Editor, we submit a study of how night-float handoffs affect
+                  overnight pages. A structured handoff cut overnight pages by a fifth across 14 weeks, which we
+                  think will interest readers who run residency programs. We used an AI tool to edit the text
+                  for grammar, as described in the manuscript.</p>
+              </div>
+            </div>
+            <button type="button" class="btn lesson-done" data-done>&gt; Mark lesson 6 done</button>
+          </div>
+        </details>
+
+        <!-- ===================== The checklist ===================== -->
+        <section id="course-checklist" class="course-checklist" aria-labelledby="checklist-title">
+          <p class="course-kicker">// Keep this one</p>
+          <h3 id="checklist-title" class="course-title course-title--small">Before you submit anything AI helped with</h3>
+          <ol class="checklist">
+            <li>I read this venue's rules on AI (journal, funder, application service, program).</li>
+            <li>No patient-identifying or confidential material went into an AI tool that was not approved for it.</li>
+            <li>The ideas, structure and conclusions are mine; I could defend every sentence.</li>
+            <li>Every reference is a source I opened, and it says what I cite it for.</li>
+            <li>Every number, dose and guideline is checked against its source.</li>
+            <li>Nothing in it is a detail I did not supply myself.</li>
+            <li>AI is not listed as an author or cited as a source.</li>
+            <li>I disclosed AI use wherever the venue asks.</li>
+            <li>I took out the padding, stock words and automatic shapes, and added what only I know.</li>
+            <li>A person I trust read it, and I read it aloud.</li>
+          </ol>
+          <p><button type="button" class="btn btn--primary" data-print-checklist>&gt; Print the checklist</button></p>
+        </section>
+
+      </div>
+
+      <noscript>
+        <p>&gt; The course needs JavaScript.</p>
+      </noscript>
+
+      <p><a href="learn.html" class="back-link">&lt; LEARNING</a></p>
+    </main>
+
+    <p class="site-social"><a href="https://www.instagram.com/aimedicinecollective/" target="_blank" rel="noopener noreferrer"><svg class="site-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg><span>&gt; INSTAGRAM: @aimedicinecollective</span></a></p>
+
+    <p class="site-note">// The AI Medicine Collective is an independent, volunteer-run group.
+      Everything on this site, including AI-assisted summaries and member-built tools, is for
+      educational purposes only and is not medical advice. We make no guarantee that it is
+      accurate, complete or current. Check all information against primary sources and use
+      your own clinical judgment.</p>
+
+    <div class="horizontal-rule bottom-rule"></div>
+
+    <footer class="footer">
+      &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+      <span class="cursor">█</span>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+  <script src="course.js"></script>
+</body>
+</html>
