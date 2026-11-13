@@ -19,6 +19,28 @@ Sets are saved on the watch the moment you log them and stay there until the
 iPhone confirms it has stored them, so you can lift with the phone in your
 locker. Closing the app keeps the session; open it again to resume.
 
+## Tools (main menu)
+
+* **Timers**: Chalk talk 5, Presentation 10, Focus 25, Stretch 2 minutes,
+  silent. The button returns to the menu and the timer keeps running (the
+  menu shows it at the top); **End** asks first; **+1 min** extends. The
+  1-minute warning and the end buzz are Scheduler alarms, so they fire even
+  if you leave the app.
+* **Stopwatch** with laps; keeps counting if you leave the screen.
+* **Mark a moment**: Coffee, Headache, Workout note, Idea, Felt great, Low
+  energy. Timestamped, synced to the iPhone, where you can add a note.
+* **Retro progress**: time, steps, sets waiting, running timer.
+* **Sync** screen: what's waiting, last sync, Sleep Log and Scheduler
+  status, free storage, versions (useful for bug reports).
+
+Workout Ghost: the set screen's second line shows last time's set for the
+exercise ("Last 135x8@2"); the first set that matches or beats it at the
+same RIR gets a distinct buzz.
+
+Needs the **Scheduler** app (installed by default on Bangle.js 2; the App
+Loader adds it if missing). Without it, timers buzz only while their screen
+is open.
+
 ## Sleep
 
 Install **Sleep Log** (0.26) too. Sleep Log records in the background; this
@@ -41,3 +63,6 @@ these undeclared means no install, reinstall or update can delete unsynced
 sets, a workout in progress or the pairing. The cost: uninstalling leaves
 those three small files behind. To remove them, delete `nsync.json`, `nsync.ses.*` and `nsync.pend.*` in the Espruino
 Web IDE's storage manager (Storage icon).
+
+Other files: `nsync.mark.a/b.json` (markers, kept like pending records),
+`nsync.timer.json` (running timer), `nsync.sw.json` (stopwatch).

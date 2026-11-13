@@ -20,7 +20,7 @@ var F = {
 };
 exports.F = F;
 exports.SVC = SVC;
-exports.VERSION = "0.01";
+exports.VERSION = "0.02";
 exports.PROTO = 1;
 exports.MAX_PEND = 600;
 exports.MAX_MARKS = 300;      // unsynced markers; synced ones beyond KEEP_MARKS are pruned

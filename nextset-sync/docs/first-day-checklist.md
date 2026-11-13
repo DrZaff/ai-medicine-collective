@@ -20,14 +20,15 @@ About 45 minutes of setup spread over the week, plus one night.
    * **Workouts**: send *Full Body A*, create one with **+**, or import a
      NextSet plan or prescription JSON or a text file (Files app).
    * **History**: per-set status, **Export CSV**.
-   * **Sleep**: nine demo nights, a seven-night chart, a nap and partial-night
-     labels. Demo data is kept separate from your real data.
-3. **Get the watch files onto the PC.** On GitHub, open the `nextset-sync`
-   repository → **Code → Download ZIP** → extract it. The watch app is the
-   `watch/nsync` folder. (Before the repository exists, use the
-   `claude/bangle-iphone-workout-sleep-x9j8xy` branch of
-   `ai-medicine-collective` the same way; the folder is
-   `nextset-sync/watch/nsync`.)
+   * **Today**: recent sessions, sync status, Moments (tap **Mark a moment on
+     the watch** on the Watch tab, sync, then add a note), last night's sleep.
+     **Sleep history** (from Today): nine demo nights, a seven-night chart, a
+     nap and partial-night labels. Demo data is kept separate from your real data.
+3. **Get the watch files onto the PC.** Easiest: on GitHub open **Actions**
+   → the newest green **NextSet Sync build and tests** (or **CI**) run →
+   **Artifacts** → download **nextset-sync-watch-app** → extract it. Those
+   are exactly the files to install, and they passed the tests. (Or **Code →
+   Download ZIP** and use the `watch/nsync` folder.)
 
 ## When the watch arrives
 
@@ -48,7 +49,8 @@ About 45 minutes of setup spread over the week, plus one night.
     `app.js`, `boot.js`, `lib.js`, `app-icon.js`, `app.png`, `README.md`,
     `ChangeLog`) → **OK**. The watch restarts and may show "Updating boot0..."
     once; that is the bootloader adding the new service. Check that **My
-    Apps** lists both NextSet Sync 0.01 and Sleep Log 0.26.
+    Apps** lists **NextSet Sync 0.02**, **Sleep Log 0.26** and **Scheduler**
+    (a default app; the loader adds it if it was missing: the timers need it).
     * This upload writes only NextSet Sync's own files. Sleep Log, your
       settings and other apps' data are untouched.
     * For later **updates**, install the same way. Pairing, unsynced sets and
@@ -81,14 +83,17 @@ About 45 minutes of setup spread over the week, plus one night.
 | G | iPhone: **History** → the session | The set appears **once**, with a green check (synced) |
 | H | iPhone: **Sync Now** twice more, then **History → Export CSV** | Still one set; the CSV has exactly one data row |
 | I | Watch: log set 2, press the button → **Finish workout** → **Finish**; iPhone: **Sync Now** | Session shows *finished* with 2 sets |
+| J | Watch: main menu → **Mark a moment → Coffee**; iPhone: **Sync Now** → **Today** | *Coffee* under Moments, once; tap it, add a note |
+| K | Watch: **Timers → Stretch (2m)**, let the screen lock, press the button once, then once more | The first press only wakes the screen; the second returns to the menu with "> Stretch" still running. Open another app: you still get **one short buzz at 1:00 left and a long triple buzz at 0:00** |
+| L | Start the Quick test again: is line 2's **"Last …"** (your Ghost: last time's set) readable at arm's length? Log a set that matches or beats it at the same RIR | A **distinct double buzz** (first match) instead of the short one |
 
 ## First night
 
 14. Before bed: watch on the wrist, not on the charger. Nothing needs to be
     open on the watch: Sleep Log records in the background.
 15. Morning: open the iPhone app near the watch. It reconnects and syncs
-    (or tap **Sync Now**). The **Sleep** tab shows estimated sleep, the sleep
-    and wake times, and the night in the seven-night chart.
+    (or tap **Sync Now**). **Today** shows last night's estimated sleep with
+    sleep and wake times; **Today → Sleep history** shows the seven-night chart.
 
 ## Still to be confirmed on hardware
 
@@ -96,6 +101,8 @@ These are built and tested in software only. Tick each off on the day:
 
 - [ ] Bluetooth pairing and reconnection with the real Bangle.js 2 (steps 11–13, F)
 - [ ] Rest-timer vibration (D), and touch sizes being comfortable mid-workout
+- [ ] Scheduler-backed buzzes after leaving the app (K), Ghost legibility and buzz (L)
+- [ ] Text previews (BangleApps *iOS Integration*, watch bonded in iOS **Settings → Bluetooth**) arriving while NextSet syncs
 - [ ] Overnight Sleep Log recording and the morning sync (14–15)
 - [ ] Reconnection while the app is in the background (lock the iPhone during C to F)
 
@@ -109,6 +116,9 @@ These are built and tested in software only. Tick each off on the day:
   then pair again (steps 11–13).
 * **Sync stopped part-way:** nothing is lost. Sets stay on the watch until the
   iPhone has saved them; just sync again.
-* **Sleep tab is empty:** check that Sleep Log is installed and enabled
+* **Anything else:** iPhone **Settings → Copy diagnostics**, and on the watch
+  **NextSet Sync → (sync line) → Sync** screen; paste and photograph both into
+  the bug report.
+* **Sleep history is empty:** check that Sleep Log is installed and enabled
   (watch **Settings → Apps → Sleep Log**), and that the watch was worn and not
   charging.

@@ -64,14 +64,14 @@ Every request carries `q` (a number); the answer echoes it. An error is
 
 | Request (phone) | Answer (watch) | Notes |
 |---|---|---|
-| `hello` `{v, phone, mtu}` | `hi` `{v, min, watch, app, fw, paired, nonce, sl}` | Always allowed. `sl` = Sleep Log `{ver, on, last}`; `nonce` = 64 random bits from `E.hwRand()`. |
+| `hello` `{v, phone, mtu, kinds}` | `hi` `{v, min, watch, app, fw, paired, nonce, sl, kinds}` | Always allowed. `kinds` (since watch 0.02): record kinds the phone stores; without it the watch assumes `["set","ses"]`. `sl` = Sleep Log `{ver, on, last}`; `nonce` = 64 random bits from `E.hwRand()`. |
 | `pair` `{phone, name, code}` | `paired` `{key, watch}` | Only while the watch app shows **Pair phone**; waits until the person taps **Pair** on the watch (or `pair_refused`). |
 | `auth` `{proof}` | `authok` | `proof = hex(SHA-256(key + ":" + nonce + ":" + phone))`. The nonce is single use. |
 | `time` `{ms, tz}` | `ok` | Sets the watch clock and time zone (minutes east of UTC); saves `timezone` in `setting.json` only if it changed. |
 | `status` | `st` `{pend, pendSets, ses, wkt, sAck, bat, free, now, sl}` | |
 | `wput` `{w}` | `wack` `{id, rev}` | Stores the workout, reads it back from flash, **then** acknowledges. |
-| `pull` `{max}` | `recs` `{recs, more, total}` | Oldest first, up to 20 per answer (phone asks for 8). |
-| `ack` `{ids: [[id, rev], …]}` | `acked` `{n, left}` | Watch deletes a record only if its stored `rev` ≤ the acknowledged rev. |
+| `pull` `{max}` | `recs` `{recs, more, total}` | Oldest first, up to 20 per answer (phone asks for 8). Only kinds the phone listed. |
+| `ack` `{ids: [[id, rev], …]}` | `acked` `{n, left}` | Watch deletes a set/session (or marks a marker synced) only if its stored `rev` ≤ the acknowledged rev. `left` counts only kinds this phone takes. |
 | `sleep` `{since, max}` | `slp` `{since, now, entries, more, sl}` | Calls Sleep Log's own `require("sleeplog").readLog(since×600000, now)`. |
 | `sack` `{upto}` | `ok` | Saves the sleep cursor (shown in `status`). |
 | `unpair` | `ok` | Forgets this phone. |
@@ -88,6 +88,19 @@ with `unauthorized`.
 {"k":"ses","id":"7a3c91e0-lz8k2q","rev":1,"sid":"7a3c91e0-lz8k2q","wn":"…","start":…,"end":…,"n":2,"at":…}
 ```
 
+```json
+{"k":"mark","id":"7a3c91e0-mlz8k2q9a","rev":1,"label":"Coffee","at":1794600000000}
+```
+
+* Every record has `k`, `id`, `rev`, `at`; all other fields are optional, so
+  the phone can decode a kind it doesn't know. **It acknowledges only kinds it
+  stores**; anything else stays on the watch until a phone that understands it
+  connects. A new kind means: the watch adds it to `KINDS`, the phone to
+  `SyncProtocol.storedKinds` and its store, plus tests on both sides.
+* Markers live on the watch in their own two-slot file (`nsync.mark.*`),
+  up to 300 unsynced (new ones are refused, never dropped, when full); after
+  acknowledgment the newest 30 are kept for the watch's Recent list. Notes
+  added on the iPhone stay on the iPhone (`notes.json`) and survive re-imports.
 * `id` is stable for the life of the record: `<watch id>-<session start in
   base-36 seconds>.<exercise index>.<set number>` for sets, the session id for
   `ses`. `rev` starts at 1 and increases on every edit on the watch; a

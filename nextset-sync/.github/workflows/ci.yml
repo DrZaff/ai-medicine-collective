@@ -74,3 +74,11 @@ jobs:
         run: swift --version
       - name: All tests (watch code in Espruino 2v29, Swift core, bridge)
         run: scripts/run-tests.sh
+      # Ready-to-install watch files: download this artifact, unzip, then in the
+      # App Loader choose More > Install App from Files and select them all.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nextset-sync-watch-app
+          path: |
+            watch/nsync/*
+          retention-days: 30

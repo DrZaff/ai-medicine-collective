@@ -79,6 +79,18 @@ How to hand work over:
   copy `icon-1024.png` into `ios/NextSetSync/Assets.xcassets/AppIcon.appiconset/`
   and make a matching 48×48 watch icon.
 
+### Next (in order; see docs/features.md for the why)
+* **Owner:** first hardware test with `first-day-checklist.md` (rows A–L), and
+  the text-preview coexistence check.
+* **Claude:** heart-rate and recovery slice, from BangleApps Health 0.44 (format
+  verified in `health-log.md`) with a `chk` check-in record kind; then
+  readiness into NextSet's `readiness` input.
+* **Codex:** local backup and restore ("time capsule", features.md #1), then
+  "gym-floor polish" (tempo metronome, plate calculator and warm-up ramp,
+  RIR-aware rest: #2–4) as one PR; XCUITest smoke in CI.
+* Later: retro watch face, GPS walks via Recorder, slide remote (needs its own
+  feasibility test: one BLE connection at a time).
+
 ### P1: make it great (pick up anytime; independent of each other)
 4. **Codex:** XCUITest smoke test in CI on the iOS simulator, in demo mode:
    launch → Watch tab → Sync Now → History shows sets → Sleep tab shows a
@@ -148,3 +160,5 @@ until it exists, `DrZaff/ai-medicine-collective` branch
 | 2026-11-13 | Claude | 16-bit icon draft (design/icon-16bit), collaboration proposal and ChatGPT brief |
 | 2026-11-13 | Claude | Removed Apple Health entirely (code, entitlement, permissions, docs) at the owner's request |
 | 2026-11-13 | Codex | First daily-use slice: Workout Ghost, silent timers and stopwatch, watch-local markers, retro status screen, and iPhone Today with training and sleep. Review and device validation pending. |
+| 2026-11-13 | Codex | PR #182: Workout Ghost, watch tools, Today (merged at the owner's direction after Claude's review) |
+| 2026-11-13 | Claude | Fixed the review findings (timers via Scheduler, unlock guard, crash-safe markers with ids, last-set memory, Ghost legibility, Today demo bug); kinds negotiation + ack-only-stored (fixes silent loss of new record kinds); marker sync end to end; Moments with phone-only notes; diagnostics; watch-files CI artifact; features.md, health-log.md. Watch 74 checks, Swift 41 tests. |

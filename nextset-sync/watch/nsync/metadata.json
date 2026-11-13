@@ -2,9 +2,9 @@
   "id": "nsync",
   "name": "NextSet Sync",
   "shortName": "NextSet",
-  "version": "0.01",
+  "version": "0.02",
   "author": "DrZaff",
-  "description": "Log strength-training sets (load, reps, RIR) with a rest timer, and sync sets and Sleep Log data directly to the NextSet Sync iPhone app over Bluetooth. No companion app or cloud account.",
+  "description": "Everyday training companion for Bangle.js 2: log sets (load, reps, RIR) with Workout Ghost and a rest timer, silent timers, stopwatch and moment markers. Syncs sets, markers and Sleep Log data directly to the NextSet Sync iPhone app over Bluetooth. No companion app, account or cloud.",
   "icon": "app.png",
   "type": "app",
   "tags": "tool,health,bluetooth",
@@ -43,5 +43,8 @@
     {
       "name": "nsync.last.json"
     }
-  ]
+  ],
+  "dependencies": {
+    "scheduler": "type"
+  }
 }
