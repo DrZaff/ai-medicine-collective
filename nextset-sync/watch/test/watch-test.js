@@ -15,6 +15,7 @@ S.eraseAll();
 S.write("nsync", FILES.lib);
 S.write("nsync.boot.js", FILES.boot);
 S.write("nsync.app.js", FILES.app);
+S.write("nsync-tools", FILES.tools);
 S.write("sleeplog", FILES.sleeplog);
 S.writeJSON("sleeplog.info", { id: "sleeplog", version: "0.26" });
 S.writeJSON(FIXTURE.archiveName, FIXTURE.archive);
@@ -38,6 +39,7 @@ global.NRF = {
 var ui = null, menu = null, prompt = null, buzzes = 0;
 global.Bangle = {
   getOptions: function() { return { lockTimeout: 10000, backlightTimeout: 10000 }; },
+  getHealthStatus: function() { return { steps: 123 }; },
   setOptions: function() {}, on: function() {}, setLCDPower: function() {}, setLocked: function() {},
   buzz: function() { buzzes++; return Promise.resolve(); },
   setUI: function(o) { if (ui && ui.remove) ui.remove(); ui = o || null; }
@@ -168,7 +170,27 @@ step(function() {
   NRF.connected = false;
   eval(S.read("nsync.app.js"));
   ok(menu && Object.keys(menu).some(function(k) { return k.indexOf("Start Upper A") == 0; }), "main menu offers Start Upper A");
+  menu["Timers"]();
+  menu["Chalk talk (5m)"]();
+  ok(ui && ui.mode == "custom", "chalk talk timer opens offline");
+  ui.btn();
+  menu["Stopwatch"]();
+  ui.touch(1, { x: 30, y: 140 });
+  ui.touch(1, { x: 150, y: 140 });
+  ui.btn();
+  menu[""].back();
+  menu["Mark a moment"]();
+  menu["Coffee"]();
+  ok(S.readJSON("nsync.markers.json")[0].label == "Coffee", "offline marker is timestamped and stored");
+  menu[""].back();
+  menu["Retro progress"]();
+  ok(ui && ui.mode == "custom", "retro progress opens offline");
+  ui.btn();
   menu[Object.keys(menu).filter(function(k) { return k.indexOf("Start") == 0; })[0]]();
+  ok(matchesGhost({ load: 135, reps: 5, rir: 2 }, { load: 140, reps: 5, rir: 2 }),
+    "ghost rewards more load with matching reps and RIR");
+  ok(!matchesGhost({ load: 135, reps: 5, rir: 2 }, { load: 140, reps: 4, rir: 2 }),
+    "ghost rejects more load at fewer reps");
   ok(ui && ui.mode == "custom", "set entry screen shown");
   ui.touch(1, { x: 87, y: 140 });  // + on load (selected by default): 135 -> 140
   ui.touch(1, { x: 87, y: 60 });   // select REPS

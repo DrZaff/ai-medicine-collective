@@ -147,3 +147,4 @@ until it exists, `DrZaff/ai-medicine-collective` branch
 | 2026-11-13 | Claude | GitHub CI: iOS app compiles on Xcode 26.3 (sim + device), all tests green on macOS and Linux; added the no-Mac/TestFlight path, app icon, Transferable sharing, Swift 6-clean demo wiring, AGENTS.md and this handoff |
 | 2026-11-13 | Claude | 16-bit icon draft (design/icon-16bit), collaboration proposal and ChatGPT brief |
 | 2026-11-13 | Claude | Removed Apple Health entirely (code, entitlement, permissions, docs) at the owner's request |
+| 2026-11-13 | Codex | First daily-use slice: Workout Ghost, silent timers and stopwatch, watch-local markers, retro status screen, and iPhone Today with training and sleep. Review and device validation pending. |

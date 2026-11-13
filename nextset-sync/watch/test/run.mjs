@@ -18,6 +18,7 @@ const log = read(join(fx, 'sleeplog-sample.log'));
 const lines = log.trim().split('\n').filter(l => !l.startsWith(','));
 const FILES = {
   lib: read(join(app, 'lib.js')), boot: read(join(app, 'boot.js')), app: read(join(app, 'app.js')),
+  tools: read(join(app, 'tools.js')),
   sleeplog: read(join(here, 'vendor', 'sleeplog-0.26-lib.js')),
 };
 const FIXTURE = {log, archive, archiveName: expected.archiveFileName,

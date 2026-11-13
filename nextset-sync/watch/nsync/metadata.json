@@ -27,6 +27,10 @@
       "url": "lib.js"
     },
     {
+      "name": "nsync-tools",
+      "url": "tools.js"
+    },
+    {
       "name": "nsync.img",
       "url": "app-icon.js",
       "evaluate": true
