@@ -9,10 +9,10 @@ struct NextSetSyncApp: App {
     var body: some Scene {
         WindowGroup {
             TabView {
+                TodayView().tabItem { Label("Today", systemImage: "heart.text.clipboard") }
                 WatchView().tabItem { Label("Watch", systemImage: "applewatch.radiowaves.left.and.right") }
                 WorkoutsView().tabItem { Label("Workouts", systemImage: "dumbbell") }
                 HistoryView().tabItem { Label("History", systemImage: "list.bullet.rectangle") }
-                SleepView().tabItem { Label("Sleep", systemImage: "bed.double") }
                 SettingsView().tabItem { Label("Settings", systemImage: "gearshape") }
             }
             .environment(model)

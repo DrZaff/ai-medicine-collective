@@ -82,45 +82,43 @@ struct SleepView: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        NavigationStack {
-            let nights = model.nights
-            List {
-                if let last = nights.first {
-                    Section("Latest night") { NightCard(night: last, current: .current) }
-                    Section("Last 7 nights") {
-                        let trend = SleepAnalyzer.trend(nights)
-                        Chart(trend) { p in
-                            if let m = p.asleepMinutes {
-                                BarMark(x: .value("Woke", String(p.wakeDate.suffix(5))), y: .value("Hours", Double(m) / 60))
-                                    .foregroundStyle(p.isPartial ? Color.orange : Color.indigo)
-                            }
-                        }
-                        .chartYAxisLabel("hours asleep (estimate)")
-                        .frame(height: 180)
-                        let known = trend.compactMap(\.asleepMinutes)
-                        if !known.isEmpty {
-                            LabeledContent("Average", value: hm(known.reduce(0, +) / known.count))
+        let nights = model.nights
+        List {
+            if let last = nights.first {
+                Section("Latest night") { NightCard(night: last, current: .current) }
+                Section("Last 7 nights") {
+                    let trend = SleepAnalyzer.trend(nights)
+                    Chart(trend) { p in
+                        if let m = p.asleepMinutes {
+                            BarMark(x: .value("Woke", String(p.wakeDate.suffix(5))), y: .value("Hours", Double(m) / 60))
+                                .foregroundStyle(p.isPartial ? Color.orange : Color.indigo)
                         }
                     }
-                    Section("Nights") {
-                        ForEach(nights) { n in
-                            NavigationLink { List { NightCard(night: n, current: .current) }.navigationTitle(n.wakeDate) } label: {
-                                HStack {
-                                    Text(n.wakeDate)
-                                    Spacer()
-                                    Text(hm(n.main.asleepMinutes)).monospacedDigit()
-                                    if n.main.isPartial { Image(systemName: "hourglass").foregroundStyle(.orange) }
-                                }
-                            }
-                        }
+                    .chartYAxisLabel("hours asleep (estimate)")
+                    .frame(height: 180)
+                    let known = trend.compactMap(\.asleepMinutes)
+                    if !known.isEmpty {
+                        LabeledContent("Average", value: hm(known.reduce(0, +) / known.count))
                     }
-                } else {
-                    ContentUnavailableView("No sleep data yet", systemImage: "bed.double",
-                                           description: Text("Install Sleep Log on the watch, wear it overnight, then sync in the morning."))
                 }
+                Section("Nights") {
+                    ForEach(nights) { n in
+                        NavigationLink { List { NightCard(night: n, current: .current) }.navigationTitle(n.wakeDate) } label: {
+                            HStack {
+                                Text(n.wakeDate)
+                                Spacer()
+                                Text(hm(n.main.asleepMinutes)).monospacedDigit()
+                                if n.main.isPartial { Image(systemName: "hourglass").foregroundStyle(.orange) }
+                            }
+                        }
+                    }
+                }
+            } else {
+                ContentUnavailableView("No sleep data yet", systemImage: "bed.double",
+                                       description: Text("Install Sleep Log on the watch, wear it overnight, then sync in the morning."))
             }
-            .navigationTitle("Sleep")
         }
+        .navigationTitle("Sleep")
     }
 }
 

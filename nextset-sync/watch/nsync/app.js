@@ -53,6 +53,14 @@ function lowReps(r) { var m = /(\d+)/.exec("" + r); return m ? parseInt(m[1], 10
 function liveSets(xi) {
   return (ses.recs || []).filter(function(r) { return r.xi == xi && !r.del; });
 }
+function ghost(ex) {
+  var previous = ses.ghost && ses.ghost[ex.id];
+  return previous && previous.units == ses.units ? previous : null;
+}
+function matchesGhost(previous, rec) {
+  return previous && rec.rir === previous.rir &&
+    rec.load >= previous.load && rec.reps >= previous.reps;
+}
 function defaults(ex) {
   var prev = liveSets(ses.xi);
   if (prev.length) { var p = prev[prev.length - 1]; return { load: p.load, reps: p.reps, rir: p.rir }; }
@@ -68,10 +76,15 @@ function startSession() {
   if (!w) return showMain();
   var c = L.cfg();
   var now = Date.now();
+  var last = S.readJSON(F.last, 1) || {}, baseline = {};
+  w.ex.forEach(function(ex) {
+    if (last[ex.id] && last[ex.id].units == (w.units || "lb")) baseline[ex.id] = last[ex.id];
+  });
   ses = {
     sid: c.wid + "-" + Math.floor(now / 1000).toString(36),
     wid: w.id, wn: w.name, units: w.units || "lb", ex: w.ex,
-    xi: 0, sn: 1, start: now, restEnd: 0, recs: []
+    xi: 0, sn: 1, start: now, restEnd: 0, recs: [],
+    ghost: baseline
   };
   save();
   showEntry();
@@ -93,7 +106,12 @@ function logSet() {
   var last = S.readJSON(F.last, 1) || {};
   last[rec.xid] = { load: rec.load, reps: rec.reps, rir: rec.rir, units: rec.units };
   S.writeJSON(F.last, last);
-  Bangle.buzz(40);
+  var previous = ghost(ex);
+  var firstMatch = matchesGhost(previous, rec) && !liveSets(ses.xi).some(function(r) {
+    return r.id != rec.id && matchesGhost(previous, r);
+  });
+  if (firstMatch) Bangle.buzz(90).then(function() { return Bangle.buzz(140, 0.5); });
+  else Bangle.buzz(40);
   var nextLabel;
   if (ses.sn < ex.sets) { ses.sn++; nextLabel = ex.name + " " + ses.sn + "/" + ex.sets; }
   else if (ses.xi < ses.ex.length - 1) { ses.xi++; ses.sn = 1; nextLabel = curEx().name + " 1/" + curEx().sets; }
@@ -116,7 +134,7 @@ function finishSession() {
 
 // ---- set entry screen ----------------------------------------------------
 var BOX = [{ x: 2, k: "load" }, { x: 60, k: "reps" }, { x: 118, k: "rir" }];
-var BY = 46, BH = 64, BW = 56, KY = 116, KH = 58;
+var BY = 56, BH = 56, BW = 56, KY = 116, KH = 58;
 
 function drawEntry() {
   var ex = editing ? ses.ex[editing.xi] : curEx();
@@ -127,6 +145,11 @@ function drawEntry() {
   var line = editing ? "Set " + editing.set : "Set " + ses.sn + "/" + ex.sets + "  " + (ex.reps || "") + (ex.rir !== undefined ? " @" + ex.rir : "");
   g.drawString(fit(line, W - 44, "6x15"), 2, 26);
   g.setFontAlign(1, -1).drawString(hhmm(), W - 2, 26);
+  var previous = editing ? null : ghost(ex);
+  if (previous) {
+    font("6x8");
+    g.setFontAlign(-1, -1).drawString("Last " + num(previous.load) + "x" + previous.reps + " @" + previous.rir, 2, 43);
+  }
   var labels = [(ses.units || "lb").toUpperCase(), "REPS", "RIR"];
   BOX.forEach(function(b, i) {
     var on = i == sel;
@@ -360,6 +383,9 @@ function showMain() {
   else m["No workout yet"] = function() { E.showAlert("Send a workout from the iPhone app.").then(showMain); };
   m[(p.sets ? p.sets + (p.sets == 1 ? " set" : " sets") + " to sync" : "All synced")] = showSyncInfo;
   m["Pair phone"] = showPair;
+  m["Timers"] = function() { require("nsync-tools").open(showMain); };
+  m["Mark a moment"] = function() { require("nsync-tools").markers(showMain); };
+  m["Retro progress"] = function() { require("nsync-tools").progress(showMain); };
   E.showMenu(m);
 }
 
