@@ -42,7 +42,7 @@ you ask it to.
 1. **App ID.** https://developer.apple.com/account → **Certificates, IDs &
    Profiles** → **Identifiers** → **+** → **App IDs** → **App** →
    Description `NextSet Sync`, Bundle ID **Explicit**
-   `com.zaffuto.nextsetsync` → under Capabilities tick **HealthKit** →
+   `com.zaffuto.nextsetsync` (no capabilities to tick) →
    **Continue** → **Register**.
    If that bundle ID is taken, use `com.<yourname>.nextsetsync` and set the
    GitHub variable `BUNDLE_ID` to it in step 4.
@@ -109,11 +109,11 @@ environment** → name `testflight` → **Configure environment**.
 Every CI run also produces `NextSetSync-unsigned-ipa` (Actions → the run →
 **Artifacts**). Windows sideloading tools such as Sideloadly can sign it with
 your Apple ID and install it over USB. Not tested here, and with a free Apple
-ID the app expires after 7 days and HealthKit may be unavailable. Use
+ID the app expires after 7 days. Use
 TestFlight if you can.
 
 ## What still needs a person
 
-* The Bluetooth, overnight, vibration and Apple Health checks in
+* The Bluetooth, overnight and vibration checks in
   [first-day-checklist.md](first-day-checklist.md). GitHub's Macs have no
   Bluetooth watch to talk to.

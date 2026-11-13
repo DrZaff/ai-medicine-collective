@@ -5,9 +5,8 @@ and wants you as a collaborator. Claude wrote this brief. Please be candid:
 the point is to improve on Claude's work, not to agree with it.
 
 **Owner's requirement:** the app is standalone. It gets watch data directly
-over Bluetooth into its own storage and never goes through Apple Health
-(that is only an optional, off-by-default export). Keep it that way in your
-suggestions.
+over Bluetooth into its own storage. No Apple Health (removed on purpose), no
+account, no cloud. Keep it that way in your suggestions.
 
 **What NextSet Sync is.** A Bangle.js 2 watch app plus a SwiftUI iPhone app
 for strength training (log load, reps and RIR on the watch, with a rest timer)
@@ -83,7 +82,7 @@ would change.
     storage, sync engine, CI and TestFlight, hardware bug triage).
   * *ChatGPT/Codex:* product, design and **independent review of every
     Claude PR** (icon, iOS screens and copy, UI tests, History and
-    progression, Health workout export).
+    progression).
   * *Owner:* decisions, Apple and GitHub setup, hardware tests, merging.
 * **Loop:**
   1. issue

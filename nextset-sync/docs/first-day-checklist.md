@@ -2,7 +2,7 @@
 
 You need: your Windows PC with Chrome or Edge (the App Loader uses Web
 Bluetooth), your iPhone (iOS 17 or later) with the **TestFlight** app, the
-Bangle.js 2 and its charger, and your paid Apple Developer account. **No Mac:**
+Bangle.js 2 and its charger, and your paid Apple Developer account (TestFlight needs one). **No Mac:**
 GitHub's macOS machines build and sign the iPhone app and send it to TestFlight.
 About 45 minutes of setup spread over the week, plus one night.
 
@@ -21,8 +21,7 @@ About 45 minutes of setup spread over the week, plus one night.
      NextSet plan or prescription JSON or a text file (Files app).
    * **History**: per-set status, **Export CSV**.
    * **Sleep**: nine demo nights, a seven-night chart, a nap and partial-night
-     labels. Apple Health export is switched off in demo mode, so sample
-     nights never reach your Health data.
+     labels. Demo data is kept separate from your real data.
 3. **Get the watch files onto the PC.** On GitHub, open the `nextset-sync`
    repository → **Code → Download ZIP** → extract it. The watch app is the
    `watch/nsync` folder. (Before the repository exists, use the
@@ -90,9 +89,6 @@ About 45 minutes of setup spread over the week, plus one night.
 15. Morning: open the iPhone app near the watch. It reconnects and syncs
     (or tap **Sync Now**). The **Sleep** tab shows estimated sleep, the sleep
     and wake times, and the night in the seven-night chart.
-16. Optional: **Sleep → Export to Apple Health** → allow **Sleep** in Apple's
-    sheet. In the Health app, **Browse → Sleep** shows an "Asleep" entry from
-    NextSet Sync.
 
 ## Still to be confirmed on hardware
 
@@ -101,7 +97,6 @@ These are built and tested in software only. Tick each off on the day:
 - [ ] Bluetooth pairing and reconnection with the real Bangle.js 2 (steps 11–13, F)
 - [ ] Rest-timer vibration (D), and touch sizes being comfortable mid-workout
 - [ ] Overnight Sleep Log recording and the morning sync (14–15)
-- [ ] Apple Health writes on the iPhone (16)
 - [ ] Reconnection while the app is in the background (lock the iPhone during C to F)
 
 ## If something goes wrong

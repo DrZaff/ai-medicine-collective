@@ -34,7 +34,7 @@ fields, so this can be added without breaking either side.
    NextSet's column order (*History → Export CSV*).
 2. **Swift package inside NextSet's iOS build.** `NextSetSyncCore` has no UI
    or Apple-only dependencies. An Expo native module (Expo Modules API, in
-   Swift) can depend on it, plus `bluetooth.swift` and `health.swift` from this
+   Swift) can depend on it, plus `bluetooth.swift` from this
    app, and expose:
    * `sendWorkout(prescriptionJSON)` → `WorkoutImporter.importFile` + `SyncEngine.sendWorkout`
    * `syncNow()` → `SyncEngine.syncAll()`, then return `LocalStore.sets` as
@@ -44,7 +44,7 @@ fields, so this can be added without breaking either side.
 
    NextSet's bundle id is `com.zaffuto.nextsetstrength`. Its iOS target would
    need `NSBluetoothAlwaysUsageDescription`, `UIBackgroundModes:
-   bluetooth-central`, and the HealthKit entitlement, added through an Expo
+   bluetooth-central`, added through an Expo
    config plugin.
 3. **Merge the apps.** Point NextSet's logs at `LocalStore`, or copy records
    across using `SetRecord.id`, which is stable and unique, so repeated

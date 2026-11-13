@@ -45,7 +45,6 @@ final class AppModel {
     @ObservationIgnored private let ble = BLEManager()
     @ObservationIgnored private var engine: SyncEngine?
     @ObservationIgnored private var demoWatch: SimulatedWatch?
-    @ObservationIgnored let health = HealthExporter()
     @ObservationIgnored private var autoSyncTask: Task<Void, Never>?
 
     init() {
@@ -90,7 +89,6 @@ final class AppModel {
     var link: LinkState { _ = revision; return store.link }
     var awaitingAck: Int { _ = revision; return store.awaitingAckCount }
     var allSets: [SetRecord] { _ = revision; return store.sets }
-    var healthExportEnabled: Bool { _ = revision; return store.healthExportEnabled }
     var zones: ZoneHistory { ZoneHistory(store.zones) }
     var nights: [SleepNight] {
         _ = revision
@@ -310,7 +308,6 @@ final class AppModel {
             let r = try await engine.syncAll()
             lastReport = r
             errorMessage = nil
-            if store.healthExportEnabled { await exportToHealth(quiet: true) }
         } catch {
             errorMessage = error.localizedDescription
             try? store.updateLink { $0.lastError = error.localizedDescription }
@@ -364,47 +361,5 @@ final class AppModel {
             notice = "Sleep Log file: \(r.added) new, \(r.changed) updated, \(r.unchanged) already imported."
             revision += 1
         } catch { errorMessage = error.localizedDescription }
-    }
-
-    // MARK: Apple Health
-
-    func setHealthExport(_ on: Bool) async {
-        if on && demoMode { notice = "Turn off demo mode to export your real sleep to Apple Health."; return }
-        if on {
-            do {
-                try await health.requestPermission()
-                store.healthExportEnabled = true
-                await exportToHealth(quiet: false)
-            } catch { errorMessage = error.localizedDescription }
-        } else {
-            store.healthExportEnabled = false
-        }
-        revision += 1
-    }
-
-    func exportToHealth(quiet: Bool) async {
-        guard !demoMode else { if !quiet { notice = "Apple Health export is off in demo mode, so sample nights never reach Health." }; return }
-        guard health.isAvailable else { if !quiet { errorMessage = "Apple Health is not available on this device." }; return }
-        let watchId = store.link.watchId ?? "watch"
-        let plan = store.healthLedger.plan(nights, watchId: watchId)
-        if plan.isEmpty { if !quiet { notice = "Apple Health is up to date." }; return }
-        do {
-            let zones = self.zones
-            let saved = try await health.export(plan, watchId: watchId, firmware: store.link.watchStatus?.firmware,
-                                                sleepLogVersion: store.link.watchStatus?.sleepLogVersion ?? "0.26",
-                                                zone: { zones.zone(at: $0) })
-            try store.updateHealthLedger { $0.record(saved) }
-            if !quiet { notice = "Wrote \(saved.count) sleep interval\(saved.count == 1 ? "" : "s") to Apple Health." }
-            log("Apple Health: \(saved.count) asleep intervals written")
-        } catch { if !quiet { errorMessage = error.localizedDescription }; log("Apple Health: \(error.localizedDescription)") }
-        revision += 1
-    }
-}
-
-extension LocalStore {
-    /// Kept in UserDefaults per store folder; not part of the synced data.
-    var healthExportEnabled: Bool {
-        get { UserDefaults.standard.bool(forKey: "health." + directory.lastPathComponent) }
-        set { UserDefaults.standard.set(newValue, forKey: "health." + directory.lastPathComponent) }
     }
 }

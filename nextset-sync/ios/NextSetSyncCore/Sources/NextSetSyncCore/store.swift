@@ -77,7 +77,6 @@ public final class LocalStore: @unchecked Sendable {
     private struct State: Codable {
         var link = LinkState()
         var zones: [ZoneMark] = []
-        var health = HealthLedger()
     }
 
     private var records = Records()
@@ -254,13 +253,6 @@ public final class LocalStore: @unchecked Sendable {
             state.zones.append(ZoneMark(at: at, zone: zone.identifier))
             try save(state, "state.json")
         }
-    }
-
-    // MARK: Apple Health ledger
-
-    public var healthLedger: HealthLedger { locked { state.health } }
-    public func updateHealthLedger(_ change: (inout HealthLedger) -> Void) throws {
-        try locked { change(&state.health); try save(state, "state.json") }
     }
 
     /// Erases everything in this store's folder.

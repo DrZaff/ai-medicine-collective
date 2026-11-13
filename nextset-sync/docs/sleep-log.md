@@ -63,22 +63,16 @@ Two quirks found in the source and handled:
   others are naps. So a night from 23:10 to 06:40 belongs to the morning it
   ended, and falling asleep at 00:30 belongs to the same morning.
 * **Partial**: if the data ends while asleep (the night is still going, or
-  the watch stopped logging), the night is marked and shown in orange; it is
-  not exported to Apple Health until it ends. If the data begins mid-sleep,
+  the watch stopped logging), the night is marked and shown in orange. If the data begins mid-sleep,
   the night says the real bedtime may be earlier.
 * **Seven-night trend**: the seven wake dates ending today, gaps left empty.
 * **Stages**: light and deep are shown as "Sleep Log estimate". They are
-  movement thresholds, not clinical stages, and are not written to Apple Health.
+  movement thresholds, not clinical stages.
 
-## Apple Health
+## Where the data lives
 
-Optional, after permission. Each finished episode's asleep stretches (split
-at awake spells) are written as `HKCategoryValueSleepAnalysis.asleepUnspecified`
-(iOS 16+) with `HKMetadataKeySyncIdentifier` `nsync.sleep.<watch id>.<t10>`,
-`HKMetadataKeySyncVersion`, `HKMetadataKeyTimeZone`, and an `HKDevice`
-naming the Bangle.js 2 and Sleep Log version. HealthKit replaces a sample
-when the same identifier arrives with a higher version, so a stretch that
-changed is re-written once and nothing is duplicated.
+Only in this app's own storage on the iPhone (and Sleep Log's files on the
+watch). The app has no Apple Health integration: removed on purpose.
 
 ## Settings to check on the watch
 

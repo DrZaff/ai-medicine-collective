@@ -7,8 +7,7 @@ the bottom whenever you finish a piece of work.**
 ## Goal
 
 **Standalone:** watch data travels watch → Bluetooth → this app's own storage.
-No Apple Health in the data path (only an optional, off-by-default export), no
-account, no server.
+No Apple Health (HealthKit removed at the owner's request), no account, no server.
 
 Two apps that make a Bangle.js 2 a dependable strength-training and sleep
 companion for the owner's iPhone, with no vendor app and no cloud:
@@ -16,7 +15,7 @@ companion for the owner's iPhone, with no vendor app and no cloud:
 * **Watch:** run a workout sent from the phone; log load, reps and RIR fast
   with sweaty hands; vibrate when rest is over; never lose a set.
 * **Phone:** send workouts, receive sets exactly once, show history, export
-  CSV, show sleep from Sleep Log, and optionally write sleep to Apple Health.
+  CSV, and show sleep from Sleep Log, all inside the app.
 * Later: feed NextSet (Expo app, `DrZaff/nextset-strength`); see
   [nextset-integration.md](nextset-integration.md).
 
@@ -95,13 +94,10 @@ How to hand work over:
 7. **Codex:** History upgrades: per-exercise progression chart (estimated
    1RM, same formula as NextSet's `estimate1RM` in `src/core.mjs`), and
    sessions grouped by week.
-8. **Codex (low priority, owner's call):** optional Apple Health **workout** export
-   (`HKWorkout`, traditional strength training, start and end from the `ses`
-   record), with the same sync-identifier idea as sleep.
-9. **Claude:** timed exercises (planks): a duration field on the watch,
+8. **Claude:** timed exercises (planks): a duration field on the watch,
    `duration_seconds` in the record (additive protocol field), mapped to
    NextSet's column.
-10. **Either:** accessibility pass (Dynamic Type, VoiceOver labels), app icon
+9. **Either:** accessibility pass (Dynamic Type, VoiceOver labels), app icon
     variants (dark/tinted), localisation-ready strings.
 
 ### P2: NextSet
@@ -150,3 +146,4 @@ until it exists, `DrZaff/ai-medicine-collective` branch
 | 2026-11-13 | Claude | Built both apps, protocol v1, tests, docs (commit 3398215) |
 | 2026-11-13 | Claude | GitHub CI: iOS app compiles on Xcode 26.3 (sim + device), all tests green on macOS and Linux; added the no-Mac/TestFlight path, app icon, Transferable sharing, Swift 6-clean demo wiring, AGENTS.md and this handoff |
 | 2026-11-13 | Claude | 16-bit icon draft (design/icon-16bit), collaboration proposal and ChatGPT brief |
+| 2026-11-13 | Claude | Removed Apple Health entirely (code, entitlement, permissions, docs) at the owner's request |

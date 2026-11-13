@@ -118,7 +118,6 @@ struct SleepView: View {
                     ContentUnavailableView("No sleep data yet", systemImage: "bed.double",
                                            description: Text("Install Sleep Log on the watch, wear it overnight, then sync in the morning."))
                 }
-                HealthSection()
             }
             .navigationTitle("Sleep")
         }
@@ -159,21 +158,6 @@ struct NightCard: View {
     }
 }
 
-struct HealthSection: View {
-    @Environment(AppModel.self) private var model
-    var body: some View {
-        Section {
-            Toggle("Export to Apple Health", isOn: Binding(get: { model.healthExportEnabled },
-                                                           set: { on in Task { await model.setHealthExport(on) } }))
-            if model.healthExportEnabled {
-                Button("Export now") { Task { await model.exportToHealth(quiet: false) } }
-            }
-        } header: { Text("Apple Health (optional)") } footer: {
-            Text("Writes each finished night's estimated asleep intervals as \"Asleep (unspecified)\". Light/deep estimates stay in this app. Nights still in progress are written once they end. Re-exporting replaces, never duplicates.")
-        }
-    }
-}
-
 // MARK: - Settings
 
 struct SettingsView: View {
@@ -196,7 +180,7 @@ struct SettingsView: View {
                 }
                 Section("Not yet tested on real hardware") {
                     ForEach(["Bluetooth pairing with a Bangle.js 2", "Overnight Sleep Log recording and morning sync",
-                             "Rest-timer vibration on the watch", "Apple Health writes on an iPhone",
+                             "Rest-timer vibration on the watch",
                              "Background reconnection with the app closed"], id: \.self) { item in
                         Label(item, systemImage: "hourglass")
                     }
@@ -205,7 +189,7 @@ struct SettingsView: View {
                     LabeledContent("Sync protocol", value: "v\(SyncProtocol.version)")
                     LabeledContent("Sleep Log supported", value: "0.26")
                     LabeledContent("Watch firmware targeted", value: "2v29")
-                    Text("No account, no cloud. Workouts, sets and sleep stay on this iPhone and the watch.").font(.footnote)
+                    Text("Standalone: no account, no cloud, no Apple Health. Workouts, sets and sleep come straight from the watch and stay on this iPhone.").font(.footnote)
                 }
             }
             .navigationTitle("Settings")

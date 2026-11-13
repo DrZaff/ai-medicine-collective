@@ -103,7 +103,7 @@ public struct SleepEpisode: Hashable, Sendable {
     public var isPartial: Bool
     /// The data starts while already asleep.
     public var startsAtDataStart: Bool
-    /// Asleep stretches, split at awake periods. These go to Apple Health.
+    /// Asleep stretches, split at awake periods.
     public var asleepIntervals: [DateInterval]
     public var startT10: Int
 }
@@ -232,51 +232,5 @@ public enum SleepAnalyzer {
         var cal = Calendar(identifier: .gregorian); cal.timeZone = tz
         let c = cal.dateComponents([.hour, .minute], from: d)
         return String(format: "%02d:%02d", c.hour!, c.minute!)
-    }
-}
-
-// MARK: - Apple Health export planning (HealthKit-free, testable)
-
-/// A sample to write as HKCategoryValueSleepAnalysis.asleepUnspecified.
-public struct HealthSleepSample: Hashable, Sendable {
-    /// HKMetadataKeySyncIdentifier: same id + higher version replaces the old sample.
-    public var syncId: String
-    public var version: Int
-    public var start: Date
-    public var end: Date
-}
-
-/// What was already written to Apple Health, by sync identifier.
-public struct HealthLedger: Codable, Equatable, Sendable {
-    public var exported: [String: Entry] = [:]
-    public struct Entry: Codable, Equatable, Sendable { public var version: Int; public var start: Double; public var end: Double }
-    public init() {}
-
-    /// Samples that are new or changed since the last export. Unfinished
-    /// nights are never exported; they are exported once they end.
-    public func plan(_ nights: [SleepNight], watchId: String) -> [HealthSleepSample] {
-        var out: [HealthSleepSample] = []
-        for n in nights {
-            for ep in [n.main] + n.naps where !ep.isPartial {
-                for iv in ep.asleepIntervals {
-                    let t10 = Int(iv.start.timeIntervalSince1970 / 600)
-                    let id = "nsync.sleep.\(watchId).\(t10)"
-                    let s = iv.start.timeIntervalSince1970, e = iv.end.timeIntervalSince1970
-                    if let old = exported[id] {
-                        if old.start == s && old.end == e { continue }
-                        out.append(HealthSleepSample(syncId: id, version: old.version + 1, start: iv.start, end: iv.end))
-                    } else {
-                        out.append(HealthSleepSample(syncId: id, version: 1, start: iv.start, end: iv.end))
-                    }
-                }
-            }
-        }
-        return out.sorted { $0.start < $1.start }
-    }
-
-    public mutating func record(_ saved: [HealthSleepSample]) {
-        for s in saved {
-            exported[s.syncId] = Entry(version: s.version, start: s.start.timeIntervalSince1970, end: s.end.timeIntervalSince1970)
-        }
     }
 }

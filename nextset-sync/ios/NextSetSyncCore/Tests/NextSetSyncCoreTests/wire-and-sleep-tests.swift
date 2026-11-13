@@ -144,11 +144,9 @@ final class SleepTests: XCTestCase {
         let eps = SleepAnalyzer.episodes(slice, dataEndT10: slice.last!.t10 + 1)
         XCTAssertTrue(eps.first!.startsAtDataStart)
         XCTAssertTrue(eps.last!.isPartial)
-        // Not exported to Apple Health until finished.
+        // The unfinished night is flagged as partial in the full analysis.
         let nights = SleepAnalyzer.nights(all, dataEndT10: dataEnd, zones: zones)
-        let plan = HealthLedger().plan(nights, watchId: "w1")
-        let partialStart = nights.first { $0.wakeDate == "2026-11-13" }!.main.start
-        XCTAssertFalse(plan.contains { $0.start >= partialStart })
+        XCTAssertTrue(nights.first { $0.wakeDate == "2026-11-13" }!.main.isPartial)
     }
 
     func testRepeatedAndOutOfOrderImportsAreIdempotent() throws {
@@ -178,23 +176,12 @@ final class SleepTests: XCTestCase {
         XCTAssertEqual(t[0].asleepMinutes, 450)
     }
 
-    func testHealthExportUsesStableSyncIdentifiers() {
+    func testAsleepIntervalsSplitAtAwakeSpells() {
         let nights = SleepAnalyzer.nights(all, dataEndT10: dataEnd, zones: zones)
-        var ledger = HealthLedger()
-        let first = ledger.plan(nights, watchId: "w1")
-        XCTAssertFalse(first.isEmpty)
-        XCTAssertTrue(first.allSatisfy { $0.version == 1 && $0.syncId.hasPrefix("nsync.sleep.w1.") && $0.end > $0.start })
-        // The 20-minute awake spell splits a night into two samples.
+        // The 20-minute awake spell splits a night into two asleep stretches.
         let n6 = nights.first { $0.wakeDate == "2026-11-06" }!
         XCTAssertEqual(n6.main.asleepIntervals.count, 2)
         XCTAssertEqual(n6.main.asleepIntervals.reduce(0) { $0 + Int($1.duration / 60) }, 430)
-        ledger.record(first)
-        XCTAssertTrue(ledger.plan(nights, watchId: "w1").isEmpty, "nothing to re-export")
-        // A later import extends the last interval of a night: same id, version 2.
-        var changed = nights
-        changed[1].main.asleepIntervals[changed[1].main.asleepIntervals.count - 1].end += 600
-        let second = ledger.plan(changed, watchId: "w1")
-        XCTAssertEqual(second.count, 1); XCTAssertEqual(second[0].version, 2)
     }
 
     func testDemoSleepLooksLikeAWeek() {

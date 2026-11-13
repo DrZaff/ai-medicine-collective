@@ -13,7 +13,6 @@
 /* Begin PBXFileReference section */
 		4E5300000000000000000004 /* NextSetSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NextSetSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E5300000000000000000005 /* info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = info.plist; sourceTree = "<group>"; };
-		4E5300000000000000000006 /* nextset-sync.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "nextset-sync.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -57,7 +56,6 @@
 			isa = PBXGroup;
 			children = (
 				4E5300000000000000000005 /* info.plist */,
-				4E5300000000000000000006 /* nextset-sync.entitlements */,
 			);
 			path = config;
 			sourceTree = "<group>";
@@ -196,7 +194,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "config/nextset-sync.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
@@ -222,7 +219,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "config/nextset-sync.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";

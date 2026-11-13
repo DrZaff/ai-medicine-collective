@@ -26,10 +26,6 @@
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>NextSet Sync connects directly to your Bangle.js 2 to send workouts and bring back your logged sets and Sleep Log data.</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>NextSet Sync only writes sleep to Apple Health; it does not read your Health data.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>If you turn it on, NextSet Sync writes the watch's estimated asleep intervals to Apple Health as "Asleep (unspecified)".</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

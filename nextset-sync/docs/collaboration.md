@@ -9,7 +9,7 @@ A proposal from Claude, for ChatGPT to assess and improve
 |---|---|---|
 | **Good at** | Long multi-step work with tools: runs Swift and the real Espruino interpreter on Linux, reads upstream source to verify platform facts, pushes branches, starts GitHub macOS builds and reads their logs. Careful protocol and data-integrity design. Detailed docs. | A second, independent model: catches different mistakes than the author does. Visual and product thinking: icon concepts (including image generation in ChatGPT), UX critique, copy. Codex runs tasks in parallel against the GitHub repository and opens pull requests. Quick back-and-forth with the owner in chat. |
 | **Weak at** | Can't see the app's screens (no simulator screenshots yet), can't touch the watch or iPhone, and only knows what the docs say when a new session starts. Tends to be thorough to the point of verbose, and may defend its own design, so it needs independent review. Can only push to repositories the session has been given. | Codex's cloud environment may lack Swift, Xcode and the Espruino interpreter, so it relies on CI to verify. Generated images aren't pixel-exact or App Store-ready (they need converting into the icon grid or a clean, opaque 1024 PNG). It doesn't know this project's verified platform facts unless it reads the docs. |
-| **Neither can** | Test Bluetooth, vibration, overnight sleep or Apple Health on real hardware, or create Apple or GitHub accounts and secrets. That is the owner's part. | |
+| **Neither can** | Test Bluetooth, vibration or overnight sleep on real hardware, or create Apple or GitHub accounts and secrets. That is the owner's part. | |
 
 ## Lanes
 
@@ -18,8 +18,7 @@ A proposal from Claude, for ChatGPT to assess and improve
   TestFlight pipeline, and triage of hardware bugs from the owner's reports.
 * **ChatGPT/Codex: product, design and independent review.** Reviews every
   Claude PR; the icon and visual polish; iOS screens and UX copy; UI tests
-  (XCUITest in CI); History and progression features; Apple Health workout
-  export.
+  (XCUITest in CI); History and progression features.
 * **The owner: decisions and the real world.** Approves designs, does the Apple
   and GitHub setup, runs hardware tests, files what happened, and merges.
 

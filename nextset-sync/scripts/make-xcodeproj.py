@@ -29,7 +29,7 @@ release = {**common, "DEBUG_INFORMATION_FORMAT": "\"dwarf-with-dsym\"", "ENABLE_
            "SWIFT_COMPILATION_MODE": "wholemodule", "VALIDATE_PRODUCT": "YES", "MTL_ENABLE_DEBUG_INFO": "NO"}
 target = {
     "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
-    "CODE_SIGN_ENTITLEMENTS": "\"config/nextset-sync.entitlements\"", "CODE_SIGN_STYLE": "Automatic",
+    "CODE_SIGN_STYLE": "Automatic",
     "CURRENT_PROJECT_VERSION": "1", "DEVELOPMENT_TEAM": "\"\"", "ENABLE_PREVIEWS": "YES",
     "GENERATE_INFOPLIST_FILE": "NO", "INFOPLIST_FILE": "config/info.plist",
     "LD_RUNPATH_SEARCH_PATHS": "(\n\t\t\t\t\t\"$(inherited)\",\n\t\t\t\t\t\"@executable_path/Frameworks\",\n\t\t\t\t)",
@@ -57,7 +57,6 @@ pbx = f"""// !$*UTF8*$!
 /* Begin PBXFileReference section */
 		{I['app_ref']} /* NextSetSync.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NextSetSync.app; sourceTree = BUILT_PRODUCTS_DIR; }};
 		{I['plist_ref']} /* info.plist */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = info.plist; sourceTree = "<group>"; }};
-		{I['ent_ref']} /* nextset-sync.entitlements */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "nextset-sync.entitlements"; sourceTree = "<group>"; }};
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -101,7 +100,6 @@ pbx = f"""// !$*UTF8*$!
 			isa = PBXGroup;
 			children = (
 				{I['plist_ref']} /* info.plist */,
-				{I['ent_ref']} /* nextset-sync.entitlements */,
 			);
 			path = config;
 			sourceTree = "<group>";
