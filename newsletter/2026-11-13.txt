@@ -1,0 +1,41 @@
+:: AI MEDICINE COLLECTIVE ::
+Weekly digest, Nov 07 - Nov 13, 2026
+
+[[AMC:NOTE]]
+// THE ONE THING
+Generative AI-related academic misconduct among medical students: co-occurrence with conventional misconduct and associated factors
+Integrity policies and assessments built around older forms of cheating may miss a group of students whose only misconduct involves AI. Educators may need clear rules on disclosing AI use and assessment formats that take generative AI into account.
+https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2026.2010823/full
+
+// AI VS PHYSICIAN
+This week: AI helped improve
+Deep Learning–Assisted Diagnosis of Middle Ear Diseases in Otoendoscopy Across Clinician Experience Levels: Retrospective Reader Study
+In this reader study, AI support helped trainees most, which points to a possible use in otoscopy teaching. Learners should still keep training their own image-reading skills: a news report on the study says that 3.5% of initially correct readings became wrong after the clinicians consulted the AI.
+https://medinform.jmir.org/2026/1/e96134
+
+// ALSO THIS WEEK
+> The impact of AI-Based Virtual Patient Simulation on Medical Student Performance: A Randomized Assessor-Blind Trial (Surgery (ScienceDirect))
+  https://www.sciencedirect.com/science/article/pii/S0039606026007324
+> Real-Time Artificial Intelligence Diagnostic Copilot in Simulated Primary Care Consultations: Randomized Simulation Study (JMIR Formative Research (via PubMed))
+  https://pubmed.ncbi.nlm.nih.gov/42771885/
+> As AI takes on a bigger role in medical care, what should medical students learn? (AAMC (AAMCNews))
+  https://www.aamc.org/learn-network/learn-serve-lead/ai-takes-bigger-role-medical-care-what-should-medical-students-learn
+> Artificial Intelligence-Assisted Chest Radiography: A Prospective Crossover Multi-Reader Study on Diagnostic Performance and Workflow Efficiency (Academic Radiology (via PubMed))
+  https://pubmed.ncbi.nlm.nih.gov/42629289/
+
+// TOOL OF THE WEEK
+Thyroid Workup Assistant
+Clinical micro-app that walks through a thyroid workup, built with ClinicalToolsDEV. Opens in the browser on phone or computer.
+https://www.aimedicinecollective.com/hub.html?project=0d2676cd-0f8d-4a92-9058-edf98a6a5ba4
+
+// FROM THE COLLECTIVE
+[[AMC:COLLECTIVE]]
+
+// ONE ASK
+[[AMC:ASK]]Vote on a time for this month's meeting. https://www.aimedicinecollective.com/schedule.html[[/AMC:ASK]]
+
+Every briefing: https://www.aimedicinecollective.com/blog.html
+Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.
+
+On Instagram: @aimedicinecollective (https://www.instagram.com/aimedicinecollective/)
+You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" under Your profile on your account page: https://www.aimedicinecollective.com/account.html#profile
