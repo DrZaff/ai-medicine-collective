@@ -107,6 +107,28 @@ How to hand work over:
   key. If the owner prefers a narrower key, switch to manual signing with an
   exported distribution certificate and profile stored as secrets.
 
+## Kickoff prompt for Codex / ChatGPT
+
+Paste this into Codex (connected to the `DrZaff/nextset-sync` repository, or
+until it exists, `DrZaff/ai-medicine-collective` branch
+`claude/bangle-iphone-workout-sleep-x9j8xy`, folder `nextset-sync/`):
+
+> You are joining an existing project as a collaborator with Claude. Read
+> `AGENTS.md` and `docs/handoff.md` first, then `docs/protocol.md`.
+> 1. **Review first.** Review the latest commit independently: look for
+>    data-loss paths in sync (the watch must never lose a set; the phone must
+>    never show a set twice), protocol mismatches between `watch/nsync/lib.js`
+>    and `ios/NextSetSyncCore/Sources/NextSetSyncCore/sync.swift`, Espruino
+>    JavaScript that would not run on firmware 2v29, and iOS 17 API misuse in
+>    `ios/NextSetSync/`. Report findings with file:line and a concrete fix;
+>    do not rewrite working code for style.
+> 2. **Then take one P1 item marked Codex** in `docs/handoff.md` (start with
+>    #4, the XCUITest smoke test), on a branch `codex/<topic>`, in a small PR
+>    whose description lists what you verified and the CI run link.
+> 3. Run `scripts/run-tests.sh` (or rely on CI if you have no Swift). Never
+>    claim a test or build passed unless you saw it pass.
+> 4. Append a line to the log in `docs/handoff.md`.
+
 ## Log
 
 | Date | Who | What |
