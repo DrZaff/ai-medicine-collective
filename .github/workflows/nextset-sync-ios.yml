@@ -9,6 +9,14 @@ on:
   push:
     branches: [claude/bangle-iphone-workout-sleep-x9j8xy]
     paths: ['nextset-sync/**', '.github/workflows/nextset-sync-ios.yml']
+  # Pull requests into the NextSet Sync branch (e.g. Codex's work) get the same
+  # Xcode build and tests on their merge ref. A submitted review re-runs it, so
+  # a reviewer can verify the exact commit under review.
+  pull_request:
+    branches: [claude/bangle-iphone-workout-sleep-x9j8xy]
+    paths: ['nextset-sync/**', '.github/workflows/nextset-sync-ios.yml']
+  pull_request_review:
+    types: [submitted]
   workflow_dispatch:
 
 permissions:
@@ -21,6 +29,7 @@ concurrency:
 jobs:
   ios:
     name: iOS app (Xcode, macOS)
+    if: github.event_name != 'pull_request_review' || github.event.pull_request.base.ref == 'claude/bangle-iphone-workout-sleep-x9j8xy'
     runs-on: macos-15
     timeout-minutes: 45
     defaults:
@@ -28,6 +37,8 @@ jobs:
         working-directory: nextset-sync
     steps:
       - uses: actions/checkout@v4
+      - name: What is being built
+        run: git log -3 --format='%h %s' && git diff --stat HEAD~1 -- . | tail -3 || true
       - name: Pick the newest Xcode on the runner
         run: |
           ls -d /Applications/Xcode*.app
@@ -66,6 +77,7 @@ jobs:
 
   watch:
     name: Watch app + Swift core (Linux, real Espruino)
+    if: github.event_name != 'pull_request_review' || github.event.pull_request.base.ref == 'claude/bangle-iphone-workout-sleep-x9j8xy'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     defaults:
