@@ -40,6 +40,9 @@ concurrency:
 jobs:
   draft:
     runs-on: ubuntu-latest
+    # The branch this run pushed, for the site-checks job below
+    outputs:
+      pushed_branch: ${{ steps.pr.outputs.branch }}
     timeout-minutes: 20
     steps:
       - name: Check for API key
@@ -149,6 +152,7 @@ jobs:
             else
               git commit -m "Blog draft for $DATE: add the missing review"
               git push origin "$branch"
+              echo "branch=$branch" >> "$GITHUB_OUTPUT"
               # worth telling the organizers: the draft now has more to review
               echo "url=$(gh pr view "$branch" --json url --jq .url 2> /dev/null)" >> "$GITHUB_OUTPUT"
             fi
@@ -159,6 +163,7 @@ jobs:
           git add "blog/posts/$DATE.json" "social/$DATE"
           git commit -m "Blog draft for $DATE"
           git push -u origin "$branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
           url=$(gh pr create --base main --head "$branch" \
             --title "Blog draft: $DATE" \
             --body-file "$RUNNER_TEMP/pr-body.md")
@@ -218,3 +223,25 @@ jobs:
             echo "A backup start may also run by itself later today; if a draft email follows this one, you can ignore this."
           } > "$RUNNER_TEMP/email.txt"
           python scripts/blog_agent/notify.py --subject "Action needed: the blog draft run failed" --body-file "$RUNNER_TEMP/email.txt"
+
+  # Pull requests opened with the default token don't start other workflows,
+  # so Site checks would never run on this one. The default token may start
+  # a workflow by hand (workflow_dispatch), so this job asks for a run on the
+  # branch just pushed; its checks land on the pull request's latest commit.
+  # It checks out no code, uses no secrets and is the only job here allowed
+  # to start workflows.
+  site-checks:
+    name: Start Site checks on the pull request
+    needs: draft
+    if: always() && needs.draft.outputs.pushed_branch != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Run Site checks on the branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: ${{ needs.draft.outputs.pushed_branch }}
+        run: gh workflow run site-checks.yml --ref "$BRANCH"

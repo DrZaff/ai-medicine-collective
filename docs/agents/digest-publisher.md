@@ -29,7 +29,7 @@ Findings that need the owner's attention:
    | Branch must be up to date before merging | no | yes |
 
    Both: a pull request with 1 approval, code-owner review, stale approvals dismissed, no force pushes or deletion, the owner as a pull-request-only bypass, and Billy on neither.
-4. **The automations' own pull requests never get Site checks.** The blog, living-review and deep-sweep jobs open their PRs with the default token, and GitHub does not start other workflows for those. With required checks on, those PRs can be merged only through the owner's bypass ("merge without waiting for requirements"). That is workable, but it means the checks are skipped for them, as they are today.
+4. ~~The automations' own pull requests never get Site checks.~~ **Fixed** (proposal 4): the blog, living-review, deep-sweep and FAQ draft and audit jobs still open their PRs with the default token, which starts no workflows on its own, but each now starts Site checks by hand on the branch it pushed. Check on the first such PR that both checks show in its Checks tab; until then, assume they may not and merge through the bypass if needed.
 5. ~~The commits will still say "github-actions[bot]".~~ **Fixed** (proposal 2): with the app set up, the job authors its commit as the app's bot account; without it, as github-actions, as before.
 
 None of these needs a workflow change before setup. Optional workflow changes are listed at the end as proposals.
@@ -62,7 +62,7 @@ Recommendation: **one ruleset, "Main - Owner Merge Only" (26914500)**, and leave
 | Review threads resolved | owner's choice (off today) | adds a tap; Codex's report is in the description, not threads |
 | Restrict updates | on | only bypass actors can change `main`: the owner by PR, the digest app by push |
 | Block force pushes, restrict deletions | on | already set |
-| Bypass: DrZaff | **For pull requests only** | lets the owner merge their own PRs (GitHub never lets anyone approve their own) and the automations' unchecked PRs; never a direct push |
+| Bypass: DrZaff | **For pull requests only** | lets the owner merge their own PRs (GitHub never lets anyone approve their own), and the automations' PRs if their checks ever fail to start; never a direct push |
 | Bypass: AMC Digest Publisher | **Always** | the job pushes directly; "pull requests only" would still refuse it |
 | Bypass: Billy, `github-actions`, repository roles | **none** | a bypass belongs to an actor, so a role or github-actions bypass would cover every person or workflow in it |
 
@@ -104,4 +104,4 @@ Each changes `.github/workflows/`, which Billy cannot publish (no Workflows perm
 1. ~~Pin `actions/create-github-app-token` to a full commit SHA~~ **Done:** pinned to release v1.12.0 (`d72941d`), with the token limited to this repository and Contents.
 2. ~~Author the digest commits as the app's bot user~~ **Done:** looked up from the app's name; if the lookup fails, the job warns and commits as github-actions.
 3. ~~Check out with `persist-credentials: false`~~ **Done:** no token is saved in the checkout; the publish step hands it to git for its pull and push only.
-4. **Open the automations' PRs with an app token**, so Site checks run on them and the owner's bypass isn't needed for routine merges.
+4. ~~Open the automations' PRs with an app token~~ **Done differently, with no new credential:** after pushing its branch, each of those workflows runs a small extra job, allowed only to start workflows, that starts Site checks on that branch by hand (`workflow_dispatch`, which the default token may do). An app token would have put a key in three more workflows.

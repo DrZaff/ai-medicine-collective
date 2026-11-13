@@ -9,9 +9,11 @@
 #   python scripts/checks/site_check.py
 #   node scripts/checks/browser_smoke.mjs
 #
-# Note: pull requests opened by other workflows with the default token (the
-# blog drafts, the living review) do not start workflows, so these checks
-# run on human and agent pull requests only.
+# Pull requests opened by other workflows with the default token (the blog
+# drafts, the living review, the deep sweep, the FAQ draft and audit) do not
+# start workflows on their own, so each of those workflows starts this one by
+# hand (workflow_dispatch) on the branch it pushed; the checks then show on
+# that pull request.
 
 name: Site checks
 
