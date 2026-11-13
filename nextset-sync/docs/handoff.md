@@ -38,8 +38,10 @@ the App Loader's "Install App from Files" deleting declared data. See the README
 
 ## Who does what
 
-The pattern this owner already uses (website repo, `docs/agents/billy.md`):
-**one agent builds, the other reviews the exact commit, the owner merges.**
+Full proposal, with each side's strengths and weaknesses:
+[collaboration.md](collaboration.md) (awaiting ChatGPT's assessment via
+[chatgpt-brief.md](chatgpt-brief.md)). In short: **one agent builds, the other
+reviews the exact commit, the owner merges.**
 
 | Owner | Claude (Claude Code) | ChatGPT / Codex |
 |---|---|---|
@@ -65,6 +67,14 @@ How to hand work over:
    missing App Store Connect record).
 3. **Owner:** first-day hardware test (first-day-checklist.md); file each
    problem as a GitHub issue with what was tapped and what happened.
+
+### Design
+* **Icon (ChatGPT first):** the owner wants a 16-bit game-logo look in 90s
+  colours. Claude's draft is in `design/icon-16bit/` (editable `icon.txt`
+  grid + `render.py`), not yet wired into the app. ChatGPT critiques and
+  improves it ([chatgpt-brief.md](chatgpt-brief.md)); the owner picks; then
+  copy `icon-1024.png` into `ios/NextSetSync/Assets.xcassets/AppIcon.appiconset/`
+  and make a matching 48×48 watch icon.
 
 ### P1: make it great (pick up anytime; independent of each other)
 4. **Codex:** XCUITest smoke test in CI on the iOS simulator, in demo mode:
@@ -135,3 +145,4 @@ until it exists, `DrZaff/ai-medicine-collective` branch
 |---|---|---|
 | 2026-11-13 | Claude | Built both apps, protocol v1, tests, docs (commit 3398215) |
 | 2026-11-13 | Claude | GitHub CI: iOS app compiles on Xcode 26.3 (sim + device), all tests green on macOS and Linux; added the no-Mac/TestFlight path, app icon, Transferable sharing, Swift 6-clean demo wiring, AGENTS.md and this handoff |
+| 2026-11-13 | Claude | 16-bit icon draft (design/icon-16bit), collaboration proposal and ChatGPT brief |
