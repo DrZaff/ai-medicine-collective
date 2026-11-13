@@ -11,7 +11,7 @@ public protocol WatchLink: AnyObject, Sendable {
 
 public struct SyncReport: Equatable, Sendable {
     public var at = Date()
-    public var newSets = 0, updatedSets = 0, duplicateRecords = 0, sessionsFinished = 0
+    public var newSets = 0, updatedSets = 0, duplicateRecords = 0, sessionsFinished = 0, newMarkers = 0
     public var sleepAdded = 0, sleepChanged = 0, sleepUnchanged = 0
     public var leftOnWatch = 0
     public var sleepLogVersion: String?
@@ -22,6 +22,7 @@ public struct SyncReport: Equatable, Sendable {
         parts.append(newSets == 1 ? "1 new set" : "\(newSets) new sets")
         if updatedSets > 0 { parts.append("\(updatedSets) edited") }
         if duplicateRecords > 0 { parts.append("\(duplicateRecords) already here") }
+        if newMarkers > 0 { parts.append(newMarkers == 1 ? "1 marker" : "\(newMarkers) markers") }
         if sessionsFinished > 0 { parts.append("\(sessionsFinished) workout\(sessionsFinished == 1 ? "" : "s") finished") }
         if let r = sleepSkippedReason { parts.append("sleep: \(r)") }
         else { parts.append("sleep: \(sleepAdded) new, \(sleepChanged) updated entries") }
@@ -142,6 +143,7 @@ public actor SyncEngine {
         m.v = SyncProtocol.version
         m.phone = store.link.phoneId
         m.mtu = link.chunkSize
+        m.kinds = SyncProtocol.storedKinds
         let r = try await request(m)
         guard r.t == "hi", let wid = r.watch else { throw WireError.unexpected("Unexpected reply to hello: \(r.t)") }
         if let min = r.min, min > SyncProtocol.version { throw WireError.protocolMismatch(min) }
@@ -197,7 +199,8 @@ public actor SyncEngine {
     private func statusStep() async throws -> WatchStatus {
         try await ensureAuthed()
         let r = try await request(WireMessage(t: "status"))
-        let s = WatchStatus(at: clock(), pendingRecords: r.pend ?? 0, pendingSets: r.pendSets ?? 0,
+        let s = WatchStatus(at: clock(), pendingRecords: (r.pend ?? 0) + (r.pendMarks ?? 0), pendingSets: r.pendSets ?? 0,
+                            pendingMarkers: r.pendMarks,
                             activeSession: r.ses.map { "\($0.wn ?? "Workout"): exercise \(($0.xi ?? 0) + 1), \($0.n ?? 0) sets" },
                             loadedWorkout: r.wkt?.name, battery: r.bat, firmware: hello?.firmware,
                             appVersion: hello?.appVersion, sleepLogVersion: r.sl?.ver, sleepLogEnabled: r.sl?.on)
@@ -245,6 +248,7 @@ public actor SyncEngine {
             // 1. durable write, 2. then acknowledge
             let result = try store.upsert(recs, isDemo: isDemo, now: clock())
             report.newSets += result.insertedSets
+            report.newMarkers += result.insertedMarkers
             report.sessionsFinished += result.insertedSessions
             report.updatedSets += result.updated
             report.duplicateRecords += result.duplicates + result.stale

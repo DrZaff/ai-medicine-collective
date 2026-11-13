@@ -89,6 +89,19 @@ function startSession() {
   save();
   showEntry();
 }
+// The prefill and next session's Ghost come from nsync.last.json. Keep it equal
+// to the newest live set of that exercise, so an edited or deleted typo
+// (1400 instead of 140) never becomes the next baseline.
+function rememberLast(xid) {
+  var live = (ses.recs || []).filter(function(r) { return r.xid == xid && !r.del; })
+    .sort(function(a, b) { return (a.ed || a.at) - (b.ed || b.at); });
+  var last = S.readJSON(F.last, 1) || {};
+  var top = live[live.length - 1];
+  if (top) last[xid] = { load: top.load, reps: top.reps, rir: top.rir, units: top.units };
+  else if (ses.ghost && ses.ghost[xid]) last[xid] = ses.ghost[xid]; // back to the value before this session
+  else delete last[xid];
+  S.writeJSON(F.last, last);
+}
 function upsertSesRec(rec) {
   for (var i = 0; i < ses.recs.length; i++) if (ses.recs[i].id == rec.id) { ses.recs[i] = rec; return; }
   ses.recs.push(rec);
@@ -103,9 +116,7 @@ function logSet() {
   };
   try { rec = L.putRec(rec); } catch (e) { return E.showAlert("Sync with the iPhone first (" + e.message + ")").then(showEntry); }
   upsertSesRec(rec);
-  var last = S.readJSON(F.last, 1) || {};
-  last[rec.xid] = { load: rec.load, reps: rec.reps, rir: rec.rir, units: rec.units };
-  S.writeJSON(F.last, last);
+  rememberLast(rec.xid);
   var previous = ghost(ex);
   var firstMatch = matchesGhost(previous, rec) && !liveSets(ses.xi).some(function(r) {
     return r.id != rec.id && matchesGhost(previous, r);
@@ -134,7 +145,7 @@ function finishSession() {
 
 // ---- set entry screen ----------------------------------------------------
 var BOX = [{ x: 2, k: "load" }, { x: 60, k: "reps" }, { x: 118, k: "rir" }];
-var BY = 56, BH = 56, BW = 56, KY = 116, KH = 58;
+var BY = 46, BH = 64, BW = 56, KY = 116, KH = 58;
 
 function drawEntry() {
   var ex = editing ? ses.ex[editing.xi] : curEx();
@@ -142,14 +153,13 @@ function drawEntry() {
   g.setFontAlign(-1, -1);
   g.drawString(fit(editing ? "Edit: " + editing.xn : ex.name, W - 4, "Vector:20"), 2, 2);
   font("6x15");
-  var line = editing ? "Set " + editing.set : "Set " + ses.sn + "/" + ex.sets + "  " + (ex.reps || "") + (ex.rir !== undefined ? " @" + ex.rir : "");
+  // Line 2: the Ghost (last time) when there is one, otherwise the prescription.
+  var previous = editing ? null : ghost(ex);
+  var line = editing ? "Set " + editing.set : "Set " + ses.sn + "/" + ex.sets + "  " + (previous
+    ? "Last " + num(previous.load) + "x" + previous.reps + "@" + previous.rir
+    : (ex.reps || "") + (ex.rir !== undefined ? " @" + ex.rir : ""));
   g.drawString(fit(line, W - 44, "6x15"), 2, 26);
   g.setFontAlign(1, -1).drawString(hhmm(), W - 2, 26);
-  var previous = editing ? null : ghost(ex);
-  if (previous) {
-    font("6x8");
-    g.setFontAlign(-1, -1).drawString("Last " + num(previous.load) + "x" + previous.reps + " @" + previous.rir, 2, 43);
-  }
   var labels = [(ses.units || "lb").toUpperCase(), "REPS", "RIR"];
   BOX.forEach(function(b, i) {
     var on = i == sel;
@@ -186,6 +196,7 @@ function commit() {
   try { r = L.putRec(r); } catch (e) { return E.showAlert("Sync with the iPhone first").then(showEntry); }
   upsertSesRec(r);
   save();
+  rememberLast(r.xid);
   editing = null; draft = null;
   Bangle.buzz(40);
   showEntry();
@@ -228,8 +239,14 @@ function showEntry() {
 }
 
 // ---- rest timer ----------------------------------------------------------
+// The end-of-rest buzz is a Scheduler alarm, so it still fires if you leave the
+// app or it is closed; without the Scheduler the countdown below buzzes.
+function scheduleRest() {
+  ses.restAlarm = L.setAlarm("nsync.rest", ses.restEnd - Date.now(), "- -");
+}
 function startRest(sec, nextLabel) {
   ses.restEnd = Date.now() + sec * 1000;
+  scheduleRest();
   ses.restTotal = sec;
   ses.restNext = nextLabel;
   save();
@@ -245,13 +262,14 @@ function drawRest() {
 }
 function endRest(skipped) {
   clearTimer();
-  ses.restEnd = 0;
+  var scheduled = ses.restAlarm;
+  if (skipped) L.cancelAlarm("nsync.rest");
+  ses.restEnd = 0; ses.restAlarm = false;
   save();
   if (!skipped) {
     Bangle.setLCDPower(1);
     if (Bangle.setLocked) Bangle.setLocked(false);
-    Bangle.buzz(500, 1).then(function() { return new Promise(function(r) { setTimeout(r, 250); }); })
-      .then(function() { return Bangle.buzz(500, 1); });
+    if (!scheduled) L.buzz("- -"); // the Scheduler alarm buzzes otherwise
   }
   showEntry();
 }
@@ -268,8 +286,8 @@ function showRest() {
     mode: "custom",
     touch: function(_, xy) {
       if (!xy || xy.y < KY - 4) return;
-      if (xy.x < 58) { ses.restEnd = Math.max(Date.now(), ses.restEnd - 15000); save(); drawRest(); }
-      else if (xy.x < 116) { ses.restEnd += 30000; save(); drawRest(); }
+      if (xy.x < 58) { ses.restEnd = Math.max(Date.now() + 1000, ses.restEnd - 15000); scheduleRest(); save(); drawRest(); }
+      else if (xy.x < 116) { ses.restEnd += 30000; scheduleRest(); save(); drawRest(); }
       else endRest(true);
     },
     btn: function() { if (Date.now() - lastUnlock < 400) return; endRest(true); },
@@ -326,7 +344,7 @@ function setActions(r) {
         if (ok) {
           try {
             var d = L.putRec(Object.assign({}, r, { del: 1, rev: r.rev + 1, ed: Date.now() }));
-            upsertSesRec(d); save();
+            upsertSesRec(d); save(); rememberLast(d.xid);
           } catch (e) { E.showAlert("Sync with the iPhone first"); }
         }
         showSetList();
@@ -362,6 +380,10 @@ function showSyncInfo() {
   m["Phone: " + (conn ? "connected" : "not connected")] = function() {};
   m["Last sync: " + (c.lastSync ? require("locale").time(new Date(c.lastSync), 1) : "never")] = function() {};
   m["Sleep Log: " + (sl.ver ? sl.ver + (sl.on ? "" : " (off)") : "missing")] = function() {};
+  m["Markers to sync: " + L.markCount().unsynced] = function() {};
+  m["Storage free: " + Math.round((S.getFree ? S.getFree() : 0) / 1024) + " KB"] = function() {};
+  m["Scheduler: " + (S.read("sched") ? "yes" : "missing")] = function() {};
+  m["App " + L.VERSION + " fw " + process.env.VERSION] = function() {};
   m["Watch ID " + c.wid] = function() {};
   m["Paired phones: " + Object.keys(c.phones).length] = function() {};
   if (Object.keys(c.phones).length) m["Forget phones"] = function() {

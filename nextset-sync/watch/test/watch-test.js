@@ -17,6 +17,9 @@ S.write("nsync.boot.js", FILES.boot);
 S.write("nsync.app.js", FILES.app);
 S.write("nsync-tools", FILES.tools);
 S.write("sleeplog", FILES.sleeplog);
+S.write("sched", FILES.schedLib);           // Scheduler 0.43, a default Bangle.js 2 app
+S.write("sched.boot.js", FILES.schedBoot);
+if (!Date.prototype.toLocalISOString) Date.prototype.toLocalISOString = function() { return this.toISOString(); };
 S.writeJSON("sleeplog.info", { id: "sleeplog", version: "0.26" });
 S.writeJSON(FIXTURE.archiveName, FIXTURE.archive);
 var slf = S.open("sleeplog.log", "w");
@@ -40,7 +43,10 @@ var ui = null, menu = null, prompt = null, buzzes = 0;
 global.Bangle = {
   getOptions: function() { return { lockTimeout: 10000, backlightTimeout: 10000 }; },
   getHealthStatus: function() { return { steps: 123 }; },
-  setOptions: function() {}, on: function() {}, setLCDPower: function() {}, setLocked: function() {},
+  ev: {}, on: function(e, f) { (this.ev[e] = this.ev[e] || []).push(f); },
+  emit: function(e, a) { (this.ev[e] || []).forEach(function(f) { f(a); }); },
+  isLCDOn: function() { return true; },
+  setOptions: function() {}, setLCDPower: function() {}, setLocked: function() {},
   buzz: function() { buzzes++; return Promise.resolve(); },
   setUI: function(o) { if (ui && ui.remove) ui.remove(); ui = o || null; }
 };
@@ -169,27 +175,61 @@ step(function() {
   disconnect();
   NRF.connected = false;
   eval(S.read("nsync.app.js"));
+  // The app is evaluated in this step's scope; hand later steps what they need.
+  global.APPX = { matchesGhost: matchesGhost, rememberLast: rememberLast, scheduleRest: scheduleRest, save: save,
+    setSes: function(v) { ses = v; } };
   ok(menu && Object.keys(menu).some(function(k) { return k.indexOf("Start Upper A") == 0; }), "main menu offers Start Upper A");
+  // Silent timer: saved, buzzes via the Scheduler, survives the button.
   menu["Timers"]();
-  menu["Chalk talk (5m)"]();
-  ok(ui && ui.mode == "custom", "chalk talk timer opens offline");
-  ui.btn();
+  menu["Focus (25m)"]();
+  var sc = require("sched");
+  ok(ui && ui.mode == "custom" && S.readJSON("nsync.timer.json").title == "Focus", "focus timer runs and is saved");
+  ok(sc.getAlarm("nsync.timer") && sc.getAlarm("nsync.warn"), "end and 1-minute buzzes are Scheduler alarms");
+  Bangle.emit("lock", false);          // the press that wakes the screen...
+  ui.btn();                            // ...must not leave the timer screen
+  ok(ui && ui.mode == "custom", "unlock press is ignored (timer screen stays)");
+});
+step(function() {}); // let the 400 ms unlock window pass
+step(function() {
+  ui.btn();                            // a deliberate press later: back to the menu
+  ok(menu && Object.keys(menu).some(function(k) { return k.indexOf("> Focus") == 0; }), "button returns to the menu; timer keeps running");
+  ok(require("sched").getAlarm("nsync.timer"), "Scheduler alarm still set after leaving the timer screen");
+  menu[Object.keys(menu).filter(function(k) { return k.indexOf("> Focus") == 0; })[0]]();
+  ui.touch(1, { x: 150, y: 140 });     // End...
+  ok(prompt && prompt.msg.indexOf("End Focus") == 0, "ending asks first");
+  prompt.answer(1);
+});
+step(function() {
+  ok(!S.read("nsync.timer.json") && !require("sched").getAlarm("nsync.timer") && !require("sched").getAlarm("nsync.warn"),
+    "confirmed End removes the timer and both alarms");
   menu["Stopwatch"]();
-  ui.touch(1, { x: 30, y: 140 });
-  ui.touch(1, { x: 150, y: 140 });
+  ui.touch(1, { x: 30, y: 140 });      // start
+  ui.btn();                            // leave the screen
+  ok(S.readJSON("nsync.sw.json").started > 0, "stopwatch keeps counting after leaving its screen");
+  menu["Stopwatch"]();
+  ui.touch(1, { x: 30, y: 140 });      // pause
   ui.btn();
   menu[""].back();
+  // Markers: crash-safe records with stable ids.
   menu["Mark a moment"]();
   menu["Coffee"]();
-  ok(S.readJSON("nsync.markers.json")[0].label == "Coffee", "offline marker is timestamped and stored");
-  menu[""].back();
+  var mk = require("nsync").marks(), mid = Object.keys(mk)[0];
+  ok(mk[mid].label == "Coffee" && mk[mid].k == "mark" && mid.indexOf("-m") > 0 && S.read("nsync.mark.a.json"),
+    "marker stored with a stable id in the two-slot file");
+  menu[""].back();                     // leave before the 'marked' message times out
+});
+step(function() {
+  ok(menu && Object.keys(menu).some(function(k) { return k.indexOf("Start") == 0; }), "leaving markers is not undone by the delayed redraw");
   menu["Retro progress"]();
   ok(ui && ui.mode == "custom", "retro progress opens offline");
+  Bangle.emit("lock", true);
+});
+step(function() {
   ui.btn();
   menu[Object.keys(menu).filter(function(k) { return k.indexOf("Start") == 0; })[0]]();
-  ok(matchesGhost({ load: 135, reps: 5, rir: 2 }, { load: 140, reps: 5, rir: 2 }),
+  ok(APPX.matchesGhost({ load: 135, reps: 5, rir: 2 }, { load: 140, reps: 5, rir: 2 }),
     "ghost rewards more load with matching reps and RIR");
-  ok(!matchesGhost({ load: 135, reps: 5, rir: 2 }, { load: 140, reps: 4, rir: 2 }),
+  ok(!APPX.matchesGhost({ load: 135, reps: 5, rir: 2 }, { load: 140, reps: 4, rir: 2 }),
     "ghost rejects more load at fewer reps");
   ok(ui && ui.mode == "custom", "set entry screen shown");
   ui.touch(1, { x: 87, y: 140 });  // + on load (selected by default): 135 -> 140
@@ -204,9 +244,23 @@ step(function() {
   ok(buzzes > 0, "haptic confirmation on LOG");
   var ses = require("nsync").readSes();
   ok(ses.restEnd > Date.now() && ses.sn == 2, "rest timer running, saved with the session");
+  var ra = require("sched").getAlarm("nsync.rest");
+  ok(ses.restAlarm && ra && ra.js.indexOf("fireAlarm") > 0, "rest end buzz is a Scheduler alarm (fires outside the app too)");
+  var before = buzzes; eval(ra.js);
+  ok(buzzes > before && !require("sched").getAlarm("nsync.rest"), "the alarm buzzes and removes itself");
+  APPX.scheduleRest(); APPX.save();
   ok(ui.touch && menu, "rest screen active");
   ui.touch(1, { x: 150, y: 140 }); // SKIP rest
+  ok(!require("sched").getAlarm("nsync.rest"), "skipping rest cancels its alarm");
   ui.touch(1, { x: 150, y: 140 }); // LOG set 2 (prefilled from set 1)
+  // A typo then fixed or deleted must not become the next baseline.
+  var sesNow = require("nsync").readSes();
+  var typo = sesNow.recs[sesNow.recs.length - 1];
+  typo.load = 1400; typo.ed = Date.now(); APPX.setSes(sesNow); APPX.rememberLast(typo.xid);
+  ok(S.readJSON("nsync.last.json").bench.load == 1400, "last-set memory follows the newest set");
+  typo.del = 1; APPX.rememberLast(typo.xid);
+  ok(S.readJSON("nsync.last.json").bench.load == 140, "deleting it restores the previous live set (140)");
+  typo.del = 0; typo.load = 140; APPX.rememberLast(typo.xid); APPX.save();
   // App killed mid-rest (or the watch rebooted): state is reloaded from flash.
   E.emit("kill");
   ui = null; menu = null;
@@ -318,6 +372,56 @@ step(function() {
   ok(Object.keys(L.pend()).length == before, "torn write: previous complete version of the pending list is used");
   L.putRec({ k: "set", id: "crash.0.2", rev: 1, sid: "crash", xi: 0, xn: "X", set: 2, load: 1, units: "lb", reps: 1, rir: 1, at: Date.now() });
   ok(Object.keys(L.pend()).length == before + 1, "next write goes on from the intact version");
+});
+
+// ---- markers through sync: kinds negotiation ----------------------------------
+step(function() { disconnect(); phone({ t: "hello", v: 1, phone: PID, mtu: 128 }); }); // an older phone: no kinds
+step(function() { nonce = last().nonce; phone({ t: "auth", proof: sha(key + ":" + nonce + ":" + PID) }); });
+step(function() { received(); phone({ t: "pull", max: 20 }); });
+var oldPull;
+step(function() {
+  oldPull = last();
+  ok(oldPull.recs.length > 0 && !oldPull.recs.some(function(r) { return r.k == "mark"; }), "an older phone never receives markers");
+  phone({ t: "ack", ids: oldPull.recs.map(function(r) { return [r.id, r.rev]; }) });
+});
+step(function() {
+  var a = last();
+  ok(a.t == "acked" && a.left == 0, "left counts only kinds that phone takes (no endless wait)");
+  ok(require("nsync").markCount().unsynced == 1, "the marker is kept on the watch for a newer phone");
+  disconnect();
+  phone({ t: "hello", v: 1, phone: PID, mtu: 128, kinds: ["set", "ses", "mark"] });
+});
+step(function() {
+  var h = last();
+  ok(h.kinds && h.kinds.indexOf("mark") >= 0, "watch lists the kinds it can send");
+  nonce = h.nonce; phone({ t: "auth", proof: sha(key + ":" + nonce + ":" + PID) });
+});
+step(function() { received(); phone({ t: "pull", max: 20 }); });
+var markRec;
+step(function() {
+  var m = last();
+  markRec = m.recs.filter(function(r) { return r.k == "mark"; })[0];
+  ok(markRec && markRec.label == "Coffee" && markRec.rev == 1, "a phone that takes markers receives them");
+  phone({ t: "ack", ids: [[markRec.id, markRec.rev]] });
+});
+step(function() {
+  var L = require("nsync");
+  ok(last().n == 1 && L.markCount().unsynced == 0 && L.marks()[markRec.id].synced, "acked marker is kept as synced history");
+  phone({ t: "ack", ids: [[markRec.id, markRec.rev]] });
+});
+step(function() {
+  var L = require("nsync");
+  ok(last().n == 0, "repeated marker ack is harmless");
+  var cap = L.MAX_MARKS; L.MAX_MARKS = 1;
+  L.addMark("Idea");
+  var refused = false; try { L.addMark("Idea"); } catch (e) { refused = e.message.indexOf("Sync") >= 0; }
+  ok(refused && L.markCount().unsynced == 1, "full marker log refuses new ones and keeps the old ones");
+  L.MAX_MARKS = cap;
+  var before = L.markCount().n;
+  var a = S.readJSON("nsync.mark.a.json", 1), b = S.readJSON("nsync.mark.b.json", 1);
+  S.write(a.g > b.g ? "nsync.mark.a.json" : "nsync.mark.b.json", '{"g":99,"d":{"x');
+  ok(L.markCount().n == before - 1 || L.markCount().n == before, "torn marker write falls back to the previous complete list");
+  ok(L.markCount().n >= 1, "markers survive the torn write");
 });
 
 next();

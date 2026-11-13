@@ -10,6 +10,7 @@
 //           "D"        link drops                        "R"        ready
 //           "L <reps>" person logs a set on the watch    "E <text>" watch-side error
 //           "F"        person finishes the workout
+//           "M <label>" person marks a moment
 import {readFileSync, mkdtempSync, writeFileSync, appendFileSync} from 'node:fs';
 import {spawn} from 'node:child_process';
 import {tmpdir} from 'node:os';
@@ -68,6 +69,7 @@ setInterval(function() {
       else if (l[0] == "D") (NRF.ev.disconnect || []).forEach(function(f) { f(); });
       else if (l[0] == "L") logSet(parseInt(l.substr(2), 10));
       else if (l[0] == "F") finish();
+      else if (l[0] == "M") L.addMark(l.substr(2));
     } catch (e) { print("E " + e); }
   }
 }, 10);

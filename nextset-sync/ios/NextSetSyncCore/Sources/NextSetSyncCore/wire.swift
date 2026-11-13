@@ -12,6 +12,9 @@ public enum SyncProtocol {
     /// Largest characteristic value the watch accepts (Bangle.js 2 ATT MTU 131 - 3).
     public static let maxChunk = 128
     public static let minChunk = 20
+    /// Record kinds this phone stores. The watch sends only these; anything
+    /// else stays on the watch until a phone that understands it connects.
+    public static let storedKinds = ["set", "ses", "mark"]
 }
 
 /// Every message in either direction. Fields are optional; `t` says which apply.
@@ -52,6 +55,9 @@ public struct WireMessage: Codable, Equatable, Sendable {
     public var sl: SleepLogInfo?
     public var pend: Int?
     public var pendSets: Int?
+    public var pendMarks: Int?
+    /// hello: record kinds the phone stores; hi: kinds the watch can send.
+    public var kinds: [String]?
     public var ses: ActiveSessionInfo?
     public var wkt: LoadedWorkoutInfo?
     public var sAck: Int?
@@ -127,7 +133,10 @@ public struct WireRecord: Codable, Equatable, Sendable {
     public var k: String
     public var id: String
     public var rev: Int
-    public var sid: String
+    /// Session id: sets and sessions carry one; markers don't.
+    /// Required fields for every kind: k, id, rev, at. Everything else is optional,
+    /// so a record type this build has not seen still decodes (and is not acked).
+    public var sid: String?
     public var wid: String?
     public var wn: String?
     public var xi: Int?
@@ -144,6 +153,8 @@ public struct WireRecord: Codable, Equatable, Sendable {
     public var start: Double?
     public var end: Double?
     public var n: Int?
+    /// Markers (`k` = "mark"): the moment's label.
+    public var label: String?
 }
 
 public enum WireError: Error, Equatable, LocalizedError {

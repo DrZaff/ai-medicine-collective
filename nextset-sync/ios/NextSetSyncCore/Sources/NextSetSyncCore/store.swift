@@ -31,6 +31,7 @@ public struct WatchStatus: Codable, Equatable, Sendable {
     public var at: Date
     public var pendingRecords: Int
     public var pendingSets: Int
+    public var pendingMarkers: Int?
     public var activeSession: String?
     public var loadedWorkout: String?
     public var battery: Int?
@@ -56,7 +57,9 @@ public struct ZoneMark: Codable, Hashable, Sendable {
 }
 
 public struct UpsertResult: Equatable, Sendable {
-    public var insertedSets = 0, insertedSessions = 0, updated = 0, duplicates = 0, stale = 0
+    public var insertedSets = 0, insertedSessions = 0, insertedMarkers = 0, updated = 0, duplicates = 0, stale = 0
+    /// Records of a kind this build does not store: NOT acknowledged, so the watch keeps them.
+    public var skippedUnknown = 0
     /// What to acknowledge: every received record, at the rev received.
     public var acks: [WireAck] = []
 }
@@ -84,6 +87,10 @@ public final class LocalStore: @unchecked Sendable {
     private var sleepIndex: [Int: SleepEntry] = [:]
     private var state = State()
     private var workoutList: [Workout] = []
+    private var markerIndex: [String: MarkerRecord] = [:]
+    /// Notes you add on the iPhone, by marker id. Never sent to the watch and
+    /// never touched by a re-import.
+    private var notes: [String: String] = [:]
 
     public init(directory: URL) throws {
         self.directory = directory
@@ -93,6 +100,8 @@ public final class LocalStore: @unchecked Sendable {
         sleepIndex = Dictionary(sleepData.entries.map { ($0.t10, $0) }, uniquingKeysWith: { _, b in b })
         if let s: State = try load("state.json") { state = s } else { try save(state, "state.json") }
         workoutList = try load("workouts.json") ?? []
+        markerIndex = try load("markers.json") ?? [:]
+        notes = try load("notes.json") ?? [:]
     }
 
     private func url(_ name: String) -> URL { directory.appendingPathComponent(name) }
@@ -152,8 +161,23 @@ public final class LocalStore: @unchecked Sendable {
     public func upsert(_ incoming: [WireRecord], isDemo: Bool = false, now: Date = Date()) throws -> UpsertResult {
         try locked {
             var r = UpsertResult()
+            var markersChanged = false
             for w in incoming {
+                // Acknowledge only kinds this build stores; the watch keeps the rest.
+                guard SyncProtocol.storedKinds.contains(w.k) else { r.skippedUnknown += 1; continue }
                 r.acks.append(WireAck(id: w.id, rev: w.rev))
+                if w.k == "mark" {
+                    if let old = markerIndex[w.id] {
+                        if old.rev == w.rev { r.duplicates += 1; continue }
+                        if old.rev > w.rev { r.stale += 1; continue }
+                        r.updated += 1
+                    } else { r.insertedMarkers += 1 }
+                    markerIndex[w.id] = MarkerRecord(id: w.id, rev: w.rev, label: w.label ?? "Marker",
+                                                     at: Date(timeIntervalSince1970: w.at / 1000), deleted: (w.del ?? 0) != 0,
+                                                     receivedAt: now, ackState: .awaitingWatchAck, isDemo: isDemo)
+                    markersChanged = true
+                    continue
+                }
                 if w.k == "ses" {
                     let s = SessionRecord(id: w.id, rev: w.rev, workoutId: w.wid ?? "", workoutName: w.wn ?? "Workout",
                                           units: Units(rawValue: w.units ?? "lb") ?? .lb,
@@ -166,7 +190,7 @@ public final class LocalStore: @unchecked Sendable {
                 }
                 guard w.k == "set" else { continue }
                 let rec = SetRecord(
-                    id: w.id, rev: w.rev, sessionId: w.sid, workoutId: w.wid ?? "", workoutName: w.wn ?? "Workout",
+                    id: w.id, rev: w.rev, sessionId: w.sid ?? "", workoutId: w.wid ?? "", workoutName: w.wn ?? "Workout",
                     exerciseIndex: w.xi ?? 0, exerciseId: w.xid ?? "", exerciseName: w.xn ?? "Exercise",
                     setNumber: w.set ?? 1, load: w.load ?? 0, units: Units(rawValue: w.units ?? "lb") ?? .lb,
                     reps: w.reps ?? 0, rir: w.rir ?? 0, loggedAt: Date(timeIntervalSince1970: w.at / 1000),
@@ -181,6 +205,7 @@ public final class LocalStore: @unchecked Sendable {
                 }
             }
             try save(records, "records.json")
+            if markersChanged { try save(markerIndex, "markers.json") }
             return r
         }
     }
@@ -191,8 +216,10 @@ public final class LocalStore: @unchecked Sendable {
             for a in acks {
                 if var s = records.sets[a.id], s.rev <= a.rev { s.ackState = .confirmed; records.sets[a.id] = s }
                 if var s = records.sessions[a.id], s.rev <= a.rev { s.ackState = .confirmed; records.sessions[a.id] = s }
+                if var m = markerIndex[a.id], m.rev <= a.rev { m.ackState = .confirmed; markerIndex[a.id] = m }
             }
             try save(records, "records.json")
+            try save(markerIndex, "markers.json")
         }
     }
 
@@ -215,6 +242,19 @@ public final class LocalStore: @unchecked Sendable {
                                   start: end?.start ?? sets.map(\.loggedAt).min() ?? Date(),
                                   end: end?.end ?? sets.map(\.loggedAt).max(), finished: end != nil, sets: ordered)
         }.sorted { $0.start > $1.start }
+    }
+
+    /// Markers, newest first (deleted ones left out).
+    public var markers: [MarkerRecord] {
+        locked { markerIndex.values.filter { !$0.deleted }.sorted { $0.at > $1.at } }
+    }
+    public func note(for markerId: String) -> String? { locked { notes[markerId] } }
+    public func setNote(_ text: String?, for markerId: String) throws {
+        try locked {
+            let t = text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            notes[markerId] = t.isEmpty ? nil : t
+            try save(notes, "notes.json")
+        }
     }
 
     public var awaitingAckCount: Int { locked { records.sets.values.filter { $0.ackState == .awaitingWatchAck }.count } }
@@ -258,10 +298,11 @@ public final class LocalStore: @unchecked Sendable {
     /// Erases everything in this store's folder.
     public func eraseAll() throws {
         try locked {
-            for name in ["records.json", "sleep.json", "state.json", "workouts.json"] {
+            for name in ["records.json", "sleep.json", "state.json", "workouts.json", "markers.json", "notes.json"] {
                 try? FileManager.default.removeItem(at: url(name))
             }
             records = Records(); sleepData = Sleep(); sleepIndex = [:]; state = State(); workoutList = []
+            markerIndex = [:]; notes = [:]
             try save(state, "state.json")
         }
     }

@@ -228,3 +228,37 @@ final class SilentLink: WatchLink, @unchecked Sendable {
 extension SimulatedWatch {
     func setDecline() { confirmPairing = false }
 }
+
+final class MarkerTests: XCTestCase {
+    func testUnknownRecordKindIsNotAcknowledged() throws {
+        let s = try LocalStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent("uk-\(UUID())"))
+        var future = WireRecord(k: "hrv", id: "w-h1", rev: 1, sid: nil, wid: nil, wn: nil, xi: nil, xid: nil, xn: nil, set: nil,
+                                load: nil, units: nil, reps: nil, rir: nil, at: 1_794_000_000_000, ed: nil, del: nil,
+                                start: nil, end: nil, n: nil)
+        future.label = "x"
+        let r = try s.upsert([future])
+        XCTAssertEqual(r.acks, [], "a kind this build cannot store must stay on the watch")
+        XCTAssertEqual(r.skippedUnknown, 1)
+    }
+
+    func testMarkersSyncOnceAndNotesSurviveReimport() async throws {
+        let rig = try await Rig().paired()
+        let m = await rig.watch.addMark("Coffee")
+        let r1 = try await rig.engine.syncAll()
+        XCTAssertEqual(r1.newMarkers, 1)
+        XCTAssertEqual(rig.store.markers.map(\.label), ["Coffee"])
+        XCTAssertEqual(rig.store.markers.first?.ackState, .confirmed)
+        try rig.store.setNote("before the lift; felt sharp", for: m.id)
+        // The same marker arriving again (say an ack was lost) changes nothing.
+        let again = try rig.store.upsert([m], isDemo: true)
+        XCTAssertEqual(again.duplicates, 1)
+        XCTAssertEqual(rig.store.markers.count, 1)
+        XCTAssertEqual(rig.store.note(for: m.id), "before the lift; felt sharp")
+        let r2 = try await rig.engine.syncAll()
+        XCTAssertEqual(r2.newMarkers, 0)
+        let left = await rig.watch.syncedMarks.contains(m.id)
+        XCTAssertTrue(left)
+        // Notes are stored on the phone and reload from disk.
+        XCTAssertEqual(try LocalStore(directory: rig.dir).note(for: m.id), "before the lift; felt sharp")
+    }
+}

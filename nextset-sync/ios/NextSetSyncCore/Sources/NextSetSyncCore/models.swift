@@ -149,3 +149,16 @@ public struct SessionSummary: Identifiable, Hashable, Sendable {
     public var awaitingAck: Int { sets.filter { $0.ackState == .awaitingWatchAck }.count }
     public var isDemo: Bool { sets.first?.isDemo ?? false }
 }
+
+/// A moment marked on the watch ("Coffee", "Idea"...). Synced like sets:
+/// stable id, rev, acknowledged only after it is stored.
+public struct MarkerRecord: Codable, Hashable, Identifiable, Sendable {
+    public var id: String
+    public var rev: Int
+    public var label: String
+    public var at: Date
+    public var deleted: Bool
+    public var receivedAt: Date
+    public var ackState: AckState
+    public var isDemo: Bool
+}

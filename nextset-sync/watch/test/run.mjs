@@ -19,6 +19,8 @@ const lines = log.trim().split('\n').filter(l => !l.startsWith(','));
 const FILES = {
   lib: read(join(app, 'lib.js')), boot: read(join(app, 'boot.js')), app: read(join(app, 'app.js')),
   tools: read(join(app, 'tools.js')),
+  schedLib: read(join(here, 'vendor', 'sched-0.43-lib.js')),
+  schedBoot: read(join(here, 'vendor', 'sched-0.43-boot.js')),
   sleeplog: read(join(here, 'vendor', 'sleeplog-0.26-lib.js')),
 };
 const FIXTURE = {log, archive, archiveName: expected.archiveFileName,

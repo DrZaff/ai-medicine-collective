@@ -66,6 +66,7 @@ final class EspruinoLink: WatchLink, @unchecked Sendable {
     func dropLink() { send("D") }
     func personLogsSet(reps: Int) { send("L \(reps)") }
     func personFinishes() { send("F") }
+    func personMarks(_ label: String) { send("M \(label)") }
     func stop() { try? input.fileHandleForWriting.close(); process.terminate() }
 }
 
@@ -108,18 +109,22 @@ final class EspruinoBridgeTests: XCTestCase {
         // 2. Phone disconnects; one set is logged on the watch.
         link.dropLink(); await engine.linkDropped()
         link.personLogsSet(reps: 11)
+        link.personMarks("Coffee")
         try await Task.sleep(nanoseconds: 300_000_000)
 
         // 3. Reconnect: the set arrives exactly once, and Sleep Log comes with it.
         engine = await connect()
         let r1 = try await engine.syncAll()
         XCTAssertEqual(r1.newSets, 1)
+        XCTAssertEqual(r1.newMarkers, 1, "marker made on the real watch code arrives")
+        XCTAssertEqual(store.markers.map(\.label), ["Coffee"])
         XCTAssertEqual(r1.leftOnWatch, 0)
         XCTAssertEqual(r1.sleepLogVersion, "0.26")
         XCTAssertEqual(store.sets.map(\.reps), [11])
         XCTAssertEqual(store.sets.first?.ackState, .confirmed)
         let r2 = try await engine.syncAll()
         XCTAssertEqual(r2.newSets, 0)
+        XCTAssertEqual(r2.newMarkers, 0, "and only once")
         XCTAssertEqual(r2.sleepAdded, 0, "repeat import adds nothing")
         XCTAssertEqual(store.sets.count, 1)
 

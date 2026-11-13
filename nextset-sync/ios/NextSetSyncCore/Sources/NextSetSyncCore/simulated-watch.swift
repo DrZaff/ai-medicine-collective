@@ -13,6 +13,9 @@ public actor SimulatedWatch: WatchLink {
     public private(set) var phones: [String: String] = [:]
     public private(set) var pending: [String: WireRecord] = [:]
     public private(set) var workout: WireWorkout?
+    /// Markers made on the watch, and which of them the phone acknowledged.
+    public private(set) var marks: [String: WireRecord] = [:]
+    public private(set) var syncedMarks: Set<String> = []
     public var sleep: [SleepEntry] = []
     public var sleepLastCheckT10: Int?
     public var sleepLogVersion: String? = "0.26"
@@ -29,6 +32,7 @@ public actor SimulatedWatch: WatchLink {
     private var nonce: String?
     private var authed = false
     private var mtu = 20
+    private var kinds = ["set", "ses"]
     public private(set) var connected = true
 
     // Fault switches.
@@ -116,8 +120,9 @@ public actor SimulatedWatch: WatchLink {
         switch m.t {
         case "hello":
             pid = m.phone; mtu = max(20, min(128, m.mtu ?? 20)); authed = false; nonce = randomHex(8)
+            kinds = (m.kinds ?? ["set", "ses"]).filter { ["set", "ses", "mark"].contains($0) }
             var r = WireMessage(t: "hi")
-            r.v = 1; r.min = 1; r.watch = watchId; r.app = "0.01-sim"; r.fw = "2v29 (simulated)"
+            r.v = 1; r.min = 1; r.watch = watchId; r.app = "0.02-sim"; r.fw = "2v29 (simulated)"; r.kinds = ["set", "ses", "mark"]
             r.paired = pid.map { phones[$0] != nil } ?? false; r.nonce = nonce
             r.sl = WireMessage.SleepLogInfo(ver: sleepLogVersion, on: sleepLogVersion != nil, last: sleepLastCheckT10)
             return r
@@ -145,6 +150,7 @@ public actor SimulatedWatch: WatchLink {
         case "status":
             var r = WireMessage(t: "st")
             r.pend = pending.count; r.pendSets = pending.values.filter { $0.k == "set" }.count
+            r.pendMarks = marks.keys.filter { !syncedMarks.contains($0) }.count
             if let s = sessionId {
                 r.ses = .init(sid: s, wn: workout?.name, xi: 0, sn: 1, n: setCounter.values.reduce(0, +), start: sessionStart.map { $0.timeIntervalSince1970 * 1000 })
             }
@@ -159,14 +165,21 @@ public actor SimulatedWatch: WatchLink {
             workout = w
             var r = WireMessage(t: "wack"); r.id = w.id; r.rev = w.rev; return r
         case "pull":
-            let all = pending.values.sorted { ($0.at, $0.id) < ($1.at, $1.id) }
+            var all = pending.values.filter { kinds.contains($0.k) }
+            if kinds.contains("mark") { all += marks.values.filter { !syncedMarks.contains($0.id) } }
+            all.sort { ($0.at, $0.id) < ($1.at, $1.id) }
             let mx = max(1, min(20, m.max ?? 8))
             var r = WireMessage(t: "recs"); r.recs = Array(all.prefix(mx)); r.more = all.count > mx; r.total = all.count
             return r
         case "ack":
             var n = 0
-            for a in m.ids ?? [] { if let rec = pending[a.id], rec.rev <= a.rev { pending[a.id] = nil; n += 1 } }
-            var r = WireMessage(t: "acked"); r.n = n; r.left = pending.count; return r
+            for a in m.ids ?? [] {
+                if let rec = pending[a.id], rec.rev <= a.rev { pending[a.id] = nil; n += 1 }
+                else if let mk = marks[a.id], mk.rev <= a.rev, !syncedMarks.contains(a.id) { syncedMarks.insert(a.id); n += 1 }
+            }
+            var left = pending.values.filter { kinds.contains($0.k) }.count
+            if kinds.contains("mark") { left += marks.keys.filter { !syncedMarks.contains($0) }.count }
+            var r = WireMessage(t: "acked"); r.n = n; r.left = left; return r
         case "sleep":
             guard sleepLogVersion != nil else { return err("no_sleeplog", "sleep") }
             let since = max(0, m.since ?? 0), mx = max(10, min(300, m.max ?? 150))
@@ -219,6 +232,18 @@ public actor SimulatedWatch: WatchLink {
     /// Copies of sets already sent, so a later edit can be made (the watch keeps them in its session file).
     private var lastKnown: [String: WireRecord] = [:]
     public func rememberSent() { for (k, v) in pending { lastKnown[k] = v } }
+
+    /// Marks a moment, as the watch's "Mark a moment" menu does.
+    @discardableResult
+    public func addMark(_ label: String, at: Date = Date()) -> WireRecord {
+        let id = "\(watchId)-m\(String(Int(at.timeIntervalSince1970 * 1000), radix: 36))"
+        var r = WireRecord(k: "mark", id: id, rev: 1, sid: nil, wid: nil, wn: nil, xi: nil, xid: nil, xn: nil, set: nil,
+                           load: nil, units: nil, reps: nil, rir: nil, at: at.timeIntervalSince1970 * 1000, ed: nil,
+                           del: nil, start: nil, end: nil, n: nil)
+        r.label = label
+        marks[id] = r
+        return r
+    }
 
     public func finishSession(at: Date = Date()) {
         guard let s = sessionId, let w = workout else { return }

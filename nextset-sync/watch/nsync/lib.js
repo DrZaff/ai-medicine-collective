@@ -15,6 +15,7 @@ var F = {
   wkt: "nsync.wkt.json",   // workout sent by the phone
   ses: "nsync.ses",        // active session: nsync.ses.a.json / .b.json
   pend: "nsync.pend",      // unacknowledged records: nsync.pend.a.json / .b.json
+  mark: "nsync.mark",      // moment markers: nsync.mark.a.json / .b.json
   last: "nsync.last.json"  // last load/reps/RIR per exercise id (prefill)
 };
 exports.F = F;
@@ -22,6 +23,12 @@ exports.SVC = SVC;
 exports.VERSION = "0.01";
 exports.PROTO = 1;
 exports.MAX_PEND = 600;
+exports.MAX_MARKS = 300;      // unsynced markers; synced ones beyond KEEP_MARKS are pruned
+exports.KEEP_MARKS = 30;
+exports.MIN_FREE = 16000;     // bytes of Storage kept free so set logging always fits
+// Record kinds this watch can send. A phone lists the kinds it stores in
+// `hello`; an older phone that sends no list gets only sets and sessions.
+exports.KINDS = ["set", "ses", "mark"];
 
 function hex(nbytes) {
   var s = "";
@@ -65,6 +72,9 @@ function writeDual(base, d) {
   S.writeJSON(base + (g & 1 ? ".a.json" : ".b.json"), { g: g, d: d });
 }
 function eraseDual(base) { S.erase(base + ".a.json"); S.erase(base + ".b.json"); }
+exports.readDual = readDual;
+exports.writeDual = writeDual;
+exports.eraseDual = eraseDual;
 exports.readSes = function() { return readDual(F.ses); };
 exports.writeSes = function(s) { writeDual(F.ses, s); };
 exports.eraseSes = function() { eraseDual(F.ses); };
@@ -90,6 +100,70 @@ exports.putRec = function(rec) {
   writeDual(F.pend, p);
   if (E.emit) E.emit("nsync", "pend");
   return rec;
+};
+
+// ---- moment markers ---------------------------------------------------------
+// Each marker is a record with a stable id, kept in its own two-slot file so a
+// burst of markers can never block set logging. Unsynced markers are capped and
+// refused (never dropped) when full; synced ones are kept briefly for display.
+exports.marks = function() { return readDual(F.mark) || {}; };
+exports.markCount = function() {
+  var m = exports.marks(), n = 0, unsynced = 0;
+  for (var k in m) { n++; if (!m[k].synced) unsynced++; }
+  return { n: n, unsynced: unsynced };
+};
+exports.addMark = function(label, at) {
+  if (S.getFree && S.getFree() < exports.MIN_FREE) throw new Error("Storage low: sync first");
+  var m = exports.marks();
+  if (exports.markCount().unsynced >= exports.MAX_MARKS) throw new Error("Sync to free space");
+  at = at || Date.now();
+  var id = exports.cfg().wid + "-m" + at.toString(36);
+  while (m[id]) id += "x"; // two marks in the same millisecond
+  m[id] = { k: "mark", id: id, rev: 1, label: ("" + label).substr(0, 24), at: at };
+  writeDual(F.mark, m);
+  if (E.emit) E.emit("nsync", "mark");
+  return m[id];
+};
+function pruneMarks(m) {
+  var synced = Object.keys(m).filter(function(k) { return m[k].synced; })
+    .sort(function(a, b) { return m[a].at - m[b].at; });
+  while (synced.length > exports.KEEP_MARKS) delete m[synced.shift()];
+}
+
+// ---- alarms through the Scheduler ("sched", a default Bangle.js 2 app) ------
+// A sched alarm fires from its boot code whatever app is open, so a rest or
+// focus timer still buzzes after you leave this app. Without sched these
+// return false and the caller buzzes from its own countdown instead.
+function sched() { try { return require("sched"); } catch (e) { return null; } }
+exports.setAlarm = function(id, ms, pattern) {
+  var sc = sched();
+  if (!sc) return false;
+  sc.setAlarm(id, { appid: "nsync", timer: Math.max(1000, ms | 0), hidden: true, del: true,
+    msg: "", data: { p: pattern || "--" }, js: "require('nsync').fireAlarm(" + JSON.stringify(id) + ")" });
+  sc.reload();
+  return true;
+};
+exports.cancelAlarm = function(id) {
+  var sc = sched();
+  if (sc && sc.getAlarm(id)) { sc.setAlarm(id, undefined); sc.reload(); }
+};
+exports.fireAlarm = function(id) {
+  var sc = sched(), a = sc && sc.getAlarm(id);
+  if (sc) { sc.setAlarm(id, undefined); sc.reload(); }
+  exports.buzz(a && a.data ? a.data.p : "--");
+  if (E.emit) E.emit("nsync", "alarm:" + id);
+};
+// "-" = long buzz, "." = short buzz, " " = pause.
+exports.buzz = function(pattern) {
+  var steps = ("" + (pattern || "-")).split("");
+  if (Bangle.setLCDPower) Bangle.setLCDPower(1);
+  function next() {
+    var c = steps.shift();
+    if (c === undefined) return;
+    var p = c == " " ? new Promise(function(r) { setTimeout(r, 250); }) : Bangle.buzz(c == "." ? 120 : 450, 1);
+    p.then(function() { return new Promise(function(r) { setTimeout(r, 120); }); }).then(next);
+  }
+  next();
 };
 
 function sleeplogInfo() {
@@ -165,8 +239,9 @@ function handle(st, m) {
       st.mtu = Math.max(20, Math.min(128, m.mtu | 0));
       st.auth = 0;
       st.nonce = hex(8);
+      st.kinds = Array.isArray(m.kinds) ? m.kinds.filter(function(k) { return exports.KINDS.indexOf(k) >= 0; }) : ["set", "ses"];
       return {
-        t: "hi", v: exports.PROTO, min: 1, watch: c.wid, app: exports.VERSION,
+        t: "hi", v: exports.PROTO, min: 1, watch: c.wid, app: exports.VERSION, kinds: exports.KINDS,
         fw: process.env.VERSION, paired: !!(st.pid && c.phones[st.pid]),
         nonce: st.nonce, sl: sleeplogInfo()
       };
@@ -217,7 +292,7 @@ function handle(st, m) {
       c = exports.cfg();
       var ses = exports.readSes(), w = S.readJSON(F.wkt, 1), pc = exports.pendCount();
       return {
-        t: "st", pend: pc.n, pendSets: pc.sets,
+        t: "st", pend: pc.n, pendSets: pc.sets, pendMarks: exports.markCount().unsynced,
         ses: ses ? { sid: ses.sid, wn: ses.wn, xi: ses.xi, sn: ses.sn, n: (ses.recs || []).length, start: ses.start } : null,
         wkt: w ? { id: w.id, rev: w.rev || 0, name: w.name } : null,
         sAck: c.sAck || 0, bat: E.getBattery ? E.getBattery() : null,
@@ -231,24 +306,37 @@ function handle(st, m) {
       if (E.emit) E.emit("nsync", "wkt");
       return { t: "wack", id: back.id, rev: back.rev || 0 };
     case "pull":
-      var p = exports.pend();
-      var all = Object.keys(p).map(function(k) { return p[k]; });
+      var p = exports.pend(), kinds = st.kinds || ["set", "ses"];
+      var all = Object.keys(p).map(function(k) { return p[k]; })
+        .filter(function(r) { return kinds.indexOf(r.k) >= 0; });
+      if (kinds.indexOf("mark") >= 0) {
+        var mk = exports.marks();
+        Object.keys(mk).forEach(function(k) { if (!mk[k].synced) all.push(mk[k]); });
+      }
       all.sort(function(a, b) { return (a.at - b.at) || (a.id < b.id ? -1 : 1); });
       var max = Math.max(1, Math.min(20, m.max | 0 || 8));
       return { t: "recs", recs: all.slice(0, max), more: all.length > max, total: all.length };
     case "ack":
       if (!Array.isArray(m.ids)) return err("bad_ack", "ack");
-      var pa = exports.pend(), n = 0;
+      var pa = exports.pend(), ma = exports.marks(), n = 0, nm = 0;
       m.ids.forEach(function(e) {
-        var r = Array.isArray(e) ? pa[e[0]] : undefined;
+        if (!Array.isArray(e)) return;
+        var r = pa[e[0]], mr = ma[e[0]];
         if (r && r.rev <= e[1]) { delete pa[e[0]]; n++; }
+        else if (mr && !mr.synced && mr.rev <= e[1]) { mr.synced = 1; nm++; }
       });
       if (n) writeDual(F.pend, pa);
+      if (nm) { pruneMarks(ma); writeDual(F.mark, ma); }
+      n += nm;
       c = exports.cfg();
       c.lastSync = Date.now();
       exports.saveCfg(c);
       if (E.emit) E.emit("nsync", "pend");
-      return { t: "acked", n: n, left: Object.keys(pa).length };
+      // Count only what this phone will receive, or an older phone would wait forever.
+      var ks = st.kinds || ["set", "ses"], left = 0;
+      for (var id in pa) if (ks.indexOf(pa[id].k) >= 0) left++;
+      if (ks.indexOf("mark") >= 0) left += exports.markCount().unsynced;
+      return { t: "acked", n: n, left: left };
     case "sleep":
       if (!S.read("sleeplog")) return err("no_sleeplog", "sleep");
       var since = Math.max(0, m.since | 0);
