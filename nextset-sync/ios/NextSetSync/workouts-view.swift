@@ -88,7 +88,7 @@ struct WorkoutDetail: View {
             .navigationTitle(w.name)
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {
-                    if let url = try? model.workoutFile(w) { ShareLink(item: url) }
+                    ShareLink(item: WorkoutFile(workout: w), preview: SharePreview(w.name))
                     Menu {
                         Button(w.source == .sample ? "Edit a copy" : "Edit", systemImage: "pencil") {
                             var copy = w

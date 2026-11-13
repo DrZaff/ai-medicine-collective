@@ -1,0 +1,76 @@
+# NextSet Sync CI (for this folder as its own repository): build the iPhone
+# app on a GitHub macOS runner and run every test. No secrets, no signing.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nextset-sync-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    name: iOS app (Xcode, macOS)
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pick the newest Xcode on the runner
+        run: |
+          ls -d /Applications/Xcode*.app
+          XC=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
+      - name: Swift core tests on macOS
+        run: cd ios/NextSetSyncCore && swift test 2>&1 | tail -40
+      - name: Build for iOS Simulator
+        run: |
+          xcodebuild -project ios/nextset-sync.xcodeproj -scheme NextSetSync \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build/sim \
+            CODE_SIGNING_ALLOWED=NO build 2>&1 | tee sim.log | grep -E "error:|warning:|\*\* BUILD" || true
+          grep -q "\*\* BUILD SUCCEEDED \*\*" sim.log
+          # Keep the app warning-free: any Swift compiler warning fails the build.
+          if grep -E "\.swift:[0-9]+:[0-9]+: warning:" sim.log; then echo "::error::Swift warnings (above)"; exit 1; fi
+      - name: Build for iPhone (unsigned)
+        run: |
+          xcodebuild -project ios/nextset-sync.xcodeproj -scheme NextSetSync \
+            -destination 'generic/platform=iOS' -configuration Release -derivedDataPath build/device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build 2>&1 | tee device.log | grep -E "error:|\*\* BUILD" || true
+          grep -q "\*\* BUILD SUCCEEDED \*\*" device.log
+          mkdir -p Payload && cp -R build/device/Build/Products/Release-iphoneos/NextSetSync.app Payload/
+          zip -qry NextSetSync-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NextSetSync-unsigned-ipa
+          path: NextSetSync-unsigned.ipa
+          retention-days: 14
+      - name: Keep build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-logs
+          path: "*.log"
+
+  watch:
+    name: Watch app + Swift core (Linux, real Espruino)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/cache@v4
+        with:
+          path: .espruino
+          key: espruino-2v29-${{ runner.os }}
+      - name: Swift toolchain
+        run: swift --version
+      - name: All tests (watch code in Espruino 2v29, Swift core, bridge)
+        run: scripts/run-tests.sh

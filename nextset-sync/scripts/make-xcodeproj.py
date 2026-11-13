@@ -28,6 +28,7 @@ debug = {**common, "DEBUG_INFORMATION_FORMAT": "dwarf", "ENABLE_TESTABILITY": "Y
 release = {**common, "DEBUG_INFORMATION_FORMAT": "\"dwarf-with-dsym\"", "ENABLE_NS_ASSERTIONS": "NO",
            "SWIFT_COMPILATION_MODE": "wholemodule", "VALIDATE_PRODUCT": "YES", "MTL_ENABLE_DEBUG_INFO": "NO"}
 target = {
+    "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
     "CODE_SIGN_ENTITLEMENTS": "\"config/nextset-sync.entitlements\"", "CODE_SIGN_STYLE": "Automatic",
     "CURRENT_PROJECT_VERSION": "1", "DEVELOPMENT_TEAM": "\"\"", "ENABLE_PREVIEWS": "YES",
     "GENERATE_INFOPLIST_FILE": "NO", "INFOPLIST_FILE": "config/info.plist",

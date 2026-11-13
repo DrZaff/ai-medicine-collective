@@ -39,8 +39,8 @@ struct HistoryView: View {
             }
             .navigationTitle("History")
             .toolbar {
-                if let url = try? model.csvFile() {
-                    ShareLink(item: url) { Label("Export CSV", systemImage: "square.and.arrow.up") }
+                ShareLink(item: SetHistoryCSV(sets: model.allSets), preview: SharePreview("Set history (CSV)")) {
+                    Label("Export CSV", systemImage: "square.and.arrow.up")
                 }
             }
         }
@@ -189,7 +189,7 @@ struct SettingsView: View {
                     Text("Demo mode uses a simulated watch and separate sample data, so you can try every screen now. Your real data is kept apart and untouched.")
                 }
                 Section("Data on this iPhone") {
-                    if let url = try? model.csvFile() { ShareLink("Export set history (CSV)", item: url) }
+                    ShareLink("Export set history (CSV)", item: SetHistoryCSV(sets: model.allSets), preview: SharePreview("Set history (CSV)"))
                     Button("Import a Sleep Log file") { importingSleep = true }
                     Text("For sleeplog.log or sleeplog_NNNN.log downloaded with the Espruino Web IDE. Normal syncing does this over Bluetooth.")
                         .font(.caption).foregroundStyle(.secondary)

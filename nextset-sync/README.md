@@ -6,7 +6,9 @@ A SwiftUI iPhone app and a Bangle.js 2 watch app that sync over a direct Bluetoo
 * **Sleep:** the watch serves Sleep Log 0.26's own log over the same link, so nothing stays open overnight. The iPhone shows estimated sleep, sleep and wake times and a seven-night trend, handling nights across midnight, partial nights, time-zone changes and repeated imports. Apple Health export is optional, as "Asleep (unspecified)", and Sleep Log's light/deep estimates stay labelled in the app.
 * **Demo mode** gives a simulated watch with realistic sets and nine nights of sleep, so every screen works before the watch arrives.
 
-**Start here: [docs/first-day-checklist.md](docs/first-day-checklist.md).**
+**No Mac needed.** GitHub's macOS machines build the iPhone app, and TestFlight installs it ([docs/no-mac-setup.md](docs/no-mac-setup.md)). The watch app installs from Chrome or Edge on Windows.
+
+**Start here: [docs/first-day-checklist.md](docs/first-day-checklist.md).** For AI collaborators (Codex, ChatGPT, Claude): [AGENTS.md](AGENTS.md) and [docs/handoff.md](docs/handoff.md).
 
 > This folder lives on the branch `claude/bangle-iphone-workout-sleep-x9j8xy` of the AI Medicine Collective website repository, because that was the repository this session could write to. **Do not merge it into the website's `main`:** Netlify publishes that repository's root. Move it to its own repository, or into NextSet, when convenient. Nothing in it depends on its location.
 
@@ -25,6 +27,7 @@ A SwiftUI iPhone app and a Bangle.js 2 watch app that sync over a direct Bluetoo
 | `protocol/` | Shared test vectors and fixtures (synthetic Sleep Log nights, NextSet JSON) |
 | `docs/` | [protocol](docs/protocol.md), [Sleep Log](docs/sleep-log.md), [NextSet integration](docs/nextset-integration.md), [first-day checklist](docs/first-day-checklist.md) |
 | `scripts/` | `run-tests.sh`, `build-espruino.sh`, `make-xcodeproj.py` |
+| `.github/workflows/` | `ci.yml` (build + all tests on macOS and Linux), `testflight.yml` (sign and upload); active once this folder is its own repository |
 
 ## Versions pinned and verified against source
 
@@ -38,7 +41,7 @@ A SwiftUI iPhone app and a Bangle.js 2 watch app that sync over a direct Bluetoo
 
 **Watch app dependencies:** Bootloader ≥ 0.34 (default), firmware 2v29, and Sleep Log 0.26 for sleep (optional: workouts work without it). It coexists with Sleep Log and with iOS Integration (ANCS), whose service options are merged by the bootloader, not overwritten.
 
-## Test results (2026-11-13, this environment: Linux, no Mac)
+## Test results (2026-11-13)
 
 | Suite | Result |
 |---|---|
@@ -46,8 +49,9 @@ A SwiftUI iPhone app and a Bangle.js 2 watch app that sync over a direct Bluetoo
 | Swift core, `swift test` (Swift 6.2.4, Linux) | **39 / 39 passed**: shared vectors (SHA-256, framing); chunk reassembly at 1–1000 bytes; Sleep Log parsing; all 8 fixture nights (midnight, after midnight, New York→Denver, nap, moveLog gap, partial); trend; repeated and out-of-order imports idempotent; Health sync-id planning; store upsert rules; CSV with formula injection blocked; NextSet plan and prescription import; text import; and engine ↔ simulated watch: offline set exactly once, response truncated mid-pull, ack lost, duplicated notification, edit after sync, 30-set paging, sleep repeat import, no Sleep Log, restart with pending state, wrong watch, timeout |
 | **Swift engine ↔ real watch code** (`EspruinoBridgeTests`, through `watch/test/bridge.mjs`) | **passed**: pair, send workout, disconnect, log on the watch, reconnect: exactly one set; Sleep Log's eight nights match the fixture; finished session |
 | BangleApps `bin/sanitycheck.js` with `apps/nsync` added | **0 errors, 0 warnings** for this app |
-| iOS app target (SwiftUI, Core Bluetooth, HealthKit) | **Not compiled here (needs Xcode).** Every file passes `swiftc -parse`; the project file parses; an independent review against the iOS 17 SDK found one compile error (fixed) and five runtime issues (fixed) |
+| iOS app target (SwiftUI, Core Bluetooth, HealthKit) on a GitHub macOS runner, **Xcode 26.3** | **`BUILD SUCCEEDED`** for iOS Simulator and for iPhone (unsigned Release); the Swift tests also pass on macOS. The first CI run's only two warnings (Swift 6 capture in demo mode) are fixed. Earlier, an independent review found one compile error and five runtime issues, all fixed. |
+| Same tests on GitHub's Linux runner | 46/46 watch, 39/39 Swift |
 
-**Pending until tested on hardware:** physical Bluetooth pairing, overnight logging, haptics, on-device HealthKit writes, background reconnection, and the Xcode build itself. The app lists them under **Settings → Not yet tested on real hardware**.
+**Pending until tested on hardware:** physical Bluetooth pairing, overnight logging, haptics, on-device HealthKit writes, background reconnection, and the first signed TestFlight upload (needs your Apple setup). The app lists them under **Settings → Not yet tested on real hardware**.
 
 Run everything that doesn't need hardware with `scripts/run-tests.sh` (Linux or macOS; needs Node 22 and Swift 5.9+).

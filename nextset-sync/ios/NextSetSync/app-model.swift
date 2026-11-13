@@ -89,6 +89,7 @@ final class AppModel {
     var sessions: [SessionSummary] { _ = revision; return store.sessions }
     var link: LinkState { _ = revision; return store.link }
     var awaitingAck: Int { _ = revision; return store.awaitingAckCount }
+    var allSets: [SetRecord] { _ = revision; return store.sets }
     var healthExportEnabled: Bool { _ = revision; return store.healthExportEnabled }
     var zones: ZoneHistory { ZoneHistory(store.zones) }
     var nights: [SleepNight] {
@@ -125,12 +126,7 @@ final class AppModel {
         demoWatch = w
         let demo = DemoData.sleep()
         await w.setSleep(demo.entries, lastCheckT10: demo.dataEndT10)
-        let e = SyncEngine(store: store, link: w, phoneName: UIDevice.current.name, isDemo: true,
-                           logger: { [weak self] s in Task { @MainActor in self?.log(s) } })
-        await w.attach(deliver: { [e] d in await e.receive(d) }, dropped: { [e, weak self] in
-            await e.linkDropped()
-            await MainActor.run { self?.connection = .waitingForWatch }
-        })
+        let e = await attachDemoEngine(w)
         engine = e
         connection = .connected
         if store.link.key == nil {
@@ -142,6 +138,17 @@ final class AppModel {
         _ = try? await e.fetchStatus()
         revision += 1
         log("Demo watch ready: 3 sets and a week of Sleep Log data waiting to sync.")
+    }
+
+    /// A sync engine wired to the simulated watch. The callbacks capture
+    /// main-actor closures rather than `self`, which Swift 6 checking accepts.
+    private func attachDemoEngine(_ w: SimulatedWatch) async -> SyncEngine {
+        let note: @MainActor @Sendable (String) -> Void = { [weak self] s in self?.log(s) }
+        let lost: @MainActor @Sendable () -> Void = { [weak self] in self?.connection = .waitingForWatch }
+        let e = SyncEngine(store: store, link: w, phoneName: UIDevice.current.name, isDemo: true,
+                           logger: { s in Task { await note(s) } })
+        await w.attach(deliver: { d in await e.receive(d) }, dropped: { await e.linkDropped(); await lost() })
+        return e
     }
 
     func demoLogSet() async {
@@ -159,12 +166,7 @@ final class AppModel {
     func demoReconnect() async {
         guard let w = demoWatch else { return }
         await w.reconnect()
-        let e = SyncEngine(store: store, link: w, phoneName: UIDevice.current.name, isDemo: true,
-                           logger: { [weak self] s in Task { @MainActor in self?.log(s) } })
-        await w.attach(deliver: { [e] d in await e.receive(d) }, dropped: { [e, weak self] in
-            await e.linkDropped(); await MainActor.run { self?.connection = .waitingForWatch }
-        })
-        engine = e
+        engine = await attachDemoEngine(w)
         connection = .connected
         log("Demo: reconnected; syncing automatically")
         await syncNow()
@@ -362,18 +364,6 @@ final class AppModel {
             notice = "Sleep Log file: \(r.added) new, \(r.changed) updated, \(r.unchanged) already imported."
             revision += 1
         } catch { errorMessage = error.localizedDescription }
-    }
-
-    func csvFile() throws -> URL {
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("nextset-sync-sets-\(SleepAnalyzer.dayString(Date(), .current)).csv")
-        try SetCSV.make(store.sets).write(to: url, atomically: true, encoding: .utf8)
-        return url
-    }
-
-    func workoutFile(_ w: Workout) throws -> URL {
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(WorkoutImporter.slug(w.name)).nextset-workout.json")
-        try WorkoutImporter.exportData(w).write(to: url)
-        return url
     }
 
     // MARK: Apple Health
