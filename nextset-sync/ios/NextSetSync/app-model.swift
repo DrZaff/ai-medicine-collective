@@ -89,6 +89,28 @@ final class AppModel {
     var link: LinkState { _ = revision; return store.link }
     var awaitingAck: Int { _ = revision; return store.awaitingAckCount }
     var allSets: [SetRecord] { _ = revision; return store.sets }
+    var markers: [MarkerRecord] { _ = revision; return store.markers }
+    func note(for m: MarkerRecord) -> String { _ = revision; return store.note(for: m.id) ?? "" }
+    func setNote(_ text: String, for m: MarkerRecord) {
+        do { try store.setNote(text, for: m.id); revision += 1 } catch { errorMessage = error.localizedDescription }
+    }
+
+    /// Plain-text snapshot for bug reports: versions, link state, counts, recent activity. No workout or sleep data.
+    var diagnostics: String {
+        let l = store.link, st = l.watchStatus
+        var lines = ["NextSet Sync diagnostics \(Date().formatted(date: .numeric, time: .standard))",
+                     "Demo mode: \(demoMode)", "Connection: \(connection.label)",
+                     "Paired: \(l.isPaired)  watch id: \(l.watchId ?? "-")  auto-connect: \(l.autoConnect)",
+                     "Last sync: \(l.lastSync?.formatted() ?? "never")  \(l.lastSyncSummary ?? "")",
+                     "Last error: \(l.lastError ?? "none")",
+                     "Watch: app \(st?.appVersion ?? "?")  firmware \(st?.firmware ?? "?")  Sleep Log \(st?.sleepLogVersion ?? "-")  battery \(st?.battery.map(String.init) ?? "?")%",
+                     "Waiting on watch: \(st?.pendingSets ?? 0) sets, \(st?.pendingMarkers ?? 0) markers",
+                     "On phone: \(store.sets.count) sets (\(store.awaitingAckCount) awaiting confirmation), \(store.markers.count) markers, \(store.sleepEntries.count) sleep entries",
+                     "Protocol v\(SyncProtocol.version), kinds \(SyncProtocol.storedKinds.joined(separator: ","))",
+                     "", "Recent activity:"]
+        lines += activity.prefix(40)
+        return lines.joined(separator: "\n")
+    }
     var zones: ZoneHistory { ZoneHistory(store.zones) }
     var nights: [SleepNight] {
         _ = revision
@@ -156,6 +178,15 @@ final class AppModel {
         let n = await w.pending.count
         await w.logSet(exercise: n % 3, load: 50 + Double(n) * 5, reps: 8 + n % 3, rir: 2)
         log("Demo: a set was logged on the watch\(connection == .connected ? "" : " while disconnected")")
+        if connection == .connected { _ = try? await engine?.fetchStatus() }
+        revision += 1
+    }
+    func demoMark() async {
+        guard let w = demoWatch else { return }
+        let labels = ["Coffee", "Idea", "Felt great", "Low energy"]
+        let n = await w.marks.count
+        await w.addMark(labels[n % labels.count])
+        log("Demo: a moment was marked on the watch")
         if connection == .connected { _ = try? await engine?.fetchStatus() }
         revision += 1
     }

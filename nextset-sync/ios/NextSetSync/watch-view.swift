@@ -9,7 +9,7 @@ struct NextSetSyncApp: App {
     var body: some Scene {
         WindowGroup {
             TabView {
-                TodayView().tabItem { Label("Today", systemImage: "heart.text.clipboard") }
+                TodayView().tabItem { Label("Today", systemImage: "sun.max") }
                 WatchView().tabItem { Label("Watch", systemImage: "applewatch.radiowaves.left.and.right") }
                 WorkoutsView().tabItem { Label("Workouts", systemImage: "dumbbell") }
                 HistoryView().tabItem { Label("History", systemImage: "list.bullet.rectangle") }
@@ -134,6 +134,7 @@ struct WatchView: View {
         Section("Try it (simulated watch)") {
             Button("Log a set on the watch") { Task { await model.demoLogSet() } }
             Button("Finish the workout on the watch") { Task { await model.demoFinishWorkout() } }
+            Button("Mark a moment on the watch") { Task { await model.demoMark() } }
             if model.connection.isLinked {
                 Button("Walk away (disconnect)") { Task { await model.demoDisconnect() } }
             } else {

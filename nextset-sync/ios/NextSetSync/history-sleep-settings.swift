@@ -1,6 +1,7 @@
 import Charts
 import NextSetSyncCore
 import SwiftUI
+import UIKit
 import UniformTypeIdentifiers
 
 // MARK: - History (completed sessions)
@@ -175,6 +176,11 @@ struct SettingsView: View {
                     Button("Import a Sleep Log file") { importingSleep = true }
                     Text("For sleeplog.log or sleeplog_NNNN.log downloaded with the Espruino Web IDE. Normal syncing does this over Bluetooth.")
                         .font(.caption).foregroundStyle(.secondary)
+                }
+                Section {
+                    Button("Copy diagnostics") { UIPasteboard.general.string = model.diagnostics; model.notice = "Diagnostics copied. Paste them into your bug report." }
+                } header: { Text("Help") } footer: {
+                    Text("Versions, connection state, counts and recent activity: no workouts, sets or sleep.")
                 }
                 Section("Not yet tested on real hardware") {
                     ForEach(["Bluetooth pairing with a Bangle.js 2", "Overnight Sleep Log recording and morning sync",
