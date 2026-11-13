@@ -1,0 +1,35 @@
+{
+ "note": "Shared vectors: the watch tests (Espruino) and Swift tests both check these.",
+ "proof": {
+  "key": "00112233445566778899aabbccddeeff",
+  "nonce": "0123456789abcdef",
+  "phone": "6F1C2A9E-0000-4000-8000-1234567890AB",
+  "input": "00112233445566778899aabbccddeeff:0123456789abcdef:6F1C2A9E-0000-4000-8000-1234567890AB",
+  "sha256hex": "7dbe421d989bf83276f1c223b3135918e7d546ee43f782473a5dffa307dcc185"
+ },
+ "sha256": [
+  {
+   "input": "abc",
+   "hex": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+  },
+  {
+   "input": "",
+   "hex": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "input": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "hex": "41edece42d63e8d9bf515a9ba6932e1c20cbc9f5a5d134645adb5db1b9737ea3"
+  }
+ ],
+ "frame": {
+  "message": "{\"t\":\"hello\",\"v\":1,\"phone\":\"6F1C2A9E-0000-4000-8000-1234567890AB\",\"mtu\":20,\"q\":1}",
+  "frame": "81:{\"t\":\"hello\",\"v\":1,\"phone\":\"6F1C2A9E-0000-4000-8000-1234567890AB\",\"mtu\":20,\"q\":1}\n",
+  "chunks20": [
+   "81:{\"t\":\"hello\",\"v\":",
+   "1,\"phone\":\"6F1C2A9E-",
+   "0000-4000-8000-12345",
+   "67890AB\",\"mtu\":20,\"q",
+   "\":1}\n"
+  ]
+ }
+}

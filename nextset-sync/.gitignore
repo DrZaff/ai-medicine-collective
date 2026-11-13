@@ -1,0 +1,6 @@
+.espruino/
+.build/
+.swiftpm/
+xcuserdata/
+DerivedData/
+node_modules/

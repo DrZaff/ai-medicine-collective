@@ -1,0 +1,78 @@
+{
+ "archiveFileName": "sleeplog_1482.log",
+ "dataEndT10": 2990944,
+ "zoneLog": [
+  {
+   "at": 1793552400,
+   "zone": "America/New_York"
+  },
+  {
+   "at": 1794272400,
+   "zone": "America/Denver"
+  },
+  {
+   "at": 1794524400,
+   "zone": "America/New_York"
+  }
+ ],
+ "nights": [
+  {
+   "wake": "2026-11-06",
+   "start": "23:10",
+   "end": "06:40",
+   "asleep": 430,
+   "partial": false
+  },
+  {
+   "wake": "2026-11-07",
+   "start": "23:40",
+   "end": "07:10",
+   "asleep": 430,
+   "partial": false
+  },
+  {
+   "wake": "2026-11-08",
+   "start": "00:30",
+   "end": "08:00",
+   "asleep": 450,
+   "partial": false
+  },
+  {
+   "wake": "2026-11-09",
+   "start": "23:10",
+   "end": "06:30",
+   "asleep": 440,
+   "partial": false,
+   "bridged": 70
+  },
+  {
+   "wake": "2026-11-10",
+   "start": "23:00",
+   "end": "06:30",
+   "asleep": 430,
+   "partial": false
+  },
+  {
+   "wake": "2026-11-11",
+   "start": "22:50",
+   "end": "06:20",
+   "asleep": 430,
+   "partial": false,
+   "naps": 50
+  },
+  {
+   "wake": "2026-11-12",
+   "start": "23:10",
+   "end": "05:50",
+   "asleep": 380,
+   "partial": false
+  },
+  {
+   "wake": "2026-11-13",
+   "start": "23:30",
+   "end": "05:40",
+   "asleep": 370,
+   "partial": true
+  }
+ ]
+}

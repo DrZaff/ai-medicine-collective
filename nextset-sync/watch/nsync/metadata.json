@@ -1,0 +1,43 @@
+{
+  "id": "nsync",
+  "name": "NextSet Sync",
+  "shortName": "NextSet",
+  "version": "0.01",
+  "author": "DrZaff",
+  "description": "Log strength-training sets (load, reps, RIR) with a rest timer, and sync sets and Sleep Log data directly to the NextSet Sync iPhone app over Bluetooth. No companion app or cloud account.",
+  "icon": "app.png",
+  "type": "app",
+  "tags": "tool,health,bluetooth",
+  "supports": [
+    "BANGLEJS2"
+  ],
+  "requires_firmware": "2v29",
+  "readme": "README.md",
+  "storage": [
+    {
+      "name": "nsync.app.js",
+      "url": "app.js"
+    },
+    {
+      "name": "nsync.boot.js",
+      "url": "boot.js"
+    },
+    {
+      "name": "nsync",
+      "url": "lib.js"
+    },
+    {
+      "name": "nsync.img",
+      "url": "app-icon.js",
+      "evaluate": true
+    }
+  ],
+  "data": [
+    {
+      "name": "nsync.wkt.json"
+    },
+    {
+      "name": "nsync.last.json"
+    }
+  ]
+}
