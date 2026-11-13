@@ -78,8 +78,7 @@ environment** → name `testflight` → **Configure environment**.
   * `ASC_KEY_ID`: the Key ID
   * `ASC_ISSUER_ID`: the Issuer ID
   * `ASC_KEY_P8`: open the `.p8` in Notepad and paste **all** of it,
-    including the `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----`
-    lines
+    including the first and last lines (the ones made of dashes and words)
 * **Environment variables → Add variable**: `APPLE_TEAM_ID` = your Team ID
   (and `BUNDLE_ID` if you changed it in step 2).
 
