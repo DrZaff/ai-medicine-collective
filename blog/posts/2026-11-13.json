@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-13",
+  "headline": "AI-assisted cheating among medical students, and an otoscopy AI that helped residents most",
+  "intro": "This briefing looks at two sides of AI in training. A survey of medical students measures how often generative AI is used to break academic rules, and a reader study finds that an ear-endoscopy AI helped junior residents most and nearly closed their gap with senior specialists.",
+  "items": [
+    {
+      "title": "Generative AI-related academic misconduct among medical students: co-occurrence with conventional misconduct and associated factors",
+      "source": "Frontiers in Public Health",
+      "url": "https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2026.2010823/full",
+      "published": "2026-11-06",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "In a survey of Chinese medical students, 17.8% (95% CI 14.2–22.1) reported at least one main AI-related misconduct behaviour, compared with 14.5% who reported a conventional one such as using unauthorised notes. The most common AI behaviours were using AI to generate answers in an assessment (18.7%), submitting AI-generated work without saying so (14.2%) and using AI paraphrasing or translation to avoid detection (11.1%). The authors found that AI misconduct overlapped a lot with conventional misconduct, but some students reported only the AI-related kind. The data are self-reported, cross-sectional and from one country.",
+      "why_it_matters": "Integrity policies and assessments built around older forms of cheating may miss a group of students whose only misconduct involves AI. Educators may need clear rules on disclosing AI use and assessment formats that take generative AI into account."
+    },
+    {
+      "title": "Deep Learning–Assisted Diagnosis of Middle Ear Diseases in Otoendoscopy Across Clinician Experience Levels: Retrospective Reader Study",
+      "source": "JMIR Medical Informatics",
+      "url": "https://medinform.jmir.org/2026/1/e96134",
+      "published": "2026-10-30",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_improved",
+      "summary": "Task: sorting ear endoscopy images into chronic otitis media, otitis media with effusion, or neither, plus secondary findings such as attic retraction and myringitis. AI: a deep learning model (EfficientNet-B4) trained on 7,335 endoscopic images. Humans: 13 clinicians (3 otology professors, 5 senior residents and 5 junior residents) read an independent set of 100 images with and without the AI's predictions, with 1 minute per image. With AI support, primary-classification accuracy rose from 78.7% to 89.7% for professors, from 65.0% to 93.8% for senior residents and from 54.4% to 86.6% for junior residents (P<.001). The gap between professors and junior residents narrowed from 24.3% to 3.1%, and the AI alone scored 94.0% to 99.0%. Main limitation: this was a retrospective reader study of still images from a single centre, read by a small group of clinicians, not a test in live patient care.",
+      "why_it_matters": "In this reader study, AI support helped trainees most, which points to a possible use in otoscopy teaching. Learners should still keep training their own image-reading skills: a news report on the study says that 3.5% of initially correct readings became wrong after the clinicians consulted the AI."
+    }
+  ],
+  "tags": [
+    "academic integrity",
+    "diagnostic accuracy",
+    "generative ai",
+    "medical education",
+    "otolaryngology",
+    "reader study",
+    "residents"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
