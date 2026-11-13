@@ -15,6 +15,13 @@ GitHub Actions macOS runners, and installs go through TestFlight
 
 ## Rules
 
+0. **Standalone by design (owner's requirement, 2026-11-13).** The app gets
+   all watch data directly from the watch over Bluetooth and keeps it in its
+   own local store, which is the source of truth. It never reads from Apple
+   Health, needs no Apple Health permission to work, and needs no account or
+   server. Apple Health is only an optional, off-by-default, write-only export
+   (`ios/NextSetSync/health.swift`); every feature must work with it off. Do
+   not add HealthKit reads or any cloud dependency.
 1. **Tests pass before you push**, and CI must be green:
    `scripts/run-tests.sh` runs the watch code in the real Espruino 2v29
    interpreter plus every Swift test. If you cannot run Swift locally, push to

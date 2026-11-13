@@ -6,6 +6,10 @@ the bottom whenever you finish a piece of work.**
 
 ## Goal
 
+**Standalone:** watch data travels watch → Bluetooth → this app's own storage.
+No Apple Health in the data path (only an optional, off-by-default export), no
+account, no server.
+
 Two apps that make a Bangle.js 2 a dependable strength-training and sleep
 companion for the owner's iPhone, with no vendor app and no cloud:
 
@@ -91,7 +95,7 @@ How to hand work over:
 7. **Codex:** History upgrades: per-exercise progression chart (estimated
    1RM, same formula as NextSet's `estimate1RM` in `src/core.mjs`), and
    sessions grouped by week.
-8. **Codex:** optional Apple Health **workout** export
+8. **Codex (low priority, owner's call):** optional Apple Health **workout** export
    (`HKWorkout`, traditional strength training, start and end from the `ses`
    record), with the same sync-identifier idea as sleep.
 9. **Claude:** timed exercises (planks): a duration field on the watch,
