@@ -95,7 +95,7 @@ async function shoot(name) {
   writeFile('sched.boot.js', read(path.join(HERE, 'vendor', 'sched-0.43-boot.js')));
   // A synthetic workout, a previous set for the Ghost, a paired phone, a marker.
   send(`require("Storage").writeJSON("nsync.wkt.json",${JSON.stringify({ id: 'sample-full-body-a', rev: 1, name: 'Full Body A', units: 'lb', ex: [
-    { id: 'goblet', name: 'Goblet squat', sets: 3, reps: '8-12', rir: 2, rest: 120, load: 45 },
+    { id: 'goblet', name: 'Goblet squat', sets: 3, reps: '8-12', rir: 1, rest: 120, load: 185, tempo: '2-1-2' },
     { id: 'press', name: 'Neutral-grip dumbbell press', sets: 3, reps: '8-12', rir: 2, rest: 120, load: 40 }] })})`);
   send(`require("Storage").writeJSON("nsync.last.json",{goblet:{load:45,reps:10,rir:2,units:"lb"}})`);
   send(`require("Storage").writeJSON("nsync.json",{wid:"7a3c91e0",phones:{P:{key:"0",name:"iPhone",at:${now}}},lastSync:${now - 3600e3}})`);
@@ -110,6 +110,10 @@ async function shoot(name) {
   send('load("nsync.app.js")'); await sleep(1500);
   await shoot('01-main-menu');
   send('startSession()'); await shoot('02-set-entry-ghost');
+  send('showTempo()'); await shoot('16-tempo-metronome');
+  send('showEntry();draft.load=185;showPlates()'); await shoot('17-plates-per-side');
+  send('showWarmup()'); await shoot('18-warm-up-ramp');
+  send('showEntry()');
   send('Bangle.emit("touch",1,{x:87,y:70,type:0})'); await shoot('03-reps-selected');
   send('Bangle.emit("touch",1,{x:150,y:140,type:0})'); await shoot('04-rest-timer');
   send('endRest(true)'); await sleep(300);
@@ -118,14 +122,18 @@ async function shoot(name) {
   send('showMain();require("nsync-tools").open(showMain)'); await shoot('07-timers-menu');
   send(`require("Storage").writeJSON("nsync.timer.json",{title:"Focus",end:${now + 754e3},alarms:true});showMain();require("nsync-tools").open(showMain)`);
   await shoot('08-focus-timer');
+  send('require("nsync-tools").stopwatch(showMain)'); await shoot('19-stopwatch');
   send('require("nsync-tools").markers(showMain)'); await shoot('09-mark-a-moment');
   send('require("nsync-tools").progress(showMain)'); await shoot('10-retro-status');
   send('showSelfTest()'); await shoot('11-self-test');
   send('showCheckin()'); await shoot('15-check-in');
   send('showSyncInfo()'); await shoot('12-sync-info');
   send('showPair()'); await shoot('13-pair-phone');
-  send('g.setTheme({fg:"#fff",bg:"#000",fg2:"#fff",bg2:"#004",fgH:"#fff",bgH:"#00f",dark:true});showEntry()');
-  await shoot('14-set-entry-dark');
+  send('showEntry();showSessionMenu();showSetList();setActions(ses.recs[0])');
+  await shoot('14-set-actions');
+  send('editing=ses.recs[0];draft=null;showEntry()'); await shoot('20-edit-set');
+  send('editing=null;draft=null;askFinish()'); await shoot('21-finish-confirmation');
+  send('showPair();global.NSYNC_PAIR("Demo phone","1234",function(){})'); await shoot('22-pair-confirmation');
 
   // Contact sheet: 4 columns at 2x with a gap.
   const S = 2, G = 8, C = 4, R = Math.ceil(shots.length / C);
