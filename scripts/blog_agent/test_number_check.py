@@ -315,6 +315,25 @@ class CodexFindings(unittest.TestCase):
         r = number_check.check("AMIE was better on 30 of 32 axes, 25 out of 26, with allocation 1:2 [1].", {1: src})
         self.assertFalse(r.needs_fact_check, r.results)
 
+    def test_a_shared_percent_sign_covers_both_numbers(self):
+        # The published FAQ's "1.42% against 1.25%" and "64% to 100%" were
+        # flagged because the papers write "1.42 vs 1.25%" and "64-100%"
+        for answer, src in (("It was 1.42% against 1.25% [1].", "Detection (RR 1.13; 1.42 vs 1.25%; P = .25)."),
+                            ("Between 64% and 100% was flagged [1].", "results ranging from 64-100% and 3-100%."),
+                            ("It rose from 5% to 10% [1].", "It rose from 5 to 10% overall."),
+                            ("It was 30% versus 20% [1].", "It was 30 versus 20% in the trial."),
+                            ("It was 1.42 vs 1.25% [1].", "It was 1.42% vs 1.25%.")):
+            r = number_check.check(answer, {1: src})
+            self.assertFalse(r.needs_fact_check, (answer, r.results))
+        # A bare number not linked to a percentage is still not a percentage
+        for answer, src in (("It was 30% [1].", "30 patients and 10% of them."),
+                            ("It was 30% [1].", "30, 10% overall."),
+                            ("It was 64% [1].", "64 cases (100% follow-up).")):
+            self.assertTrue(number_check.check(answer, {1: src}).needs_fact_check, (answer, src))
+        # Nor does a shared sign make a count a percentage in the answer
+        self.assertTrue(number_check.check("Of 30 patients, 20% improved [1].",
+                                           {1: "Of 30% of patients, 20% improved."}).needs_fact_check)
+
     def test_unreadable_leftover_digits_fail_closed(self):
         r = number_check.check("The effect was 2³ times larger [1].", {1: "2 times larger"})
         self.assertTrue(r.needs_fact_check)
