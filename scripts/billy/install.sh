@@ -32,6 +32,9 @@ for f in preflight.py pr_test.py handoff.py review-schema.json; do
 done
 # Reviews pass from agent (writes) to billy-pub (reads) through this folder only.
 install -d -o agent -g "$PUB" -m 2750 /var/lib/billy-reviews
+# Private repositories' commits pass the other way, billy-pub (writes) to agent (reads), as git
+# bundles: the reviewer never holds a GitHub credential.
+install -d -o "$PUB" -g agent -m 2750 /var/lib/billy-sources
 # Old copies in agent's home are replaced by /opt/billy.
 rm -rf /home/agent/.local/lib/billy
 chmod 700 /home/agent/.codex 2>/dev/null || true
@@ -42,5 +45,5 @@ sudo -u "$PUB" python3 -c 'import cryptography' 2>/dev/null || apt-get install -
 if [ -e "$OLD/app.pem" ]; then echo "STOP: the old key copy is still in $OLD"; exit 1; fi
 if sudo -u agent test -r "$PH/.config/billy/app.pem"; then echo "STOP: agent can still read the key"; exit 1; fi
 stat -c '%U:%G %a %n' "$PH" "$PH/.config/billy/app.pem" "$PH/.config/billy/app.json" \
-  /opt/billy /opt/billy/* /var/lib/billy-reviews /home/agent/.codex
+  /opt/billy /opt/billy/* /var/lib/billy-reviews /var/lib/billy-sources /home/agent/.codex
 echo "agent_cannot_read_key=yes"

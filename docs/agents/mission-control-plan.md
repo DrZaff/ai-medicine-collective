@@ -7,7 +7,7 @@ The build order for [mission-control.md](mission-control.md) (issue #196). Each 
 ## Order and dependencies
 
 ```text
-A0 ─► A1 ─► A2 ─► A3 ─► A4 ─► A5 ─────────────► B1 ─► B2
+A0 + A0b ─► A1 ─► A2 ─► A3 ─► A4 ─► A5 ─────────────► B1 ─► B2
                          │                       │
                          └─► (stop switch)        └─► D1 ─► D2 ─► D3 ─┐
 B5 (independent, this repo)                                           │
@@ -34,7 +34,8 @@ Priority: **A** first (useful immediately, read-only, no new risk). **B5** any t
 
 | # | Item | Depends on | Exit criteria |
 | --- | --- | --- | --- |
-| A0 | **Owner:** decisions 1, 2 and 11 (hosting, sign-in, code location); create the private repository | — | The decisions are written in the A1 issue. The repository exists, is private, and Billy publisher is **not** installed on it until E1's contract is met. |
+| A0 | **Owner:** decisions 1, 2 and 11 (**decided 2026-11-14**: the Dell over Tailscale; Tailscale plus a passkey; a new private repository). Then, in this order: <ol><li>Create the private repository `DrZaff/billy-mission-control`, starting with a README.</li><li>Give its `main` a ruleset like 26914500: restrict updates and deletion, block force pushes, require a pull request (1 approval, code-owner review, stale approvals dismissed, last-push approval). Bypass: the owner, pull requests only, and nobody else. Required checks are added after A1 adds CI.</li><li>Only then install Billy on it (Billy's existing permissions, now two repositories).</li><li>Give Claude access to it.</li></ol> | — | The repository is private, and its ruleset is active before Billy is installed. Billy's permissions are unchanged. |
+| A0b | *(this repo)* Review path for a private repository: a `fetch` step as `billy-pub`, and Codex reviews a git bundle of the exact commit offline | — | <ul><li>An allow-list of repositories.</li><li>A read-only token for one repository, revoked after the fetch.</li><li>The bundle is checked against repository, branch, commit and age (under an hour).</li><li>The review record is bound to its repository.</li><li>The public path is unchanged.</li><li>Tests include a real git bundle round trip.</li><li>After merging, the owner re-installs with `install.sh`, which adds `/var/lib/billy-sources`.</li></ul> |
 | A1 | Repository skeleton | A0 | <ul><li>`AGENTS.md` pointing to the rules in this repository's design.</li><li>A lint and test command, and CI running it on every PR.</li><li>CODEOWNERS covering everything.</li><li>A `main` ruleset (owner, set up like 26914500).</li><li>CI is green on an empty app.</li></ul> |
 | A2 | Task model: derive each task's state from GitHub-shaped JSON and run records | A1 | <ul><li>Pure functions with a unit test for every transition in design §6.</li><li>Tests for each invariant: a stale review after a new commit, a published head ≠ reviewed SHA, a clinical path forcing clinical review, a merge without owner approval impossible to represent.</li><li>Fixtures are synthetic.</li></ul> |
 | A3 | Read-only screens on fixtures (Demo 0) | A2 | <ul><li>Home, Tasks, Task detail, Usage (placeholder) and Settings render from fixtures.</li><li>The command helper shows the review and publish commands for a SHA, copy only.</li><li>No route changes anything except the stop switch.</li><li>No third-party scripts; a strict Content Security Policy.</li><li>Screenshots at 320, 360 and 1280 px with no horizontal scroll; tap targets ≥ 44 px; text ≥ 16 px.</li></ul> |
