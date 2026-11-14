@@ -35,8 +35,31 @@ NUMBER = re.compile(
     r"(?<![\w.·])(\d{1,3}(?:[,    ]\d{3})+|\d+)([.·]\d+)?(\s?%|\s?per\s?cent\b|\s?percent\b)?(?![\w·])",
     re.IGNORECASE)
 PAIR = re.compile(r"(\d[\d,.·]*)\s*(?:out of|of|/)\s*(\d[\d,.·]*)", re.IGNORECASE)
-SOURCE_PAIR = r"{a}\s*(?:out of|of|/|in)\s*{b}(?![\d.·])"
+# The pair in source text: whole numbers on both sides, so "130 out of 32"
+# does not count as "30 of 32" and "30 of 320" not as "30 of 32".
+SOURCE_PAIR = r"(?<![\w.·,]){a}\s*(?:out of|of|/|in)\s*{b}(?![\d.·])"
 YEAR = re.compile(r"^(19|20)\d\d$")
+# A year needs year words before it ("in 2024", "since 2019", "March 2024",
+# "(2024)") AND nothing it could be counting after it: "in 2024," or
+# "(2024)" is a year, "in 1980 patients" or "of 2024 patients" is a count.
+YEAR_BEFORE = re.compile(
+    r"(?:\b(?:in|from|since|until|till|during|between|published|"
+    r"january|february|march|april|may|june|july|august|september|october|november|december|"
+    r"jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\s+|\(\s*)$", re.IGNORECASE)
+YEAR_AFTER = re.compile(
+    r"^(?:\s*$|\s*[,.;:)!?]|\s+(?:and|or|to|the|a|an|it|this|that|these|its|their|when|which|with|for|"
+    r"on|was|were|is|are|has|had|have)\b|\s+[A-Z])")
+
+
+def is_year(text: str, m: re.Match) -> bool:
+    """A four-digit number written without separators, with year words before
+    it and no counted noun after it. "2,024 patients", "1999 patients" and
+    "a cohort of 2024 patients" are counts, checked like any other number."""
+    written = m.group(1)
+    if not YEAR.match(written) or m.group(2) or m.group(3):
+        return False
+    before = YEAR_BEFORE.search(text[max(0, m.start() - 16):m.start()])
+    return bool(before and YEAR_AFTER.match(text[m.end():m.end() + 16]))
 
 
 def canon(digits: str, decimals: str | None = None) -> str:
@@ -115,38 +138,42 @@ def check(answer: str, texts: dict[int, str]) -> Report:
     """Check every number in `answer`. `texts` maps each 1-based source number
     to its retrieved text ("" or missing when it could not be fetched)."""
     texts = {k: normalise_source(v or "") for k, v in texts.items()}
+    # Source text with thousands separators removed, for the pair search
+    joined = {k: re.sub(r"(?<=\d)[,    ](?=\d{3}(?!\d))", "", v) for k, v in texts.items()}
     report = Report()
-    for sentence in re.split(r"(?<=[.!?])\s+(?=[A-Z\"'(])", answer.strip()):
+    # Split at every sentence end, whatever follows (a digit, a lowercase
+    # word): a sentence must carry its own citation. Splitting too often only
+    # makes more numbers "unverified", never fewer.
+    for sentence in re.split(r"(?<=[.!?])\s+", answer.strip()):
         cited = sorted({int(n) for marker in CITATION.findall(sentence) for n in re.findall(r"\d+", marker)})
         plain = CITATION.sub("", sentence)
-        claims = numbers_in(plain)
+        claims = [m for m in NUMBER.finditer(plain)]
         if not claims:
             continue
-        # Pairs ("30 of 32") must appear as pairs in the cited source
-        pairs = [(canon(a.replace("·", ".").rstrip(".,")), canon(b.replace("·", ".").rstrip(".,")))
-                 for a, b in PAIR.findall(plain)]
-        paired = {}
-        for a, b in pairs:
-            ok = None
-            for n in cited:
-                m = re.search(SOURCE_PAIR.format(a=re.escape(a), b=re.escape(b)),
-                              re.sub(r"(?<=\d)[,   ](?=\d{3})", "", texts.get(n, "")), re.IGNORECASE)
-                if m:
-                    ok = n
-                    break
-            paired[a] = paired[b] = (ok, f"{a} of {b}")
-        for value, percent, written in claims:
+        # Pairs ("30 of 32") must appear as that pair in a cited source. Each
+        # pair is judged on its own, by position, so a valid pair elsewhere in
+        # the sentence cannot clear a failed one.
+        failed_spans = []   # (start, end, "a of b") of pairs not found
+        for p in PAIR.finditer(plain):
+            a = canon(p.group(1).replace("·", ".").rstrip(".,"))
+            b = canon(p.group(2).replace("·", ".").rstrip(".,"))
+            pattern = SOURCE_PAIR.format(a=re.escape(a), b=re.escape(b))
+            if not any(re.search(pattern, joined.get(n, ""), re.IGNORECASE) for n in cited):
+                failed_spans.append((p.start(), p.end(), f"{a} of {b}"))
+        for m in claims:
+            value, percent, written = canon(m.group(1), m.group(2)), bool(m.group(3)), m.group(0).strip()
             base = dict(number=written, sentence=sentence.strip(), cited=cited)
-            if YEAR.match(value) and not percent:
+            if is_year(plain, m) and not percent:
                 report.results.append(NumberResult(**base, status="year", reason="a year, not checked"))
                 continue
             if not cited:
                 report.results.append(NumberResult(**base, status="unverified", reason="the sentence cites no source"))
                 continue
-            if value in paired and paired[value][0] is None:
+            pair = next((label for s, e, label in failed_spans if s <= m.start() < e), None)
+            if pair:
                 report.results.append(NumberResult(
                     **base, status="unverified",
-                    reason=f'"{paired[value][1]}" does not appear as a pair in the cited source text'))
+                    reason=f'"{pair}" does not appear as a pair in the cited source text'))
                 continue
             missing = [n for n in cited if not texts.get(n)]
             hit = None

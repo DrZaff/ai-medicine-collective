@@ -109,9 +109,49 @@ class Markers(unittest.TestCase):
         self.assertEqual(r.results, [])
 
     def test_year_is_listed_not_counted(self):
-        r = number_check.check("WHO guidance from 2024 calls for oversight [1].", {1: ""})
+        r = number_check.check("In 2024, WHO guidance called for human oversight [1].", {1: ""})
         self.assertEqual(statuses(r), {"2024": "year"})
         self.assertFalse(r.needs_fact_check)
+        r = number_check.check("WHO guidance (2024) calls for oversight [1].", {1: ""})
+        self.assertEqual(statuses(r), {"2024": "year"})
+
+
+class CodexFindings(unittest.TestCase):
+    """The four problems Codex's review of b308e9f found, each reproduced."""
+
+    def test_a_valid_pair_cannot_clear_a_failed_pair(self):
+        # "25 of 32" is not in the abstract; "30 of 32" and "25 of 26" are.
+        # Judged by value, the later valid pairs used to clear the failed one.
+        r = number_check.check("AMIE won 25 of 32 axes, 30 of 32 with specialists and 25 of 26 with actors [1].",
+                               {1: AMIE})
+        first_25 = [x for x in r.results if x.number == "25"][0]
+        first_32 = [x for x in r.results if x.number == "32"][0]
+        self.assertEqual((first_25.status, first_32.status), ("unverified", "unverified"))
+        self.assertIn('"25 of 32"', first_25.reason)
+        self.assertTrue(r.needs_fact_check)
+
+    def test_pair_numerator_must_be_a_whole_number_in_the_source(self):
+        # The source also has a standalone 30 and 32, so only the pair rule can
+        # catch that "30 of 32" is really "130 out of 32" (or "30 out of 320")
+        src = "Readers agreed on 130 out of 32 cases. 30 readers and 32 nurses took part."
+        r = number_check.check("Readers agreed on 30 of 32 cases [1].", {1: src})
+        self.assertEqual(statuses(r)["30"], "unverified")
+        src = "Readers agreed on 30 out of 320 cases. 32 nurses took part."
+        r = number_check.check("Readers agreed on 30 of 32 cases [1].", {1: src})
+        self.assertEqual(statuses(r)["32"], "unverified")
+
+    def test_next_sentence_citation_does_not_cover_an_uncited_sentence(self):
+        # Sentences starting with a digit or a lowercase word used not to split
+        r = number_check.check("AMIE won on 30 axes. 25 out of 26 axes favoured it too [1].", {1: AMIE})
+        self.assertEqual([x.status for x in r.results if x.number == "30"], ["unverified"])
+        r = number_check.check("AMIE won on 30 axes. and 25 out of 26 favoured it [1].", {1: AMIE})
+        self.assertEqual([x.status for x in r.results if x.number == "30"], ["unverified"])
+
+    def test_counts_that_look_like_years_are_checked(self):
+        for answer in ("The trial enrolled 2,024 patients [1].", "A cohort of 2024 patients [1].",
+                       "It was tested in 1980 patients [1].", "Researchers recruited 1999 patients [1]."):
+            r = number_check.check(answer, {1: MASAI})
+            self.assertEqual([x.status for x in r.results], ["unverified"], answer)
 
     def test_number_found_in_one_of_two_cited_sources(self):
         r = number_check.check("Datasets of 2,400 cases exist [1, 2].", {1: MASAI, 2: HAGER})
