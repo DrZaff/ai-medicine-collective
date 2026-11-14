@@ -153,7 +153,6 @@ final class AppModel {
         await w.setHealth(DemoData.health())
         let e = await attachDemoEngine(w)
         engine = e
-        connection = .connected
         if store.link.key == nil {
             do { try await e.pair(code: "0000") } catch { errorMessage = error.localizedDescription }
         }
@@ -161,6 +160,7 @@ final class AppModel {
         // Three sets already logged on the "watch", waiting to sync.
         for i in 0..<3 { await w.logSet(exercise: 0, load: 50, reps: 10 - i, rir: Double(2 - min(i, 1)), at: Date().addingTimeInterval(Double(i * 150 - 900))) }
         _ = try? await e.fetchStatus()
+        connection = .connected
         revision += 1
         log("Demo watch ready: 3 sets and a week of Sleep Log data waiting to sync.")
     }

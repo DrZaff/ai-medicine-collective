@@ -10,8 +10,8 @@
    </BuildAction>
    <TestAction buildConfiguration = "Debug" selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB" shouldUseLaunchSchemeArgsEnv = "YES" shouldAutocreateTestPlan = "YES">
       <Testables>
-         <TestableReference skipped = "NO">
-            <BuildableReference BuildableIdentifier = "primary" BlueprintIdentifier = "NextSetSyncCoreTests" BuildableName = "NextSetSyncCoreTests" BlueprintName = "NextSetSyncCoreTests" ReferencedContainer = "container:NextSetSyncCore">
+         <TestableReference skipped = "NO" parallelizable = "NO">
+            <BuildableReference BuildableIdentifier = "primary" BlueprintIdentifier = "4E5300000000000000000018" BuildableName = "NextSetSyncUITests.xctest" BlueprintName = "NextSetSyncUITests" ReferencedContainer = "container:nextset-sync.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>

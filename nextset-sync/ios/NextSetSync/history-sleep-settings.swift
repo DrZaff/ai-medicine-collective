@@ -36,6 +36,7 @@ struct HistoryView: View {
                             }
                         }
                     }
+                    .accessibilityIdentifier("history.session.\(s.finished ? "finished" : "inProgress").\(s.sets.count)")
                 }
             }
             .navigationTitle("History")
