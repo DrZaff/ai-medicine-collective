@@ -31,8 +31,32 @@
       "url": "tools.js"
     },
     {
+      "name": "nsync-sleep",
+      "url": "sleep.js"
+    },
+    {
       "name": "nsync.img",
       "url": "app-icon.js",
+      "evaluate": true
+    },
+    {
+      "name": "nsync.eye0.img",
+      "url": "eye-open.js",
+      "evaluate": true
+    },
+    {
+      "name": "nsync.eye1.img",
+      "url": "eye-closing.js",
+      "evaluate": true
+    },
+    {
+      "name": "nsync.eye2.img",
+      "url": "eye-nearly.js",
+      "evaluate": true
+    },
+    {
+      "name": "nsync.eye3.img",
+      "url": "eye-closed.js",
       "evaluate": true
     }
   ],

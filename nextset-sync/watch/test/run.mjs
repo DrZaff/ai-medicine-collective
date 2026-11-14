@@ -18,7 +18,8 @@ const log = read(join(fx, 'sleeplog-sample.log'));
 const lines = log.trim().split('\n').filter(l => !l.startsWith(','));
 const FILES = {
   lib: read(join(app, 'lib.js')), boot: read(join(app, 'boot.js')), app: read(join(app, 'app.js')),
-  tools: read(join(app, 'tools.js')),
+  tools: read(join(app, 'tools.js')), sleep: read(join(app, 'sleep.js')),
+  eyes: ['open', 'closing', 'nearly', 'closed'].map(n => read(join(app, `eye-${n}.js`))),
   schedLib: read(join(here, 'vendor', 'sched-0.43-lib.js')),
   healthLib: read(join(here, 'vendor', 'health-0.44-lib.js')),
   healthRawB64: readFileSync(join(fx, 'health-2026-11.raw')).toString('base64'), // binary: via atob, not JSON text

@@ -91,6 +91,14 @@ async function shoot(name) {
   writeFile('nsync', read(path.join(APP, 'lib.js')));
   writeFile('nsync.app.js', read(path.join(APP, 'app.js')));
   writeFile('nsync-tools', read(path.join(APP, 'tools.js')));
+  writeFile('nsync-sleep', read(path.join(APP, 'sleep.js')));
+  // Sleep face frames: "evaluate": true files hold atob("..."); store the decoded bytes, as the App Loader does.
+  ['open', 'closing', 'nearly', 'closed'].forEach((n, i) => {
+    const b64 = /atob\("([^"]+)"\)/.exec(read(path.join(APP, `eye-${n}.js`)))[1];
+    const size = Buffer.from(b64, 'base64').length; // sent as base64: the console is not 8-bit clean
+    for (let off = 0; off < b64.length; off += 1200)
+      send(`require("Storage").write("nsync.eye${i}.img",atob("${b64.slice(off, off + 1200)}"),${off / 4 * 3},${size})`);
+  });
   writeFile('sched', read(path.join(HERE, 'vendor', 'sched-0.43-lib.js')));
   writeFile('sched.boot.js', read(path.join(HERE, 'vendor', 'sched-0.43-boot.js')));
   // A synthetic workout, a previous set for the Ghost, a paired phone, a marker.
@@ -123,6 +131,12 @@ async function shoot(name) {
   send('showSelfTest()'); await shoot('11-self-test');
   send('showCheckin()'); await shoot('15-check-in');
   send('showSyncInfo()'); await shoot('12-sync-info');
+  send('showSleepFace()'); await shoot('16-sleep-face');
+  for (const [i, n] of [[1, 'closing'], [2, 'nearly-closed'], [3, 'closed']]) {
+    send(`g.drawImage(require("Storage").read("nsync.eye0.img"),0,0);g.drawImage(require("Storage").read("nsync.eye${i}.img"),13,13)`);
+    await shoot(`1${6 + i}-sleep-face-${n}`);
+  }
+  send('Bangle.setUI();showMain()'); await sleep(300);
   send('showPair()'); await shoot('13-pair-phone');
   send('g.setTheme({fg:"#fff",bg:"#000",fg2:"#fff",bg2:"#004",fgH:"#fff",bgH:"#00f",dark:true});showEntry()');
   await shoot('14-set-entry-dark');

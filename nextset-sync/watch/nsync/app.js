@@ -419,6 +419,16 @@ function showSelfTest() {
   });
   E.showMenu(m);
 }
+// Overnight screen: the user's own lock and backlight times while it is open
+// (not the longer ones used while lifting).
+function showSleepFace() {
+  screen = "sleep";
+  if (savedOpts) Bangle.setOptions({ lockTimeout: savedOpts.lockTimeout, backlightTimeout: savedOpts.backlightTimeout });
+  require("nsync-sleep").open(function() {
+    Bangle.setOptions({ lockTimeout: 30000, backlightTimeout: 15000 });
+    showMain();
+  });
+}
 function showMain() {
   clearTimer();
   screen = "main";
@@ -429,6 +439,7 @@ function showMain() {
   else if (w) m["Start " + short(w.name)] = startSession;
   else m["No workout yet"] = function() { E.showAlert("Send a workout from the iPhone app.").then(showMain); };
   m[(p.sets ? p.sets + (p.sets == 1 ? " set" : " sets") + " to sync" : "All synced")] = showSyncInfo;
+  m["Sleep face"] = showSleepFace;
   m["Pair phone"] = showPair;
   m["Check-in"] = showCheckin;
   m["Self-test"] = showSelfTest;

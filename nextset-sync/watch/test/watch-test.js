@@ -16,6 +16,8 @@ S.write("nsync", FILES.lib);
 S.write("nsync.boot.js", FILES.boot);
 S.write("nsync.app.js", FILES.app);
 S.write("nsync-tools", FILES.tools);
+S.write("nsync-sleep", FILES.sleep);
+FILES.eyes.forEach(function(e, i) { S.write("nsync.eye" + i + ".img", eval(e)); }); // "evaluate": true, as the App Loader does
 S.write("sleeplog", FILES.sleeplog);
 S.write("sched", FILES.schedLib);           // Scheduler 0.43 (this app's dependency)
 S.write("sched.boot.js", FILES.schedBoot);
@@ -49,8 +51,10 @@ global.Bangle = {
   getHealthStatus: function() { return { steps: 123 }; },
   ev: {}, on: function(e, f) { (this.ev[e] = this.ev[e] || []).push(f); },
   emit: function(e, a) { (this.ev[e] || []).forEach(function(f) { f(a); }); },
-  isLCDOn: function() { return true; },
-  setOptions: function() {}, setLCDPower: function() {}, setLocked: function() {},
+  lcd: true, lcdCalls: 0, isLCDOn: function() { return Bangle.lcd; },
+  removeListener: function(e, f) { var a = this.ev[e] || [], i = a.indexOf(f); if (i >= 0) a.splice(i, 1); },
+  setOptions: function() {}, setLocked: function() {},
+  setLCDPower: function() { Bangle.lcdCalls++; }, setLCDBrightness: function() { Bangle.lcdCalls++; }, setBacklight: function() { Bangle.lcdCalls++; },
   buzz: function() { buzzes++; return Promise.resolve(); },
   setUI: function(o) { if (ui && ui.remove) ui.remove(); ui = o || null; }
 };
@@ -59,6 +63,8 @@ function stubG() {
   ["reset", "clearRect", "fillRect", "drawRect", "setColor", "setFont", "setFontAlign", "drawString", "clear", "flip"].forEach(function(k) {
     o[k] = function() { return o; };
   });
+  o.images = [];
+  o.drawImage = function(im, x, y) { o.images.push({ w: im.charCodeAt(0), h: im.charCodeAt(1), bpp: im.charCodeAt(2), len: im.length, x: x, y: y, t: getTime() }); return o; };
   o.getWidth = function() { return 176; }; o.getHeight = function() { return 176; };
   o.stringWidth = function(s) { return ("" + s).length * 9; };
   return o;
@@ -181,7 +187,7 @@ step(function() {
   eval(S.read("nsync.app.js"));
   // The app is evaluated in this step's scope; hand later steps what they need.
   global.APPX = { matchesGhost: matchesGhost, rememberLast: rememberLast, scheduleRest: scheduleRest, save: save,
-    setSes: function(v) { ses = v; } };
+    setSes: function(v) { ses = v; }, showSleepFace: showSleepFace };
   ok(menu && Object.keys(menu).some(function(k) { return k.indexOf("Start Upper A") == 0; }), "main menu offers Start Upper A");
   // Silent timer: saved, buzzes via the Scheduler, survives the button.
   menu["Timers"]();
@@ -485,6 +491,60 @@ step(function() {
 step(function() {
   var m = last();
   ok(m.t == "hlt" && m.rows.length == 6 && m.hl.ver == "0.44", "the phone's health request returns rows over Bluetooth");
+});
+
+// ---- Sleep face ------------------------------------------------------------------
+var SF, sfBack = 0, sfOff;
+step(function() {
+  var sizes = [0, 1, 2, 3].map(function(i) { var im = S.read("nsync.eye" + i + ".img"); return [im.charCodeAt(0), im.charCodeAt(1), im.charCodeAt(2), im.length]; });
+  ok(sizes[0][0] == 176 && sizes[0][1] == 176 && sizes[0][2] == (2 | 64) && sizes[0][3] == 3 + 8 + 176 * 176 / 4, "open frame: 176x176, 2 bits with palette");
+  ok([1, 2, 3].every(function(i) { var z = sizes[i]; return z[0] == sizes[1][0] && z[1] == sizes[1][1] && z[2] == (2 | 64) && 13 + z[0] <= 176 && 13 + z[1] <= 176 && z[3] == 3 + 8 + Math.ceil(z[0] * z[1] / 4); }),
+    "blink frames share one rectangle inside the screen (" + sizes[1][0] + "x" + sizes[1][1] + " at 13,13)");
+  SF = require("nsync-sleep");
+  SF.cfg.min = SF.cfg.max = 100000;
+  Bangle.lcd = true; Bangle.lcdCalls = 0; g.images = [];
+  APPX.showSleepFace();
+  SF = require("nsync-sleep");
+  var first = g.images[0];
+  ok(first && first.w == 176 && first.x == 0 && first.y == 0, "Sleep face draws the whole open frame first");
+});
+step(function() {});
+step(function() {
+  var st = SF.state(), ims = g.images;
+  ok(st.frames.join() == "0,1,2,3,2,1,0" && st.blinks == 1, "blinks once on entry: open, closing, nearly, closed, nearly, closing, open (" + st.frames.join() + ")");
+  var gaps = [], want = [50, 40, 70, 50, 60];
+  for (var i = 2; i < ims.length; i++) gaps.push(Math.round((ims[i].t - ims[i - 1].t) * 1000));
+  ok(gaps.length == 5 && gaps.every(function(d, i) { return d >= want[i] - 5 && d < want[i] + 60; }), "frame timings 50/40/70/50/60 ms (" + gaps.join("/") + ")");
+  ok(ims.slice(1).every(function(m) { return m.w == 176 ? m.x == 0 : m.x == 13 && m.y == 13; }), "blink frames drawn at 13,13 over the open frame; the bezel is never redrawn");
+  ok(st.blinkT !== undefined && st.frameT === undefined, "the next blink is scheduled");
+  Bangle.lcd = false; Bangle.emit("lcdPower", false);
+  ok(SF.state().blinkT === undefined && SF.state().frameT === undefined, "LCD off cancels the blink timers");
+  SF.cfg.min = SF.cfg.max = 1; g.images = [];
+});
+step(function() {
+  ok(g.images.length == 0, "nothing drawn while the LCD is off");
+  Bangle.lcd = true; Bangle.emit("lcdPower", true);
+  ok(g.images.length == 1 && g.images[0].w == 176, "LCD on restores the open frame");
+  sfOff = setTimeout(function() { Bangle.lcd = false; Bangle.emit("lcdPower", false); }, 80); // mid-blink
+});
+step(function() {
+  var st = SF.state(), n = g.images.length;
+  ok(st.blinks == 2 && st.frames[st.frames.length - 1] != 0, "a blink starts while the LCD is on and stops part-way when it goes off");
+  ok(st.frameT === undefined && st.blinkT === undefined, "no frame or blink timer left pending after LCD off");
+  sfOff = n;
+});
+step(function() {
+  ok(g.images.length == sfOff, "no frame drawn after LCD off");
+  Bangle.lcd = true; Bangle.emit("lcdPower", true);
+  var st = SF.state();
+  ok(st.frames[st.frames.length - 1] == 0, "returning shows the open frame, not a half-closed eye");
+  ok(Bangle.lcdCalls == 0, "Sleep face never turned the LCD or backlight on or changed brightness");
+  Bangle.emit("lock", false); ui.btn();
+  ok(SF.state() !== null, "the press that only woke the screen does not leave");
+  SF.state().lastUnlock = 0; SF.cfg.min = SF.cfg.max = 100000;
+  ui.btn();
+  ok(SF.state() === null && Bangle.ev.lcdPower.length == 0, "button leaves: listeners removed, timers cancelled");
+  ok(menu && menu["Sleep face"], "back on the main menu");
 });
 
 next();

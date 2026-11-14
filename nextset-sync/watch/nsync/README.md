@@ -46,6 +46,16 @@ Install **Sleep Log** (0.26) too. Sleep Log records in the background; this
 app's boot code serves its log to the iPhone, so nothing needs to stay open
 overnight.
 
+**Sleep face** (main menu): the square gold bezel and green reptile eye, for
+the night. It blinks once when it opens, then every 30 to 90 seconds, but only
+while the screen is already on: it never turns the screen or backlight on and
+never changes brightness, and when the screen goes off every pending blink is
+cancelled. When the screen comes back on it shows the open eye. No clock and no
+widgets. While it is open the watch uses your normal lock and backlight times
+(not the longer ones used while lifting). The button (after the press that only
+wakes the screen) goes back to the menu. Sleep Log keeps recording either way;
+the face does not touch it.
+
 ## Files
 
 `nsync.json` (watch id, paired phones), `nsync.wkt.json` (workout),
@@ -64,4 +74,7 @@ those three small files behind. To remove them, delete `nsync.json`, `nsync.ses.
 Web IDE's storage manager (Storage icon).
 
 Other files: `nsync.mark.a/b.json` (markers, kept like pending records),
-`nsync.timer.json` (running timer), `nsync.sw.json` (stopwatch).
+`nsync.timer.json` (running timer), `nsync.sw.json` (stopwatch),
+`nsync.eye0.img` to `nsync.eye3.img` (Sleep face frames, made from
+`design/sleep-face/` by `scripts/make-sleep-face.py`; 2-bit images with a
+palette, read memory-mapped, so they use no RAM).

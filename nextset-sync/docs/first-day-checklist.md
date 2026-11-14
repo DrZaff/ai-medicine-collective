@@ -91,6 +91,7 @@ About 45 minutes of setup spread over the week, plus one night.
 | L | Start the Quick test again: is line 2's **"Last …"** (your Ghost: last time's set) readable at arm's length? Log a set that matches or beats it at the same RIR | A **distinct double buzz** (first match) instead of the short one |
 | M | Watch: main menu → **Check-in → 4 Good**; iPhone: **Sync Now** → **Today** | *Check-in today: 4/5 Good* under Recovery |
 | N | Watch: main menu → **Self-test** | No **XX** lines; fix any **!!** it explains (e.g. Health → HRM interval) |
+| O | Watch: main menu → **Sleep face**. Watch for a minute, let the screen go off, wait two minutes, then press the button once | The eye blinks once at the start, then every 30–90 s; the bezel never moves; the screen does **not** turn itself on to blink; after the press it shows the open eye (no half-closed eye). A second press returns to the menu |
 
 ## First night
 
@@ -108,7 +109,8 @@ These are built and tested in software only. Tick each off on the day:
 - [ ] Rest-timer vibration (D), and touch sizes being comfortable mid-workout
 - [ ] Scheduler-backed buzzes after leaving the app (K), Ghost legibility and buzz (L)
 - [ ] Text previews (BangleApps *iOS Integration*, watch bonded in iOS **Settings → Bluetooth**) arriving while NextSet syncs
-- [ ] Overnight Sleep Log recording and the morning sync (14–15)
+- [ ] Overnight Sleep Log recording and the morning sync (14–15), also with the Sleep face open all night (O): check the battery in the morning
+- [ ] Sleep face colours and dithering on the real screen (O), blink speed
 - [ ] Reconnection while the app is in the background (lock the iPhone during C to F)
 
 ## If something goes wrong
