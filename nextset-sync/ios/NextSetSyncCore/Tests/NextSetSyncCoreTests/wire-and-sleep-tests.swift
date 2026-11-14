@@ -200,3 +200,67 @@ final class SleepTests: XCTestCase {
         XCTAssertTrue(n2.first!.main.isPartial)
     }
 }
+
+/// Decodes the HEALTH2 fixture the way the Health app's lib.js does (test-only;
+/// on the phone, rows arrive over Bluetooth from the watch's own reader).
+enum HealthFixture {
+    static func rows() throws -> [HealthRow] {
+        let d = [UInt8](try Shared.data("fixtures/health-2026-11.raw"))
+        precondition(String(decoding: d[0..<7], as: UTF8.self) == "HEALTH2")
+        var out: [HealthRow] = [], idx = 8
+        var cal = Calendar(identifier: .gregorian); cal.timeZone = TimeZone(identifier: "UTC")!
+        for day in 0..<31 {
+            for hr in 0..<24 {
+                for m in 0..<6 {
+                    let r = Array(d[idx..<(idx + 10)]); idx += 10
+                    if r.allSatisfy({ $0 == 0xFF }) { continue }
+                    let date = cal.date(from: DateComponents(year: 2026, month: 11, day: day + 1, hour: hr, minute: m * 10))!
+                    out.append(HealthRow(t10: Int(date.timeIntervalSince1970 / 600), steps: Int(r[0]) << 8 | Int(r[1]),
+                                         bpmMin: Int(r[2]), bpmMax: Int(r[3]), movement: Int(r[4]) * 8, activity: Int(r[7] >> 5)))
+                }
+            }
+            idx += 10
+        }
+        return out
+    }
+}
+
+final class RecoveryTests: XCTestCase {
+    func testRestingHeartRatePerNightAndBaseline() throws {
+        let exp = try Shared.json("fixtures/health-expected.json")
+        let sleepExp = try Shared.json("fixtures/sleep-expected.json")
+        let log = String(decoding: try Shared.data("fixtures/sleeplog-sample.log"), as: UTF8.self)
+        let entries = try SleepLogParser.parseArchive(try Shared.data("fixtures/sleeplog-archive.json")) + SleepLogParser.parseStorageFile(log)
+        let zones = ZoneHistory((sleepExp["zoneLog"] as! [[String: Any]]).map {
+            ZoneMark(at: Date(timeIntervalSince1970: TimeInterval($0["at"] as! Int)), zone: $0["zone"] as! String)
+        })
+        let nights = SleepAnalyzer.nights(entries, dataEndT10: sleepExp["dataEndT10"] as? Int, zones: zones)
+        let rec = RecoveryAnalyzer.nights(nights, rows: try HealthFixture.rows())
+        let want = exp["resting"] as! [String: Int]
+        XCTAssertEqual(Dictionary(uniqueKeysWithValues: rec.map { ($0.wakeDate, $0.restingHR ?? -1) }), want)
+        let last = rec.first { $0.wakeDate == "2026-11-13" }!
+        XCTAssertEqual(last.baselineHR, (exp["baselineFor"] as! [String: Int])["2026-11-13"])
+        XCTAssertEqual(last.delta, 50 - 53)
+        XCTAssertNil(rec.first { $0.wakeDate == "2026-11-06" }!.baselineHR, "no baseline from fewer than 3 nights")
+    }
+
+    func testMissingHeartRateStaysMissing() {
+        let start = Date(timeIntervalSince1970: 1_794_000_000), end = start.addingTimeInterval(8 * 3600)
+        let t0 = Int(start.timeIntervalSince1970 / 600)
+        // Readings with a gap: never three consecutive slots.
+        let rows = [0, 1, 3, 4, 6].map { HealthRow(t10: t0 + $0, steps: 0, bpmMin: 55, bpmMax: 55, movement: 0, activity: 4) }
+            + [HealthRow(t10: t0 + 10, steps: 0, bpmMin: 0, bpmMax: 0, movement: 0, activity: 4)]
+        let (r, n) = RecoveryAnalyzer.restingHR(rows, from: start, to: end)
+        XCTAssertNil(r)
+        XCTAssertEqual(n, 5)
+    }
+
+    func testHealthImportIsIdempotent() throws {
+        let s = try LocalStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent("h-\(UUID())"))
+        let rows = try HealthFixture.rows()
+        XCTAssertEqual(try s.importHealth(rows).added, rows.count)
+        let again = try s.importHealth(rows)
+        XCTAssertEqual(again.added + again.changed, 0)
+        XCTAssertEqual(try LocalStore(directory: s.directory).healthRows.count, rows.count)
+    }
+}

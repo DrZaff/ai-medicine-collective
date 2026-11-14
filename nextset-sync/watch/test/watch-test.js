@@ -19,6 +19,10 @@ S.write("nsync-tools", FILES.tools);
 S.write("sleeplog", FILES.sleeplog);
 S.write("sched", FILES.schedLib);           // Scheduler 0.43, a default Bangle.js 2 app
 S.write("sched.boot.js", FILES.schedBoot);
+S.write("health", FILES.healthLib);         // Health 0.44 and a synthetic November log
+S.writeJSON("health.info", { id: "health", version: "0.44" });
+S.write(FILES.healthExpected.file, atob(FILES.healthRawB64));
+S.writeJSON("health.json", { hrm: 10, useUTC: true }); // the fixture is filed in UTC (the setting we recommend)
 if (!Date.prototype.toLocalISOString) Date.prototype.toLocalISOString = function() { return this.toISOString(); };
 S.writeJSON("sleeplog.info", { id: "sleeplog", version: "0.26" });
 S.writeJSON(FIXTURE.archiveName, FIXTURE.archive);
@@ -429,7 +433,7 @@ step(function() {
   var L = require("nsync");
   S.write(".boot0", "var bleServices={};/* ... */bleServices['d9a50001-3c1f-4b0e-9f5d-7a1e6c2b8f40']={};");
   S.writeJSON("setting.json", { timezone: -5, whitelist: ["aa:bb"] });
-  S.write("health", "exports={}"); S.writeJSON("health.json", { hrm: 0 });
+  S.writeJSON("health.json", { hrm: 0, useUTC: true });   // HRM polling off for this check
   var r = L.selfTest(), by = {};
   r.forEach(function(c) { by[c.n.split(" ")[0]] = c; });
   ok(by.Sync && by.Sync.s == "ok", "self-test: sync service registered at boot");
@@ -439,6 +443,48 @@ step(function() {
   ok(by.Paired.s == "ok" && by.Clock.s == "ok", "self-test: paired phone and sane clock");
   S.write(".boot0", "nothing here");
   ok(L.selfTest().filter(function(c) { return c.n == "Sync service"; })[0].s == "fail", "self-test fails when the bootloader has not included the service");
+});
+
+// ---- heart rate (Health app log) and check-ins --------------------------------
+var hx = FILES.healthExpected;
+step(function() {
+  var L = require("nsync");
+  ok(L.healthInfo().ver == "0.44", "hello reports the Health app version");
+  var since = hx.lastSlotT10 - 36;          // the last 6 hours of the log
+  var r = L.healthRows(since, 300);
+  ok(r.rows.length == 36 && r.rows[0][0] == since + 1 && r.rows[35][0] == hx.lastSlotT10, "reads 10-minute rows after the cursor, in order");
+  var lows = r.rows.filter(function(x) { return x[2] == hx.resting["2026-11-13"]; });
+  ok(lows.length == 3 && lows[1][0] - lows[0][0] == 1, "the 30-minute resting window comes through (3 slots at 50 bpm)");
+  var paged = L.healthRows(since, 10);
+  ok(paged.rows.length == 10 && paged.more, "health rows are paged");
+  ok(L.healthRows(hx.lastSlotT10, 50).rows.length == 0, "nothing after the newest slot");
+  L.addCheckin(4);
+  disconnect();
+  phone({ t: "hello", v: 1, phone: PID, mtu: 128, kinds: ["set", "ses", "mark"] }); // knows markers, not check-ins
+});
+step(function() { var h = last(); ok(h.hl && h.hl.ver == "0.44", "hi carries Health app info"); nonce = h.nonce; phone({ t: "auth", proof: sha(key + ":" + nonce + ":" + PID) }); });
+step(function() { received(); phone({ t: "pull", max: 20 }); });
+step(function() {
+  var m = last();
+  ok(!m.recs.some(function(r) { return r.k == "chk"; }), "a phone without check-in support never gets them");
+  disconnect();
+  phone({ t: "hello", v: 1, phone: PID, mtu: 128, kinds: ["set", "ses", "mark", "chk"] });
+});
+step(function() { nonce = last().nonce; phone({ t: "auth", proof: sha(key + ":" + nonce + ":" + PID) }); });
+step(function() { received(); phone({ t: "pull", max: 20 }); });
+var chk;
+step(function() {
+  chk = last().recs.filter(function(r) { return r.k == "chk"; })[0];
+  ok(chk && chk.score == 4 && chk.id.indexOf("-c") > 0, "check-in syncs with its score and a stable id");
+  phone({ t: "ack", ids: [[chk.id, chk.rev]] });
+});
+step(function() {
+  ok(last().n == 1 && require("nsync").marks()[chk.id].synced, "acked check-in is kept as synced");
+  phone({ t: "health", since: hx.lastSlotT10 - 6, max: 100 });
+});
+step(function() {
+  var m = last();
+  ok(m.t == "hlt" && m.rows.length == 6 && m.hl.ver == "0.44", "the phone's health request returns rows over Bluetooth");
 });
 
 next();

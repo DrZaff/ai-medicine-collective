@@ -22,6 +22,8 @@ const read = p => readFileSync(join(here, p), 'utf8');
 const expected = JSON.parse(read('../../protocol/fixtures/sleep-expected.json'));
 const FILES = {
   lib: read('../nsync/lib.js'), boot: read('../nsync/boot.js'), sleeplog: read('vendor/sleeplog-0.26-lib.js'),
+  health: read('vendor/health-0.44-lib.js'),
+  healthB64: readFileSync(join(here, '../../protocol/fixtures/health-2026-11.raw')).toString('base64'),
   log: read('../../protocol/fixtures/sleeplog-sample.log'),
   archive: read('../../protocol/fixtures/sleeplog-archive.json'), archiveName: expected.archiveFileName,
 };
@@ -30,6 +32,8 @@ var S = require("Storage");
 S.eraseAll();
 S.write("nsync", FILES.lib); S.write("sleeplog", FILES.sleeplog);
 S.writeJSON("sleeplog.info", {id: "sleeplog", version: "0.26"});
+S.write("health", FILES.health); S.writeJSON("health.info", {id: "health", version: "0.44"});
+S.write("health-2026-11.raw", atob(FILES.healthB64)); S.writeJSON("health.json", {hrm: 10, useUTC: true});
 S.write(FILES.archiveName, FILES.archive);
 S.open("sleeplog.log", "w").write(FILES.log);
 var SVC = "d9a50001-3c1f-4b0e-9f5d-7a1e6c2b8f40", RXC = "d9a50002-3c1f-4b0e-9f5d-7a1e6c2b8f40";
@@ -70,6 +74,7 @@ setInterval(function() {
       else if (l[0] == "L") logSet(parseInt(l.substr(2), 10));
       else if (l[0] == "F") finish();
       else if (l[0] == "M") L.addMark(l.substr(2));
+      else if (l[0] == "C") L.addCheckin(parseInt(l.substr(2), 10));
     } catch (e) { print("E " + e); }
   }
 }, 10);

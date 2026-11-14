@@ -396,6 +396,19 @@ function showSyncInfo() {
   };
   E.showMenu(m);
 }
+// Morning check-in: one tap, synced to the iPhone beside last night's sleep and resting heart rate.
+function showCheckin() {
+  screen = "menu";
+  var m = { "": { title: "How do you feel?", back: showMain } };
+  [[5, "Great"], [4, "Good"], [3, "OK"], [2, "Tired"], [1, "Wrecked"]].forEach(function(o) {
+    m[o[0] + "  " + o[1]] = function() {
+      try { L.addCheckin(o[0]); } catch (e) { return E.showAlert(e.message, "Not saved").then(showMain); }
+      Bangle.buzz(40);
+      E.showAlert("Saved: " + o[1] + "\nSyncs with your sleep", "Check-in").then(showMain);
+    };
+  });
+  E.showMenu(m);
+}
 function showSelfTest() {
   screen = "menu";
   var r = L.selfTest(), bad = r.filter(function(c) { return c.s != "ok"; }).length;
@@ -417,6 +430,7 @@ function showMain() {
   else m["No workout yet"] = function() { E.showAlert("Send a workout from the iPhone app.").then(showMain); };
   m[(p.sets ? p.sets + (p.sets == 1 ? " set" : " sets") + " to sync" : "All synced")] = showSyncInfo;
   m["Pair phone"] = showPair;
+  m["Check-in"] = showCheckin;
   m["Self-test"] = showSelfTest;
   m["Timers"] = function() { require("nsync-tools").open(showMain); };
   m["Mark a moment"] = function() { require("nsync-tools").markers(showMain); };

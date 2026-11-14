@@ -67,6 +67,7 @@ final class EspruinoLink: WatchLink, @unchecked Sendable {
     func personLogsSet(reps: Int) { send("L \(reps)") }
     func personFinishes() { send("F") }
     func personMarks(_ label: String) { send("M \(label)") }
+    func personChecksIn(_ score: Int) { send("C \(score)") }
     func stop() { try? input.fileHandleForWriting.close(); process.terminate() }
 }
 
@@ -110,6 +111,7 @@ final class EspruinoBridgeTests: XCTestCase {
         link.dropLink(); await engine.linkDropped()
         link.personLogsSet(reps: 11)
         link.personMarks("Coffee")
+        link.personChecksIn(5)
         try await Task.sleep(nanoseconds: 300_000_000)
 
         // 3. Reconnect: the set arrives exactly once, and Sleep Log comes with it.
@@ -118,6 +120,8 @@ final class EspruinoBridgeTests: XCTestCase {
         XCTAssertEqual(r1.newSets, 1)
         XCTAssertEqual(r1.newMarkers, 1, "marker made on the real watch code arrives")
         XCTAssertEqual(store.markers.map(\.label), ["Coffee"])
+        XCTAssertEqual(store.checkins.map(\.score), [5], "check-in from the real watch code")
+        XCTAssertGreaterThan(r1.healthRowsAdded, 1000, "heart rate read through the real Health 0.44 reader")
         XCTAssertEqual(r1.leftOnWatch, 0)
         XCTAssertEqual(r1.sleepLogVersion, "0.26")
         XCTAssertEqual(store.sets.map(\.reps), [11])
@@ -139,6 +143,10 @@ final class EspruinoBridgeTests: XCTestCase {
             XCTAssertEqual(n.main.asleepMinutes, w["asleep"] as? Int, n.wakeDate)
             XCTAssertEqual(n.main.isPartial, w["partial"] as? Bool, n.wakeDate)
         }
+        // Resting heart rate per night from rows the real watch code sent.
+        let hExp = try Shared.json("fixtures/health-expected.json")["resting"] as! [String: Int]
+        let rec = RecoveryAnalyzer.nights(nights, rows: store.healthRows)
+        XCTAssertEqual(Dictionary(uniqueKeysWithValues: rec.map { ($0.wakeDate, $0.restingHR ?? -1) }), hExp)
 
         // 5. Finishing the workout on the watch syncs a finished session.
         link.personFinishes()

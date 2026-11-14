@@ -162,3 +162,36 @@ public struct MarkerRecord: Codable, Hashable, Identifiable, Sendable {
     public var ackState: AckState
     public var isDemo: Bool
 }
+
+/// A morning check-in from the watch: how you feel, 1 (wrecked) to 5 (great).
+public struct CheckinRecord: Codable, Hashable, Identifiable, Sendable {
+    public var id: String
+    public var rev: Int
+    public var score: Int
+    public var at: Date
+    public var receivedAt: Date
+    public var ackState: AckState
+    public var isDemo: Bool
+    public var label: String { ["", "Wrecked", "Tired", "OK", "Good", "Great"][max(1, min(5, score))] }
+}
+
+/// One 10-minute record from the BangleApps Health log. bpm 0 = no reading.
+public struct HealthRow: Codable, Hashable, Sendable {
+    public var t10: Int
+    public var steps: Int
+    public var bpmMin: Int
+    public var bpmMax: Int
+    public var movement: Int
+    public var activity: Int
+    public init(t10: Int, steps: Int, bpmMin: Int, bpmMax: Int, movement: Int, activity: Int) {
+        self.t10 = t10; self.steps = steps; self.bpmMin = bpmMin; self.bpmMax = bpmMax
+        self.movement = movement; self.activity = activity
+    }
+    public init?(_ a: [Int]) {
+        guard a.count >= 6 else { return nil }
+        self.init(t10: a[0], steps: a[1], bpmMin: a[2], bpmMax: a[3], movement: a[4], activity: a[5])
+    }
+    /// Mid-point of the 10 minutes' heart rate, or nil without a reading.
+    public var bpm: Double? { bpmMin > 0 && bpmMax > 0 ? Double(bpmMin + bpmMax) / 2 : nil }
+    public var date: Date { Date(timeIntervalSince1970: TimeInterval(t10) * 600) }
+}

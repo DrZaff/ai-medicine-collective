@@ -17,6 +17,8 @@ public struct LinkState: Codable, Equatable, Sendable {
     public var watchStatus: WatchStatus?
     /// Sleep Log time (10-minute steps) imported up to.
     public var sleepCursorT10: Int?
+    /// Health log imported up to (10-minute steps, UTC).
+    public var healthCursorT10: Int?
     public var sentWorkoutId: String?
     public var sentWorkoutRev: Int?
 
@@ -32,6 +34,8 @@ public struct WatchStatus: Codable, Equatable, Sendable {
     public var pendingRecords: Int
     public var pendingSets: Int
     public var pendingMarkers: Int?
+    public var healthAppVersion: String?
+    public var heartRatePolling: Int?
     public var activeSession: String?
     public var loadedWorkout: String?
     public var battery: Int?
@@ -57,7 +61,7 @@ public struct ZoneMark: Codable, Hashable, Sendable {
 }
 
 public struct UpsertResult: Equatable, Sendable {
-    public var insertedSets = 0, insertedSessions = 0, insertedMarkers = 0, updated = 0, duplicates = 0, stale = 0
+    public var insertedSets = 0, insertedSessions = 0, insertedMarkers = 0, insertedCheckins = 0, updated = 0, duplicates = 0, stale = 0
     /// Records of a kind this build does not store: NOT acknowledged, so the watch keeps them.
     public var skippedUnknown = 0
     /// What to acknowledge: every received record, at the rev received.
@@ -91,6 +95,8 @@ public final class LocalStore: @unchecked Sendable {
     /// Notes you add on the iPhone, by marker id. Never sent to the watch and
     /// never touched by a re-import.
     private var notes: [String: String] = [:]
+    private var checkinIndex: [String: CheckinRecord] = [:]
+    private var healthIndex: [Int: HealthRow] = [:]
 
     public init(directory: URL) throws {
         self.directory = directory
@@ -102,6 +108,9 @@ public final class LocalStore: @unchecked Sendable {
         workoutList = try load("workouts.json") ?? []
         markerIndex = try load("markers.json") ?? [:]
         notes = try load("notes.json") ?? [:]
+        checkinIndex = try load("checkins.json") ?? [:]
+        let rows: [HealthRow] = try load("health.json") ?? []
+        healthIndex = Dictionary(rows.map { ($0.t10, $0) }, uniquingKeysWith: { _, b in b })
     }
 
     private func url(_ name: String) -> URL { directory.appendingPathComponent(name) }
@@ -161,11 +170,23 @@ public final class LocalStore: @unchecked Sendable {
     public func upsert(_ incoming: [WireRecord], isDemo: Bool = false, now: Date = Date()) throws -> UpsertResult {
         try locked {
             var r = UpsertResult()
-            var markersChanged = false
+            var markersChanged = false, checkinsChanged = false
             for w in incoming {
                 // Acknowledge only kinds this build stores; the watch keeps the rest.
                 guard SyncProtocol.storedKinds.contains(w.k) else { r.skippedUnknown += 1; continue }
                 r.acks.append(WireAck(id: w.id, rev: w.rev))
+                if w.k == "chk" {
+                    if let old = checkinIndex[w.id] {
+                        if old.rev == w.rev { r.duplicates += 1; continue }
+                        if old.rev > w.rev { r.stale += 1; continue }
+                        r.updated += 1
+                    } else { r.insertedCheckins += 1 }
+                    checkinIndex[w.id] = CheckinRecord(id: w.id, rev: w.rev, score: w.score ?? 3,
+                                                       at: Date(timeIntervalSince1970: w.at / 1000), receivedAt: now,
+                                                       ackState: .awaitingWatchAck, isDemo: isDemo)
+                    checkinsChanged = true
+                    continue
+                }
                 if w.k == "mark" {
                     if let old = markerIndex[w.id] {
                         if old.rev == w.rev { r.duplicates += 1; continue }
@@ -206,6 +227,7 @@ public final class LocalStore: @unchecked Sendable {
             }
             try save(records, "records.json")
             if markersChanged { try save(markerIndex, "markers.json") }
+            if checkinsChanged { try save(checkinIndex, "checkins.json") }
             return r
         }
     }
@@ -217,7 +239,9 @@ public final class LocalStore: @unchecked Sendable {
                 if var s = records.sets[a.id], s.rev <= a.rev { s.ackState = .confirmed; records.sets[a.id] = s }
                 if var s = records.sessions[a.id], s.rev <= a.rev { s.ackState = .confirmed; records.sessions[a.id] = s }
                 if var m = markerIndex[a.id], m.rev <= a.rev { m.ackState = .confirmed; markerIndex[a.id] = m }
+                if var c = checkinIndex[a.id], c.rev <= a.rev { c.ackState = .confirmed; checkinIndex[a.id] = c }
             }
+            try save(checkinIndex, "checkins.json")
             try save(records, "records.json")
             try save(markerIndex, "markers.json")
         }
@@ -249,6 +273,25 @@ public final class LocalStore: @unchecked Sendable {
         locked { markerIndex.values.filter { !$0.deleted }.sorted { $0.at > $1.at } }
     }
     public func note(for markerId: String) -> String? { locked { notes[markerId] } }
+
+    /// Check-ins, newest first.
+    public var checkins: [CheckinRecord] { locked { checkinIndex.values.sorted { $0.at > $1.at } } }
+
+    /// Merges Health log rows by time slot: re-importing changes nothing.
+    @discardableResult
+    public func importHealth(_ rows: [HealthRow]) throws -> SleepImportResult {
+        try locked {
+            var r = SleepImportResult()
+            for row in rows {
+                if let old = healthIndex[row.t10] {
+                    if old == row { r.unchanged += 1 } else { healthIndex[row.t10] = row; r.changed += 1 }
+                } else { healthIndex[row.t10] = row; r.added += 1 }
+            }
+            if r.added + r.changed > 0 { try save(healthIndex.values.sorted { $0.t10 < $1.t10 }, "health.json") }
+            return r
+        }
+    }
+    public var healthRows: [HealthRow] { locked { healthIndex.values.sorted { $0.t10 < $1.t10 } } }
     public func setNote(_ text: String?, for markerId: String) throws {
         try locked {
             let t = text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -298,11 +341,11 @@ public final class LocalStore: @unchecked Sendable {
     /// Erases everything in this store's folder.
     public func eraseAll() throws {
         try locked {
-            for name in ["records.json", "sleep.json", "state.json", "workouts.json", "markers.json", "notes.json"] {
+            for name in ["records.json", "sleep.json", "state.json", "workouts.json", "markers.json", "notes.json", "checkins.json", "health.json"] {
                 try? FileManager.default.removeItem(at: url(name))
             }
             records = Records(); sleepData = Sleep(); sleepIndex = [:]; state = State(); workoutList = []
-            markerIndex = [:]; notes = [:]
+            markerIndex = [:]; notes = [:]; checkinIndex = [:]; healthIndex = [:]
             try save(state, "state.json")
         }
     }

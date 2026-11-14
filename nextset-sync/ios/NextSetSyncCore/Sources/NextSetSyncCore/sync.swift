@@ -13,6 +13,8 @@ public struct SyncReport: Equatable, Sendable {
     public var at = Date()
     public var newSets = 0, updatedSets = 0, duplicateRecords = 0, sessionsFinished = 0, newMarkers = 0
     public var sleepAdded = 0, sleepChanged = 0, sleepUnchanged = 0
+    public var newCheckins = 0, healthRowsAdded = 0
+    public var healthSkippedReason: String?
     public var leftOnWatch = 0
     public var sleepLogVersion: String?
     public var sleepSkippedReason: String?
@@ -22,6 +24,8 @@ public struct SyncReport: Equatable, Sendable {
         parts.append(newSets == 1 ? "1 new set" : "\(newSets) new sets")
         if updatedSets > 0 { parts.append("\(updatedSets) edited") }
         if duplicateRecords > 0 { parts.append("\(duplicateRecords) already here") }
+        if newCheckins > 0 { parts.append(newCheckins == 1 ? "1 check-in" : "\(newCheckins) check-ins") }
+        if healthRowsAdded > 0 { parts.append("heart rate: \(healthRowsAdded) new readings") }
         if newMarkers > 0 { parts.append(newMarkers == 1 ? "1 marker" : "\(newMarkers) markers") }
         if sessionsFinished > 0 { parts.append("\(sessionsFinished) workout\(sessionsFinished == 1 ? "" : "s") finished") }
         if let r = sleepSkippedReason { parts.append("sleep: \(r)") }
@@ -37,6 +41,7 @@ public struct HelloInfo: Equatable, Sendable {
     public var appVersion: String?
     public var firmware: String?
     public var sleepLog: WireMessage.SleepLogInfo?
+    public var healthLog: WireMessage.HealthLogInfo?
 }
 
 /// Runs protocol v1 against one connected watch. Create one per connection.
@@ -149,7 +154,7 @@ public actor SyncEngine {
         if let min = r.min, min > SyncProtocol.version { throw WireError.protocolMismatch(min) }
         nonce = r.nonce
         authed = false
-        let h = HelloInfo(watchId: wid, paired: r.paired ?? false, appVersion: r.app, firmware: r.fw, sleepLog: r.sl)
+        let h = HelloInfo(watchId: wid, paired: r.paired ?? false, appVersion: r.app, firmware: r.fw, sleepLog: r.sl, healthLog: r.hl)
         hello = h
         logger("hello: watch \(wid), app \(r.app ?? "?"), firmware \(r.fw ?? "?"), paired \(h.paired)")
         return h
@@ -200,7 +205,8 @@ public actor SyncEngine {
         try await ensureAuthed()
         let r = try await request(WireMessage(t: "status"))
         let s = WatchStatus(at: clock(), pendingRecords: (r.pend ?? 0) + (r.pendMarks ?? 0), pendingSets: r.pendSets ?? 0,
-                            pendingMarkers: r.pendMarks,
+                            pendingMarkers: r.pendMarks, healthAppVersion: hello?.healthLog?.ver,
+                            heartRatePolling: hello?.healthLog?.hrm,
                             activeSession: r.ses.map { "\($0.wn ?? "Workout"): exercise \(($0.xi ?? 0) + 1), \($0.n ?? 0) sets" },
                             loadedWorkout: r.wkt?.name, battery: r.bat, firmware: hello?.firmware,
                             appVersion: hello?.appVersion, sleepLogVersion: r.sl?.ver, sleepLogEnabled: r.sl?.on)
@@ -230,6 +236,7 @@ public actor SyncEngine {
             report.at = clock()
             try await pullRecords(&report)
             try await pullSleep(&report)
+            try await pullHealth(&report)
             let st = try await statusStep()
             report.leftOnWatch = st.pendingRecords
             try store.updateLink { $0.lastSync = report.at; $0.lastSyncSummary = report.summary; $0.lastError = nil }
@@ -249,6 +256,7 @@ public actor SyncEngine {
             let result = try store.upsert(recs, isDemo: isDemo, now: clock())
             report.newSets += result.insertedSets
             report.newMarkers += result.insertedMarkers
+            report.newCheckins += result.insertedCheckins
             report.sessionsFinished += result.insertedSessions
             report.updatedSets += result.updated
             report.duplicateRecords += result.duplicates + result.stale
@@ -289,6 +297,27 @@ public actor SyncEngine {
             _ = try await request(s)
             try store.updateLink { $0.sleepCursorT10 = newest }
         }
+    }
+
+    /// Heart rate and steps from the BangleApps Health log, 10-minute rows.
+    /// Re-reads the last hour each time (the newest slot can still change).
+    private func pullHealth(_ report: inout SyncReport) async throws {
+        guard let hl = hello?.healthLog, hl.ver != nil else { report.healthSkippedReason = "Health app not installed"; return }
+        let nowT10 = Int(clock().timeIntervalSince1970 / 600)
+        // First sync: 8 days (enough for a 7-night baseline); then from the cursor.
+        var since = Swift.max(0, (store.link.healthCursorT10 ?? (nowT10 - 8 * 144)) - 6)
+        var newest = store.link.healthCursorT10 ?? 0
+        for _ in 0..<200 {
+            var m = WireMessage(t: "health"); m.since = since; m.max = 144
+            let r = try await request(m)
+            let rows = (r.rows ?? []).compactMap(HealthRow.init)
+            let imp = try store.importHealth(rows)
+            report.healthRowsAdded += imp.added
+            newest = Swift.max(newest, rows.map(\.t10).max() ?? 0)
+            guard r.more == true, let last = rows.last?.t10, last > since else { break }
+            since = last
+        }
+        if newest > 0 { try store.updateLink { $0.healthCursorT10 = newest } }
     }
 
     public func unpair() async throws {

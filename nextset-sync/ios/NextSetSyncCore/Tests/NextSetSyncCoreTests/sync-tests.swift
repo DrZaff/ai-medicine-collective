@@ -262,3 +262,23 @@ final class MarkerTests: XCTestCase {
         XCTAssertEqual(try LocalStore(directory: rig.dir).note(for: m.id), "before the lift; felt sharp")
     }
 }
+
+final class HeartRateSyncTests: XCTestCase {
+    func testHealthAndCheckinsSyncOnce() async throws {
+        let rig = try await Rig().paired()
+        let rows = DemoData.health(now: Date(), zone: .current)
+        await rig.watch.setHealth(rows)
+        await rig.watch.addCheckin(4)
+        let r1 = try await rig.engine.syncAll()
+        XCTAssertEqual(r1.newCheckins, 1)
+        XCTAssertGreaterThan(r1.healthRowsAdded, 1000)
+        XCTAssertEqual(rig.store.checkins.map(\.score), [4])
+        XCTAssertEqual(rig.store.checkins.first?.label, "Good")
+        let r2 = try await rig.engine.syncAll()
+        XCTAssertEqual(r2.newCheckins, 0)
+        XCTAssertEqual(r2.healthRowsAdded, 0, "re-reading the last hour adds nothing")
+        let nights = SleepAnalyzer.nights(DemoData.sleep().entries, dataEndT10: DemoData.sleep().dataEndT10, zones: ZoneHistory([]))
+        let rec = RecoveryAnalyzer.nights(nights, rows: rig.store.healthRows)
+        XCTAssertTrue(rec.prefix(3).allSatisfy { $0.restingHR != nil }, "recent nights have a resting heart rate")
+    }
+}

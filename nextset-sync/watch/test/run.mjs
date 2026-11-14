@@ -20,6 +20,9 @@ const FILES = {
   lib: read(join(app, 'lib.js')), boot: read(join(app, 'boot.js')), app: read(join(app, 'app.js')),
   tools: read(join(app, 'tools.js')),
   schedLib: read(join(here, 'vendor', 'sched-0.43-lib.js')),
+  healthLib: read(join(here, 'vendor', 'health-0.44-lib.js')),
+  healthRawB64: readFileSync(join(fx, 'health-2026-11.raw')).toString('base64'), // binary: via atob, not JSON text
+  healthExpected: JSON.parse(read(join(fx, 'health-expected.json'))),
   schedBoot: read(join(here, 'vendor', 'sched-0.43-boot.js')),
   sleeplog: read(join(here, 'vendor', 'sleeplog-0.26-lib.js')),
 };

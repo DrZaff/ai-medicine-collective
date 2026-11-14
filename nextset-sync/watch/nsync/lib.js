@@ -28,7 +28,7 @@ exports.KEEP_MARKS = 30;
 exports.MIN_FREE = 16000;     // bytes of Storage kept free so set logging always fits
 // Record kinds this watch can send. A phone lists the kinds it stores in
 // `hello`; an older phone that sends no list gets only sets and sessions.
-exports.KINDS = ["set", "ses", "mark"];
+exports.KINDS = ["set", "ses", "mark", "chk"];
 
 function hex(nbytes) {
   var s = "";
@@ -111,6 +111,27 @@ exports.markCount = function() {
   var m = exports.marks(), n = 0, unsynced = 0;
   for (var k in m) { n++; if (!m[k].synced) unsynced++; }
   return { n: n, unsynced: unsynced };
+};
+// Unsynced markers and check-ins of the kinds this phone takes.
+function unsyncedMoments(kinds) {
+  var m = exports.marks(), out = [];
+  for (var k in m) if (!m[k].synced && kinds.indexOf(m[k].k || "mark") >= 0) out.push(m[k]);
+  return out;
+}
+// Morning check-in: how you feel, 1 (wrecked) to 5 (great). Stored and synced
+// exactly like a marker (same crash-safe file, caps and acks).
+exports.addCheckin = function(score, at) {
+  score = Math.max(1, Math.min(5, score | 0));
+  if (S.getFree && S.getFree() < exports.MIN_FREE) throw new Error("Storage low: sync first");
+  if (exports.markCount().unsynced >= exports.MAX_MARKS) throw new Error("Sync to free space");
+  var m = exports.marks();
+  at = at || Date.now();
+  var id = exports.cfg().wid + "-c" + at.toString(36);
+  while (m[id]) id += "x";
+  m[id] = { k: "chk", id: id, rev: 1, score: score, at: at };
+  writeDual(F.mark, m);
+  if (E.emit) E.emit("nsync", "chk");
+  return m[id];
 };
 exports.addMark = function(label, at) {
   if (S.getFree && S.getFree() < exports.MIN_FREE) throw new Error("Storage low: sync first");
@@ -211,6 +232,28 @@ function sleeplogInfo() {
 }
 exports.sleeplogInfo = sleeplogInfo;
 
+// BangleApps Health app (0.44): 10-minute records with steps and heart rate.
+function healthInfo() {
+  var info = S.readJSON("health.info", 1), set = S.readJSON("health.json", 1) || {};
+  return { ver: info ? info.version : (S.read("health") ? "?" : null), hrm: set.hrm | 0, utc: !!set.useUTC };
+}
+exports.healthInfo = healthInfo;
+// Rows [t10, steps, bpmMin, bpmMax, movement, activity index] after `since`
+// (UTC 10-minute steps), read only through the Health app's own reader.
+exports.healthRows = function(since, max) {
+  var H = require("health"), utc = healthInfo().utc, rows = [], acts = H.ACTIVITY || [];
+  var from = new Date((since + 1) * 6E5 - 864E5); // a day earlier: its reader walks whole local days
+  H.readAllRecordsSince(from, function(r) {
+    // Records are filed by wall-clock time; in UTC mode that wall clock is UTC.
+    var ms = r.date.getTime() - (utc ? r.date.getTimezoneOffset() * 60000 : 0);
+    var t10 = Math.round(ms / 6E5);
+    if (t10 > since) rows.push([t10, r.steps | 0, r.bpmMin | 0, r.bpmMax | 0, r.movement | 0, Math.max(0, acts.indexOf(r.activity))]);
+  });
+  if (Modules.getCached().indexOf("health") >= 0) Modules.removeCached("health");
+  rows.sort(function(a, b) { return a[0] - b[0]; });
+  return { rows: rows.slice(0, max), more: rows.length > max };
+};
+
 // ---- outgoing frames -------------------------------------------------------
 function send(st, o) {
   var s = JSON.stringify(o);
@@ -277,7 +320,7 @@ function handle(st, m) {
       return {
         t: "hi", v: exports.PROTO, min: 1, watch: c.wid, app: exports.VERSION, kinds: exports.KINDS,
         fw: process.env.VERSION, paired: !!(st.pid && c.phones[st.pid]),
-        nonce: st.nonce, sl: sleeplogInfo()
+        nonce: st.nonce, sl: sleeplogInfo(), hl: healthInfo()
       };
     case "pair":
       if (!st.pid || m.phone !== st.pid) return err("hello_first", "pair");
@@ -343,10 +386,7 @@ function handle(st, m) {
       var p = exports.pend(), kinds = st.kinds || ["set", "ses"];
       var all = Object.keys(p).map(function(k) { return p[k]; })
         .filter(function(r) { return kinds.indexOf(r.k) >= 0; });
-      if (kinds.indexOf("mark") >= 0) {
-        var mk = exports.marks();
-        Object.keys(mk).forEach(function(k) { if (!mk[k].synced) all.push(mk[k]); });
-      }
+      all = all.concat(unsyncedMoments(kinds));
       all.sort(function(a, b) { return (a.at - b.at) || (a.id < b.id ? -1 : 1); });
       var max = Math.max(1, Math.min(20, m.max | 0 || 8));
       return { t: "recs", recs: all.slice(0, max), more: all.length > max, total: all.length };
@@ -369,7 +409,7 @@ function handle(st, m) {
       // Count only what this phone will receive, or an older phone would wait forever.
       var ks = st.kinds || ["set", "ses"], left = 0;
       for (var id in pa) if (ks.indexOf(pa[id].k) >= 0) left++;
-      if (ks.indexOf("mark") >= 0) left += exports.markCount().unsynced;
+      left += unsyncedMoments(ks).length;
       return { t: "acked", n: n, left: left };
     case "sleep":
       if (!S.read("sleeplog")) return err("no_sleeplog", "sleep");
@@ -382,6 +422,10 @@ function handle(st, m) {
         t: "slp", since: since, now: (Date.now() / 6E5) | 0, entries: page,
         more: log.length > lmax, sl: sleeplogInfo()
       };
+    case "health":
+      if (!S.read("health")) return err("no_health", "health");
+      var hr = exports.healthRows(Math.max(0, m.since | 0), Math.max(10, Math.min(300, m.max | 0 || 144)));
+      return { t: "hlt", rows: hr.rows, more: hr.more, hl: healthInfo(), now: (Date.now() / 6E5) | 0 };
     case "sack":
       c = exports.cfg();
       if ((m.upto | 0) > (c.sAck || 0)) { c.sAck = m.upto | 0; exports.saveCfg(c); }

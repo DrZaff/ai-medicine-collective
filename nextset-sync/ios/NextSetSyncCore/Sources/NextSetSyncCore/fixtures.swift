@@ -71,6 +71,29 @@ public enum DemoData {
         return (kept, nowT10)
     }
 
+    /// A Health log (10-minute rows) to go with `sleep`: ~60 bpm asleep with a
+    /// lowest half hour per night, 70-95 bpm and steps by day.
+    public static func health(now: Date = Date(), zone: TimeZone = .current) -> [HealthRow] {
+        let s = sleep(now: now, zone: zone)
+        let nights = SleepAnalyzer.nights(s.entries, dataEndT10: s.dataEndT10, zones: ZoneHistory([], fallback: zone))
+        let end = Int(now.timeIntervalSince1970 / 600), start = end - 10 * 144
+        var rows: [Int: HealthRow] = [:]
+        for t in start...end {
+            let hour = (t % 144) / 6
+            rows[t] = HealthRow(t10: t, steps: (7...22).contains(hour) ? 60 + (t * 37) % 140 : 0,
+                                bpmMin: 72 + t % 7, bpmMax: 86 + t % 9, movement: 400, activity: 2)
+        }
+        for (i, n) in nights.enumerated() {
+            let a = Int(n.main.start.timeIntervalSince1970 / 600), b = Int(n.main.end.timeIntervalSince1970 / 600)
+            let resting = 50 + (i * 3) % 7, mid = (a + b) / 2
+            for t in a..<b where t >= start && t <= end {
+                let v = (mid..<(mid + 3)).contains(t) ? resting : resting + 5 + t % 5
+                rows[t] = HealthRow(t10: t, steps: 0, bpmMin: v, bpmMax: v, movement: 40, activity: 4)
+            }
+        }
+        return rows.values.sorted { $0.t10 < $1.t10 }
+    }
+
     /// Two earlier sessions of Full Body A, already synced.
     public static func history(now: Date = Date()) -> [WireRecord] {
         var out: [WireRecord] = []

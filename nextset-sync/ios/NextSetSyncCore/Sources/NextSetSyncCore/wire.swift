@@ -14,7 +14,7 @@ public enum SyncProtocol {
     public static let minChunk = 20
     /// Record kinds this phone stores. The watch sends only these; anything
     /// else stays on the watch until a phone that understands it connects.
-    public static let storedKinds = ["set", "ses", "mark"]
+    public static let storedKinds = ["set", "ses", "mark", "chk"]
 }
 
 /// Every message in either direction. Fields are optional; `t` says which apply.
@@ -58,6 +58,10 @@ public struct WireMessage: Codable, Equatable, Sendable {
     public var pendMarks: Int?
     /// hello: record kinds the phone stores; hi: kinds the watch can send.
     public var kinds: [String]?
+    /// BangleApps Health app: version, HRM polling interval (minutes, 0 = off), UTC filing.
+    public var hl: HealthLogInfo?
+    /// Health rows: [t10, steps, bpmMin, bpmMax, movement, activity].
+    public var rows: [[Int]]?
     public var ses: ActiveSessionInfo?
     public var wkt: LoadedWorkoutInfo?
     public var sAck: Int?
@@ -66,6 +70,11 @@ public struct WireMessage: Codable, Equatable, Sendable {
 
     public init(t: String) { self.t = t }
 
+    public struct HealthLogInfo: Codable, Equatable, Sendable {
+        public var ver: String?
+        public var hrm: Int?
+        public var utc: Bool?
+    }
     public struct SleepLogInfo: Codable, Equatable, Sendable {
         public var ver: String?
         public var on: Bool?
@@ -155,6 +164,8 @@ public struct WireRecord: Codable, Equatable, Sendable {
     public var n: Int?
     /// Markers (`k` = "mark"): the moment's label.
     public var label: String?
+    /// Check-ins (`k` = "chk"): how you feel, 1-5.
+    public var score: Int?
 }
 
 public enum WireError: Error, Equatable, LocalizedError {
@@ -174,6 +185,7 @@ public enum WireError: Error, Equatable, LocalizedError {
             case "auth_failed": return "The watch no longer recognises this iPhone. Pair again."
             case "unauthorized": return "The watch needs this iPhone to pair first."
             case "no_sleeplog": return "Sleep Log is not installed on the watch."
+            case "no_health": return "The Health app is not installed on the watch."
             case "bad_workout": return "The watch rejected the workout (check sets and exercises)."
             default: return "Watch error: \(code)."
             }

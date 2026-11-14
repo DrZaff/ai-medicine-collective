@@ -19,6 +19,8 @@ public actor SimulatedWatch: WatchLink {
     public var sleep: [SleepEntry] = []
     public var sleepLastCheckT10: Int?
     public var sleepLogVersion: String? = "0.26"
+    public var healthLogVersion: String? = "0.44"
+    public var health: [HealthRow] = []
     public private(set) var sleepAck = 0
     public private(set) var timeZoneMinutes: Int?
     public var confirmPairing = true
@@ -59,6 +61,7 @@ public actor SimulatedWatch: WatchLink {
     }
     public func setSleep(_ entries: [SleepEntry], lastCheckT10: Int?) { sleep = entries; sleepLastCheckT10 = lastCheckT10 }
     public func setSleepLogVersion(_ v: String?) { sleepLogVersion = v }
+    public func setHealth(_ rows: [HealthRow]) { health = rows.sorted { $0.t10 < $1.t10 } }
 
     // MARK: connection
 
@@ -120,9 +123,10 @@ public actor SimulatedWatch: WatchLink {
         switch m.t {
         case "hello":
             pid = m.phone; mtu = max(20, min(128, m.mtu ?? 20)); authed = false; nonce = randomHex(8)
-            kinds = (m.kinds ?? ["set", "ses"]).filter { ["set", "ses", "mark"].contains($0) }
+            kinds = (m.kinds ?? ["set", "ses"]).filter { ["set", "ses", "mark", "chk"].contains($0) }
             var r = WireMessage(t: "hi")
-            r.v = 1; r.min = 1; r.watch = watchId; r.app = "0.02-sim"; r.fw = "2v29 (simulated)"; r.kinds = ["set", "ses", "mark"]
+            r.v = 1; r.min = 1; r.watch = watchId; r.app = "0.02-sim"; r.fw = "2v29 (simulated)"; r.kinds = ["set", "ses", "mark", "chk"]
+            r.hl = WireMessage.HealthLogInfo(ver: healthLogVersion, hrm: 10, utc: true)
             r.paired = pid.map { phones[$0] != nil } ?? false; r.nonce = nonce
             r.sl = WireMessage.SleepLogInfo(ver: sleepLogVersion, on: sleepLogVersion != nil, last: sleepLastCheckT10)
             return r
@@ -166,7 +170,7 @@ public actor SimulatedWatch: WatchLink {
             var r = WireMessage(t: "wack"); r.id = w.id; r.rev = w.rev; return r
         case "pull":
             var all = pending.values.filter { kinds.contains($0.k) }
-            if kinds.contains("mark") { all += marks.values.filter { !syncedMarks.contains($0.id) } }
+            all += marks.values.filter { !syncedMarks.contains($0.id) && kinds.contains($0.k) }
             all.sort { ($0.at, $0.id) < ($1.at, $1.id) }
             let mx = max(1, min(20, m.max ?? 8))
             var r = WireMessage(t: "recs"); r.recs = Array(all.prefix(mx)); r.more = all.count > mx; r.total = all.count
@@ -178,7 +182,7 @@ public actor SimulatedWatch: WatchLink {
                 else if let mk = marks[a.id], mk.rev <= a.rev, !syncedMarks.contains(a.id) { syncedMarks.insert(a.id); n += 1 }
             }
             var left = pending.values.filter { kinds.contains($0.k) }.count
-            if kinds.contains("mark") { left += marks.keys.filter { !syncedMarks.contains($0) }.count }
+            left += marks.values.filter { !syncedMarks.contains($0.id) && kinds.contains($0.k) }.count
             var r = WireMessage(t: "acked"); r.n = n; r.left = left; return r
         case "sleep":
             guard sleepLogVersion != nil else { return err("no_sleeplog", "sleep") }
@@ -192,6 +196,15 @@ public actor SimulatedWatch: WatchLink {
             r.since = since; r.entries = Array(rows.prefix(mx)); r.more = rows.count > mx
             r.now = Double(sleepLastCheckT10 ?? 0)
             r.sl = WireMessage.SleepLogInfo(ver: sleepLogVersion, on: true, last: sleepLastCheckT10)
+            return r
+        case "health":
+            guard healthLogVersion != nil else { return err("no_health", "health") }
+            let since = m.since ?? 0, mx = max(10, min(300, m.max ?? 144))
+            let after = health.filter { $0.t10 > since }
+            var r = WireMessage(t: "hlt")
+            r.rows = after.prefix(mx).map { [$0.t10, $0.steps, $0.bpmMin, $0.bpmMax, $0.movement, $0.activity] }
+            r.more = after.count > mx
+            r.hl = WireMessage.HealthLogInfo(ver: healthLogVersion, hrm: 10, utc: true)
             return r
         case "sack":
             sleepAck = max(sleepAck, m.upto ?? 0)
@@ -241,6 +254,18 @@ public actor SimulatedWatch: WatchLink {
                            load: nil, units: nil, reps: nil, rir: nil, at: at.timeIntervalSince1970 * 1000, ed: nil,
                            del: nil, start: nil, end: nil, n: nil)
         r.label = label
+        marks[id] = r
+        return r
+    }
+
+    /// A morning check-in, as the watch's Check-in menu makes it.
+    @discardableResult
+    public func addCheckin(_ score: Int, at: Date = Date()) -> WireRecord {
+        let id = "\(watchId)-c\(String(Int(at.timeIntervalSince1970 * 1000), radix: 36))"
+        var r = WireRecord(k: "chk", id: id, rev: 1, sid: nil, wid: nil, wn: nil, xi: nil, xid: nil, xn: nil, set: nil,
+                           load: nil, units: nil, reps: nil, rir: nil, at: at.timeIntervalSince1970 * 1000, ed: nil,
+                           del: nil, start: nil, end: nil, n: nil)
+        r.score = score
         marks[id] = r
         return r
     }
