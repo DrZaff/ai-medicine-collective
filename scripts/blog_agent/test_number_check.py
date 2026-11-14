@@ -275,6 +275,16 @@ class CodexFindings(unittest.TestCase):
         self.assertTrue(r.needs_fact_check)
         self.assertIn("chains", r.results[0].reason)
 
+    def test_source_pairs_inside_chains_or_signed_numbers_confirm_nothing(self):
+        # Codex's review of c7293a1 (should fix, both)
+        for src in ("Doses were 1/2/3 mg; 1 dose and 2 doses.", "Doses were 3/1/2; 1 dose and 2 doses.",
+                    "Doses were 3 / 1 / 2; 1 dose and 2 doses."):
+            self.assertTrue(number_check.check("Doses were 1/2 [1].", {1: src}).needs_fact_check, src)
+        r = number_check.check("Scores rose on 30 of 32 axes [1].", {1: "Change was −30 of 32 axes; 30 more."})
+        self.assertTrue(r.needs_fact_check)
+        self.assertFalse(number_check.check("Scores rose on 30 of 32 axes [1].",
+                                            {1: "Scores rose on 30 / 32 axes."}).needs_fact_check)
+
     def test_unreadable_leftover_digits_fail_closed(self):
         r = number_check.check("The effect was 2³ times larger [1].", {1: "2 times larger"})
         self.assertTrue(r.needs_fact_check)

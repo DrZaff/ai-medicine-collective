@@ -72,7 +72,9 @@ PAIR_CHAIN = re.compile(rf"{NUM}\s*(?:out of|of|in|/)\s*{NUM}\s*(?:out of|of|in|
 RATIO = re.compile(rf"(?<![\w.·:]){NUM}(?:\s*:\s*{NUM})+(?![\w·]|\s*:\s*\d)")
 # The pair in source text: whole numbers on both sides, so "130 out of 32"
 # does not count as "30 of 32" and "30 of 320" not as "30 of 32".
-SOURCE_PAIR = r"(?<![\w.·,]){a}\s*{sep}\s*{b}(?!\d|[.·]\d)"   # a full stop may follow, a decimal may not
+# Neither side may be part of a longer chain ("1/2/3") or a signed number
+# ("-30 of 32"); slashes are written without spaces in the joined text.
+SOURCE_PAIR = r"(?<![\w.·,/−–+-]){a}\s*{sep}\s*{b}(?!\d|[.·]\d|/\d)"   # a full stop may follow, a decimal may not
 PAIR_WORDS = "(?:out of|of|/|in)"   # "30 of 32" may be written any of these ways; a ratio "1:3" only as 1:3
 # A magnitude word after a number is part of it: "2.5 million" is not "2.5 billion"
 MAGNITUDE = re.compile(r"^\s*(thousand|million|billion|trillion)\b", re.IGNORECASE)
@@ -250,7 +252,7 @@ def check(answer: str, texts: dict[int, str]) -> Report:
     # Source text with thousands separators removed, for the pair search
     # and a bare leading decimal written with its zero (.5 -> 0.5), the same
     # form canon() gives the answer's pair numbers
-    joined = {k: re.sub(r"(?<![\w.])\.(?=\d)", "0.", re.sub(r"(?<=\d)[,    ](?=\d{3}(?!\d))", "", v))
+    joined = {k: re.sub(r"\s*/\s*", "/", re.sub(r"(?<![\w.])\.(?=\d)", "0.", re.sub(r"(?<=\d)[,    ](?=\d{3}(?!\d))", "", v)))
               for k, v in texts.items()}
     report = Report()
     # Split at every sentence end, whatever follows (a digit, a lowercase
