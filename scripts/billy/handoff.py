@@ -211,7 +211,34 @@ def finding_lines(report):
     return '\n'.join(lines) or '- No findings.'
 
 
+def sign_off(url=None):
+    """The owner's sign-off steps for a Billy PR: exact links when the PR address is known (the
+    terminal), GitHub's tab names when it is not (the PR description). Each link ends its line, so
+    a phone terminal never folds punctuation into it. There is no link that approves or merges in
+    one tap; that stays a person's act on GitHub. The bypass box skips every requirement, failing
+    checks included, so the steps say exactly when it may be ticked."""
+    files = '%s/files' % url if url else 'the **Files changed** tab'
+    page = url or 'the **Conversation** tab'
+    return [
+        'Sign off (owner only; Billy never merges). Wait until Site checks are green on the PR.',
+        '1. Ready for review: open %s' % page,
+        '   and press **Ready for review** (Billy opens PRs as drafts).',
+        '2. Approve: open %s' % files,
+        '   then **Review changes** > **Approve** > **Submit review**.',
+        '3. Merge: open %s' % page,
+        '   and scroll to the merge box. Only if it shows **Changes approved** and **All checks have '
+        'passed**, and the one line left is "Cannot update this protected ref", tick **Merge without '
+        'waiting for requirements to be met (bypass rules)**, then **Merge pull request** > '
+        '**Confirm merge**.',
+        '4. Press **Delete branch**.',
+        'Anything else in the merge box (a failed or running check, a missing approval, a '
+        'clinician\'s review) means it is not ready: do not tick the box. Clinical files also need '
+        'the clinician\'s approval of this exact commit.',
+    ]
+
+
 def pr_body(sha, merge_base, files, report, log, issue):
+    steps = sign_off()
     counts = {s: sum(1 for f in report['findings'] if f.get('severity') == s)
               for s in ('should_fix', 'note')}
     sensitive = sorted(f for f in files if f.startswith(SENSITIVE) or f in SENSITIVE)
@@ -229,8 +256,9 @@ def pr_body(sha, merge_base, files, report, log, issue):
         '- %d file(s) changed.' % len(files),
         '- Paths that act outside the code once merged: %s.'
         % (', '.join('`%s`' % f for f in sensitive) if sensitive else 'none'), '',
-        '## For the reviewer', '',
-        '- Approve and merge yourself on GitHub. Billy never merges.',
+        '## Sign off', '',
+    ] + [steps[0], ''] + steps[1:-1] + ['', steps[-1]] + [
+        '',
         '- Any new commit needs a fresh Codex review and a fresh approval.',
         '- Netlify posts the deploy preview link on this PR.', '',
         '## Codex review report', '', report['summary'].strip(), '', finding_lines(report),
@@ -305,6 +333,9 @@ def publish(a):
     print('PASS: draft PR head is the reviewed commit: ' + pr['html_url'])
     journal(entry)
     print('DONE: stopped for human approval. Review, approve and merge on GitHub yourself.')
+    print()
+    for line in sign_off(pr['html_url']):
+        print(line.replace('**', ''))
     return 0
 
 

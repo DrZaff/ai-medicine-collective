@@ -89,7 +89,7 @@ Residual risks: a future workflow on `main` naming `digest-publish`; the `create
 
 **Phase 4, turn it on (owner's explicit go-ahead), then test.** Pick a time away from Friday afternoon. Set enforcement to **Active**. Then:
 - *Negative*: on github.com, edit any file on `main` and try "Commit directly to the main branch"; GitHub should only offer a new branch. On the branches page, deleting `main` should be refused. On an open Billy PR, before approving, the merge box should say merging is blocked; as owner you'll see the bypass option, which you don't use.
-- *Positive*: approve and merge a Billy PR normally. On the next Friday, the digest run succeeds and pushes as the app.
+- *Positive*: approve a Billy PR and merge it through the pull-request bypass box. Because "Restrict updates" is on, the owner's merges always go through it, even with every requirement met ([billy.md](billy.md), step 5). On the next Friday, the digest run succeeds and pushes as the app.
 - *Rollback*: if either positive test fails, set the ruleset back to **Disabled** and re-run what failed.
 
 Progress (2026-11-14): the ruleset is **Active**, and GitHub's rules endpoint shows its five rules on `main`. **Billy's negative test passed** against the live ruleset: with `billy-test/protected-target` added to it for the test, Billy's direct push, its merge of an unapproved PR (#194) and its branch deletion were all refused, and `main` did not change (procedure and results in [billy.md](billy.md)). **Still open:** the owner's own negative checks above, approving and merging a PR normally, and the next Friday digest run pushing as the app.
