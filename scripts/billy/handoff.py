@@ -126,27 +126,34 @@ def check_repo(name):
     return name
 
 
+def clone_options(url, env=None):
+    """A credential-less clone of GitHub skips file contents (git downloads them on checkout,
+    which a public repository allows). A clone made with a token, or from a local bundle, takes
+    everything at once, so no later git command ever needs to fetch, or to hold the token."""
+    return ['--filter=blob:none'] if url.startswith('https://') and env is None else []
+
+
 def fetch(base, source, sha, url=None, env=None, ref=None):
     """Clone (from GitHub, or from a bundle when url is a file), check the branch is at exactly
     sha, and return repo, merge base, files and log. ref is the branch name inside the clone
-    (the source branch on GitHub; REVIEW_REF in a bundle)."""
+    (the source branch on GitHub; REVIEW_REF in a bundle). Every git command here gets the same
+    env, so a private repository's credentials reach any command that touches the network."""
     repo = os.path.join(base, 'repo')
     url = url or git_url(DEFAULT_REPO)
-    opts = ['--filter=blob:none'] if url.startswith('https://') else []
-    git(base, 'clone', '--quiet', *opts, '--no-checkout', url, repo, env=env)
+    git(base, 'clone', '--quiet', *clone_options(url, env), '--no-checkout', url, repo, env=env)
     head = git(repo, 'rev-parse', '--verify', '--quiet', 'refs/remotes/origin/' + (ref or source),
-               check=False)
+               env=env, check=False)
     if not head:
         raise p.SafeFailure('Branch %s is not on GitHub.' % source)
     if head != sha:
         raise p.SafeFailure('%s is at %s, not the commit you named (%s). Nothing done.'
                             % (source, head[:12], sha[:12]))
-    git(repo, 'checkout', '--quiet', '--detach', sha)
-    merge_base = git(repo, 'merge-base', 'origin/main', sha)
-    files = git(repo, 'diff', '--name-only', merge_base, sha).splitlines()
+    git(repo, 'checkout', '--quiet', '--detach', sha, env=env)
+    merge_base = git(repo, 'merge-base', 'origin/main', sha, env=env)
+    files = git(repo, 'diff', '--name-only', merge_base, sha, env=env).splitlines()
     if not files:
         raise p.SafeFailure('The commit changes nothing compared with main.')
-    log = git(repo, 'log', '--format=%h %s%n%b', merge_base + '..' + sha)
+    log = git(repo, 'log', '--format=%h %s%n%b', merge_base + '..' + sha, env=env)
     return repo, merge_base, files, log
 
 
@@ -428,7 +435,7 @@ def publish(a):
             repo, merge_base, files, log = fetch(base, a.source, a.sha, url=git_url(a.repo),
                                                  env=env if REPOS[a.repo] else None)
             body = pr_body(a.sha, merge_base, files, report, log, a.issue)
-            title = git(repo, 'log', '-1', '--format=%s', a.sha)[:200] or 'Agent change'
+            title = git(repo, 'log', '-1', '--format=%s', a.sha, env=env)[:200] or 'Agent change'
             if SECRET_RE.search(body) or SECRET_RE.search(title):
                 raise p.SafeFailure('The PR text contains something key- or token-shaped; nothing published.')
             slug = re.sub(r'[^a-z0-9-]+', '-', a.source.split('/', 1)[1].lower()).strip('-')[:40] or 'change'

@@ -215,6 +215,34 @@ class PrivateRepositories(unittest.TestCase):
         with self.assertRaises(handoff.p.SafeFailure):
             handoff.fetch_step(self.fetch_args(path, sha, base_sha, repo='ai-medicine-collective'))
 
+    def test_authenticated_clone_takes_everything_up_front(self):
+        # Codex's review of 5caa984 (blocking): a filtered clone of a private repository had to
+        # download file contents at checkout, without the token.
+        url = 'https://github.com/DrZaff/billy-mission-control.git'
+        self.assertEqual(handoff.clone_options(url), ['--filter=blob:none'])
+        self.assertEqual(handoff.clone_options(url, env={'X': '1'}), [])
+        self.assertEqual(handoff.clone_options('/tmp/x.bundle'), [])
+
+    def test_every_git_command_in_fetch_gets_the_credentials(self):
+        origin, base_sha, sha = self.make_origin()
+        env = dict(os.environ, BILLY_TEST_MARK='1', GIT_TERMINAL_PROMPT='0')
+        seen = []
+        real = handoff.git
+
+        def recording(cwd, *args, env=None, check=True):
+            seen.append((args[0], env))
+            return real(cwd, *args, env=env, check=check)
+
+        handoff.git = recording
+        self.addCleanup(setattr, handoff, 'git', real)
+        work = os.path.join(self.tmp, 'work')
+        os.makedirs(work)
+        _, merge_base, files, _ = handoff.fetch(work, 'claude/x', sha, url=origin, env=env)
+        self.assertEqual((merge_base, files), (base_sha, ['b.txt']))
+        self.assertGreaterEqual(len(seen), 6)
+        for command, given in seen:
+            self.assertIs(given, env, command)
+
     def test_fetch_step_is_for_private_repositories_only(self):
         a = argparse.Namespace(repo='ai-medicine-collective', source='claude/x', sha='d' * 40)
         with self.assertRaises(handoff.p.SafeFailure) as caught:
