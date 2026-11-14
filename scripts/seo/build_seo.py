@@ -116,6 +116,9 @@ def faq_html(faq: dict) -> str:
             out.append(f'<details class="faq-item resource-group" id="faq-{esc(item["id"])}">')
             out.append(f'<summary class="faq-question resource-summary">{esc(item["question"])}</summary>')
             out.append(f'<div class="faq-answer resource-body"><p class="faq-text">{answer}</p>')
+            fix = item.get("correction") or {}
+            if fix.get("note"):
+                out.append(f'<p class="faq-correction">Corrected {esc(nice(fix.get("date")))}: {esc(fix["note"])}</p>')
             if item.get("sources"):
                 out.append('<p class="faq-sources-label">Sources</p><ol class="faq-sources">')
                 for n, source in enumerate(item["sources"], 1):

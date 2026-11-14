@@ -5549,6 +5549,17 @@ button.meeting-undo {
   color: var(--muted);
 }
 
+.faq-correction {
+  max-width: 72ch;
+  margin: 8px 0 0;
+  padding: 6px 10px;
+  font-family: var(--font-read);
+  line-height: 1.5;
+  border-left: 2px var(--rule-style) var(--accent);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
 .faq-share {
   padding: 3px 10px;
   border: 1px solid var(--line-strong);

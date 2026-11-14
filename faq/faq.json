@@ -1,6 +1,6 @@
 {
   "_about": "Frequently asked questions about AI in medicine, shown on faq.html (faq.js) and built into the page as static HTML and FAQPage data at deploy time (scripts/seo/build_seo.py). Answers are plain text; [1] marks cite the item's sources in order. The FAQ agent (scripts/blog_agent/faq_agent.py) proposes one new item every other day and the monthly audit (faq_audit.py) proposes refreshes, both by pull request: merging publishes. Every number in an answer must appear in a cited source.",
-  "updated": "2026-11-13",
+  "updated": "2026-11-14",
   "categories": [
     {
       "id": "general",
@@ -1011,7 +1011,7 @@
       "id": "will-ai-replace-doctors",
       "category": "general",
       "question": "Will AI replace doctors?",
-      "answer": "No. The evidence shows AI taking over specific tasks, not replacing doctors, usually with a clinician still checking the result. The strongest real-world example is the MASAI randomised trial of more than 80,000 women in Sweden. AI-supported mammography screening detected a similar number of cancers to standard double reading (244 versus 203) while cutting radiologists' screen-reading workload by 44%, and radiologists still made the final calls [1]. In a simulated text-chat study, Google's AMIE system was rated better than primary care physicians on 30 of 32 axes by specialists and 25 of 26 by patient actors [2], but those were role-played cases, not real patients. In a study built on 2,400 real patients with abdominal conditions, open-source language models diagnosed worse than physicians on a subset of 80 cases, followed neither diagnostic nor treatment guidelines, and could not interpret laboratory results [3]. WHO guidance calls for human oversight and accountability when these models are used in health care [4]. The likely near-term change is that doctors spend less time on some tasks and more time supervising AI output.",
+      "answer": "No. The evidence shows AI taking over specific tasks, not replacing doctors, usually with a clinician still checking the result. The strongest real-world example is the MASAI randomised trial of 80,033 women in Sweden [1]. AI-supported mammography screening had a similar cancer detection rate to standard double reading (6.1 versus 5.1 per 1000 screened) while cutting radiologists' screen-reading workload by 44.3%, and radiologists still made the final calls [1]. In a simulated text-chat study, Google's AMIE system was rated better than primary care physicians on 30 of 32 axes by specialists and 25 of 26 by patient actors [2], but those were role-played cases, not real patients. In a study built on 2,400 real patients with abdominal conditions, open-source language models diagnosed worse than physicians on a subset of 80 cases, followed neither diagnostic nor treatment guidelines, and could not interpret laboratory results [3]. WHO guidance calls for human oversight and accountability when these models are used in health care [4]. The likely near-term change is that doctors spend less time on some tasks and more time supervising AI output.",
       "sources": [
         {
           "title": "Artificial intelligence-supported screen reading versus standard double reading in the Mammography Screening with Artificial Intelligence trial (MASAI): a clinical safety analysis of a randomised, controlled, non-inferiority, single-blinded, screening accuracy study",
@@ -1045,7 +1045,8 @@
         "AI and physician jobs"
       ],
       "added": "2026-11-13",
-      "updated": "2026-11-13"
+      "updated": "2026-11-14",
+      "correction": {"date": "2026-11-14", "note": "The MASAI figures were corrected: the trial enrolled 80,033 women (the answer said more than 80,000, without a citation), the screen-reading workload fell by 44.3% (not 44%), and the paper reports a similar cancer detection rate, not a similar number of cancers."}
     }
   ]
 }
