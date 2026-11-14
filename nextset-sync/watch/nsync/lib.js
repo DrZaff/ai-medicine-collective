@@ -36,9 +36,23 @@ exports.restSeconds = function(base, rir) {
 };
 
 exports.tempoPhases = function(tempo) {
-  var parts = typeof tempo == "string" && /^(\d+)-(\d+)-(\d+)(-\d+)?$/.test(tempo) ? tempo.split("-").map(Number) : [];
-  if (!parts.length || parts.some(function(sec) { return sec > 30; }) ||
-      !parts.some(function(sec) { return sec > 0; })) return [];
+  if (typeof tempo != "string") return [];
+  var parts = tempo.split("-");
+  if (parts.length < 3 || parts.length > 4) return [];
+  var total = 0;
+  for (var i = 0; i < parts.length; i++) {
+    var text = parts[i];
+    if (!text.length || text.length > 2) return [];
+    for (var j = 0; j < text.length; j++) {
+      var digit = text.charCodeAt(j);
+      if (digit < 48 || digit > 57) return [];
+    }
+    var sec = parseInt(text, 10);
+    if (sec > 30) return [];
+    total += sec;
+    parts[i] = sec;
+  }
+  if (!total) return [];
   return parts;
 };
 
