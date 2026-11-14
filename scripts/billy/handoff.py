@@ -19,7 +19,9 @@ holds a GitHub credential:
            The review step then clones from that bundle instead of from GitHub.
            Without Billy installed on the repository, the owner carries a bundle to the server
            instead: fetch --bundle FILE --main <main's sha> checks the branch and main commits
-           and needs no token. Billy can't publish there, so Claude opens the PR, whose head
+           and needs no token. The owner copies main's sha from GitHub themself, never from the
+           builder who made the bundle, and afterwards checks that the PR's "Files changed" count
+           on GitHub equals the count this step prints. Billy can't publish there, so Claude opens the PR, whose head
            must be the reviewed commit.
 
 The owner launches both by hand from a terminal (each step refuses to run without one):
@@ -355,7 +357,11 @@ def fetch_step(a):
       - GitHub, with a read-only token for that one repository (needs Billy installed on it);
       - --bundle FILE, a bundle the owner carried to the server, with --main naming main's exact
         commit (no token, no app). The review diffs against main, so a bundle's main must be the
-        real one: a stale or crafted main could hide part of a change."""
+        real one: a stale or crafted main could hide part of a change. This host can't read the
+        private repository, so the check is only as independent as --main: the OWNER copies it
+        from GitHub, never from the builder who made the bundle. The step also prints how many
+        files the review covers, which must equal the PR's "Files changed" count on GitHub
+        (computed against the real main)."""
     if not REPOS[a.repo]:
         raise p.SafeFailure('%s is public; the review step clones it directly.' % a.repo)
     if not os.path.isdir(SOURCES):
@@ -389,6 +395,10 @@ def fetch_step(a):
             raise p.SafeFailure('%s is at %s, not the commit you named (%s). Nothing fetched.'
                                 % (a.source, (head or 'nothing')[:12], a.sha[:12]))
         main = git(repo, 'rev-parse', '--verify', '--quiet', 'refs/remotes/origin/main', check=False)
+        if not main:
+            raise p.SafeFailure('There is no main to review against. Nothing fetched.')
+        changed = git(repo, 'diff', '--name-only', git(repo, 'merge-base', main, a.sha), a.sha)
+        count = len(changed.splitlines())
         if carried and main != a.main:
             raise p.SafeFailure('The bundle\'s main is %s, not the main you named (%s). Nothing '
                                 'fetched.' % ((main or 'missing')[:12], a.main[:12]))
@@ -396,7 +406,8 @@ def fetch_step(a):
         os.chmod(bundle + '.tmp', 0o640)
         os.replace(bundle + '.tmp', bundle)
         meta = {'repo': a.repo, 'source': a.source, 'sha': a.sha, 'main': main,
-                'via': 'carried bundle' if carried else 'GitHub', 'fetched_at': time.time()}
+                'via': 'carried bundle' if carried else 'GitHub', 'files': count,
+                'fetched_at': time.time()}
         with open(meta_path + '.tmp', 'w') as f:
             json.dump(meta, f, indent=2)
         os.chmod(meta_path + '.tmp', 0o640)
@@ -406,6 +417,8 @@ def fetch_step(a):
     journal(dict(meta, step='fetch'))
     print('PASS: fetched %s %s at %s (main %s, from %s) for review; the review step may run.'
           % (a.repo, a.source, a.sha[:12], main[:12], meta['via']))
+    print('CHECK: the review covers %d changed file(s). Before merging, the PR\'s "Files changed" '
+          'tab on GitHub must show the same number.' % count)
     return 0
 
 
@@ -488,7 +501,8 @@ def main():
     ap.add_argument('sha', help='the full 40-character commit')
     ap.add_argument('--issue', type=int, help='issue number for "Closes #N" (publish)')
     ap.add_argument('--bundle', help='fetch: a git bundle the owner carried here, instead of GitHub')
-    ap.add_argument('--main', help="fetch --bundle: main's full 40-character commit, checked")
+    ap.add_argument('--main', help="fetch --bundle: main's full 40-character commit, copied by "
+                    'the owner from GitHub (never from the builder who made the bundle)')
     ap.add_argument('--repo', default=DEFAULT_REPO,
                     help='repository name, one of: %s (default %s)' % (', '.join(sorted(REPOS)), DEFAULT_REPO))
     ap.add_argument('--codex', help='path to the codex program (review; default: found on PATH)')

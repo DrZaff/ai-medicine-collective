@@ -181,8 +181,11 @@ class PrivateRepositories(unittest.TestCase):
 
     def test_carried_bundle_reaches_the_reviewer_unchanged(self):
         path, base_sha, sha = self.carried()
-        with contextlib.redirect_stdout(io.StringIO()):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
             self.assertEqual(handoff.fetch_step(self.fetch_args(path, sha, base_sha)), 0)
+        self.assertIn('covers 1 changed file(s)', out.getvalue())
+        self.assertIn('"Files changed"', out.getvalue())
         bundle, meta_path = handoff.source_paths('billy-mission-control', sha)
         with open(meta_path) as f:
             meta = json.load(f)
@@ -193,6 +196,35 @@ class PrivateRepositories(unittest.TestCase):
         _, merge_base, files, _ = handoff.fetch(review, 'claude/x', sha, url=bundle,
                                                 ref=handoff.REVIEW_REF)
         self.assertEqual((merge_base, files), (base_sha, ['b.txt']))
+
+    def test_crafted_main_shows_up_as_a_smaller_file_count(self):
+        # Codex's review of 3f6c885 (blocking): a builder-supplied main could hide part of a
+        # change. The owner now takes main from GitHub, and the printed count is a second check:
+        # a bundle whose main already holds half the change reports fewer files than the PR.
+        origin, base_sha, first = self.make_origin()  # claude/x: b.txt
+        run(origin, 'checkout', '--quiet', 'claude/x')
+        write(os.path.join(origin, 'c.txt'), 'second half\n')
+        run(origin, 'add', 'c.txt')
+        run(origin, 'commit', '--quiet', '-m', 'second half')
+        sha = run(origin, 'rev-parse', 'HEAD')
+        run(origin, 'branch', '--force', 'crafted-main', first)  # main that already has b.txt
+        for name in ('SOURCES', 'WORK', 'JOURNAL'):
+            folder = os.path.join(self.tmp, name.lower())
+            os.makedirs(folder)
+            self.addCleanup(setattr, handoff, name, getattr(handoff, name))
+            setattr(handoff, name, folder)
+        honest = os.path.join(self.tmp, 'honest.bundle')
+        crafted = os.path.join(self.tmp, 'crafted.bundle')
+        run(origin, 'bundle', 'create', honest, 'main', 'claude/x')
+        run(origin, 'update-ref', 'refs/heads/main', first)
+        run(origin, 'bundle', 'create', crafted, 'main', 'claude/x')
+        counts = {}
+        for label, path, main in (('honest', honest, base_sha), ('crafted', crafted, first)):
+            with contextlib.redirect_stdout(io.StringIO()):
+                handoff.fetch_step(self.fetch_args(path, sha, main))
+            with open(handoff.source_paths('billy-mission-control', sha)[1]) as f:
+                counts[label] = json.load(f)['files']
+        self.assertEqual(counts, {'honest': 2, 'crafted': 1})
 
     def test_carried_bundle_with_another_main_is_refused(self):
         path, base_sha, sha = self.carried()
