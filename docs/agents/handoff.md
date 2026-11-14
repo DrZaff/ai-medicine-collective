@@ -33,6 +33,14 @@ This builds on the supervised Billy handoff in [billy.md](billy.md) and the rule
 
 Run the command once per commit. A second run for the same commit stops at "already existed": Billy never reuses a branch.
 
+For the private Mission Control repository, add `--repo billy-mission-control` to each step and run the fetch step first:
+```sh
+N=/home/agent/.nvm/versions/node/v26.13.0/bin; cd /tmp && \
+sudo -H -u billy-pub python3 /opt/billy/handoff.py fetch <branch> <sha> --repo billy-mission-control && \
+sudo -H -u agent env PATH="$N:/usr/local/bin:/usr/bin:/bin" python3 /opt/billy/handoff.py review <branch> <sha> --repo billy-mission-control && \
+sudo -H -u billy-pub python3 /opt/billy/handoff.py publish <branch> <sha> --repo billy-mission-control --issue <N>
+```
+
 ## From a phone
 
 - **Write and approve the issue:** GitHub app or Safari > the repository > Issues > New issue > Agent task. Add `agent:ready` from the issue's Labels.

@@ -12,6 +12,12 @@ Two steps run as two Unix users, so the reviewer can never read Billy's key:
            exactly that commit, refuses a report containing anything key- or token-shaped, then
            pushes that same commit to a NEW agent/... branch and opens a draft PR into main.
 
+Private repositories (REPOS) add a third step before the review, so the reviewer still never
+holds a GitHub credential:
+  fetch    as `billy-pub`: a read-only token for that one repository fetches the exact commit and
+           writes it as a git bundle to /var/lib/billy-sources (billy-pub writes, agent reads).
+           The review step then clones from that bundle instead of from GitHub.
+
 The owner launches both by hand from a terminal (each step refuses to run without one):
   sudo -H -u agent env PATH="$NODE_BIN:/usr/local/bin:/usr/bin:/bin" \\
       python3 /opt/billy/handoff.py review <branch> <sha> \\
@@ -38,7 +44,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import preflight as p  # noqa: E402
 
-GIT_URL = 'https://github.com/' + p.REPO + '.git'
+OWNER = p.REPO.split('/')[0]
+# The only repositories Billy works on, and whether each is private. A private repository's
+# commit reaches the reviewer through the fetch step; a public one is cloned without credentials.
+REPOS = {'ai-medicine-collective': False, 'billy-mission-control': True}
+DEFAULT_REPO = p.REPO.split('/')[1]
+SOURCES = '/var/lib/billy-sources'
+REVIEW_REF = 'billy-review'
 SCHEMA = os.path.join(HERE, 'review-schema.json')
 RECORDS = '/var/lib/billy-reviews'
 HOME = pwd.getpwuid(os.getuid()).pw_dir
@@ -57,6 +69,7 @@ SENSITIVE = ('.github/', 'netlify.toml', 'supabase/', 'auth.js', 'social/', 'new
              'blog/posts/', 'evidence/', 'scripts/')
 CODEX_TIMEOUT = 1800
 RECORD_MAX_AGE = 3600
+SOURCE_MAX_AGE = 3600
 MAX_DIFF = 400000
 
 REVIEW_PROMPT = """You are the code reviewer for the AI Medicine Collective website (public repository
@@ -98,11 +111,26 @@ def git(cwd, *args, env=None, check=True):
     return r.stdout.strip()
 
 
-def fetch(base, source, sha):
-    """Credential-less clone; checks the branch is at exactly sha. Returns repo, merge base, files, log."""
+def git_url(name):
+    return 'https://github.com/%s/%s.git' % (OWNER, name)
+
+
+def check_repo(name):
+    if name not in REPOS:
+        raise p.SafeFailure('Billy works only on: %s.' % ', '.join(sorted(REPOS)))
+    return name
+
+
+def fetch(base, source, sha, url=None, env=None, ref=None):
+    """Clone (from GitHub, or from a bundle when url is a file), check the branch is at exactly
+    sha, and return repo, merge base, files and log. ref is the branch name inside the clone
+    (the source branch on GitHub; REVIEW_REF in a bundle)."""
     repo = os.path.join(base, 'repo')
-    git(base, 'clone', '--quiet', '--filter=blob:none', '--no-checkout', GIT_URL, repo)
-    head = git(repo, 'rev-parse', '--verify', '--quiet', 'refs/remotes/origin/' + source, check=False)
+    url = url or git_url(DEFAULT_REPO)
+    opts = ['--filter=blob:none'] if url.startswith('https://') else []
+    git(base, 'clone', '--quiet', *opts, '--no-checkout', url, repo, env=env)
+    head = git(repo, 'rev-parse', '--verify', '--quiet', 'refs/remotes/origin/' + (ref or source),
+               check=False)
     if not head:
         raise p.SafeFailure('Branch %s is not on GitHub.' % source)
     if head != sha:
@@ -115,6 +143,37 @@ def fetch(base, source, sha):
         raise p.SafeFailure('The commit changes nothing compared with main.')
     log = git(repo, 'log', '--format=%h %s%n%b', merge_base + '..' + sha)
     return repo, merge_base, files, log
+
+
+def source_paths(name, sha):
+    stem = os.path.join(SOURCES, '%s-%s' % (name, sha))
+    return stem + '.bundle', stem + '.json'
+
+
+def bundle_commit(repo, sha, out):
+    """Write main and the reviewed commit (as REVIEW_REF) of a full clone to a git bundle."""
+    git(repo, 'update-ref', 'refs/heads/' + REVIEW_REF, sha)
+    git(repo, 'update-ref', 'refs/heads/main', git(repo, 'rev-parse', 'refs/remotes/origin/main'))
+    git(repo, 'bundle', 'create', out, 'refs/heads/main', 'refs/heads/' + REVIEW_REF)
+
+
+def check_source_meta(meta, name, source, sha, now=None):
+    """The fetched copy must be of this repository, branch and commit, and under an hour old."""
+    if (meta.get('repo') != name or meta.get('source') != source or meta.get('sha') != sha):
+        raise p.SafeFailure('The fetched copy is for a different repository, branch or commit; '
+                            'run the fetch step again.')
+    if (now or time.time()) - float(meta.get('fetched_at', 0)) > SOURCE_MAX_AGE:
+        raise p.SafeFailure('The fetched copy is more than an hour old; run the fetch step again.')
+
+
+def askpass_env(base, token):
+    ask = os.path.join(base, 'askpass')
+    with open(ask, 'w') as f:
+        f.write('#!/bin/sh\ncase "$1" in Username*) echo x-access-token;; '
+                '*) printf "%s\\n" "$BILLY_GIT_TOKEN";; esac\n')
+    os.chmod(ask, 0o700)
+    return dict(os.environ, HOME=base, GIT_TERMINAL_PROMPT='0', GIT_CONFIG_NOSYSTEM='1',
+                GIT_ASKPASS=ask, BILLY_GIT_TOKEN=token, LC_ALL='C')
 
 
 def passed(report):
@@ -149,8 +208,19 @@ def review(a):
         raise p.SafeFailure('review-schema.json is missing next to handoff.py.')
     base = tempfile.mkdtemp(dir=WORK)
     try:
-        repo, merge_base, files, log = fetch(base, a.source, a.sha)
-        print('INFO: %s is at %s; %d file(s) differ from main.' % (a.source, a.sha[:12], len(files)))
+        if REPOS[a.repo]:
+            bundle, meta_path = source_paths(a.repo, a.sha)
+            try:
+                with open(meta_path) as f:
+                    check_source_meta(json.load(f), a.repo, a.source, a.sha)
+            except FileNotFoundError:
+                raise p.SafeFailure('%s is private: run the fetch step (as %s) first.'
+                                    % (a.repo, PUBLISHER))
+            repo, merge_base, files, log = fetch(base, a.source, a.sha, url=bundle, ref=REVIEW_REF)
+        else:
+            repo, merge_base, files, log = fetch(base, a.source, a.sha, url=git_url(a.repo))
+        print('INFO: %s %s is at %s; %d file(s) differ from main.'
+              % (a.repo, a.source, a.sha[:12], len(files)))
         print('INFO: Codex is reviewing that exact commit (read-only). This can take several minutes.')
         diff = git(repo, 'diff', '--stat', merge_base, a.sha) + '\n\n' + git(repo, 'diff', merge_base, a.sha)
         if len(diff) > MAX_DIFF:
@@ -180,7 +250,8 @@ def review(a):
             raise p.SafeFailure('The checkout changed during the review.')
     finally:
         shutil.rmtree(base, ignore_errors=True)
-    record = {'sha': a.sha, 'source': a.source, 'merge_base': merge_base, 'reviewed_at': time.time(),
+    record = {'repo': a.repo, 'sha': a.sha, 'source': a.source, 'merge_base': merge_base,
+              'reviewed_at': time.time(),
               'verdict': report['verdict'], 'summary': report['summary'], 'findings': report['findings']}
     tmp = record_path(a.sha) + '.tmp'
     with open(tmp, 'w') as f:
@@ -266,41 +337,80 @@ def pr_body(sha, merge_base, files, report, log, issue):
     return '\n'.join(parts)[:60000]
 
 
+def fetch_step(a):
+    """As billy-pub, for a private repository: fetch the exact commit with a read-only token for
+    that one repository and leave it as a git bundle for the reviewer. Pushes nothing."""
+    from pr_test import mint  # needs the key: publisher only
+    if not REPOS[a.repo]:
+        raise p.SafeFailure('%s is public; the review step clones it directly.' % a.repo)
+    if not os.path.isdir(SOURCES):
+        raise p.SafeFailure('%s is missing; run install.sh.' % SOURCES)
+    bundle, meta_path = source_paths(a.repo, a.sha)
+    base = tempfile.mkdtemp(dir=WORK)
+    try:
+        _, token = mint('%s/%s' % (OWNER, a.repo), {'contents': 'read', 'metadata': 'read'})
+        try:
+            repo = os.path.join(base, 'repo')
+            # A full clone (no blob filter), so the bundle holds everything the review needs.
+            git(base, 'clone', '--quiet', '--no-checkout', git_url(a.repo), repo,
+                env=askpass_env(base, token))
+        finally:
+            p.revoke(token)
+        head = git(repo, 'rev-parse', '--verify', '--quiet', 'refs/remotes/origin/' + a.source,
+                   check=False)
+        if head != a.sha:
+            raise p.SafeFailure('%s is at %s, not the commit you named (%s). Nothing fetched.'
+                                % (a.source, (head or 'nothing')[:12], a.sha[:12]))
+        bundle_commit(repo, a.sha, bundle + '.tmp')
+        os.chmod(bundle + '.tmp', 0o640)
+        os.replace(bundle + '.tmp', bundle)
+        meta = {'repo': a.repo, 'source': a.source, 'sha': a.sha, 'fetched_at': time.time()}
+        with open(meta_path + '.tmp', 'w') as f:
+            json.dump(meta, f, indent=2)
+        os.chmod(meta_path + '.tmp', 0o640)
+        os.replace(meta_path + '.tmp', meta_path)
+    finally:
+        shutil.rmtree(base, ignore_errors=True)
+    journal(dict(meta, step='fetch'))
+    print('PASS: fetched %s %s at %s for review; the review step may run.'
+          % (a.repo, a.source, a.sha[:12]))
+    return 0
+
+
 def publish(a):
-    from pr_test import mint, message  # noqa: F401  (needs the key: publisher only)
+    from pr_test import mint  # needs the key: publisher only
     path = record_path(a.sha)
     try:
         with open(path) as f:
             report = json.load(f)
     except FileNotFoundError:
         raise p.SafeFailure('No review record for %s; run the review step first.' % a.sha[:12])
-    if report.get('sha') != a.sha or report.get('source') != a.source:
-        raise p.SafeFailure('The review record is for a different commit or branch.')
+    if (report.get('sha') != a.sha or report.get('source') != a.source
+            or report.get('repo', DEFAULT_REPO) != a.repo):
+        raise p.SafeFailure('The review record is for a different repository, commit or branch.')
     if time.time() - float(report.get('reviewed_at', 0)) > RECORD_MAX_AGE:
         raise p.SafeFailure('The review is more than an hour old; run the review step again.')
     if not passed(report):
         raise p.SafeFailure('The review did not pass; nothing published.')
+    full = '%s/%s' % (OWNER, a.repo)
     base = tempfile.mkdtemp(dir=WORK)
     try:
-        repo, merge_base, files, log = fetch(base, a.source, a.sha)
-        body = pr_body(a.sha, merge_base, files, report, log, a.issue)
-        title = git(repo, 'log', '-1', '--format=%s', a.sha)[:200] or 'Agent change'
-        if SECRET_RE.search(body) or SECRET_RE.search(title):
-            raise p.SafeFailure('The PR text contains something key- or token-shaped; nothing published.')
-        slug = re.sub(r'[^a-z0-9-]+', '-', a.source.split('/', 1)[1].lower()).strip('-')[:40] or 'change'
-        name = 'agent/%s%s-%s' % ('%d-' % a.issue if a.issue else '', slug, a.sha[:7])
-        ref = 'refs/heads/' + name
-        if not ref.startswith(PUSH_PREFIX):
-            raise p.SafeFailure('Refusing to push outside agent/.')
-        _, token = mint()
+        _, token = mint(full)
         try:
-            ask = os.path.join(base, 'askpass')
-            with open(ask, 'w') as f:
-                f.write('#!/bin/sh\ncase "$1" in Username*) echo x-access-token;; '
-                        '*) printf "%s\\n" "$BILLY_GIT_TOKEN";; esac\n')
-            os.chmod(ask, 0o700)
-            env = dict(os.environ, HOME=base, GIT_TERMINAL_PROMPT='0', GIT_CONFIG_NOSYSTEM='1',
-                       GIT_ASKPASS=ask, BILLY_GIT_TOKEN=token, LC_ALL='C')
+            env = askpass_env(base, token)
+            # A public repository is cloned without credentials, as before; a private one with
+            # this run's token, which lasts at most an hour and is revoked below.
+            repo, merge_base, files, log = fetch(base, a.source, a.sha, url=git_url(a.repo),
+                                                 env=env if REPOS[a.repo] else None)
+            body = pr_body(a.sha, merge_base, files, report, log, a.issue)
+            title = git(repo, 'log', '-1', '--format=%s', a.sha)[:200] or 'Agent change'
+            if SECRET_RE.search(body) or SECRET_RE.search(title):
+                raise p.SafeFailure('The PR text contains something key- or token-shaped; nothing published.')
+            slug = re.sub(r'[^a-z0-9-]+', '-', a.source.split('/', 1)[1].lower()).strip('-')[:40] or 'change'
+            name = 'agent/%s%s-%s' % ('%d-' % a.issue if a.issue else '', slug, a.sha[:7])
+            ref = 'refs/heads/' + name
+            if not ref.startswith(PUSH_PREFIX):
+                raise p.SafeFailure('Refusing to push outside agent/.')
             # An empty lease means "this branch must not exist yet": GitHub refuses the push
             # if anything created it, so a branch is never reused or moved.
             r = subprocess.run(['git', '-c', 'credential.helper=', '-c', 'core.hooksPath=/dev/null',
@@ -316,15 +426,15 @@ def publish(a):
                        for l in r.stdout.splitlines()):
                 raise p.SafeFailure('Branch %s already existed; Billy never reuses a branch.' % name)
             print('PASS: pushed %s as %s' % (a.sha[:12], name))
-            pr = p.api('POST', '/repos/%s/pulls' % p.REPO, token, {
+            pr = p.api('POST', '/repos/%s/pulls' % full, token, {
                 'title': title, 'head': name, 'base': 'main', 'draft': True, 'body': body})
             print('INFO: opened draft PR as %s: %s' % (pr['user']['login'], pr['html_url']))
         finally:
             p.revoke(token)
     finally:
         shutil.rmtree(base, ignore_errors=True)
-    entry = {'step': 'publish', 'sha': a.sha, 'source': a.source, 'branch': name, 'pr': pr['html_url'],
-             'pr_head': pr['head']['sha']}
+    entry = {'step': 'publish', 'repo': a.repo, 'sha': a.sha, 'source': a.source, 'branch': name,
+             'pr': pr['html_url'], 'pr_head': pr['head']['sha']}
     if pr['head']['sha'] != a.sha:
         entry['failed'] = 'PR head is not the reviewed commit'
         journal(entry)
@@ -341,10 +451,12 @@ def publish(a):
 
 def main():
     ap = argparse.ArgumentParser(description='Codex reviews one commit; Billy opens a draft PR if it passes.')
-    ap.add_argument('step', choices=('review', 'publish'))
+    ap.add_argument('step', choices=('fetch', 'review', 'publish'))
     ap.add_argument('source', help='branch Claude pushed, claude/... or agent/...')
     ap.add_argument('sha', help='the full 40-character commit')
     ap.add_argument('--issue', type=int, help='issue number for "Closes #N" (publish)')
+    ap.add_argument('--repo', default=DEFAULT_REPO,
+                    help='repository name, one of: %s (default %s)' % (', '.join(sorted(REPOS)), DEFAULT_REPO))
     ap.add_argument('--codex', help='path to the codex program (review; default: found on PATH)')
     a = ap.parse_args()
     if not (sys.stdin.isatty() and sys.stdout.isatty()):
@@ -353,13 +465,14 @@ def main():
         raise p.SafeFailure('The source branch must be claude/... or agent/...')
     if not SHA_RE.match(a.sha):
         raise p.SafeFailure('Give the full 40-character commit, in lowercase.')
+    check_repo(a.repo)
     user = pwd.getpwuid(os.getuid()).pw_name
-    expected = REVIEWER if a.step == 'review' else PUBLISHER
+    expected = REVIEWER if a.step == 'review' else PUBLISHER  # fetch and publish hold the key
     if user != expected:
         raise p.SafeFailure('The %s step runs as %s, not %s.' % (a.step, expected, user))
     os.umask(0o077)
     os.makedirs(WORK, mode=0o700, exist_ok=True)
-    return review(a) if a.step == 'review' else publish(a)
+    return {'fetch': fetch_step, 'review': review, 'publish': publish}[a.step](a)
 
 
 if __name__ == '__main__':

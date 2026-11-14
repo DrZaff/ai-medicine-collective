@@ -29,7 +29,13 @@ def message(e):
         return ''
 
 
-def mint():
+def mint(repo=None, permissions=None):
+    """A token for ONE repository of the owner's (default: p.REPO) with the given permissions
+    (default: Billy's full set). Refuses a token whose permissions differ from those asked for."""
+    repo = repo or p.REPO
+    permissions = permissions or p.PERMISSIONS
+    if not repo.startswith('DrZaff/') or repo.count('/') != 1:
+        raise p.SafeFailure('Refusing a token for %s.' % repo)
     cfg = json.loads(p.read_private(p.ROOT / 'app.json'))
     key = p.serialization.load_pem_private_key(p.read_private(p.ROOT / 'app.pem'), password=None)
     now = int(time.time())
@@ -37,11 +43,14 @@ def mint():
         {'iat': now - 60, 'exp': now + 540, 'iss': str(cfg['app_id'])}).encode())
     jwt = (msg + b'.' + p.enc(key.sign(msg, p.padding.PKCS1v15(), p.hashes.SHA256()))).decode()
     app = p.api('GET', '/app', jwt)
-    inst = p.api('GET', '/repos/' + p.REPO + '/installation', jwt)
+    inst = p.api('GET', '/repos/' + repo + '/installation', jwt)
     if app['id'] != int(cfg['app_id']) or inst['id'] != int(cfg['installation_id']):
         raise p.SafeFailure('App or installation identity mismatch.')
     res = p.api('POST', '/app/installations/%d/access_tokens' % inst['id'], jwt,
-                {'repositories': ['ai-medicine-collective'], 'permissions': p.PERMISSIONS})
+                {'repositories': [repo.split('/')[1]], 'permissions': permissions})
+    if res.get('permissions') != permissions:
+        p.revoke(res['token'])
+        raise p.SafeFailure('The token\'s permissions differ from those asked for.')
     return app['slug'], res['token']
 
 

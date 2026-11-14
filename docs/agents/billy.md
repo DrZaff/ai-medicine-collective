@@ -5,7 +5,7 @@ Billy is the GitHub App that publishes agent work, the "orchestrator credential"
 ## The app
 
 - Private app **Billy - AI Medicine Collective**, App ID 5691222, installation 180393253.
-- Installed on `DrZaff/ai-medicine-collective` only, with Contents (read and write), Pull requests (read and write) and Metadata (read). No Issues, Administration, Workflows or Secrets permission.
+- Installed on `DrZaff/ai-medicine-collective` and, from Mission Control's step A0, the private `DrZaff/billy-mission-control` (after that repository's ruleset is active), and nothing else, with Contents (read and write), Pull requests (read and write) and Metadata (read). No Issues, Administration, Workflows or Secrets permission.
 - Its PRs and commits appear as `billy-ai-medicine-collective[bot]`, so the owner can approve them.
 
 ## On the server (outside this repository)
@@ -21,6 +21,7 @@ Two Unix users, so the reviewer can never read the publisher's key (the first ha
 | --- | --- |
 | `/opt/billy/` (root-owned, read-only to both users) | `preflight.py`, `pr_test.py`, `handoff.py`, `review-schema.json`: the files in `scripts/billy/`, installed by hash with `install.sh` |
 | `/var/lib/billy-reviews/` (`agent` writes, `billy-pub` reads) | one review record per commit |
+| `/var/lib/billy-sources/` (`billy-pub` writes, `agent` reads) | a git bundle of a private repository's commit, for the reviewer |
 | `~/.local/state/billy/runs/` of each user | a JSON record per step (verdict, findings, PR link; no secrets) |
 
 Each publishing step turns the key into a token that lasts at most an hour, is limited to this repository and the three permissions, is never printed, and is revoked when the step ends. Tailscale on the server is the snap package: receive Taildrop files into `/var/snap/tailscale/common/inbox`, not a folder under a home directory. Codex for `agent` is installed through nvm, so its node folder goes on PATH in the launch command.
@@ -36,7 +37,7 @@ GitHub carries the work between the three; nothing is copied by hand. How a task
    sudo -H -u agent env PATH="$N:/usr/local/bin:/usr/bin:/bin" python3 /opt/billy/handoff.py review <branch> <sha> && \
    sudo -H -u billy-pub python3 /opt/billy/handoff.py publish <branch> <sha> [--issue N]
    ```
-3. **Codex reviews the exact commit** (`review`, as `agent`). The script refuses to start if it can read Billy's key, clones without credentials, stops unless the branch is at exactly that commit, and runs `codex exec` in a read-only sandbox on the diff against `main`. A report containing anything key- or token-shaped is neither printed nor saved, and the run stops. The report follows `review-schema.json` (each finding with severity, file and line, problem, reproduction, confidence and fix, and a verdict) and is recorded for that commit.
+3. **Codex reviews the exact commit** (`review`, as `agent`). For a **private** repository (`--repo billy-mission-control`), a `fetch` step runs first as `billy-pub`. It uses a read-only token for that one repository, revoked straight after, and writes a git bundle of the exact commit to `/var/lib/billy-sources`. The review then clones from that bundle, after checking it is for that repository, branch and commit and under an hour old, so the reviewer still never holds a credential. Billy works only on the repositories listed in `REPOS` in `handoff.py`. The script refuses to start if it can read Billy's key, clones a public repository without credentials, stops unless the branch is at exactly that commit, and runs `codex exec` in a read-only sandbox on the diff against `main`. A report containing anything key- or token-shaped is neither printed nor saved, and the run stops. The report follows `review-schema.json` (each finding with severity, file and line, problem, reproduction, confidence and fix, and a verdict) and is recorded for that commit.
 4. **Billy publishes only after a passing review** (`publish`, as `billy-pub`). It re-clones on its own, re-checks the commit, and requires a passing record for exactly that commit, less than an hour old. It refuses any PR text containing something key- or token-shaped. Then it pushes that same commit to a **new** branch `agent/[<issue>-]<name>-<sha7>` (GitHub refuses the push if the branch already exists) and opens a **draft** PR into `main` carrying the report. If the PR's head is not the reviewed commit, the step fails and says not to approve it. With blocking findings, nothing is pushed.
 5. **Stop for the owner.** The PR stays a draft until Site checks pass. The owner reviews, approves and merges on GitHub. The publish step ends by printing the **sign-off steps with exact links**: Ready for review, then the Files changed tab to approve, then the merge box. The same steps, without links, are in the PR description.
 

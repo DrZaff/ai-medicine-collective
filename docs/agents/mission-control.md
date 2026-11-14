@@ -466,8 +466,8 @@ Each journey ends with what happens when something goes wrong.
 
 ## 15. Decisions for the owner
 
-1. **Hosting of Mission Control:** on the Dell over Tailscale (recommended), or elsewhere. It is never public.
-2. **Sign-in:** Tailscale identity alone, or Tailscale plus a passkey in the app (recommended: both, because a lost phone stays on the tailnet).
+1. **Hosting of Mission Control:** on the Dell over Tailscale (recommended), or elsewhere. It is never public. **Decided 2026-11-14: the Dell, over Tailscale.**
+2. **Sign-in:** Tailscale identity alone, or Tailscale plus a passkey in the app (recommended: both, because a lost phone stays on the tailnet). **Decided 2026-11-14: Tailscale plus a passkey.**
 3. **GitHub read access:** a new read-only GitHub App (recommended), a fine-grained read-only token, or public unauthenticated reads.
 4. **Coordinator model and budget:** which provider and model, and the monthly hard cap (for example $20 to start, measured in month one).
 5. **Step zero:** whether to run the Claude Code Action and Codex GitHub review proofs of concept, and on which plans.
@@ -476,7 +476,9 @@ Each journey ends with what happens when something goes wrong.
 8. **Attachment retention:** 30 days by default.
 9. **Clinician:** remains the owner for now. A second clinician for logic that could change care ([architecture.md](architecture.md), "Risk tiers").
 10. **Native iPhone app:** only after phase A proves useful (plan F).
-11. **Where Mission Control's code lives:** a new private repository (recommended), or a folder in this one that Netlify is set up never to publish. Either way, never as pages of the public site.
+11. **Where Mission Control's code lives:** a new private repository (recommended), or a folder in this one that Netlify is set up never to publish. Either way, never as pages of the public site. **Decided 2026-11-14: a new private repository, `DrZaff/billy-mission-control`.**
+
+    Because Codex's review user holds no GitHub credential, it can't clone a private repository. **Decided 2026-11-14:** Billy's publisher user fetches the exact commit with a read-only token for that one repository, and Codex reviews a git bundle of it offline (plan item A0b; [billy.md](billy.md)). The reviewer still never holds a credential.
 
 ## 16. Demo plan: fake data first
 
