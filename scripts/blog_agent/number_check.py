@@ -85,7 +85,7 @@ RATIO = re.compile(rf"(?<![\w.·:]){ANSWER_SIGN}(?P<terms>{NUM}(?:\s*:\s*{NUM})+
 # chain. A chain continues with the same kind of link ("1 of 2 of 3",
 # "1 in 2 in 3", "1/2/3"); "25 of 26 in 159 cases" is a pair. A full stop
 # may follow, a decimal may not.
-SOURCE_PAIR = r"{a}\s*(?P<sep>{sep})\s*{b}(?!\d|[.·]\d)"
+SOURCE_PAIR = r"{a}\s*(?P<sep>{sep})\s*{b}(?!\d|[.·]\d|/\d)"   # nor a fraction: "3 of 10/20"
 PAIR_WORDS = "(?:out of|of|/|in)"   # "30 of 32" may be written any of these ways; a ratio "1:3" only as 1:3
 # A magnitude word after a number is part of it: "2.5 million" is not "2.5 billion"
 MAGNITUDE = re.compile(r"^\s*(thousand|million|billion|trillion)\b", re.IGNORECASE)

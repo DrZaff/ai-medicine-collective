@@ -305,6 +305,11 @@ class CodexFindings(unittest.TestCase):
                             ("The ratio was −1:2 [1].", "The ratio was -1:2.")):
             self.assertFalse(number_check.check(answer, {1: src}).needs_fact_check, (answer, src))
 
+    def test_fractional_denominator_confirms_nothing(self):
+        # Codex's review of 1eb0e1d (should fix): "3 of 10/20" confirmed "3 of 10"
+        for src in ("It was 3 of 10/20; 3 and 10.", "It was 3 of 10 / 20; 3 and 10.", "It was 3 in 10/20; 3 and 10."):
+            self.assertTrue(number_check.check("It was 3 of 10 [1].", {1: src}).needs_fact_check, src)
+
     def test_ordinary_pairs_still_match_after_the_followups(self):
         src = "AMIE was better on 30 out of 32 axes in 2024, and 25 of 26 in 159 cases; allocation 1:2."
         r = number_check.check("AMIE was better on 30 of 32 axes, 25 out of 26, with allocation 1:2 [1].", {1: src})
