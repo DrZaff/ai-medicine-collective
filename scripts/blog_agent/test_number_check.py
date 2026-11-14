@@ -219,7 +219,11 @@ class CodexFindings(unittest.TestCase):
                     # also dash minus signs and bracketed exponents
                     "Overall 3×10⁺⁵ scans.", "Overall 10⁺⁵ scans.", "Overall p=3×10–5.",
                     "Overall p=3×10‑5.", "Overall p=1.2e–5.", "Overall p=10^(−5).",
-                    "Overall p=3×10^(-5).", "Overall p=3·10^(−5)."):
+                    "Overall p=3×10^(-5).", "Overall p=3·10^(−5).",
+                    # Codex's review of 0521a32 (blocking): middle dot with a
+                    # plain signed exponent
+                    "Overall p=3·10−5.", "Overall p=3·10-5.", "Overall p=3·10 – 5.", "Overall p=1·2·10−5.",
+                    "Overall p=3‧10⁻⁵.", "Overall p=3⋅10⁻⁵.", "Overall p=3∙10−5.", "Overall p=3×10e-5."):
             for answer in ("It ran across 5 sites [1].", "It ran across 3 sites [1].",
                            "It ran across 10 sites [1]."):
                 r = number_check.check(answer, {1: src})
@@ -229,6 +233,12 @@ class CodexFindings(unittest.TestCase):
     def test_numbers_beside_source_scientific_notation_are_still_found(self):
         src = "It ran across 5 sites with 1·2 million scans; p=3×10−5 overall."
         r = number_check.check("It ran across 5 sites and 1.2 million scans [1].", {1: src})
+        self.assertFalse(r.needs_fact_check, r.results)
+
+    def test_middle_dot_decimal_ranges_are_still_read(self):
+        # "0·10–0·15" is a range of two decimals, not 0 × 10^-0
+        src = "Rates were 0·10–0·15 per 1000 and 1·10-5·20 per 100."
+        r = number_check.check("Rates were 0.10 to 0.15 per 1000 and 5.20 per 100 [1].", {1: src})
         self.assertFalse(r.needs_fact_check, r.results)
 
     def test_unreadable_leftover_digits_fail_closed(self):
