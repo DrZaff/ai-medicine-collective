@@ -69,6 +69,7 @@ jobs:
           path: nextset-sync/NextSetSync-unsigned.ipa
           retention-days: 14
       - name: Demo mode XCUITest
+        shell: bash
         run: |
           SIM=$(xcrun simctl list devices available -j | python3 scripts/iphone-simulator.py)
           xcrun simctl bootstatus "$SIM" -b
