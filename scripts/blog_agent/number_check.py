@@ -123,8 +123,24 @@ def numbers_in(text: str) -> list[tuple[str, bool, str]]:
     return found
 
 
+# A whole scientific-notation expression in a source (3×10−5, 1.2e-5,
+# 3 x 10^-5, 10^-3, 10⁻⁵). The checker does not read it, so it is masked
+# before matching: none of its digits may confirm a number in an answer.
+SOURCE_SCIENTIFIC = re.compile(
+    r"\d+(?:\.\d+)?\s*(?:[eE]\s*[-+−]?\s*\d+"
+    r"|[×xX*]\s*10\s*(?:\^|\*\*)?\s*[-+−⁻]?\s*[0-9⁰-⁹¹²³]*)"
+    r"|\b10\s*(?:\^|\*\*)\s*[-+−]?\s*\d+"
+    r"|\b10[⁻⁰-⁹¹²³]+")
+# "3·10⁻⁵" (a middle dot as the times sign, exponent written) is masked
+# before middle dots become decimal points.
+SOURCE_SCIENTIFIC_DOT = re.compile(
+    r"\d+(?:[.·]\d+)?\s*·\s*10\s*(?:(?:\^|\*\*)\s*[-+−]?\s*\d+|[⁻⁰-⁹¹²³]+)")
+
+
 def normalise_source(text: str) -> str:
-    return text.replace("·", ".")
+    """Middle dots read as decimal points; scientific notation is masked."""
+    text = SOURCE_SCIENTIFIC_DOT.sub(" [sci] ", text)
+    return SOURCE_SCIENTIFIC.sub(" [sci] ", text.replace("·", "."))
 
 
 @dataclass

@@ -210,6 +210,22 @@ class CodexFindings(unittest.TestCase):
             self.assertTrue(all(x.status == "unverified" for x in r.results), answer)
             self.assertIn("scientific notation", r.results[0].reason, answer)
 
+    def test_scientific_notation_in_a_source_confirms_nothing(self):
+        # Codex's review of 09c6ee6 (blocking): source text was still split,
+        # so the exponent of "3×10−5" could confirm an unrelated "5"
+        for src in ("Overall p=3×10−5.", "Overall p=1.2e-5.", "Overall p = 3 x 10^-5.", "Overall p<10⁻⁵.",
+                    "Overall p=10^-5.", "Overall p=3·10⁻⁵.", "Overall p=1·2×10−5."):
+            for answer in ("It ran across 5 sites [1].", "It ran across 3 sites [1].",
+                           "It ran across 10 sites [1]."):
+                r = number_check.check(answer, {1: src})
+                self.assertTrue(r.needs_fact_check, (src, answer))
+                self.assertEqual(statuses(r), {answer.split()[3]: "unverified"}, (src, answer))
+
+    def test_numbers_beside_source_scientific_notation_are_still_found(self):
+        src = "It ran across 5 sites with 1·2 million scans; p=3×10−5 overall."
+        r = number_check.check("It ran across 5 sites and 1.2 million scans [1].", {1: src})
+        self.assertFalse(r.needs_fact_check, r.results)
+
     def test_unreadable_leftover_digits_fail_closed(self):
         r = number_check.check("The effect was 2³ times larger [1].", {1: "2 times larger"})
         self.assertTrue(r.needs_fact_check)
