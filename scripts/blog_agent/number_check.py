@@ -21,8 +21,15 @@ that sentence cites, written the same way:
     before it and only punctuation or the end after it ("In 2024,",
     "(2024)"); anything else, "in 2024 ICU patients", is checked;
   - anything the checker cannot read fails closed: scientific notation in
-    any form (1.2e-5, 3×10−4, 10^-3, 10⁻⁵) or digits left over outside every
-    number it read make every number in that sentence unverified.
+    any form (1.2e-5, 3×10−4, 10^-3, 10⁻⁵, p<10−5), a chain such as 1/2/3,
+    or digits left over outside every number it read make every number in
+    that sentence unverified; scientific notation in a source is masked, so
+    none of its digits can confirm anything;
+  - a ratio of any length (1:3, 1:2:3) must appear whole, in that order, in
+    the cited source. "10-5" in a source is read as a power of ten, but
+    "10–15" (a rising range) as two numbers, unless a comparator comes
+    first ("p<10-15"); a source whose superscripts were lost may still be
+    misread, which a reviewer checks.
 
 Not seen at all: numbers written as words ("forty"), units (5 mg vs 5 g),
 and what a number measures; a reviewer checks those.
@@ -56,7 +63,13 @@ NUMBER = re.compile(
 # One unsigned number as NUMBER reads it, for pairs, so a pair never stops at
 # "1" in "1 200" and reads ".5 of 2" whole.
 NUM = rf"(?:(?:\d{{1,3}}(?:{SEP}\d{{3}})+|\d+)(?:[.·]\d+)?|[.·]\d+)"
-PAIR = re.compile(rf"(?<![\w.·])({NUM})\s*(out of|of|in|/|:)\s*({NUM})(?![\w·])", re.IGNORECASE)
+PAIR = re.compile(rf"(?<![\w.·])({NUM})\s*(out of|of|in|/)\s*({NUM})(?![\w·])", re.IGNORECASE)
+# A ratio of two or more parts, "1:3" or "1:2:3", read whole: every part must
+# appear in that order, as the whole ratio, in the source.
+# Three or more numbers joined by "/" or "of" ("1/2/3") are not a pair; the
+# checker does not read them, so the sentence fails closed.
+PAIR_CHAIN = re.compile(rf"{NUM}\s*(?:out of|of|in|/)\s*{NUM}\s*(?:out of|of|in|/)\s*{NUM}", re.IGNORECASE)
+RATIO = re.compile(rf"(?<![\w.·:]){NUM}(?:\s*:\s*{NUM})+(?![\w·]|\s*:\s*\d)")
 # The pair in source text: whole numbers on both sides, so "130 out of 32"
 # does not count as "30 of 32" and "30 of 320" not as "30 of 32".
 SOURCE_PAIR = r"(?<![\w.·,]){a}\s*{sep}\s*{b}(?!\d|[.·]\d)"   # a full stop may follow, a decimal may not
@@ -143,10 +156,30 @@ SOURCE_SCIENTIFIC_DOT = re.compile(
     rf"|{SCI_SUP}+)")
 
 
+# A bare power of ten written with a sign, "10−5" or "p<10-5". A hyphen or
+# dash after 10 can also be a range ("aged 10–15"), so it counts as a power
+# only when the sign is a true minus or plus, when a comparator comes before
+# it, or when the second number is not larger than 10 ("10-5" is no range).
+BARE_POWER = re.compile(rf"(?<![\w.·,])10\s*(?P<sign>{SCI_SIGN})\s*(?P<exp>\d+)(?![.·]?\d)")
+COMPARATOR = re.compile(r"(?:[<>=≤≥]|\bp)\s*$", re.IGNORECASE)
+
+
+def bare_powers(text: str) -> list[re.Match]:
+    found = []
+    for m in BARE_POWER.finditer(text):
+        if (m.group("sign") in "+−⁺⁻" or COMPARATOR.search(text[max(0, m.start() - 6):m.start()])
+                or int(m.group("exp")) <= 10):
+            found.append(m)
+    return found
+
+
 def normalise_source(text: str) -> str:
     """Middle dots read as decimal points; scientific notation is masked."""
     text = SOURCE_SCIENTIFIC_DOT.sub(" [sci] ", text)
-    return SOURCE_SCIENTIFIC.sub(" [sci] ", text.replace("·", "."))
+    text = SOURCE_SCIENTIFIC.sub(" [sci] ", text.replace("·", "."))
+    for m in reversed(bare_powers(text)):
+        text = text[:m.start()] + " [sci] " + text[m.end():]
+    return text
 
 
 @dataclass
@@ -236,7 +269,9 @@ def check(answer: str, texts: dict[int, str]) -> Report:
             for i in range(m.start(), m.end()):
                 covered[i] = True
         leftover = "".join(c.group() for c in ANY_DIGIT.finditer(plain) if not covered[c.start()])
-        unreadable = ("it uses scientific notation, which is not machine-checked" if SCIENTIFIC.search(plain)
+        unreadable = ("it uses scientific notation, which is not machine-checked"
+                      if SCIENTIFIC.search(plain) or bare_powers(plain)
+                      else "it chains three or more numbers with / or of" if PAIR_CHAIN.search(plain)
                       else f"it has digits the checker cannot read ({leftover})" if leftover else "")
         if unreadable:
             for item in [m.group(0).strip() for m in claims] or [leftover]:
@@ -248,10 +283,16 @@ def check(answer: str, texts: dict[int, str]) -> Report:
         # the sentence cannot clear a failed one.
         failed_spans = []   # (start, end, "a of b") of pairs not found
         for p in PAIR.finditer(plain):
-            a, b, ratio = canon_token(p.group(1)), canon_token(p.group(3)), p.group(2) == ":"
-            pattern = SOURCE_PAIR.format(a=re.escape(a), b=re.escape(b), sep=":" if ratio else PAIR_WORDS)
+            a, b = canon_token(p.group(1)), canon_token(p.group(3))
+            pattern = SOURCE_PAIR.format(a=re.escape(a), b=re.escape(b), sep=PAIR_WORDS)
             if not any(re.search(pattern, joined.get(n, ""), re.IGNORECASE) for n in cited):
-                failed_spans.append((p.start(), p.end(), f"{a}:{b}" if ratio else f"{a} of {b}"))
+                failed_spans.append((p.start(), p.end(), f"{a} of {b}"))
+        for r in RATIO.finditer(plain):
+            terms = [canon_token(t) for t in re.split(r"\s*:\s*", r.group(0))]
+            pattern = (r"(?<![\w.,:])" + r"\s*:\s*".join(re.escape(t) for t in terms)
+                       + r"(?!\d|\.\d|\s*:\s*\d)")
+            if not any(re.search(pattern, joined.get(n, "")) for n in cited):
+                failed_spans.append((r.start(), r.end(), ":".join(terms)))
         for m in claims:
             value, percent, written = parts(m)
             mag = magnitude(plain, m.end())

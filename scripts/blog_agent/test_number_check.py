@@ -241,6 +241,40 @@ class CodexFindings(unittest.TestCase):
         r = number_check.check("Rates were 0.10 to 0.15 per 1000 and 5.20 per 100 [1].", {1: src})
         self.assertFalse(r.needs_fact_check, r.results)
 
+    def test_bare_power_of_ten_in_a_source_confirms_nothing(self):
+        # Codex's review of 0db3c67 (blocking): "10−5" was read as 10 and 5
+        for src in ("Overall p<10−5.", "Overall p = 10-5.", "Overall P<10–6.", "Overall p<10 − 5.",
+                    "Overall 10+5 copies.", "Overall 10-5 copies."):
+            for answer in ("It ran across 5 sites [1].", "It ran across 10 sites [1].",
+                           "It ran across 6 sites [1]."):
+                r = number_check.check(answer, {1: src})
+                self.assertTrue(r.needs_fact_check, (src, answer))
+        for answer in ("It was significant (p<10−5) [1].", "It was significant (p = 10-5) [1]."):
+            r = number_check.check(answer, {1: "p 10 and 5"})
+            self.assertTrue(r.needs_fact_check, answer)
+            self.assertIn("scientific notation", r.results[0].reason, answer)
+
+    def test_ascending_ranges_from_ten_are_still_read(self):
+        src = "Children aged 10–15 years and 10-20% of adults."
+        r = number_check.check("It covered children aged 10 to 15 and 20% of adults [1].", {1: src})
+        self.assertFalse(r.needs_fact_check, r.results)
+
+    def test_ratios_of_any_length_must_appear_whole(self):
+        # Codex's review of 0db3c67 (should fix): "1:2:3" was checked as 1:2
+        # with the 3 matched anywhere
+        r = number_check.check("Arms were allocated 1:2:3 [1].", {1: "Allocation 1:2, 3 arms."})
+        self.assertTrue(r.needs_fact_check)
+        self.assertEqual(set(statuses(r).values()), {"unverified"})
+        self.assertFalse(number_check.check("Arms were allocated 1:2:3 [1].",
+                                            {1: "Allocation was 1:2:3 overall."}).needs_fact_check)
+        # A two-part ratio is not confirmed by part of a longer one
+        for src in ("Allocation was 1:2:3.", "Allocation was 3:1:2."):
+            self.assertTrue(number_check.check("Arms were allocated 1:2 [1].", {1: src}).needs_fact_check, src)
+        # The same for "/" chains, which the checker does not read at all
+        r = number_check.check("Doses were 1/2/3 mg [1].", {1: "Doses 1/2 and 3 mg."})
+        self.assertTrue(r.needs_fact_check)
+        self.assertIn("chains", r.results[0].reason)
+
     def test_unreadable_leftover_digits_fail_closed(self):
         r = number_check.check("The effect was 2³ times larger [1].", {1: "2 times larger"})
         self.assertTrue(r.needs_fact_check)
