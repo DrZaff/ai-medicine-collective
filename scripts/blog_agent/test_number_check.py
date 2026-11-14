@@ -140,6 +140,24 @@ class CodexFindings(unittest.TestCase):
         r = number_check.check("Readers agreed on 30 of 32 cases [1].", {1: src})
         self.assertEqual(statuses(r)["32"], "unverified")
 
+    def test_pair_with_space_separated_thousands_is_read_whole(self):
+        # Codex's review of 86fc093: the pair pattern read "30 of 1 200" as
+        # "30 of 1", which this source has, and "1 200" was then found on its own
+        src = "Readers agreed on 30 out of 1, then 30 more. Overall 1 200 cases were read."
+        for answer in ("Readers agreed on 30 of 1 200 cases [1].", "Readers agreed on 30 of 1 200 cases [1].",
+                       "Readers agreed on 30 of 1,200 cases [1]."):
+            r = number_check.check(answer, {1: src})
+            self.assertTrue(r.needs_fact_check, answer)
+            self.assertIn('"30 of 1200"', r.results[0].reason, answer)
+        # a pair at the end of a source sentence is still a pair; a decimal is not
+        r = number_check.check("Accuracy was 30/32 [1].", {1: "Accuracy was 30/32."})
+        self.assertFalse(r.needs_fact_check)
+        r = number_check.check("Accuracy was 30/32 [1].", {1: "Accuracy was 30/32.5 here; 30 and 32 appear."})
+        self.assertTrue(r.needs_fact_check)
+        # and the same pair written with a space is accepted when the source has it
+        r = number_check.check("Readers agreed on 30 of 1 200 cases [1].", {1: "They agreed on 30 out of 1 200 cases."})
+        self.assertEqual(set(statuses(r).values()), {"found"})
+
     def test_next_sentence_citation_does_not_cover_an_uncited_sentence(self):
         # Sentences starting with a digit or a lowercase word used not to split
         r = number_check.check("AMIE won on 30 axes. 25 out of 26 axes favoured it too [1].", {1: AMIE})

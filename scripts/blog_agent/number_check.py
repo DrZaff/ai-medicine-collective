@@ -34,10 +34,13 @@ CITATION = re.compile(r"\[\s*\d+(?:\s*[,–-]\s*\d+)*\s*\]")
 NUMBER = re.compile(
     r"(?<![\w.·])(\d{1,3}(?:[,    ]\d{3})+|\d+)([.·]\d+)?(\s?%|\s?per\s?cent\b|\s?percent\b)?(?![\w·])",
     re.IGNORECASE)
-PAIR = re.compile(r"(\d[\d,.·]*)\s*(?:out of|of|/)\s*(\d[\d,.·]*)", re.IGNORECASE)
+# One number as NUMBER reads it (thousands groups with a comma or any kind of
+# space, optional decimals), so a pair never stops at "1" in "1 200".
+NUM = r"(?:\d{1,3}(?:[,    ]\d{3})+|\d+)(?:[.·]\d+)?"
+PAIR = re.compile(rf"(?<![\w.·])({NUM})\s*(?:out of|of|/)\s*({NUM})(?![\w·])", re.IGNORECASE)
 # The pair in source text: whole numbers on both sides, so "130 out of 32"
 # does not count as "30 of 32" and "30 of 320" not as "30 of 32".
-SOURCE_PAIR = r"(?<![\w.·,]){a}\s*(?:out of|of|/|in)\s*{b}(?![\d.·])"
+SOURCE_PAIR = r"(?<![\w.·,]){a}\s*(?:out of|of|/|in)\s*{b}(?!\d|[.·]\d)"   # a full stop may follow, a decimal may not
 YEAR = re.compile(r"^(19|20)\d\d$")
 # A year needs year words before it ("in 2024", "since 2019", "March 2024",
 # "(2024)") AND nothing it could be counting after it: "in 2024," or
