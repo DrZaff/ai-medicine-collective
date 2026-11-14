@@ -17,6 +17,10 @@ holds a GitHub credential:
   fetch    as `billy-pub`: a read-only token for that one repository fetches the exact commit and
            writes it as a git bundle to /var/lib/billy-sources (billy-pub writes, agent reads).
            The review step then clones from that bundle instead of from GitHub.
+           Without Billy installed on the repository, the owner carries a bundle to the server
+           instead: fetch --bundle FILE --main <main's sha> checks the branch and main commits
+           and needs no token. Billy can't publish there, so Claude opens the PR, whose head
+           must be the reviewed commit.
 
 The owner launches both by hand from a terminal (each step refuses to run without one):
   sudo -H -u agent env PATH="$NODE_BIN:/usr/local/bin:/usr/bin:/bin" \\
@@ -70,6 +74,7 @@ SENSITIVE = ('.github/', 'netlify.toml', 'supabase/', 'auth.js', 'social/', 'new
 CODEX_TIMEOUT = 1800
 RECORD_MAX_AGE = 3600
 SOURCE_MAX_AGE = 3600
+MAX_BUNDLE = 200 * 1000 * 1000
 MAX_DIFF = 400000
 
 REVIEW_PROMPT = """You are the code reviewer for the AI Medicine Collective website (public repository
@@ -338,33 +343,53 @@ def pr_body(sha, merge_base, files, report, log, issue):
 
 
 def fetch_step(a):
-    """As billy-pub, for a private repository: fetch the exact commit with a read-only token for
-    that one repository and leave it as a git bundle for the reviewer. Pushes nothing."""
-    from pr_test import mint  # needs the key: publisher only
+    """As billy-pub, for a private repository: put the exact commit where the reviewer can read
+    it, as a git bundle. Pushes nothing. Two sources:
+      - GitHub, with a read-only token for that one repository (needs Billy installed on it);
+      - --bundle FILE, a bundle the owner carried to the server, with --main naming main's exact
+        commit (no token, no app). The review diffs against main, so a bundle's main must be the
+        real one: a stale or crafted main could hide part of a change."""
     if not REPOS[a.repo]:
         raise p.SafeFailure('%s is public; the review step clones it directly.' % a.repo)
     if not os.path.isdir(SOURCES):
         raise p.SafeFailure('%s is missing; run install.sh.' % SOURCES)
+    carried = getattr(a, 'bundle', None)
+    if carried:
+        if not SHA_RE.match(getattr(a, 'main', None) or ''):
+            raise p.SafeFailure('With --bundle, give --main: main\'s full 40-character commit.')
+        carried = os.path.realpath(carried)
+        if not os.path.isfile(carried) or os.path.getsize(carried) > MAX_BUNDLE:
+            raise p.SafeFailure('The bundle file is missing, not a file, or larger than %d MB.'
+                                % (MAX_BUNDLE // 1000000))
     bundle, meta_path = source_paths(a.repo, a.sha)
     base = tempfile.mkdtemp(dir=WORK)
     try:
-        _, token = mint('%s/%s' % (OWNER, a.repo), {'contents': 'read', 'metadata': 'read'})
-        try:
-            repo = os.path.join(base, 'repo')
-            # A full clone (no blob filter), so the bundle holds everything the review needs.
-            git(base, 'clone', '--quiet', '--no-checkout', git_url(a.repo), repo,
-                env=askpass_env(base, token))
-        finally:
-            p.revoke(token)
+        repo = os.path.join(base, 'repo')
+        if carried:
+            git(base, 'clone', '--quiet', '--no-checkout', carried, repo)
+        else:
+            from pr_test import mint  # needs the key: publisher only
+            _, token = mint('%s/%s' % (OWNER, a.repo), {'contents': 'read', 'metadata': 'read'})
+            try:
+                # A full clone (no blob filter), so the bundle holds everything the review needs.
+                git(base, 'clone', '--quiet', '--no-checkout', git_url(a.repo), repo,
+                    env=askpass_env(base, token))
+            finally:
+                p.revoke(token)
         head = git(repo, 'rev-parse', '--verify', '--quiet', 'refs/remotes/origin/' + a.source,
                    check=False)
         if head != a.sha:
             raise p.SafeFailure('%s is at %s, not the commit you named (%s). Nothing fetched.'
                                 % (a.source, (head or 'nothing')[:12], a.sha[:12]))
+        main = git(repo, 'rev-parse', '--verify', '--quiet', 'refs/remotes/origin/main', check=False)
+        if carried and main != a.main:
+            raise p.SafeFailure('The bundle\'s main is %s, not the main you named (%s). Nothing '
+                                'fetched.' % ((main or 'missing')[:12], a.main[:12]))
         bundle_commit(repo, a.sha, bundle + '.tmp')
         os.chmod(bundle + '.tmp', 0o640)
         os.replace(bundle + '.tmp', bundle)
-        meta = {'repo': a.repo, 'source': a.source, 'sha': a.sha, 'fetched_at': time.time()}
+        meta = {'repo': a.repo, 'source': a.source, 'sha': a.sha, 'main': main,
+                'via': 'carried bundle' if carried else 'GitHub', 'fetched_at': time.time()}
         with open(meta_path + '.tmp', 'w') as f:
             json.dump(meta, f, indent=2)
         os.chmod(meta_path + '.tmp', 0o640)
@@ -372,8 +397,8 @@ def fetch_step(a):
     finally:
         shutil.rmtree(base, ignore_errors=True)
     journal(dict(meta, step='fetch'))
-    print('PASS: fetched %s %s at %s for review; the review step may run.'
-          % (a.repo, a.source, a.sha[:12]))
+    print('PASS: fetched %s %s at %s (main %s, from %s) for review; the review step may run.'
+          % (a.repo, a.source, a.sha[:12], main[:12], meta['via']))
     return 0
 
 
@@ -455,6 +480,8 @@ def main():
     ap.add_argument('source', help='branch Claude pushed, claude/... or agent/...')
     ap.add_argument('sha', help='the full 40-character commit')
     ap.add_argument('--issue', type=int, help='issue number for "Closes #N" (publish)')
+    ap.add_argument('--bundle', help='fetch: a git bundle the owner carried here, instead of GitHub')
+    ap.add_argument('--main', help="fetch --bundle: main's full 40-character commit, checked")
     ap.add_argument('--repo', default=DEFAULT_REPO,
                     help='repository name, one of: %s (default %s)' % (', '.join(sorted(REPOS)), DEFAULT_REPO))
     ap.add_argument('--codex', help='path to the codex program (review; default: found on PATH)')
@@ -466,6 +493,8 @@ def main():
     if not SHA_RE.match(a.sha):
         raise p.SafeFailure('Give the full 40-character commit, in lowercase.')
     check_repo(a.repo)
+    if (a.bundle or a.main) and a.step != 'fetch':
+        raise p.SafeFailure('--bundle and --main belong to the fetch step only.')
     user = pwd.getpwuid(os.getuid()).pw_name
     expected = REVIEWER if a.step == 'review' else PUBLISHER  # fetch and publish hold the key
     if user != expected:

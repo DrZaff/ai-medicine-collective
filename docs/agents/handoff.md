@@ -33,7 +33,7 @@ This builds on the supervised Billy handoff in [billy.md](billy.md) and the rule
 
 Run the command once per commit. A second run for the same commit stops at "already existed": Billy never reuses a branch.
 
-For the private Mission Control repository, add `--repo billy-mission-control` to each step and run the fetch step first:
+For the private Mission Control repository, add `--repo billy-mission-control` to each step and run the fetch step first. While Billy isn't installed there, Claude sends the owner a bundle file instead: carry it to the server (Taildrop), then run `fetch` with `--bundle <file> --main <main's full SHA>` (both given by Claude), then `review`; skip `publish`, because Claude opens that PR itself. With Billy installed, the commands are:
 ```sh
 N=/home/agent/.nvm/versions/node/v26.13.0/bin; cd /tmp && \
 sudo -H -u billy-pub python3 /opt/billy/handoff.py fetch <branch> <sha> --repo billy-mission-control && \

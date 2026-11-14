@@ -5,6 +5,8 @@
 """
 
 import argparse
+import contextlib
+import io
 import json
 import os
 import shutil
@@ -161,6 +163,57 @@ class PrivateRepositories(unittest.TestCase):
         with self.assertRaises(handoff.p.SafeFailure) as caught:
             handoff.publish(a)
         self.assertIn('different repository', str(caught.exception))
+
+    def carried(self):
+        """An owner-carried bundle of main and claude/x, plus the step's folders, all temporary."""
+        origin, base_sha, sha = self.make_origin()
+        path = os.path.join(self.tmp, 'carried.bundle')
+        run(origin, 'bundle', 'create', path, 'main', 'claude/x')
+        for name in ('SOURCES', 'WORK', 'JOURNAL'):
+            folder = os.path.join(self.tmp, name.lower())
+            os.makedirs(folder)
+            self.addCleanup(setattr, handoff, name, getattr(handoff, name))
+            setattr(handoff, name, folder)
+        return path, base_sha, sha
+
+    def fetch_args(self, bundle, sha, main, repo='billy-mission-control'):
+        return argparse.Namespace(repo=repo, source='claude/x', sha=sha, bundle=bundle, main=main)
+
+    def test_carried_bundle_reaches_the_reviewer_unchanged(self):
+        path, base_sha, sha = self.carried()
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(handoff.fetch_step(self.fetch_args(path, sha, base_sha)), 0)
+        bundle, meta_path = handoff.source_paths('billy-mission-control', sha)
+        with open(meta_path) as f:
+            meta = json.load(f)
+        self.assertEqual((meta['main'], meta['via']), (base_sha, 'carried bundle'))
+        handoff.check_source_meta(meta, 'billy-mission-control', 'claude/x', sha)
+        review = os.path.join(self.tmp, 'review')
+        os.makedirs(review)
+        _, merge_base, files, _ = handoff.fetch(review, 'claude/x', sha, url=bundle,
+                                                ref=handoff.REVIEW_REF)
+        self.assertEqual((merge_base, files), (base_sha, ['b.txt']))
+
+    def test_carried_bundle_with_another_main_is_refused(self):
+        path, base_sha, sha = self.carried()
+        with self.assertRaises(handoff.p.SafeFailure) as caught:
+            handoff.fetch_step(self.fetch_args(path, sha, 'e' * 40))
+        self.assertIn('not the main you named', str(caught.exception))
+        self.assertFalse(os.listdir(handoff.SOURCES))
+
+    def test_carried_bundle_at_another_commit_is_refused(self):
+        path, base_sha, sha = self.carried()
+        with self.assertRaises(handoff.p.SafeFailure):
+            handoff.fetch_step(self.fetch_args(path, 'f' * 40, base_sha))
+        self.assertFalse(os.listdir(handoff.SOURCES))
+
+    def test_carried_bundle_needs_main_and_a_private_repository(self):
+        path, base_sha, sha = self.carried()
+        for main in (None, '', 'abc'):
+            with self.assertRaises(handoff.p.SafeFailure):
+                handoff.fetch_step(self.fetch_args(path, sha, main))
+        with self.assertRaises(handoff.p.SafeFailure):
+            handoff.fetch_step(self.fetch_args(path, sha, base_sha, repo='ai-medicine-collective'))
 
     def test_fetch_step_is_for_private_repositories_only(self):
         a = argparse.Namespace(repo='ai-medicine-collective', source='claude/x', sha='d' * 40)
