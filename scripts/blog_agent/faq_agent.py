@@ -449,6 +449,7 @@ def main() -> int:
         item = next(i for i in faq["items"] if i["id"] == target["refresh_id"])
         item.update(answer=result["answer"].strip(), sources=sources, keywords=result.get("keywords", item.get("keywords", [])),
                     updated=date.isoformat())
+        item.pop("correction", None)   # a note about the old text does not apply to the rewrite
     else:
         item = {"id": slug(result["question"], {i["id"] for i in faq["items"]}), "category": result["category"],
                 "question": result["question"].strip(), "answer": result["answer"].strip(), "sources": sources,

@@ -4905,6 +4905,13 @@ html.terminal::view-transition-new(root) {
   font-size: 0.875rem;
 }
 
+.modern .faq-correction {
+  border-left: 3px solid var(--brand);
+  border-radius: 0 6px 6px 0;
+  background: var(--brand-soft);
+  color: var(--body);
+}
+
 .modern .faq-share {
   border-color: var(--line);
   color: var(--brand);

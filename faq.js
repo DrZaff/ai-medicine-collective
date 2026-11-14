@@ -54,6 +54,12 @@
     const summary = el("summary", "faq-question resource-summary", item.question);
     const body = el("div", "faq-answer resource-body");
     body.append(answerText(item));
+    // A correction that changed a number or a result is noted, with its date
+    // (corrections.html), never made silently
+    if (item.correction && item.correction.note) {
+      body.append(el("p", "faq-correction",
+        `Corrected ${niceDate(item.correction.date)}: ${item.correction.note}`));
+    }
 
     if (item.sources && item.sources.length) {
       const list = el("ol", "faq-sources");

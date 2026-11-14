@@ -1,6 +1,6 @@
 {
   "_about": "Frequently asked questions about AI in medicine, shown on faq.html (faq.js) and built into the page as static HTML and FAQPage data at deploy time (scripts/seo/build_seo.py). Answers are plain text; [1] marks cite the item's sources in order. The FAQ agent (scripts/blog_agent/faq_agent.py) proposes one new item every other day and the monthly audit (faq_audit.py) proposes refreshes, both by pull request: merging publishes. Every number in an answer must appear in a cited source.",
-  "updated": "2026-11-13",
+  "updated": "2026-11-14",
   "categories": [
     {
       "id": "general",
@@ -1045,7 +1045,8 @@
         "AI and physician jobs"
       ],
       "added": "2026-11-13",
-      "updated": "2026-11-14"
+      "updated": "2026-11-14",
+      "correction": {"date": "2026-11-14", "note": "The MASAI figures were corrected: the trial enrolled 80,033 women (the answer said more than 80,000, without a citation), the screen-reading workload fell by 44.3% (not 44%), and the paper reports a similar cancer detection rate, not a similar number of cancers."}
     }
   ]
 }
