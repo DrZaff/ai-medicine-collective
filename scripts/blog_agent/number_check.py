@@ -26,7 +26,9 @@ that sentence cites, written the same way:
     that sentence unverified; scientific notation in a source is masked, so
     none of its digits can confirm anything;
   - a ratio of any length (1:3, 1:2:3) must appear whole, in that order, in
-    the cited source. "10-5" in a source is read as a power of ten, but
+    the cited source; a pair or ratio found there must not be part of a
+    longer one ("1 of 2 of 3", "1/2/3", "3:1:2"), and a signed one ("−3 of
+    10", "−1:2") must carry the same sign in the source. "10-5" in a source is read as a power of ten, but
     "10–15" (a rising range) as two numbers, unless a comparator comes
     first ("p<10-15"); a source whose superscripts were lost may still be
     misread, which a reviewer checks.
@@ -63,18 +65,27 @@ NUMBER = re.compile(
 # One unsigned number as NUMBER reads it, for pairs, so a pair never stops at
 # "1" in "1 200" and reads ".5 of 2" whole.
 NUM = rf"(?:(?:\d{{1,3}}(?:{SEP}\d{{3}})+|\d+)(?:[.·]\d+)?|[.·]\d+)"
-PAIR = re.compile(rf"(?<![\w.·])({NUM})\s*(out of|of|in|/)\s*({NUM})(?![\w·])", re.IGNORECASE)
+# A minus or plus sign before the first number is part of the pair: "−3 of
+# 10" must appear signed in the source.
+ANSWER_SIGN = r"(?P<sign>[−–+-](?=[.·]?\d))?"
+PAIR = re.compile(rf"(?<![\w.·]){ANSWER_SIGN}(?P<a>{NUM})\s*(?:out of|of|in|/)\s*(?P<b>{NUM})(?![\w·])",
+                  re.IGNORECASE)
 # A ratio of two or more parts, "1:3" or "1:2:3", read whole: every part must
 # appear in that order, as the whole ratio, in the source.
 # Three or more numbers joined by "/" or "of" ("1/2/3") are not a pair; the
 # checker does not read them, so the sentence fails closed.
 PAIR_CHAIN = re.compile(rf"{NUM}\s*(?:out of|of|in|/)\s*{NUM}\s*(?:out of|of|in|/)\s*{NUM}", re.IGNORECASE)
-RATIO = re.compile(rf"(?<![\w.·:]){NUM}(?:\s*:\s*{NUM})+(?![\w·]|\s*:\s*\d)")
+RATIO = re.compile(rf"(?<![\w.·:]){ANSWER_SIGN}(?P<terms>{NUM}(?:\s*:\s*{NUM})+)(?![\w·]|\s*:\s*\d)")
 # The pair in source text: whole numbers on both sides, so "130 out of 32"
 # does not count as "30 of 32" and "30 of 320" not as "30 of 32".
 # Neither side may be part of a longer chain ("1/2/3") or a signed number
 # ("-30 of 32"); slashes are written without spaces in the joined text.
-SOURCE_PAIR = r"(?<![\w.·,/−–+-]){a}\s*{sep}\s*{b}(?!\d|[.·]\d|/\d)"   # a full stop may follow, a decimal may not
+# What surrounds the pair is checked in code (_source_has): its sign must
+# match the answer's, and it may not be part of a longer number, ratio or
+# chain. A chain continues with the same kind of link ("1 of 2 of 3",
+# "1 in 2 in 3", "1/2/3"); "25 of 26 in 159 cases" is a pair. A full stop
+# may follow, a decimal may not.
+SOURCE_PAIR = r"{a}\s*(?P<sep>{sep})\s*{b}(?!\d|[.·]\d|/\d)"   # nor a fraction: "3 of 10/20"
 PAIR_WORDS = "(?:out of|of|/|in)"   # "30 of 32" may be written any of these ways; a ratio "1:3" only as 1:3
 # A magnitude word after a number is part of it: "2.5 million" is not "2.5 billion"
 MAGNITUDE = re.compile(r"^\s*(thousand|million|billion|trillion)\b", re.IGNORECASE)
@@ -245,6 +256,34 @@ def _near(value: str, percent: bool, text: str) -> list[str]:
     return hints[:3]
 
 
+def answer_sign(m: re.Match) -> str:
+    """"-" or "+" for a signed pair or ratio in the answer, else ""."""
+    sign = m.group("sign") or ""
+    return "+" if sign == "+" else "-" if sign else ""
+
+
+def _source_has(pattern: str, text: str, sign: str) -> bool:
+    """True if `pattern` (a pair or ratio without its left boundary) occurs in
+    `text` with the same sign as the answer's and not as the tail of a longer
+    number, chain or ratio."""
+    for m in re.finditer(pattern, text, re.IGNORECASE):
+        before = text[:m.start()]
+        signed = re.search(r"[−–+-]$", before)
+        found = "" if not signed else "+" if signed.group() == "+" else "-"
+        if found != sign:
+            continue
+        rest = before[:-1] if signed else before
+        if re.search(r"[\w.·,/:]$", rest):
+            continue
+        link = m.group("sep").lower() if "sep" in m.re.groupindex else ":"   # a ratio's link is ":"
+        link = r"(?:out of|of)" if link in ("of", "out of") else re.escape(link)
+        if (re.search(rf"\d\s*{link}\s*$", rest, re.IGNORECASE)
+                or re.match(rf"\s*{link}\s*\d", text[m.end():], re.IGNORECASE)):
+            continue
+        return True
+    return False
+
+
 def check(answer: str, texts: dict[int, str]) -> Report:
     """Check every number in `answer`. `texts` maps each 1-based source number
     to its retrieved text ("" or missing when it could not be fetched)."""
@@ -285,16 +324,16 @@ def check(answer: str, texts: dict[int, str]) -> Report:
         # the sentence cannot clear a failed one.
         failed_spans = []   # (start, end, "a of b") of pairs not found
         for p in PAIR.finditer(plain):
-            a, b = canon_token(p.group(1)), canon_token(p.group(3))
+            a, b, sign = canon_token(p.group("a")), canon_token(p.group("b")), answer_sign(p)
             pattern = SOURCE_PAIR.format(a=re.escape(a), b=re.escape(b), sep=PAIR_WORDS)
-            if not any(re.search(pattern, joined.get(n, ""), re.IGNORECASE) for n in cited):
-                failed_spans.append((p.start(), p.end(), f"{a} of {b}"))
+            if not any(_source_has(pattern, joined.get(n, ""), sign) for n in cited):
+                failed_spans.append((p.start(), p.end(), f"{sign}{a} of {b}"))
         for r in RATIO.finditer(plain):
-            terms = [canon_token(t) for t in re.split(r"\s*:\s*", r.group(0))]
-            pattern = (r"(?<![\w.,:])" + r"\s*:\s*".join(re.escape(t) for t in terms)
-                       + r"(?!\d|\.\d|\s*:\s*\d)")
-            if not any(re.search(pattern, joined.get(n, "")) for n in cited):
-                failed_spans.append((r.start(), r.end(), ":".join(terms)))
+            terms = [canon_token(t) for t in re.split(r"\s*:\s*", r.group("terms"))]
+            sign = answer_sign(r)
+            pattern = r"\s*:\s*".join(re.escape(t) for t in terms) + r"(?!\d|\.\d|\s*:\s*\d)"
+            if not any(_source_has(pattern, joined.get(n, ""), sign) for n in cited):
+                failed_spans.append((r.start(), r.end(), sign + ":".join(terms)))
         for m in claims:
             value, percent, written = parts(m)
             mag = magnitude(plain, m.end())
