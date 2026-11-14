@@ -60,6 +60,7 @@ function stubG() {
     o[k] = function() { return o; };
   });
   o.getWidth = function() { return 176; }; o.getHeight = function() { return 176; };
+  o.setTheme = function(theme) { o.theme = theme; return o; };
   o.stringWidth = function(s) { return ("" + s).length * 9; };
   return o;
 }
@@ -168,7 +169,7 @@ step(function() {
   NRF.failNext = 3; // softdevice busy for three notifications
   phone({ t: "wput", w: {
     id: "sample-upper-a", rev: 2, name: "Upper A", units: "lb", ex: [
-      { id: "bench", name: "Bench press", sets: 2, reps: "6-8", rir: 2, rest: 120, load: 135 },
+      { id: "bench", name: "Bench press", sets: 2, reps: "6-8", rir: 2, rest: 120, load: 135, tempo: "2-1-2" },
       { id: "row", name: "Chest-supported row", sets: 2, reps: "8-12", rir: 2, rest: 90 }] } });
 });
 step(function() {
@@ -236,6 +237,29 @@ step(function() {
   ok(!APPX.matchesGhost({ load: 135, reps: 5, rir: 2 }, { load: 140, reps: 4, rir: 2 }),
     "ghost rejects more load at fewer reps");
   ok(ui && ui.mode == "custom", "set entry screen shown");
+  var gym = require("nsync");
+  ok(gym.restSeconds(120, 0) == 150 && gym.restSeconds(120, 1) == 150 &&
+     gym.restSeconds(120, 2) == 120 && gym.restSeconds(120, 4) == 105, "rest adapts to logged RIR");
+  ok(gym.restSeconds(10, 5) == 0 && gym.restSeconds(0, 0) == 0, "rest clamps at zero and preserves disabled rest");
+  ok(gym.tempoPhases("2-0-3-1").join(",") == "2,0,3,1" &&
+     !gym.tempoPhases("0-0-0").length && !gym.tempoPhases("2-fast-2").length, "tempo handles pauses and rejects invalid prescriptions");
+  var lb = gym.plates(185, "lb"), kg = gym.plates(83, "kg");
+  ok(lb.bar == 45 && lb.plates[0].size == 45 && lb.plates[1].size == 25 &&
+     kg.bar == 20 && kg.load == 82.5, "plates use the correct bar and pairs in each unit");
+  ok(gym.warmup(185, "lb").join(",") == "85,110,140", "warm-up ramp rounds to loadable weights");
+  ui.drag({ x: 38, y: 70, dx: 18, dy: 0, b: 1 });
+  ui.drag({ x: 75, y: 70, dx: 37, dy: 0, b: 0 });
+  ok(menu && menu[""].title == "Plates / side", "swiping the load box opens the plate calculator");
+  menu["Warm-up ramp"]();
+  ok(menu[""].title == "Warm-up", "warm-up ramp is available on the first exercise");
+  menu[""].back();
+  menu[""].back();
+  ui.btn();
+  var tempoBuzzes = buzzes;
+  menu["Start tempo 2-1-2"]();
+  ok(buzzes == tempoBuzzes + 1 && ui.mode == "custom", "tempo starts with a short phase buzz");
+  ui.touch(1, { x: 88, y: 145 });
+  ok(typeof ui.drag == "function", "stopping tempo returns to set entry without logging");
   ui.touch(1, { x: 87, y: 140 });  // + on load (selected by default): 135 -> 140
   ui.touch(1, { x: 87, y: 60 });   // select REPS
   ui.touch(1, { x: 30, y: 140 });  // - : 6 -> 5

@@ -30,6 +30,35 @@ exports.MIN_FREE = 16000;     // bytes of Storage kept free so set logging alway
 // `hello`; an older phone that sends no list gets only sets and sessions.
 exports.KINDS = ["set", "ses", "mark", "chk"];
 
+exports.restSeconds = function(base, rir) {
+  if (base <= 0) return 0;
+  return Math.max(0, base + (rir <= 1 ? 30 : rir >= 4 ? -15 : 0));
+};
+
+exports.tempoPhases = function(tempo) {
+  var parts = typeof tempo == "string" && /^(\d+)-(\d+)-(\d+)(-\d+)?$/.test(tempo) ? tempo.split("-").map(Number) : [];
+  if (!parts.length || parts.some(function(sec) { return sec > 30; }) ||
+      !parts.some(function(sec) { return sec > 0; })) return [];
+  return parts;
+};
+
+exports.plates = function(load, units) {
+  var kg = units == "kg", bar = kg ? 20 : 45;
+  var sizes = kg ? [25, 20, 15, 10, 5, 2.5, 1.25] : [45, 35, 25, 10, 5, 2.5];
+  var smallest = sizes[sizes.length - 1];
+  var each = smallest * Math.max(0, Math.round((load - bar) / (2 * smallest)));
+  var left = each, plates = [];
+  sizes.forEach(function(size) {
+    var count = Math.floor(left / size);
+    if (count) { plates.push({ size: size, count: count }); left -= count * size; }
+  });
+  return { bar: bar, load: bar + 2 * each, plates: plates };
+};
+
+exports.warmup = function(load, units) {
+  return [0.45, 0.60, 0.75].map(function(ratio) { return exports.plates(load * ratio, units).load; });
+};
+
 function hex(nbytes) {
   var s = "";
   while (s.length < nbytes * 2) {
