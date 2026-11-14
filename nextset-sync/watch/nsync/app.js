@@ -394,6 +394,16 @@ function showSyncInfo() {
   };
   E.showMenu(m);
 }
+function showSelfTest() {
+  screen = "menu";
+  var r = L.selfTest(), bad = r.filter(function(c) { return c.s != "ok"; }).length;
+  var m = { "": { title: bad ? bad + " to check" : "All good", back: showMain } };
+  var mark = { ok: "OK ", warn: "!! ", fail: "XX " };
+  r.forEach(function(c) {
+    m[mark[c.s] + c.n] = function() { if (c.d) E.showAlert(c.d, c.n).then(showSelfTest); };
+  });
+  E.showMenu(m);
+}
 function showMain() {
   clearTimer();
   screen = "main";
@@ -405,6 +415,7 @@ function showMain() {
   else m["No workout yet"] = function() { E.showAlert("Send a workout from the iPhone app.").then(showMain); };
   m[(p.sets ? p.sets + (p.sets == 1 ? " set" : " sets") + " to sync" : "All synced")] = showSyncInfo;
   m["Pair phone"] = showPair;
+  m["Self-test"] = showSelfTest;
   m["Timers"] = function() { require("nsync-tools").open(showMain); };
   m["Mark a moment"] = function() { require("nsync-tools").markers(showMain); };
   m["Retro progress"] = function() { require("nsync-tools").progress(showMain); };

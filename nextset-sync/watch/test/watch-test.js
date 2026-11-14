@@ -424,4 +424,21 @@ step(function() {
   ok(L.markCount().n >= 1, "markers survive the torn write");
 });
 
+// ---- self-test -------------------------------------------------------------
+step(function() {
+  var L = require("nsync");
+  S.write(".boot0", "var bleServices={};/* ... */bleServices['d9a50001-3c1f-4b0e-9f5d-7a1e6c2b8f40']={};");
+  S.writeJSON("setting.json", { timezone: -5, whitelist: ["aa:bb"] });
+  S.write("health", "exports={}"); S.writeJSON("health.json", { hrm: 0 });
+  var r = L.selfTest(), by = {};
+  r.forEach(function(c) { by[c.n.split(" ")[0]] = c; });
+  ok(by.Sync && by.Sync.s == "ok", "self-test: sync service registered at boot");
+  ok(by.Scheduler.s == "ok", "self-test: Scheduler present");
+  ok(by.Whitelist && by.Whitelist.s == "warn", "self-test warns that the whitelist can block an iPhone");
+  ok(by.Heart && by.Heart.s == "warn" && by.Heart.d.indexOf("HRM") >= 0, "self-test points to the Health HRM setting");
+  ok(by.Paired.s == "ok" && by.Clock.s == "ok", "self-test: paired phone and sane clock");
+  S.write(".boot0", "nothing here");
+  ok(L.selfTest().filter(function(c) { return c.n == "Sync service"; })[0].s == "fail", "self-test fails when the bootloader has not included the service");
+});
+
 next();

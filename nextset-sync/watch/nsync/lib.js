@@ -166,6 +166,40 @@ exports.buzz = function(pattern) {
   next();
 };
 
+// ---- self-test (first-day bring-up) ------------------------------------------
+// Each check: { n: name, s: "ok" | "warn" | "fail", d: detail }. Read-only.
+exports.selfTest = function() {
+  var out = [], set = S.readJSON("setting.json", 1) || {};
+  function add(n, st, d) { out.push({ n: n, s: st, d: d || "" }); }
+  var fw = process.env.VERSION || "?";
+  add("Firmware " + fw, /^2v(29|[3-9]\d)/.test(fw) || /^[3-9]v/.test(fw) ? "ok" : "warn", "2v29 or newer recommended");
+  var boot0 = S.read(".boot0") || "";
+  if (boot0.indexOf(SVC) >= 0 && global.NSYNC) add("Sync service", "ok", "registered at boot");
+  else if (boot0.indexOf(SVC) >= 0) add("Sync service", "warn", "restart the watch once");
+  else add("Sync service", "fail", "restart the watch (bootloader update pending)");
+  add("Bluetooth", set.ble === false ? "fail" : "ok", set.ble === false ? "turn on in Settings" : "on");
+  if (set.whitelist && !set.whitelist_disabled) add("Whitelist", "warn", "may block the iPhone: turn off");
+  if (set.passkey && ("" + set.passkey).length == 6) add("Passkey", "warn", "iPhone must bond first");
+  add("Scheduler", S.read("sched") && S.read("sched.boot.js") ? "ok" : "warn", "timers buzz only on-screen without it");
+  var sl = sleeplogInfo();
+  if (!sl.ver) add("Sleep Log", "warn", "install for sleep");
+  else add("Sleep Log " + sl.ver, sl.on ? (sl.ver == "0.26" ? "ok" : "warn") : "warn",
+    !sl.on ? "turn on in its settings" : sl.ver == "0.26" ? "supported" : "tested with 0.26");
+  var hs = S.readJSON("health.json", 1);
+  if (!S.read("health")) add("Health app", "warn", "install for heart rate");
+  else add("Heart rate log", hs && (hs.hrm | 0) > 0 ? "ok" : "warn", hs && (hs.hrm | 0) > 0 ? "polling on" : "Health > HRM interval: 10 min");
+  var free = S.getFree ? S.getFree() : 0;
+  add("Storage " + Math.round(free / 1024) + " KB free", free > 4 * exports.MIN_FREE ? "ok" : free > exports.MIN_FREE ? "warn" : "fail", "");
+  var y = new Date().getFullYear();
+  add("Clock " + y, y >= 2026 ? "ok" : "fail", y >= 2026 ? "" : "connect the App Loader or iPhone");
+  var c = exports.cfg(), np = Object.keys(c.phones).length;
+  add("Paired phones: " + np, np ? "ok" : "warn", np ? "" : "pair from the iPhone app");
+  var pc = exports.pendCount(), mc = exports.markCount();
+  add("Waiting: " + pc.sets + " sets, " + mc.unsynced + " marks", pc.n + mc.unsynced < exports.MAX_PEND / 2 ? "ok" : "warn", "sync soon");
+  if (E.getBattery) { var b = E.getBattery(); add("Battery " + b + "%", b > 20 ? "ok" : "warn", ""); }
+  return out;
+};
+
 function sleeplogInfo() {
   var info = S.readJSON("sleeplog.info", 1);
   var sl = global.sleeplog;
