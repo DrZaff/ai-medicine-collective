@@ -10,6 +10,8 @@ that sentence cites, written the same way:
     a ratio "1:3" must appear as 1:3, in that order;
   - a percentage must be a percentage in the source (44% is not matched by a
     bare 44), and the value must be identical (44% is not matched by 44.3%);
+    a range or comparison may share one % sign ("1.42 vs 1.25%", "64-100%",
+    "from 5 to 10%"), so both of its numbers count as percentages;
   - a minus sign is part of the number (-5% is not 5%), but the hyphen in a
     range such as 5·4-6·9 is not a sign;
   - a magnitude word is part of the number (2.5 million is not 2.5 billion);
@@ -230,12 +232,29 @@ def magnitude(text: str, end: int) -> str:
     return m.group(1).lower() if m else ""
 
 
+# A range or comparison that shares one % sign: "1.42 vs 1.25%", "64-100%",
+# "from 5 to 10%". Only these links; "30 patients and 10%" shares nothing.
+SHARED_PERCENT_LINK = re.compile(r"\s*(?:[-–—]|to\b|vs\b\.?|versus\b)\s*", re.IGNORECASE)
+
+
+def is_percent(text: str, m: re.Match) -> bool:
+    """A percentage written with its own % sign, or sharing the sign of the
+    percentage it is linked to by a range or comparison."""
+    while not m.group("pct"):
+        link = SHARED_PERCENT_LINK.match(text, m.end())
+        nxt = NUMBER.match(text, link.end()) if link else None
+        if not nxt:
+            return False
+        m = nxt
+    return True
+
+
 def _find(value: str, percent: bool, text: str, mag: str = "") -> re.Match | None:
     """The first place `value` appears in normalised source text, written as a
     number on its own (and as a percentage when `percent`), with the same
     magnitude word after it ("2.5 million"), if any."""
     for m in NUMBER.finditer(text):
-        if parts(m)[:2] == (value, percent) and magnitude(text, m.end()) == mag:
+        if parts(m)[0] == value and is_percent(text, m) == percent and magnitude(text, m.end()) == mag:
             return m
     return None
 
@@ -336,6 +355,7 @@ def check(answer: str, texts: dict[int, str]) -> Report:
                 failed_spans.append((r.start(), r.end(), sign + ":".join(terms)))
         for m in claims:
             value, percent, written = parts(m)
+            percent = is_percent(plain, m)   # "1.42 vs 1.25%": the 1.42 is a percentage too
             mag = magnitude(plain, m.end())
             if mag:
                 written = f"{written} {mag}"
