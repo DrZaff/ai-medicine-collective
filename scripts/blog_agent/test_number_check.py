@@ -214,7 +214,12 @@ class CodexFindings(unittest.TestCase):
         # Codex's review of 09c6ee6 (blocking): source text was still split,
         # so the exponent of "3×10−5" could confirm an unrelated "5"
         for src in ("Overall p=3×10−5.", "Overall p=1.2e-5.", "Overall p = 3 x 10^-5.", "Overall p<10⁻⁵.",
-                    "Overall p=10^-5.", "Overall p=3·10⁻⁵.", "Overall p=1·2×10−5."):
+                    "Overall p=10^-5.", "Overall p=3·10⁻⁵.", "Overall p=1·2×10−5.",
+                    # Codex's review of ddc31cf (blocking): superscript plus;
+                    # also dash minus signs and bracketed exponents
+                    "Overall 3×10⁺⁵ scans.", "Overall 10⁺⁵ scans.", "Overall p=3×10–5.",
+                    "Overall p=3×10‑5.", "Overall p=1.2e–5.", "Overall p=10^(−5).",
+                    "Overall p=3×10^(-5).", "Overall p=3·10^(−5)."):
             for answer in ("It ran across 5 sites [1].", "It ran across 3 sites [1].",
                            "It ran across 10 sites [1]."):
                 r = number_check.check(answer, {1: src})

@@ -77,8 +77,10 @@ YEAR_BEFORE = re.compile(
 YEAR_AFTER = re.compile(r"^(?:\s*$|\s*[,.;:)!?])")
 # Scientific notation in any form: 1.2e-5, 3×10−4, 3 x 10^-4, 10⁻⁵. The
 # checker does not read it, so every number in such a sentence is unverified.
+SCI_SIGN = r"[-+‐-―−⁺⁻]"     # any plus or minus: hyphen, dashes, superscripts
+SCI_SUP = r"[⁰-⁹¹²³⁺⁻]"  # superscript digits and signs
 SCIENTIFIC = re.compile(
-    r"\d\s*[eE]\s*[-+\u2212]?\s*\d|\d\s*[×xX*·]\s*10\b|\b10\s*(?:\^|\*\*|[\u207b\u2070-\u2079\u00b9\u00b2\u00b3])")
+    rf"\d\s*[eE]\s*{SCI_SIGN}?\s*\d|\d\s*[×xX*·]\s*10\b|\b10\s*(?:\^|\*\*|{SCI_SUP})")
 # Digits of any kind, including superscripts, for the "left over" check
 ANY_DIGIT = re.compile(r"[0-9\u2070-\u2079\u00b9\u00b2\u00b3]")
 
@@ -126,15 +128,16 @@ def numbers_in(text: str) -> list[tuple[str, bool, str]]:
 # A whole scientific-notation expression in a source (3×10−5, 1.2e-5,
 # 3 x 10^-5, 10^-3, 10⁻⁵). The checker does not read it, so it is masked
 # before matching: none of its digits may confirm a number in an answer.
+# An exponent written after 10: "^-5", "**(-5)", "–5", "⁻⁵", "⁺⁵"
+SCI_EXP = rf"\s*(?:\^|\*\*)?\s*[({{]?\s*{SCI_SIGN}?\s*(?:\d+|{SCI_SUP}+)\s*[)}}]?"
 SOURCE_SCIENTIFIC = re.compile(
-    r"\d+(?:\.\d+)?\s*(?:[eE]\s*[-+−]?\s*\d+"
-    r"|[×xX*]\s*10\s*(?:\^|\*\*)?\s*[-+−⁻]?\s*[0-9⁰-⁹¹²³]*)"
-    r"|\b10\s*(?:\^|\*\*)\s*[-+−]?\s*\d+"
-    r"|\b10[⁻⁰-⁹¹²³]+")
+    rf"\d+(?:\.\d+)?\s*(?:[eE]\s*{SCI_SIGN}?\s*\d+|[×xX*]\s*10(?:{SCI_EXP})?)"
+    rf"|\b10\s*(?:\^|\*\*)\s*[({{]?\s*{SCI_SIGN}?\s*\d+\s*[)}}]?"
+    rf"|\b10\s*{SCI_SUP}+")
 # "3·10⁻⁵" (a middle dot as the times sign, exponent written) is masked
 # before middle dots become decimal points.
 SOURCE_SCIENTIFIC_DOT = re.compile(
-    r"\d+(?:[.·]\d+)?\s*·\s*10\s*(?:(?:\^|\*\*)\s*[-+−]?\s*\d+|[⁻⁰-⁹¹²³]+)")
+    rf"\d+(?:[.·]\d+)?\s*·\s*10\s*(?:(?:\^|\*\*)\s*[({{]?\s*{SCI_SIGN}?\s*\d+\s*[)}}]?|{SCI_SUP}+)")
 
 
 def normalise_source(text: str) -> str:
