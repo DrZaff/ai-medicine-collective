@@ -285,6 +285,31 @@ class CodexFindings(unittest.TestCase):
         self.assertFalse(number_check.check("Scores rose on 30 of 32 axes [1].",
                                             {1: "Scores rose on 30 / 32 axes."}).needs_fact_check)
 
+    def test_codex_followups_of_a11983e(self):
+        # 1. a source pair inside a chain joined by "of", "in" or "out of"
+        for src in ("Arms 1 of 2 of 3; 2 and 3.", "Arms 2 of 3 of 4; 2 and 3.", "Arms 1 in 2 in 3; 2 and 3.",
+                    "Arms 1 out of 2 out of 3; 2 and 3."):
+            self.assertTrue(number_check.check("It was 2 of 3 [1].", {1: src}).needs_fact_check, src)
+        # 2. a source ratio after a minus sign
+        r = number_check.check("The ratio was 1:2 [1].", {1: "The ratio was −1:2; 1 and 2 arms."})
+        self.assertTrue(r.needs_fact_check)
+        for src in ("The ratio was 3 : 1:2; 1 and 2 arms.", "The ratio was 1:2 : 3; 1 and 2 arms."):
+            self.assertTrue(number_check.check("The ratio was 1:2 [1].", {1: src}).needs_fact_check, src)
+        # 3. a signed answer pair or ratio must appear signed in the source
+        for answer, src in (("It changed by −3 of 10 [1].", "It changed by 3 of 10; −3 overall."),
+                            ("It changed by -3 of 10 [1].", "It changed by 3 of 10; -3 overall."),
+                            ("The ratio was −1:2 [1].", "The ratio was 1:2; −1 overall.")):
+            self.assertTrue(number_check.check(answer, {1: src}).needs_fact_check, answer)
+        for answer, src in (("It changed by −3 of 10 [1].", "It changed by −3 of 10."),
+                            ("It changed by -3 of 10 [1].", "It changed by −3 of 10."),
+                            ("The ratio was −1:2 [1].", "The ratio was -1:2.")):
+            self.assertFalse(number_check.check(answer, {1: src}).needs_fact_check, (answer, src))
+
+    def test_ordinary_pairs_still_match_after_the_followups(self):
+        src = "AMIE was better on 30 out of 32 axes in 2024, and 25 of 26 in 159 cases; allocation 1:2."
+        r = number_check.check("AMIE was better on 30 of 32 axes, 25 out of 26, with allocation 1:2 [1].", {1: src})
+        self.assertFalse(r.needs_fact_check, r.results)
+
     def test_unreadable_leftover_digits_fail_closed(self):
         r = number_check.check("The effect was 2³ times larger [1].", {1: "2 times larger"})
         self.assertTrue(r.needs_fact_check)
