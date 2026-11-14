@@ -158,6 +158,47 @@ class CodexFindings(unittest.TestCase):
         r = number_check.check("Readers agreed on 30 of 1 200 cases [1].", {1: "They agreed on 30 out of 1 200 cases."})
         self.assertEqual(set(statuses(r).values()), {"found"})
 
+    def test_leading_decimal_numbers_are_checked(self):
+        # Codex's review of f5e935b (blocking): ".05" was not read as a number
+        r = number_check.check("The difference was significant (p<.05) [1].", {1: MASAI})
+        self.assertEqual(statuses(r), {".05": "unverified"})
+        self.assertTrue(r.needs_fact_check)
+        r = number_check.check("The ratio's p value was .052 [1].", {1: MASAI})   # MASAI writes p=0·052
+        self.assertEqual(statuses(r), {".052": "found"})
+
+    def test_in_pairs_are_checked_as_pairs(self):
+        # Codex's review of f5e935b: "30 in 32" was checked as two loose numbers
+        src = "Readers agreed in 30 out of 320 cases. 32 readers took part."
+        r = number_check.check("Readers agreed in 30 in 32 cases [1].", {1: src})
+        self.assertTrue(r.needs_fact_check)
+        self.assertIn('"30 of 32"', r.results[0].reason)
+
+    def test_signs_are_kept_and_range_hyphens_are_not_signs(self):
+        src = "Readmissions fell (change −5%). The CI was 5·4-6·9."
+        r = number_check.check("Readmissions rose by 5% [1].", {1: src})
+        self.assertTrue(r.needs_fact_check)          # 5% is not -5%
+        r = number_check.check("Readmissions changed by −5% [1].", {1: src})
+        self.assertFalse(r.needs_fact_check)
+        r = number_check.check("The interval reached 6.9 [1].", {1: src})   # 6·9 after a range hyphen
+        self.assertFalse(r.needs_fact_check)
+
+    def test_ratios_must_match_in_order(self):
+        # Found while fixing f5e935b: "1:3" was two loose numbers, so "3:1" passed
+        r = number_check.check("Cases were randomised 1:3 [1].", {1: "Cases were randomised 3:1."})
+        self.assertTrue(r.needs_fact_check)
+        self.assertIn('"1:3"', r.results[0].reason)
+        r = number_check.check("Cases were randomised 1:3 [1].", {1: "Cases were randomised 1:3 to the arms."})
+        self.assertFalse(r.needs_fact_check)
+
+    def test_magnitude_words_are_part_of_the_number(self):
+        # Found while fixing f5e935b: "2.5 million" was matched by "2.5 billion"
+        src = "The model was trained on 2.5 billion tokens."
+        r = number_check.check("It was trained on 2.5 million tokens [1].", {1: src})
+        self.assertTrue(r.needs_fact_check)
+        self.assertEqual(r.results[0].number, "2.5 million")
+        r = number_check.check("It was trained on 2.5 billion tokens [1].", {1: src})
+        self.assertFalse(r.needs_fact_check)
+
     def test_next_sentence_citation_does_not_cover_an_uncited_sentence(self):
         # Sentences starting with a digit or a lowercase word used not to split
         r = number_check.check("AMIE won on 30 axes. 25 out of 26 axes favoured it too [1].", {1: AMIE})

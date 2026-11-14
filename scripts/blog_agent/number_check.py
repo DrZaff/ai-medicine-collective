@@ -5,14 +5,23 @@ text (PubMed Central full text or the PubMed abstract, through NCBI's API) and
 passes it here. Every number in a sentence must appear in the text of a source
 that sentence cites, written the same way:
 
-  - "X of Y", "X out of Y" and "X/Y" must appear as that pair in the source,
-    so a number with the wrong denominator is not accepted;
+  - "X of Y", "X out of Y", "X in Y" and "X/Y" must appear as that pair in
+    the source (any of those forms), so a wrong denominator is not accepted;
+    a ratio "1:3" must appear as 1:3, in that order;
   - a percentage must be a percentage in the source (44% is not matched by a
     bare 44), and the value must be identical (44% is not matched by 44.3%);
-  - thousands separators and the Lancet's middle dot are normalised
-    (80,033 = 80 033, 0.052 = 0·052), nothing else is;
+  - a minus sign is part of the number (-5% is not 5%), but the hyphen in a
+    range such as 5·4-6·9 is not a sign;
+  - a magnitude word is part of the number (2.5 million is not 2.5 billion);
+  - thousands separators (comma or any kind of space), the Lancet's middle
+    dot and a bare leading decimal are normalised (80,033 = 80 033,
+    0.052 = 0·052 = .052), nothing else is;
   - citation markers such as [1] or [2, 3] are not numbers;
-  - a four-digit year is listed but not counted as a quantitative claim.
+  - a four-digit number is a year (listed, not counted) only with year words
+    before it and no counted noun after it ("in 2024,", "(2024)").
+
+Not seen at all: numbers written as words ("forty"), units (5 mg vs 5 g),
+and what a number measures; a reviewer checks those.
 
 Anything else fails closed as "unverified": a number missing from the cited
 source text (even if another source has it), a sentence with a number and no
@@ -29,18 +38,27 @@ import re
 from dataclasses import dataclass, field
 
 CITATION = re.compile(r"\[\s*\d+(?:\s*[,–-]\s*\d+)*\s*\]")
-# A number: digits with optional thousands groups and decimals (dot or middle
-# dot), optionally a percentage. Not part of a longer word or number.
+# A number: an optional sign, digits with optional thousands groups (comma or
+# any kind of space) and decimals (dot or middle dot), or a leading-decimal
+# number such as .05; optionally a percentage. Not part of a longer word or
+# number. A minus sign counts only where it is a sign, so the hyphen in a
+# range like 5·4-6·9 (a digit before it) is not read as one.
+SEP = "[,    ]"
 NUMBER = re.compile(
-    r"(?<![\w.·])(\d{1,3}(?:[,    ]\d{3})+|\d+)([.·]\d+)?(\s?%|\s?per\s?cent\b|\s?percent\b)?(?![\w·])",
+    r"(?<![\w.·])(?P<sign>[−–+-])?(?=[.·]?\d)"
+    rf"(?P<int>\d{{1,3}}(?:{SEP}\d{{3}})+|\d+)?(?P<dec>[.·]\d+)?"
+    r"(?P<pct>\s?%|\s?per\s?cent\b|\s?percent\b)?(?![\w·])",
     re.IGNORECASE)
-# One number as NUMBER reads it (thousands groups with a comma or any kind of
-# space, optional decimals), so a pair never stops at "1" in "1 200".
-NUM = r"(?:\d{1,3}(?:[,    ]\d{3})+|\d+)(?:[.·]\d+)?"
-PAIR = re.compile(rf"(?<![\w.·])({NUM})\s*(?:out of|of|/)\s*({NUM})(?![\w·])", re.IGNORECASE)
+# One unsigned number as NUMBER reads it, for pairs, so a pair never stops at
+# "1" in "1 200" and reads ".5 of 2" whole.
+NUM = rf"(?:(?:\d{{1,3}}(?:{SEP}\d{{3}})+|\d+)(?:[.·]\d+)?|[.·]\d+)"
+PAIR = re.compile(rf"(?<![\w.·])({NUM})\s*(out of|of|in|/|:)\s*({NUM})(?![\w·])", re.IGNORECASE)
 # The pair in source text: whole numbers on both sides, so "130 out of 32"
 # does not count as "30 of 32" and "30 of 320" not as "30 of 32".
-SOURCE_PAIR = r"(?<![\w.·,]){a}\s*(?:out of|of|/|in)\s*{b}(?!\d|[.·]\d)"   # a full stop may follow, a decimal may not
+SOURCE_PAIR = r"(?<![\w.·,]){a}\s*{sep}\s*{b}(?!\d|[.·]\d)"   # a full stop may follow, a decimal may not
+PAIR_WORDS = "(?:out of|of|/|in)"   # "30 of 32" may be written any of these ways; a ratio "1:3" only as 1:3
+# A magnitude word after a number is part of it: "2.5 million" is not "2.5 billion"
+MAGNITUDE = re.compile(r"^\s*(thousand|million|billion|trillion)\b", re.IGNORECASE)
 YEAR = re.compile(r"^(19|20)\d\d$")
 # A year needs year words before it ("in 2024", "since 2019", "March 2024",
 # "(2024)") AND nothing it could be counting after it: "in 2024," or
@@ -58,24 +76,39 @@ def is_year(text: str, m: re.Match) -> bool:
     """A four-digit number written without separators, with year words before
     it and no counted noun after it. "2,024 patients", "1999 patients" and
     "a cohort of 2024 patients" are counts, checked like any other number."""
-    written = m.group(1)
-    if not YEAR.match(written) or m.group(2) or m.group(3):
+    written = m.group("int") or ""
+    if not YEAR.match(written) or m.group("sign") or m.group("dec") or m.group("pct"):
         return False
     before = YEAR_BEFORE.search(text[max(0, m.start() - 16):m.start()])
     return bool(before and YEAR_AFTER.match(text[m.end():m.end() + 16]))
 
 
-def canon(digits: str, decimals: str | None = None) -> str:
-    """A number as one comparable string: no thousands separators, dot decimal."""
-    whole = re.sub(r"[,    ]", "", digits)
-    return whole + (("." + decimals[1:]) if decimals else "")
+def canon(digits: str | None, decimals: str | None = None, sign: str | None = None) -> str:
+    """A number as one comparable string: no thousands separators, dot
+    decimal, a leading 0 before a bare decimal (.05 = 0.05), "-" for any
+    minus sign ("+" is dropped)."""
+    whole = re.sub(SEP, "", digits or "") or "0"
+    minus = "-" if sign and sign != "+" else ""
+    return minus + whole + (("." + decimals[1:]) if decimals else "")
+
+
+def parts(m: re.Match) -> tuple[str, bool, str]:
+    """(canonical value, is_percent, as written) for one NUMBER match."""
+    return canon(m.group("int"), m.group("dec"), m.group("sign")), bool(m.group("pct")), m.group(0).strip()
+
+
+def canon_token(token: str) -> str:
+    """A pair's number (unsigned) in canonical form."""
+    token = token.replace("·", ".").rstrip(".,")
+    whole, _, dec = token.partition(".")
+    return canon(whole, "." + dec if dec else None)
 
 
 def numbers_in(text: str) -> list[tuple[str, bool, str]]:
     """(canonical value, is_percent, as written) for each number in the text."""
     found = []
     for m in NUMBER.finditer(text):
-        found.append((canon(m.group(1), m.group(2)), bool(m.group(3)), m.group(0).strip()))
+        found.append(parts(m))
     return found
 
 
@@ -112,11 +145,18 @@ def _excerpt(text: str, start: int, end: int, width: int = 90) -> str:
     return ("…" if a else "") + " ".join(text[a:b].split()) + ("…" if b < len(text) else "")
 
 
-def _find(value: str, percent: bool, text: str) -> re.Match | None:
+def magnitude(text: str, end: int) -> str:
+    """The magnitude word right after a number ("million"), lowercased, or ""."""
+    m = MAGNITUDE.match(text[end:end + 14])
+    return m.group(1).lower() if m else ""
+
+
+def _find(value: str, percent: bool, text: str, mag: str = "") -> re.Match | None:
     """The first place `value` appears in normalised source text, written as a
-    number on its own (and as a percentage when `percent`)."""
+    number on its own (and as a percentage when `percent`), with the same
+    magnitude word after it ("2.5 million"), if any."""
     for m in NUMBER.finditer(text):
-        if canon(m.group(1), m.group(2)) == value and bool(m.group(3)) == percent:
+        if parts(m)[:2] == (value, percent) and magnitude(text, m.end()) == mag:
             return m
     return None
 
@@ -158,13 +198,15 @@ def check(answer: str, texts: dict[int, str]) -> Report:
         # the sentence cannot clear a failed one.
         failed_spans = []   # (start, end, "a of b") of pairs not found
         for p in PAIR.finditer(plain):
-            a = canon(p.group(1).replace("·", ".").rstrip(".,"))
-            b = canon(p.group(2).replace("·", ".").rstrip(".,"))
-            pattern = SOURCE_PAIR.format(a=re.escape(a), b=re.escape(b))
+            a, b, ratio = canon_token(p.group(1)), canon_token(p.group(3)), p.group(2) == ":"
+            pattern = SOURCE_PAIR.format(a=re.escape(a), b=re.escape(b), sep=":" if ratio else PAIR_WORDS)
             if not any(re.search(pattern, joined.get(n, ""), re.IGNORECASE) for n in cited):
-                failed_spans.append((p.start(), p.end(), f"{a} of {b}"))
+                failed_spans.append((p.start(), p.end(), f"{a}:{b}" if ratio else f"{a} of {b}"))
         for m in claims:
-            value, percent, written = canon(m.group(1), m.group(2)), bool(m.group(3)), m.group(0).strip()
+            value, percent, written = parts(m)
+            mag = magnitude(plain, m.end())
+            if mag:
+                written = f"{written} {mag}"
             base = dict(number=written, sentence=sentence.strip(), cited=cited)
             if is_year(plain, m) and not percent:
                 report.results.append(NumberResult(**base, status="year", reason="a year, not checked"))
@@ -181,7 +223,7 @@ def check(answer: str, texts: dict[int, str]) -> Report:
             missing = [n for n in cited if not texts.get(n)]
             hit = None
             for n in cited:
-                m = _find(value, percent, texts.get(n, "")) if texts.get(n) else None
+                m = _find(value, percent, texts.get(n, ""), mag) if texts.get(n) else None
                 if m:
                     hit = (n, m)
                     break
@@ -193,7 +235,7 @@ def check(answer: str, texts: dict[int, str]) -> Report:
             if missing and len(missing) == len(cited):
                 reason = "the cited source's text could not be retrieved"
             else:
-                elsewhere = [k for k, t in texts.items() if k not in cited and t and _find(value, percent, t)]
+                elsewhere = [k for k, t in texts.items() if k not in cited and t and _find(value, percent, t, mag)]
                 hints = [h for n in cited for h in _near(value, percent, texts.get(n, ""))]
                 reason = "not found in the cited source text"
                 if elsewhere:
