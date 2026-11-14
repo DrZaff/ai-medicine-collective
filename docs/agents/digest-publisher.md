@@ -1,6 +1,6 @@
 # Digest publisher app and turning on protection for `main`
 
-Status: **plan, nothing changed** (issue #171, 2026-11-11). Both `main` rulesets are disabled; the app does not exist yet. Every step below is the owner's to perform, and the rulesets go on only after the owner says so.
+Status (2026-11-14): phases 1 to 3 done; phase 4 **in progress**. "Main - Owner Merge Only" (26914500) is **Active** on `main`, with the AMC Digest Publisher app (Always) and the owner (pull requests only) as its only bypass actors; "Protect Main - Human Approval Required" (26913560) stays disabled. Billy's negative test against the live ruleset passed ([billy.md](billy.md)). Still to do: the owner's own checks and the first Friday digest push under the ruleset (phase 4 below). The plan was written for issue #171 on 2026-11-11; every step is the owner's to perform.
 
 ## Why it is needed
 
@@ -17,7 +17,7 @@ What already works as intended:
 
 Findings that need the owner's attention:
 1. **The environment may already exist, unprotected.** GitHub creates a job's environment automatically, with no branch rule, the first time the job runs, and this job has run every week. Before adding any secret, open it and set the branch rule (checklist step 3). Until then, any branch's run of a job naming it could read secrets put there.
-2. **Netlify production publishing is locked.** The Moderation page loads the digest from the live site (`newsletter/latest.json`). While the lock is on, a newly published issue will not appear there, so the end-to-end test in phase 2 cannot finish. Decide whether to lift the lock for that test, or publish one deploy by hand in Netlify.
+2. ~~**Netlify production publishing is locked.**~~ **Resolved:** the owner unlocked it on 2026-11-14, so every merge to `main` publishes again. The Moderation page loads the digest from the live site (`newsletter/latest.json`). While the lock is on, a newly published issue will not appear there, so the end-to-end test in phase 2 cannot finish. Decide whether to lift the lock for that test, or publish one deploy by hand in Netlify.
 3. **Two rulesets disagree.** Turned on together, the stricter of each rule applies, which is hard to reason about:
 
    | Setting | Main - Owner Merge Only (26914500) | Protect Main - Human Approval Required (26913560) |
@@ -76,20 +76,23 @@ Residual risks: a future workflow on `main` naming `digest-publish`; the `create
 
 ## Safe test order
 
-**Phase 1, set up** (checklist above). Rulesets still disabled.
+**Phase 1, set up** (checklist above). Rulesets still disabled. **Done.**
 
 **Phase 2, publish once with the app, rulesets disabled.** Wait for the normal Friday run (a manual run on another day publishes an extra issue dated that day). Then check:
 - Actions > Weekly digest > that run: the step "Get a token for the digest publisher App" ran, and there is no notice "The digest publisher App is not set up yet".
 - The push was made by the app (see "How to check who pushed"), and the commit's author is the app's bot account, not github-actions. A warning "Could not look up the App's bot account" in the log means the push still worked but the author lookup did not.
 - Organizers got the "ready to send" email; **no member was emailed**. Members are emailed only after an admin loads the issue on the Moderation page and presses Send (this needs the live site, finding 2).
 - If the run fails, the organizers get the failure email and nothing on `main` changes; fix the setup and re-run it. No ruleset is involved yet.
+- **Done:** the app's live test run passed (Weekly digest, run 19).
 
-**Phase 3, prepare the ruleset, still disabled.** Edit "Main - Owner Merge Only" per the table: add **AMC Digest Publisher** to the bypass list with **Always**; leave the owner's pull-request-only entry; change nothing else unless decided. Save, still **Disabled**. Ask Claude to read the ruleset back from GitHub and confirm the bypass list.
+**Phase 3, prepare the ruleset, still disabled.** Edit "Main - Owner Merge Only" per the table: add **AMC Digest Publisher** to the bypass list with **Always**; leave the owner's pull-request-only entry; change nothing else unless decided. Save, still **Disabled**. Ask Claude to read the ruleset back from GitHub and confirm the bypass list. **Done (2026-11-14):** checked from the owner's screen recording: AMC Digest Publisher "Always allow", DrZaff "Allow for pull requests only", no Billy or github-actions, target the default branch.
 
 **Phase 4, turn it on (owner's explicit go-ahead), then test.** Pick a time away from Friday afternoon. Set enforcement to **Active**. Then:
 - *Negative*: on github.com, edit any file on `main` and try "Commit directly to the main branch"; GitHub should only offer a new branch. On the branches page, deleting `main` should be refused. On an open Billy PR, before approving, the merge box should say merging is blocked; as owner you'll see the bypass option, which you don't use.
 - *Positive*: approve and merge a Billy PR normally. On the next Friday, the digest run succeeds and pushes as the app.
 - *Rollback*: if either positive test fails, set the ruleset back to **Disabled** and re-run what failed.
+
+Progress (2026-11-14): the ruleset is **Active**, and GitHub's rules endpoint shows its five rules on `main`. **Billy's negative test passed** against the live ruleset: with `billy-test/protected-target` added to it for the test, Billy's direct push, its merge of an unapproved PR (#194) and its branch deletion were all refused, and `main` did not change (procedure and results in [billy.md](billy.md)). **Still open:** the owner's own negative checks above, approving and merging a PR normally, and the next Friday digest run pushing as the app.
 
 ## How to check who pushed (the ambiguous part)
 
