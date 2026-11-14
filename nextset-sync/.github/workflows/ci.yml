@@ -74,6 +74,20 @@ jobs:
         run: swift --version
       - name: All tests (watch code in Espruino 2v29, Swift core, bridge)
         run: scripts/run-tests.sh
+      # Every watch screen from the official Bangle.js 2 emulator (firmware 2v29
+      # compiled to WebAssembly), so layouts can be reviewed without the watch.
+      - name: Watch screenshots (Bangle.js 2 emulator)
+        run: |
+          git init -q "$RUNNER_TEMP/ide"
+          git -C "$RUNNER_TEMP/ide" fetch -q --depth 1 https://github.com/espruino/EspruinoWebIDE 4a1a36528eb1e068a7cddf16eeb2f41b5028bb22
+          git -C "$RUNNER_TEMP/ide" checkout -q FETCH_HEAD
+          IDE="$RUNNER_TEMP/ide" node watch/test/screens.cjs screens
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: watch-screens
+          path: screens
+          retention-days: 30
       # Ready-to-install watch files: download this artifact, unzip, then in the
       # App Loader choose More > Install App from Files and select them all.
       - uses: actions/upload-artifact@v4

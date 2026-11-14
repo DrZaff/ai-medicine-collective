@@ -357,8 +357,10 @@ function showPair() {
   screen = "pair";
   Bangle.setUI();
   var give = setTimeout(function() { delete global.NSYNC_PAIR; showMain(); }, 120000);
-  E.showMenu({ "": { title: "Pair phone", back: function() { clearTimeout(give); delete global.NSYNC_PAIR; showMain(); } },
-    "Waiting for iPhone": function() {}, "Open NextSet Sync,": function() {}, "tap Pair Watch": function() {} });
+  function cancel() { clearTimeout(give); delete global.NSYNC_PAIR; showMain(); }
+  // Plain instructions (not menu rows that look tappable); the button cancels.
+  E.showMessage("On the iPhone:\nNextSet Sync >\nWatch > Pair Watch\n\nWaiting 2 min...\n(button: cancel)", "Pair phone");
+  Bangle.setUI({ mode: "custom", btn: function() { if (Date.now() - lastUnlock >= 400) cancel(); } });
   global.NSYNC_PAIR = function(name, code, cb) {
     clearTimeout(give);
     delete global.NSYNC_PAIR;
@@ -375,7 +377,7 @@ function showSyncInfo() {
   var c = L.cfg(), p = L.pendCount(), sl = L.sleeplogInfo();
   var conn = NRF.getSecurityStatus ? NRF.getSecurityStatus().connected : false;
   var m = { "": { title: "Sync", back: showMain } };
-  m["Waiting: " + p.sets + " sets"] = function() {};
+  m["Waiting: " + p.sets + (p.sets == 1 ? " set" : " sets")] = function() {};
   m["Other records: " + (p.n - p.sets)] = function() {};
   m["Phone: " + (conn ? "connected" : "not connected")] = function() {};
   m["Last sync: " + (c.lastSync ? require("locale").time(new Date(c.lastSync), 1) : "never")] = function() {};

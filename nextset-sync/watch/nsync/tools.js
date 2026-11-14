@@ -152,7 +152,7 @@ function progress() {
     g.reset().setColor("#102").fillRect(0, 0, 175, 175);
     g.setColor("#ff8").setFont("Vector", 42).setFontAlign(0, 0).drawString(time, 88, 46);
     g.setColor("#0ff").setFont("6x15").drawString(steps + " STEPS", 88, 92);
-    g.setColor("#faf").drawString(pending.sets + " SETS TO SYNC", 88, 116);
+    g.setColor("#faf").drawString(pending.sets ? pending.sets + (pending.sets == 1 ? " SET" : " SETS") + " TO SYNC" : "ALL SYNCED", 88, 116);
     if (t) g.setColor("#ff0").drawString(t.title + " " + clock(t.end - Date.now()), 88, 140);
   }
   Bangle.setUI({ mode: "custom", btn: function() { if (!justUnlocked()) leave(); }, remove: stopTick });
