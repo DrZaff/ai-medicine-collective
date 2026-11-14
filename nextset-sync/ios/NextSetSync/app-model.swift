@@ -374,6 +374,20 @@ final class AppModel {
 
     // MARK: workouts and files
 
+    func restoreBackup(from url: URL) {
+        let accessible = url.startAccessingSecurityScopedResource()
+        defer {
+            if accessible { url.stopAccessingSecurityScopedResource() }
+            revision += 1
+        }
+        do {
+            let changed = try store.restoreBackup(Data(contentsOf: url))
+            notice = changed ? "Backup merged." : "This backup is already restored."
+        } catch {
+            errorMessage = "Could not finish restoring the backup. \(error.localizedDescription)"
+        }
+    }
+
     func save(_ w: Workout) {
         do { try store.saveWorkout(w); revision += 1 } catch { errorMessage = error.localizedDescription }
     }

@@ -162,6 +162,7 @@ struct NightCard: View {
 struct SettingsView: View {
     @Environment(AppModel.self) private var model
     @State private var importingSleep = false
+    @State private var importingBackup = false
 
     var body: some View {
         NavigationStack {
@@ -172,6 +173,14 @@ struct SettingsView: View {
                     Text("Demo mode uses a simulated watch and separate sample data, so you can try every screen now. Your real data is kept apart and untouched.")
                 }
                 Section("Data on this iPhone") {
+                    ShareLink("Export backup (JSON)", item: LocalBackupFile(store: model.store), preview: SharePreview("NextSet Sync backup"))
+                    Button("Restore backup") { importingBackup = true }
+                        .fileImporter(isPresented: $importingBackup, allowedContentTypes: [.json]) { result in
+                            switch result {
+                            case .success(let url): model.restoreBackup(from: url)
+                            case .failure(let error): model.errorMessage = error.localizedDescription
+                            }
+                        }
                     ShareLink("Export set history (CSV)", item: SetHistoryCSV(sets: model.allSets), preview: SharePreview("Set history (CSV)"))
                     Button("Import a Sleep Log file") { importingSleep = true }
                     Text("For sleeplog.log or sleeplog_NNNN.log downloaded with the Espruino Web IDE. Normal syncing does this over Bluetooth.")
