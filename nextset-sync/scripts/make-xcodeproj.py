@@ -13,7 +13,9 @@ BUNDLE_ID = "com.zaffuto.nextsetsync"
 I = {k: "4E53" + format(n, "020X") for n, k in enumerate([
     "project", "buildfile_core", "productdep_core", "app_ref", "plist_ref", "ent_ref", "sync_group",
     "frameworks", "main_group", "products", "config_group", "target", "sources", "resources",
-    "proj_cfgs", "proj_debug", "proj_release", "tgt_cfgs", "tgt_debug", "tgt_release", "pkg_ref"], start=1)}
+    "proj_cfgs", "proj_debug", "proj_release", "tgt_cfgs", "tgt_debug", "tgt_release", "pkg_ref",
+    "ui_group", "ui_ref", "ui_target", "ui_sources", "ui_cfgs", "ui_debug", "ui_release",
+    "ui_dependency", "ui_proxy"], start=1)}
 assert all(len(v) == 24 for v in I.values())
 
 common = {
@@ -37,6 +39,14 @@ target = {
     "SUPPORTED_PLATFORMS": "\"iphoneos iphonesimulator\"", "SUPPORTS_MACCATALYST": "NO",
     "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO", "SWIFT_EMIT_LOC_STRINGS": "YES", "TARGETED_DEVICE_FAMILY": "1",
 }
+ui_settings = {
+    "GENERATE_INFOPLIST_FILE": "YES",
+    "PRODUCT_BUNDLE_IDENTIFIER": BUNDLE_ID + ".uitests",
+    "PRODUCT_NAME": '"$(TARGET_NAME)"',
+    "SUPPORTED_PLATFORMS": "iphonesimulator",
+    "TARGETED_DEVICE_FAMILY": "1",
+    "TEST_TARGET_NAME": "NextSetSync",
+}
 
 def cfg(id_, name, settings):
     body = "".join(f"\t\t\t\t{k} = {v};\n" for k, v in sorted(settings.items()))
@@ -50,6 +60,10 @@ pbx = f"""// !$*UTF8*$!
 	objectVersion = 77;
 	objects = {{
 
+/* Begin PBXContainerItemProxy section */
+		{I['ui_proxy']} = {{isa = PBXContainerItemProxy; containerPortal = {I['project']}; proxyType = 1; remoteGlobalIDString = {I['target']}; remoteInfo = NextSetSync; }};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXBuildFile section */
 		{I['buildfile_core']} /* NextSetSyncCore in Frameworks */ = {{isa = PBXBuildFile; productRef = {I['productdep_core']} /* NextSetSyncCore */; }};
 /* End PBXBuildFile section */
@@ -57,9 +71,11 @@ pbx = f"""// !$*UTF8*$!
 /* Begin PBXFileReference section */
 		{I['app_ref']} /* NextSetSync.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NextSetSync.app; sourceTree = BUILT_PRODUCTS_DIR; }};
 		{I['plist_ref']} /* info.plist */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = info.plist; sourceTree = "<group>"; }};
+		{I['ui_ref']} = {{isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextSetSyncUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; }};
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		{I['ui_group']} = {{isa = PBXFileSystemSynchronizedRootGroup; path = NextSetSyncUITests; sourceTree = "<group>"; }};
 		{I['sync_group']} /* NextSetSync */ = {{
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = NextSetSync;
@@ -83,6 +99,7 @@ pbx = f"""// !$*UTF8*$!
 			isa = PBXGroup;
 			children = (
 				{I['sync_group']} /* NextSetSync */,
+				{I['ui_group']} /* NextSetSyncUITests */,
 				{I['config_group']} /* config */,
 				{I['products']} /* Products */,
 			);
@@ -92,6 +109,7 @@ pbx = f"""// !$*UTF8*$!
 			isa = PBXGroup;
 			children = (
 				{I['app_ref']} /* NextSetSync.app */,
+				{I['ui_ref']} /* NextSetSyncUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -107,6 +125,18 @@ pbx = f"""// !$*UTF8*$!
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		{I['ui_target']} /* NextSetSyncUITests */ = {{
+			isa = PBXNativeTarget;
+			buildConfigurationList = {I['ui_cfgs']};
+			buildPhases = ({I['ui_sources']},);
+			buildRules = ();
+			dependencies = ({I['ui_dependency']},);
+			fileSystemSynchronizedGroups = ({I['ui_group']},);
+			name = NextSetSyncUITests;
+			productName = NextSetSyncUITests;
+			productReference = {I['ui_ref']};
+			productType = "com.apple.product-type.bundle.ui-testing";
+		}};
 		{I['target']} /* NextSetSync */ = {{
 			isa = PBXNativeTarget;
 			buildConfigurationList = {I['tgt_cfgs']} /* Build configuration list for PBXNativeTarget "NextSetSync" */;
@@ -140,6 +170,7 @@ pbx = f"""// !$*UTF8*$!
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {{
+					{I['ui_target']} = {{ CreatedOnToolsVersion = 16.0; TestTargetID = {I['target']}; }};
 					{I['target']} = {{
 						CreatedOnToolsVersion = 16.0;
 					}};
@@ -163,6 +194,7 @@ pbx = f"""// !$*UTF8*$!
 			projectRoot = "";
 			targets = (
 				{I['target']} /* NextSetSync */,
+				{I['ui_target']} /* NextSetSyncUITests */,
 			);
 		}};
 /* End PBXProject section */
@@ -178,6 +210,7 @@ pbx = f"""// !$*UTF8*$!
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		{I['ui_sources']} = {{isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; }};
 		{I['sources']} /* Sources */ = {{
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -187,10 +220,15 @@ pbx = f"""// !$*UTF8*$!
 		}};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		{I['ui_dependency']} = {{isa = PBXTargetDependency; target = {I['target']}; targetProxy = {I['ui_proxy']}; }};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-{cfg(I['proj_debug'], 'Debug', debug)}{cfg(I['proj_release'], 'Release', release)}{cfg(I['tgt_debug'], 'Debug', target)}{cfg(I['tgt_release'], 'Release', target)}/* End XCBuildConfiguration section */
+{cfg(I['proj_debug'], 'Debug', debug)}{cfg(I['proj_release'], 'Release', release)}{cfg(I['tgt_debug'], 'Debug', target)}{cfg(I['tgt_release'], 'Release', target)}{cfg(I['ui_debug'], 'Debug', ui_settings)}{cfg(I['ui_release'], 'Release', ui_settings)}/* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		{I['ui_cfgs']} = {{isa = XCConfigurationList; buildConfigurations = ({I['ui_debug']}, {I['ui_release']},); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; }};
 		{I['proj_cfgs']} /* Build configuration list for PBXProject "nextset-sync" */ = {{
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -241,8 +279,8 @@ scheme = f"""<?xml version="1.0" encoding="UTF-8"?>
    </BuildAction>
    <TestAction buildConfiguration = "Debug" selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB" shouldUseLaunchSchemeArgsEnv = "YES" shouldAutocreateTestPlan = "YES">
       <Testables>
-         <TestableReference skipped = "NO">
-            <BuildableReference BuildableIdentifier = "primary" BlueprintIdentifier = "NextSetSyncCoreTests" BuildableName = "NextSetSyncCoreTests" BlueprintName = "NextSetSyncCoreTests" ReferencedContainer = "container:NextSetSyncCore">
+         <TestableReference skipped = "NO" parallelizable = "NO">
+            <BuildableReference BuildableIdentifier = "primary" BlueprintIdentifier = "{I['ui_target']}" BuildableName = "NextSetSyncUITests.xctest" BlueprintName = "NextSetSyncUITests" ReferencedContainer = "container:nextset-sync.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>

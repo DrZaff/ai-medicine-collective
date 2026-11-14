@@ -34,10 +34,10 @@ struct TodayView: View {
                 }
                 Section {
                     RecoveryRows()
-                } header: { Text("Recovery") } footer: {
+                } header: { Text("Recovery").accessibilityIdentifier("today.recovery") } footer: {
                     Text("Resting heart rate: your lowest half-hour while asleep, from the watch's Health app. Estimates, not medical advice.")
                 }
-                Section("Moments") {
+                Section {
                     let marks = Array(model.markers.prefix(5))
                     if marks.isEmpty {
                         Text("Moments you mark on the watch (Coffee, Idea...) appear here.").foregroundStyle(.secondary)
@@ -48,7 +48,7 @@ struct TodayView: View {
                     if model.markers.count > marks.count {
                         NavigationLink("All moments (\(model.markers.count))") { MarkersView() }
                     }
-                }
+                } header: { Text("Moments").accessibilityIdentifier("today.moments") }
                 Section("Sleep") {
                     if let n = model.nights.first {
                         LabeledContent("Last night", value: hm(n.main.asleepMinutes) + (n.main.isPartial ? " (so far)" : ""))
