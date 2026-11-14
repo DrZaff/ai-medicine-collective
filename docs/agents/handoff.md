@@ -29,7 +29,7 @@ This builds on the supervised Billy handoff in [billy.md](billy.md) and the rule
    sudo -H -u billy-pub python3 /opt/billy/handoff.py publish <branch> <sha> --issue <N>
    ```
    Codex reviews exactly that commit. With no blocking findings, Billy opens a draft PR from `agent/<N>-<name>-<sha7>` with `Closes #<N>` and the review report. With blocking findings, nothing is published: tell Claude, which fixes them in a new commit, and run the command again with the new SHA.
-5. **Merge.** When Site checks pass, the owner reads the PR (description, report, Files changed, the Netlify preview for visible changes), marks it ready, approves and merges. Merging closes the issue. A clinical change also needs the clinician's approval on that exact commit (AGENTS.md, "Clinical content").
+5. **Merge.** When Site checks pass, the owner reads the PR (description, report, Files changed, the Netlify preview for visible changes), marks it ready, approves and merges, following the sign-off steps Billy prints at the end of the publish step (also in the PR description). The merge goes through the bypass box, ticked only when the merge box shows **Changes approved** and **All checks have passed** ([billy.md](billy.md), step 5). Merging closes the issue. A clinical change also needs the clinician's approval on that exact commit (AGENTS.md, "Clinical content").
 
 Run the command once per commit. A second run for the same commit stops at "already existed": Billy never reuses a branch.
 
@@ -38,7 +38,10 @@ Run the command once per commit. A second run for the same commit stops at "alre
 - **Write and approve the issue:** GitHub app or Safari > the repository > Issues > New issue > Agent task. Add `agent:ready` from the issue's Labels.
 - **Start the build:** in the Claude app, "Implement issue #N in DrZaff/ai-medicine-collective."
 - **Review and publish:** paste Claude's one command into Termius, connected to the agent server as the owner's account. Paste the output back to Claude if anything stops.
-- **Merge:** GitHub app > the PR > Ready for review > Review changes > Approve > Merge.
+- **Merge:** tap the links Billy prints at the end of the publish step, in order:
+  1. The PR: **Ready for review**.
+  2. Its Files changed tab: **Review changes** > **Approve**.
+  3. The PR again: once it shows Changes approved and All checks have passed, tick the bypass box, then **Merge** and **Delete branch**.
 
 ## Example: a low-risk task
 
