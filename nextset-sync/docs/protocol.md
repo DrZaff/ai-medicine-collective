@@ -74,6 +74,7 @@ Every request carries `q` (a number); the answer echoes it. An error is
 | `ack` `{ids: [[id, rev], …]}` | `acked` `{n, left}` | Watch deletes a set/session (or marks a marker synced) only if its stored `rev` ≤ the acknowledged rev. `left` counts only kinds this phone takes. |
 | `sleep` `{since, max}` | `slp` `{since, now, entries, more, sl}` | Calls Sleep Log's own `require("sleeplog").readLog(since×600000, now)`. |
 | `sack` `{upto}` | `ok` | Saves the sleep cursor (shown in `status`). |
+| `health` `{since, max}` | `hlt` `{rows, more, hl, now}` | BangleApps Health log through its own reader: `[t10, steps, bpmMin, bpmMax, movement, activity]` rows after `since` (UTC 10-minute steps; UTC filing mode converted). `hl` = `{ver, hrm, utc}`, also in `hi`. |
 | `unpair` | `ok` | Forgets this phone. |
 
 Before `authok`, everything except `hello`, `pair` and `auth` is refused
@@ -89,6 +90,7 @@ with `unauthorized`.
 ```
 
 ```json
+{"k":"chk","id":"7a3c91e0-clz8k2q9b","rev":1,"score":4,"at":1794600000000}
 {"k":"mark","id":"7a3c91e0-mlz8k2q9a","rev":1,"label":"Coffee","at":1794600000000}
 ```
 

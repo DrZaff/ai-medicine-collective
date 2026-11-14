@@ -22,13 +22,13 @@ companion for the owner's iPhone, with no vendor app and no cloud:
 The owner has **no Mac**: builds run on GitHub Actions macOS runners and
 installs go through TestFlight ([no-mac-setup.md](no-mac-setup.md)).
 
-## State on 2026-11-13
+## State on 2026-11-14
 
 | Area | Status | Evidence |
 |---|---|---|
-| Watch app (`watch/nsync`) | Done, v0.01 | 46/46 checks in the real Espruino 2v29 interpreter; BangleApps sanity check clean |
+| Watch app (`watch/nsync`) | Done, v0.02 | 90/90 checks in the real Espruino 2v29 interpreter; screenshots from the official emulator each build; BangleApps sanity check clean |
 | Protocol v1 | Done | [protocol.md](protocol.md); shared vectors; Swift engine tested against the real watch code (bridge test) |
-| Swift core | Done | 39 tests on Linux and macOS (GitHub) |
+| Swift core | Done | 45 tests on Linux and macOS (GitHub) |
 | iOS app | **Compiles** with Xcode 26.3 for simulator and device (GitHub macOS runner, `BUILD SUCCEEDED`); never run on a phone | CI run 43484568933 |
 | TestFlight pipeline | Written, **not yet run** (needs the owner's Apple setup and a separate repo) | `.github/workflows/testflight.yml` |
 | Hardware | Watch arriving next week. Nothing tested on a real Bangle or iPhone yet | first-day-checklist.md |
@@ -80,14 +80,34 @@ How to hand work over:
   and make a matching 48×48 watch icon.
 
 ### Next (in order; see docs/features.md for the why)
-* **Owner:** first hardware test with `first-day-checklist.md` (rows A–L), and
+* **Owner:** create the `nextset-sync` repository and the Apple setup
+  (`no-mac-setup.md`), so the first TestFlight build can run; then the first
+  hardware test with `first-day-checklist.md` (rows A–N), the self-test, and
   the text-preview coexistence check.
-* **Claude:** heart-rate and recovery slice, from BangleApps Health 0.44 (format
-  verified in `health-log.md`) with a `chk` check-in record kind; then
-  readiness into NextSet's `readiness` input.
-* **Codex:** local backup and restore ("time capsule", features.md #1), then
-  "gym-floor polish" (tempo metronome, plate calculator and warm-up ramp,
-  RIR-aware rest: #2–4) as one PR; XCUITest smoke in CI.
+* **Claude:** move to the new repository, first TestFlight run, monthly
+  auto-upload; then readiness into NextSet's `readiness` input
+  (features.md #5) once heart-rate data is real.
+* **Codex (now, in this order, one PR each):**
+  1. **Local backup and restore** (features.md #1). Export one JSON file
+     (share sheet) holding workouts, sets, sessions, markers, notes,
+     check-ins, sleep entries and heart-rate rows; restore merges by
+     record id and rev, and by slot for sleep and heart rate, so restoring
+     twice changes nothing. Acceptance: a Swift round-trip test (export,
+     erase, restore, compare), a restore-twice test, and demo-mode export
+     and restore in the simulator.
+  2. **Gym-floor polish** (features.md #2–4), all on the watch:
+     * a tempo metronome (short buzzes at each tempo phase during a set,
+       opt-in per exercise);
+     * a plate calculator with NextSet's warm-up ramp (about 45/60/75 %
+       of the working load, rounded to plates);
+     * RIR-aware rest (RIR 0–1: +30 s, RIR 4+: −15 s).
+
+     Acceptance: Espruino tests for each, new screens in
+     `watch/test/screens.cjs`, and the watch-screens artifact attached to the PR.
+  3. **XCUITest smoke test in CI** on the iOS simulator in demo mode:
+     launch → Watch → Sync Now → History shows sets → Today shows Moments and
+     Recovery. Also save the simulator screenshots as artifacts (they double
+     as App Store screenshots later). Acceptance: green in the `ios` job.
 * Later: retro watch face, GPS walks via Recorder, slide remote (needs its own
   feasibility test: one BLE connection at a time).
 
@@ -162,3 +182,4 @@ until it exists, `DrZaff/ai-medicine-collective` branch
 | 2026-11-13 | Codex | First daily-use slice: Workout Ghost, silent timers and stopwatch, watch-local markers, retro status screen, and iPhone Today with training and sleep. Review and device validation pending. |
 | 2026-11-13 | Codex | PR #182: Workout Ghost, watch tools, Today (merged at the owner's direction after Claude's review) |
 | 2026-11-13 | Claude | Fixed the review findings (timers via Scheduler, unlock guard, crash-safe markers with ids, last-set memory, Ghost legibility, Today demo bug); kinds negotiation + ack-only-stored (fixes silent loss of new record kinds); marker sync end to end; Moments with phone-only notes; diagnostics; watch-files CI artifact; features.md, health-log.md. Watch 74 checks, Swift 41 tests. |
+| 2026-11-14 | Claude | Watch Self-test screen; every watch screen from the official Bangle.js 2 emulator in CI (watch-screens artifact; found and fixed "1 sets" wording and a confusing pairing screen); heart rate from BangleApps Health 0.44 + morning check-ins + Recovery on Today. Watch 90 checks, Swift 45 tests. |

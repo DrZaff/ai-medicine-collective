@@ -37,9 +37,8 @@ Workout Ghost: the set screen's second line shows last time's set for the
 exercise ("Last 135x8@2"); the first set that matches or beats it at the
 same RIR gets a distinct buzz.
 
-Needs the **Scheduler** app (installed by default on Bangle.js 2; the App
-Loader adds it if missing). Without it, timers buzz only while their screen
-is open.
+Needs the **Scheduler** app, which the App Loader installs as a dependency
+of this app. Without it, timers buzz only while their screen is open.
 
 ## Sleep
 

@@ -17,7 +17,7 @@ S.write("nsync.boot.js", FILES.boot);
 S.write("nsync.app.js", FILES.app);
 S.write("nsync-tools", FILES.tools);
 S.write("sleeplog", FILES.sleeplog);
-S.write("sched", FILES.schedLib);           // Scheduler 0.43, a default Bangle.js 2 app
+S.write("sched", FILES.schedLib);           // Scheduler 0.43 (this app's dependency)
 S.write("sched.boot.js", FILES.schedBoot);
 S.write("health", FILES.healthLib);         // Health 0.44 and a synthetic November log
 S.writeJSON("health.info", { id: "health", version: "0.44" });

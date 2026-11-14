@@ -90,6 +90,9 @@ final class AppModel {
     var awaitingAck: Int { _ = revision; return store.awaitingAckCount }
     var allSets: [SetRecord] { _ = revision; return store.sets }
     var markers: [MarkerRecord] { _ = revision; return store.markers }
+    var checkins: [CheckinRecord] { _ = revision; return store.checkins }
+    /// Resting heart rate per night (newest first), from the Health log and Sleep Log.
+    var recovery: [RecoveryNight] { _ = revision; return RecoveryAnalyzer.nights(nights, rows: store.healthRows) }
     func note(for m: MarkerRecord) -> String { _ = revision; return store.note(for: m.id) ?? "" }
     func setNote(_ text: String, for m: MarkerRecord) {
         do { try store.setNote(text, for: m.id); revision += 1 } catch { errorMessage = error.localizedDescription }
@@ -105,7 +108,8 @@ final class AppModel {
                      "Last error: \(l.lastError ?? "none")",
                      "Watch: app \(st?.appVersion ?? "?")  firmware \(st?.firmware ?? "?")  Sleep Log \(st?.sleepLogVersion ?? "-")  battery \(st?.battery.map(String.init) ?? "?")%",
                      "Waiting on watch: \(st?.pendingSets ?? 0) sets, \(st?.pendingMarkers ?? 0) markers",
-                     "On phone: \(store.sets.count) sets (\(store.awaitingAckCount) awaiting confirmation), \(store.markers.count) markers, \(store.sleepEntries.count) sleep entries",
+                     "On phone: \(store.sets.count) sets (\(store.awaitingAckCount) awaiting confirmation), \(store.markers.count) markers, \(store.checkins.count) check-ins, \(store.sleepEntries.count) sleep entries, \(store.healthRows.count) heart-rate rows",
+                     "Health app: \(st?.healthAppVersion ?? "-")  HRM interval: \(st?.heartRatePolling.map { "\($0) min" } ?? "-")",
                      "Protocol v\(SyncProtocol.version), kinds \(SyncProtocol.storedKinds.joined(separator: ","))",
                      "", "Recent activity:"]
         lines += activity.prefix(40)
@@ -146,6 +150,7 @@ final class AppModel {
         demoWatch = w
         let demo = DemoData.sleep()
         await w.setSleep(demo.entries, lastCheckT10: demo.dataEndT10)
+        await w.setHealth(DemoData.health())
         let e = await attachDemoEngine(w)
         engine = e
         connection = .connected
@@ -188,6 +193,12 @@ final class AppModel {
         await w.addMark(labels[n % labels.count])
         log("Demo: a moment was marked on the watch")
         if connection == .connected { _ = try? await engine?.fetchStatus() }
+        revision += 1
+    }
+    func demoCheckin() async {
+        guard let w = demoWatch else { return }
+        await w.addCheckin(Int.random(in: 3...5))
+        log("Demo: morning check-in on the watch")
         revision += 1
     }
     func demoFinishWorkout() async { await demoWatch?.finishSession(); log("Demo: workout finished on the watch") }

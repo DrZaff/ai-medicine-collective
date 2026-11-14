@@ -32,6 +32,11 @@ struct TodayView: View {
                         }
                     }
                 }
+                Section {
+                    RecoveryRows()
+                } header: { Text("Recovery") } footer: {
+                    Text("Resting heart rate: your lowest half-hour while asleep, from the watch's Health app. Estimates, not medical advice.")
+                }
                 Section("Moments") {
                     let marks = Array(model.markers.prefix(5))
                     if marks.isEmpty {
@@ -101,5 +106,34 @@ struct MarkerNoteView: View {
         .navigationTitle(marker.label)
         .onAppear { text = model.note(for: marker) }
         .onDisappear { model.setNote(text, for: marker) }
+    }
+}
+
+struct RecoveryRows: View {
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        let today = SleepAnalyzer.dayString(Date(), .current)
+        let checkin = model.checkins.first { SleepAnalyzer.dayString($0.at, .current) == today }
+        if let r = model.recovery.first {
+            if let hr = r.restingHR {
+                LabeledContent("Resting heart rate (\(r.wakeDate.suffix(5)))") {
+                    Text("\(hr) bpm").monospacedDigit()
+                }
+                if let base = r.baselineHR, let d = r.delta {
+                    LabeledContent("7-night baseline", value: "\(base) bpm (\(d > 0 ? "+" : "")\(d))")
+                        .foregroundStyle(d >= 5 ? Color.orange : Color.secondary)
+                } else {
+                    Text("Baseline after 3 nights with heart rate.").font(.footnote).foregroundStyle(.secondary)
+                }
+            } else {
+                Text(r.readings == 0
+                     ? "No heart rate last night. On the watch: Health app > Settings > HRM interval: 10 min."
+                     : "Not enough heart-rate readings last night (\(r.readings)).")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+        } else {
+            Text("Appears after a night with Sleep Log and the Health app's heart-rate logging.").foregroundStyle(.secondary)
+        }
+        LabeledContent("Check-in today", value: checkin.map { "\($0.score)/5 \($0.label)" } ?? "none yet (watch: Check-in)")
     }
 }

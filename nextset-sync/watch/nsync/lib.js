@@ -151,7 +151,7 @@ function pruneMarks(m) {
   while (synced.length > exports.KEEP_MARKS) delete m[synced.shift()];
 }
 
-// ---- alarms through the Scheduler ("sched", a default Bangle.js 2 app) ------
+// ---- alarms through the Scheduler ("sched"; installed as this app's dependency) --
 // A sched alarm fires from its boot code whatever app is open, so a rest or
 // focus timer still buzzes after you leave this app. Without sched these
 // return false and the caller buzzes from its own countdown instead.

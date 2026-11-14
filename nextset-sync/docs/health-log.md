@@ -35,6 +35,15 @@ across zones shifts slots and can overwrite or skip an hour. **Recommend:**
 turn on the UTC setting, and have the watch report which mode is in use, so
 the phone can convert correctly.
 
+## Implemented (2026-11-14)
+
+As proposed below: `lib.js` `healthRows`/`health` request, `chk`
+check-ins, phone `RecoveryAnalyzer` (resting HR + 7-night baseline), Today
+"Recovery". Tested against the vendored Health 0.44 `lib.js` with
+`protocol/fixtures/health-2026-11.raw` (generator `make-health-fixture.py`),
+including the bridge test. **On the watch, set Health → HRM interval to 10
+minutes and turn on "UTC time"** (the self-test checks the first).
+
 ## Proposed approach (same pattern as Sleep Log)
 
 1. The watch reads through the Health app's own module, never its file

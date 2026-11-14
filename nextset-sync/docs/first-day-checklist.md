@@ -43,14 +43,17 @@ About 45 minutes of setup spread over the week, plus one night.
    of that page. Updates keep your apps and data, but you have the backup
    anyway.
 8. **Install Sleep Log:** **Library** → search **Sleep Log** → click the
-    install arrow. Check that **My Apps** shows **Sleep Log 0.26**.
+    install arrow. Check that **My Apps** shows **Sleep Log 0.26**. Also
+    check **Health** (a default app) is there: on the watch open **Settings →
+    Apps → Health**, set **HRM interval: 10 min** and turn on **UTC time**
+    (heart rate for Recovery).
 9. **Install NextSet Sync:** **More** tab → **Install App from Files** →
     select every file in the `watch/nsync` folder you extracted (`metadata.json`,
     `app.js`, `boot.js`, `lib.js`, `app-icon.js`, `app.png`, `README.md`,
     `ChangeLog`) → **OK**. The watch restarts and may show "Updating boot0..."
     once; that is the bootloader adding the new service. Check that **My
     Apps** lists **NextSet Sync 0.02**, **Sleep Log 0.26** and **Scheduler**
-    (a default app; the loader adds it if it was missing: the timers need it).
+    (installed as a dependency of NextSet Sync if missing: the timers need it).
     * This upload writes only NextSet Sync's own files. Sleep Log, your
       settings and other apps' data are untouched.
     * For later **updates**, install the same way. Pairing, unsynced sets and
@@ -86,6 +89,8 @@ About 45 minutes of setup spread over the week, plus one night.
 | J | Watch: main menu → **Mark a moment → Coffee**; iPhone: **Sync Now** → **Today** | *Coffee* under Moments, once; tap it, add a note |
 | K | Watch: **Timers → Stretch (2m)**, let the screen lock, press the button once, then once more | The first press only wakes the screen; the second returns to the menu with "> Stretch" still running. Open another app: you still get **one short buzz at 1:00 left and a long triple buzz at 0:00** |
 | L | Start the Quick test again: is line 2's **"Last …"** (your Ghost: last time's set) readable at arm's length? Log a set that matches or beats it at the same RIR | A **distinct double buzz** (first match) instead of the short one |
+| M | Watch: main menu → **Check-in → 4 Good**; iPhone: **Sync Now** → **Today** | *Check-in today: 4/5 Good* under Recovery |
+| N | Watch: main menu → **Self-test** | No **XX** lines; fix any **!!** it explains (e.g. Health → HRM interval) |
 
 ## First night
 

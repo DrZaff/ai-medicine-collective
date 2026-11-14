@@ -121,6 +121,7 @@ async function shoot(name) {
   send('require("nsync-tools").markers(showMain)'); await shoot('09-mark-a-moment');
   send('require("nsync-tools").progress(showMain)'); await shoot('10-retro-status');
   send('showSelfTest()'); await shoot('11-self-test');
+  send('showCheckin()'); await shoot('15-check-in');
   send('showSyncInfo()'); await shoot('12-sync-info');
   send('showPair()'); await shoot('13-pair-phone');
   send('g.setTheme({fg:"#fff",bg:"#000",fg2:"#fff",bg2:"#004",fgH:"#fff",bgH:"#00f",dark:true});showEntry()');
