@@ -69,6 +69,23 @@ GitHub is the shared record. Each party reads it before acting, and nothing pass
 | End to end: Codex review of the exact commit, then Billy's draft PR into `main` | Passed (#156, head = reviewed commit `42e73de`); Site checks started on Billy's PR and passed |
 | With a ruleset requiring a PR and 1 approval: direct push, merge before approval and branch deletion are refused | Passed on `billy-test/protected-target` (ruleset 26928012, PR #155): "Changes must be made through a pull request.", HTTP 405 "New changes require approval from someone other than the last pusher.", "Cannot delete this branch" |
 
+## Verified against the live `main` ruleset (2026-11-14)
+
+"Main - Owner Merge Only" (26914500) was **Active** on `main`. To test Billy against its real rules and bypass list without risking `main`, the owner added `billy-test/protected-target` as a second target of that same ruleset for the test, then removed it. GitHub's rules endpoint showed the test branch with exactly `main`'s five rules, all from 26914500 (`deletion`, `non_fast_forward`, `pull_request`, `required_status_checks`, `update`). `pr_test.py` only pushes to `billy-test/` branches and refuses force pushes, so a failure could only have changed the disposable branch.
+
+| Step | Result |
+| --- | --- |
+| Installed scripts match the repository (`sha256sum /opt/billy/preflight.py /opt/billy/pr_test.py`) | Matched (`2e0bb166…`, `1aa70c7a…`) |
+| `preflight.py` | Passed; token revoked |
+| `pr_test.py setup`: target branch from `main`, dev branch, PR as `billy-ai-medicine-collective[bot]` | Passed (PR #194) |
+| `pr_test.py negative`: Billy pushes directly to the protected branch | **Refused**: "2 of 2 required status checks are expected" |
+| `pr_test.py negative`: Billy merges unapproved PR #194 | **Refused**: "Cannot update this protected ref", "Waiting on code owner review from DrZaff" |
+| `pr_test.py negative`: Billy deletes the protected branch | **Refused**: "Cannot delete this branch" |
+| Clean-up | Test target removed from the ruleset, PR #194 closed unmerged, both `billy-test/*` branches deleted |
+| Repository unchanged | `main` at `06ec2a7` before and after, with no push to it during the test; its five rules still in force |
+
+This shows Billy is not on 26914500's bypass list and cannot push to, merge into or delete `main`. It does not cover a clinician's approval for clinical files: CODEOWNERS lists no clinical paths yet ([architecture.md](architecture.md)).
+
 ## Remaining setup
 
 | Step | Who | State |
@@ -76,7 +93,7 @@ GitHub is the shared record. Each party reads it before acting, and nothing pass
 | Confirm the app reaches no other repository (GitHub > Settings > Applications > Billy > Configure) | Owner | Open |
 | Every Codex finding from the setup reviews (#156, #157, #158) | Claude builds; Codex reviews; owner merges | Done (#166: no findings) |
 | Test ruleset, `billy-test/*` branches and test PRs | Owner | Removed 2026-11-11 |
-| Both `main` rulesets: owner on each bypass list (pull requests only), Billy on neither, CodeQL rule removed | Owner | Done; both stay **disabled** until the owner decides |
-| Digest publisher app, then turning on protection for `main` | Owner | Open: checklist, ruleset decision and test order in [digest-publisher.md](digest-publisher.md) |
+| Both `main` rulesets: owner on each bypass list (pull requests only), Billy on neither, CodeQL rule removed | Owner | Done. "Main - Owner Merge Only" (26914500) is **Active** (2026-11-14); "Protect Main - Human Approval Required" (26913560) stays disabled |
+| Digest publisher app, then turning on protection for `main` | Owner | Ruleset on and Billy's negative test passed (above). Still open: the owner's own checks and the first Friday digest push under the ruleset; see phase 4 in [digest-publisher.md](digest-publisher.md) |
 
-Not part of the pilot: unattended runs, timers, issue labels (Billy has no Issues permission), Netlify production publishing (stays locked), and anything in architecture.md's sandbox and credential sections, which apply before any unattended run.
+Not part of the pilot: unattended runs, timers, issue labels (Billy has no Issues permission), Netlify settings (production auto-publishing was unlocked by the owner on 2026-11-14), and anything in architecture.md's sandbox and credential sections, which apply before any unattended run.
