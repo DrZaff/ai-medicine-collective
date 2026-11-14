@@ -79,9 +79,9 @@ public final class LocalStore: @unchecked Sendable {
     public let directory: URL
     private let lock = NSLock()
 
-    private struct Records: Codable { var sets: [String: SetRecord] = [:]; var sessions: [String: SessionRecord] = [:] }
-    private struct Sleep: Codable { var entries: [SleepEntry] = []; var dataEndT10: Int?; var imports: Int = 0 }
-    private struct State: Codable {
+    private struct Records: Codable, Equatable { var sets: [String: SetRecord] = [:]; var sessions: [String: SessionRecord] = [:] }
+    private struct Sleep: Codable, Equatable { var entries: [SleepEntry] = []; var dataEndT10: Int?; var imports: Int = 0 }
+    private struct State: Codable, Equatable {
         var link = LinkState()
         var zones: [ZoneMark] = []
     }
@@ -134,6 +134,117 @@ public final class LocalStore: @unchecked Sendable {
     }
 
     private func locked<T>(_ body: () throws -> T) rethrows -> T { lock.lock(); defer { lock.unlock() }; return try body() }
+
+    // MARK: backup
+
+    private struct Backup: Codable {
+        var format: String
+        var version: Int
+        var workouts: [Workout]
+        var sets: [SetRecord]
+        var sessions: [SessionRecord]
+        var markers: [MarkerRecord]
+        var notes: [String: String]
+        var checkins: [CheckinRecord]
+        var sleep: [SleepEntry]
+        var sleepEndT10: Int?
+        var heartRate: [HealthRow]
+        var zones: [ZoneMark]
+    }
+
+    public func exportBackup() throws -> Data {
+        let backup = locked {
+            Backup(format: "nextset-sync-backup", version: 1, workouts: workoutList,
+                   sets: records.sets.values.sorted { $0.id < $1.id },
+                   sessions: records.sessions.values.sorted { $0.id < $1.id },
+                   markers: markerIndex.values.sorted { $0.id < $1.id }, notes: notes,
+                   checkins: checkinIndex.values.sorted { $0.id < $1.id },
+                   sleep: sleepData.entries, sleepEndT10: sleepData.dataEndT10,
+                   heartRate: healthIndex.values.sorted { $0.t10 < $1.t10 }, zones: state.zones)
+        }
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .millisecondsSince1970
+        encoder.outputFormatting = [.sortedKeys]
+        return try encoder.encode(backup)
+    }
+
+    /// Applies a versioned snapshot under the same lock as Bluetooth writes.
+    /// Each file commits atomically. If a write fails, retrying completes the merge.
+    @discardableResult
+    public func restoreBackup(_ data: Data) throws -> Bool {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .millisecondsSince1970
+        let backup = try decoder.decode(Backup.self, from: data)
+        guard backup.format == "nextset-sync-backup", backup.version == 1 else {
+            throw WorkoutError.unreadable("This file uses an unsupported NextSet Sync backup format.")
+        }
+        for workout in backup.workouts { try workout.validate() }
+
+        return try locked {
+            var changed = false
+            func persist<T: Codable & Equatable>(_ value: T, over old: T, in file: String) throws -> Bool {
+                guard value != old else { return false }
+                try save(value, file)
+                changed = true
+                return true
+            }
+
+            var workouts = workoutList
+            for workout in backup.workouts {
+                if let index = workouts.firstIndex(where: { $0.id == workout.id }) {
+                    if workout.rev > workouts[index].rev { workouts[index] = workout }
+                } else { workouts.append(workout) }
+            }
+            if try persist(workouts, over: workoutList, in: "workouts.json") { workoutList = workouts }
+
+            let mergedRecords = Records(
+                sets: Self.mergeRevisions(records.sets, backup.sets, revision: \.rev),
+                sessions: Self.mergeRevisions(records.sessions, backup.sessions, revision: \.rev))
+            if try persist(mergedRecords, over: records, in: "records.json") { records = mergedRecords }
+
+            let markers = Self.mergeRevisions(markerIndex, backup.markers, revision: \.rev)
+            if try persist(markers, over: markerIndex, in: "markers.json") { markerIndex = markers }
+            let checkins = Self.mergeRevisions(checkinIndex, backup.checkins, revision: \.rev)
+            if try persist(checkins, over: checkinIndex, in: "checkins.json") { checkinIndex = checkins }
+            let mergedNotes = notes.merging(backup.notes) { local, _ in local }
+            if try persist(mergedNotes, over: notes, in: "notes.json") { notes = mergedNotes }
+
+            var sleep = sleepIndex
+            for entry in backup.sleep { sleep[entry.t10] = entry }
+            var mergedSleep = sleepData
+            mergedSleep.entries = sleep.values.sorted { $0.t10 < $1.t10 }
+            if let end = backup.sleepEndT10 { mergedSleep.dataEndT10 = max(sleepData.dataEndT10 ?? end, end) }
+            if try persist(mergedSleep, over: sleepData, in: "sleep.json") {
+                sleepIndex = sleep
+                sleepData = mergedSleep
+            }
+
+            var heartRate = healthIndex
+            for row in backup.heartRate { heartRate[row.t10] = row }
+            if heartRate != healthIndex {
+                try save(heartRate.values.sorted { $0.t10 < $1.t10 }, "health.json")
+                healthIndex = heartRate
+                changed = true
+            }
+
+            var mergedState = state
+            var zones = Dictionary(state.zones.map { ($0.at, $0) }, uniquingKeysWith: { _, newest in newest })
+            for zone in backup.zones where zones[zone.at] == nil { zones[zone.at] = zone }
+            mergedState.zones = zones.values.sorted { $0.at < $1.at }
+            if try persist(mergedState, over: state, in: "state.json") { state = mergedState }
+            return changed
+        }
+    }
+
+    private static func mergeRevisions<T: Identifiable>(_ local: [String: T], _ incoming: [T],
+                                                        revision: KeyPath<T, Int>) -> [String: T] where T.ID == String {
+        var merged = local
+        for record in incoming {
+            if let old = merged[record.id], old[keyPath: revision] >= record[keyPath: revision] { continue }
+            merged[record.id] = record
+        }
+        return merged
+    }
 
     // MARK: link state
 

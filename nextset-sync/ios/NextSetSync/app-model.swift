@@ -53,6 +53,12 @@ final class AppModel {
         store = AppModel.openStore(demo: demo)
         seedIfNeeded()
         try? store.recordZone()
+        #if DEBUG && targetEnvironment(simulator)
+        if demo && ProcessInfo.processInfo.arguments.contains("--verify-demo-backup") {
+            verifyDemoBackup()
+            return
+        }
+        #endif
         ble.onEvent = { [weak self] e in MainActor.assumeIsolated { self?.handle(e) } }
         if demo { Task { await startDemoWatch() } } else { reconnectIfPaired() }
     }
@@ -373,6 +379,44 @@ final class AppModel {
     }
 
     // MARK: workouts and files
+
+    func restoreBackup(from url: URL) {
+        let accessible = url.startAccessingSecurityScopedResource()
+        defer {
+            if accessible { url.stopAccessingSecurityScopedResource() }
+            revision += 1
+        }
+        do {
+            let changed = try store.restoreBackup(Data(contentsOf: url))
+            notice = changed ? "Backup merged." : "This backup is already restored."
+        } catch {
+            errorMessage = "Could not finish restoring the backup. \(error.localizedDescription)"
+        }
+    }
+
+    #if DEBUG && targetEnvironment(simulator)
+    private func verifyDemoBackup() {
+        let scratch = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let demoStore = store
+        defer {
+            store = demoStore
+            try? FileManager.default.removeItem(at: scratch)
+        }
+        do {
+            let file = try LocalBackupFile(store: store).makeFile()
+            defer { try? FileManager.default.removeItem(at: file.deletingLastPathComponent()) }
+            let exported = try Data(contentsOf: file)
+            store = try LocalStore(directory: scratch)
+            restoreBackup(from: file)
+            guard !store.sets.isEmpty, try store.exportBackup() == exported else { return }
+            restoreBackup(from: file)
+            guard notice == "This backup is already restored.", errorMessage == nil else { return }
+            try Data("OK\n".utf8).write(to: AppModel.folder(demo: true).appendingPathComponent("backup-check.txt"))
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    #endif
 
     func save(_ w: Workout) {
         do { try store.saveWorkout(w); revision += 1 } catch { errorMessage = error.localizedDescription }
