@@ -80,7 +80,11 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DATE: ${{ steps.today.outputs.date }}
-        run: python scripts/blog_agent/faq_agent.py --date "$DATE" --pr-body "$RUNNER_TEMP/pr-body.md"
+        # The agent checks every number against its source's text (#185); any it
+        # cannot match go in fact-check.txt and set needs_fact_check.
+        run: >-
+          python scripts/blog_agent/faq_agent.py --date "$DATE" --pr-body "$RUNNER_TEMP/pr-body.md"
+          --fact-check-file "$RUNNER_TEMP/fact-check.txt"
 
       - name: Open pull request
         id: pr
@@ -89,7 +93,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           DATE: ${{ steps.draft.outputs.date }}
           FAQ_ID: ${{ steps.draft.outputs.faq_id }}
+          NEEDS_FACT_CHECK: ${{ steps.draft.outputs.needs_fact_check }}
         run: |
+          title="FAQ draft: $DATE"
+          if [ "$NEEDS_FACT_CHECK" = "true" ]; then title="FAQ draft (NEEDS FACT-CHECK): $DATE"; fi
           branch="faq/$DATE"
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
@@ -100,7 +107,7 @@ jobs:
           git push -u origin "$branch"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
           url=$(gh pr create --base main --head "$branch" \
-            --title "FAQ draft: $DATE" \
+            --title "$title" \
             --body-file "$RUNNER_TEMP/pr-body.md")
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
@@ -111,8 +118,18 @@ jobs:
           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
           DATE: ${{ steps.draft.outputs.date }}
           PR_URL: ${{ steps.pr.outputs.url }}
+          NEEDS_FACT_CHECK: ${{ steps.draft.outputs.needs_fact_check }}
         run: |
+          subject="Action needed: review the FAQ draft for $DATE"
+          if [ "$NEEDS_FACT_CHECK" = "true" ]; then subject="NEEDS FACT-CHECK: the FAQ draft for $DATE"; fi
           {
+            # The fact-check warning, when there is one, comes first
+            if [ -s "$RUNNER_TEMP/fact-check.txt" ]; then
+              cat "$RUNNER_TEMP/fact-check.txt"
+              echo
+              echo "Do not merge until each number above is checked against its source: $PR_URL"
+              echo
+            fi
             echo "A new FAQ answer is waiting for your review. It is not published yet."
             echo
             echo "WHAT TO DO"
@@ -124,7 +141,7 @@ jobs:
             echo "----- THE DRAFT -----"
             cat "$RUNNER_TEMP/pr-body.md"
           } > "$RUNNER_TEMP/email.txt"
-          python scripts/blog_agent/notify.py --subject "Action needed: review the FAQ draft for $DATE" --body-file "$RUNNER_TEMP/email.txt"
+          python scripts/blog_agent/notify.py --subject "$subject" --body-file "$RUNNER_TEMP/email.txt"
 
       - name: Email - the run failed
         if: failure()

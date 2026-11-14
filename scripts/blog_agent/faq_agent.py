@@ -16,17 +16,31 @@ Safeguards, the same as the blog agent's:
     results, or is already a checked source (the AI vs Physician register or
     an existing answer); an answer that cites a source that fails this check
     is not used at all
-  - every number in the answer is listed in the pull request for the
-    reviewer to check against its source
   - a question too close to an existing one is refused
   - the prompt forbids patient information and personal medical advice
 
-Spending is bounded by small search and fetch limits (about $0.50 to $1 a run).
+Numbers are checked against the sources' own text (issue #185, after #181
+was drafted from memory): once Claude has written the answer, this script
+fetches the text of every cited paper itself (PubMed Central full text when
+open access, else the PubMed abstract, through NCBI's API; see
+living_review.paper_text), and a second request with no web access corrects
+the answer against those texts. number_check.py then checks every number
+against the text of the source its sentence cites, without AI. Any number it
+cannot match (missing, rounded, wrong denominator, only in another source,
+or a source whose text could not be fetched) makes the draft "NEEDS
+FACT-CHECK": --fact-check-file gets the warning (the workflow puts it
+first in the email and in the PR title), and the PR body opens with it. A
+person always checks that matched numbers are used in the same sense.
+
+Spending is bounded by small search and fetch limits plus one short request
+with no web access (about $0.60 to $1.20 a run).
 
 Usage:
-    python scripts/blog_agent/faq_agent.py [--date YYYY-MM-DD] [--pr-body PATH]
-    python scripts/blog_agent/faq_agent.py --fixture sample.json   # no API call
-    The fixture is JSON {"result": {...the answer...}, "search_urls": [...]}.
+    python scripts/blog_agent/faq_agent.py [--date YYYY-MM-DD] [--pr-body PATH] [--fact-check-file PATH]
+    python scripts/blog_agent/faq_agent.py --fixture sample.json   # no API or network call
+    The fixture is JSON {"result": {...the answer...}, "search_urls": [...],
+    "source_texts": {"<url>": "<retrieved text, or empty for unavailable>"},
+    "revised": {...optional answer as corrected against the texts...}}.
     Never commit the faq/ files a test run changes.
 """
 
@@ -41,6 +55,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import agent  # noqa: E402
+import number_check  # noqa: E402
 
 FAQ_PATH = agent.ROOT / "faq" / "faq.json"
 TARGETS_PATH = agent.ROOT / "faq" / "targets.json"
@@ -81,6 +96,10 @@ number, a study, a quote or a link.
 conversation, or one from the list of already checked sources you are given. \
 Never construct, guess or shorten a URL. Prefer the PubMed page \
 (https://pubmed.ncbi.nlm.nih.gov/<PMID>/) for journal articles.
+- Do not spend web_fetch on PubMed pages: they show automated readers no \
+abstract. Use web_search to find studies; after you answer, the abstracts and \
+open full texts of PubMed sources are fetched for you and every number is \
+checked against them, so prefer studies with a PubMed page.
 - Never include patient-identifiable information. Never give personal \
 medical, legal or regulatory advice; for those topics say the answer is \
 general information.
@@ -238,28 +257,98 @@ def verify(result: dict, found: set[str], known: dict[str, dict]) -> tuple[list[
     return problems, warnings
 
 
-def numbers_to_check(answer: str, sources: list[dict], known: dict[str, dict]) -> list[str]:
-    """Each sentence with a number, its sources, and whether the number is in a
-    checked register finding (the reviewer checks the rest)."""
+REVISE_SYSTEM = """\
+You are correcting a short FAQ answer about AI in medicine against the text \
+of the sources it cites. You have no web access and must not use your own \
+memory of any paper.
+
+Rules:
+- Keep the question, the [n] citation markers and the order of the sources. \
+You may drop a source only if you also remove every sentence that cites it.
+- Every number must appear in the text of the source its sentence cites, \
+written exactly as that text writes it (same value, same units, same \
+denominator: "30 out of 32", "44.3%"). Never round, combine or compute.
+- If the text says something weaker than the answer (for example a "similar" \
+rate, a subset, a non-significant difference), say what the text says.
+- If a number cannot be found in its cited source's text, or that source's \
+text is unavailable, remove the number or the claim rather than guess.
+- Keep 80 to 180 words, the first sentence a direct plain answer, and the \
+other rules of the original answer (no patient information, no personal \
+medical advice).
+- "note": what you changed and why, for the editors only.
+"""
+
+
+def source_texts(sources: list[dict], fixture: dict | None = None) -> dict[int, tuple[str, str]]:
+    """{1-based source number: (kind, text)} for each source. kind is
+    "full_text" or "abstract", or "" when the text could not be fetched (a
+    non-PubMed page such as WHO guidance, a fetch failure, an empty abstract).
+    In a fixture run the texts come from the fixture, never the network."""
+    import living_review  # its paper_text uses NCBI's API (and medRxiv's for preprints)
+    texts = {}
+    for n, source in enumerate(sources, 1):
+        if fixture is not None:
+            text = (fixture.get("source_texts") or {}).get(source.get("url", ""), "")
+            texts[n] = ("abstract" if text else "", text)
+        else:
+            texts[n] = living_review.paper_text({"url": source.get("url", "")})
+    return texts
+
+
+def revise_prompt(result: dict, texts: dict[int, tuple[str, str]]) -> str:
+    parts = []
+    for n, source in enumerate(result.get("sources", []), 1):
+        kind, text = texts.get(n, ("", ""))
+        label = {"full_text": "full text (PubMed Central)", "abstract": "abstract (PubMed)"}.get(kind, "")
+        parts.append(f"[{n}] {source.get('title', '')} ({source.get('source', '')}) {source.get('url', '')}\n"
+                     + (f"{label}:\n{text}" if text else "TEXT UNAVAILABLE: no number may be cited to this source."))
+    return ("Correct this answer against the sources' text and return it in the required JSON format.\n\n"
+            "The answer:\n" + json.dumps(result, ensure_ascii=False) + "\n\nThe sources' text:\n\n"
+            + "\n\n".join(parts))
+
+
+def number_lines(report: number_check.Report, sources: list[dict]) -> list[str]:
+    """The reviewer's list: every number, where it was or wasn't found."""
+    def name(n):
+        return f"[{n}] {sources[n - 1]['title'][:90]}" if n and 0 < n <= len(sources) else "no source"
     lines = []
-    for sentence in re.split(r"(?<=[.!?])\s+", answer):
-        nums = re.findall(r"\d+(?:[.,]\d+)?%?", re.sub(r"\[\d+\]", "", sentence))
-        if not nums:
-            continue
-        refs = [int(m) for m in re.findall(r"\[(\d+)\]", sentence)]
-        findings = " ".join(known.get(agent.normalize_url(sources[r - 1]["url"]), {}).get("finding", "")
-                            for r in refs if 0 < r <= len(sources))
-        status = []
-        for num in nums:
-            bare = num.rstrip("%")
-            status.append(f"{num} ({'in the register finding' if bare and bare in findings else 'check'})")
-        lines.append(f"{', '.join(status)}: \"{sentence.strip()}\"")
-    return lines
+    for r in report.results:
+        if r.status == "found":
+            lines.append(f"- **{r.number}**: found in the text of {name(r.source)} (context not machine-checked): "
+                         f"\"{r.excerpt}\"")
+        elif r.status == "year":
+            lines.append(f"- {r.number}: a year, not checked")
+        else:
+            cited = ", ".join(name(n) for n in r.cited) or "no source"
+            lines.append(f"- **{r.number}: UNVERIFIED**, {r.reason}. Cited: {cited}. Sentence: \"{r.sentence}\"")
+    return lines or ["- (no numbers)"]
+
+
+def fact_check_warning(report: number_check.Report, sources: list[dict], texts: dict[int, tuple[str, str]]) -> str:
+    """The NEEDS FACT-CHECK block (plain text, used first in the PR and the
+    email), or "" when every number was found in its cited source's text."""
+    if not report.needs_fact_check:
+        return ""
+    lines = [f"NEEDS FACT-CHECK: {len(report.unverified)} number(s) in this draft could not be matched to the "
+             "text of the source they cite. A clinician or editor must check each one against the source, and "
+             "correct or remove it, before this is merged.", ""]
+    for r in report.unverified:
+        lines.append(f"- {r.number}: {r.reason}.")
+        lines.append(f"  Sentence: \"{r.sentence}\"")
+        for n in r.cited or []:
+            if 0 < n <= len(sources):
+                kind = texts.get(n, ("", ""))[0] or "text unavailable"
+                lines.append(f"  Source [{n}] ({kind}): {sources[n - 1]['title']} {sources[n - 1]['url']}")
+    return "\n".join(lines)
 
 
 def write_pr_body(path: Path, item: dict, target: dict | None, refresh: bool, warnings: list[str],
-                  numbers: list[str], note: str, usage: dict | None) -> None:
-    lines = [
+                  numbers: list[str], note: str, usage: dict | None, fact_check: str = "") -> None:
+    lines = []
+    if fact_check:
+        head, _, rest = fact_check.partition("\n")
+        lines += [f"> [!WARNING]", f"> **{head}**", *[f"> {l}" if l else ">" for l in rest.splitlines()], ""]
+    lines += [
         f"## FAQ draft: {item['question']}",
         "",
         ("**A refreshed answer** to an existing question" if refresh else "**A new answer**") +
@@ -273,9 +362,13 @@ def write_pr_body(path: Path, item: dict, target: dict | None, refresh: bool, wa
         *[f"{n}. [{s['title']}]({s['url']}), {s['source']}{', ' + s['published'] if s.get('published') else ''}"
           for n, s in enumerate(item["sources"], 1)],
         "",
-        "### For the reviewer",
-        "Check each number against its source before merging (docs/editorial/scientific-review.md, section 4).",
-        *[f"- {line}" for line in numbers or ["(no numbers)"]],
+        "### Numbers, checked against the sources' text",
+        "Each number was looked for, without AI, in the retrieved text of the source its sentence cites. "
+        "\"Found\" means the same number appears there; check that it means the same thing (outcome, comparator, "
+        "population, denominator). Every UNVERIFIED number must be checked against the source and corrected or "
+        "removed before merging (docs/editorial/scientific-review.md, section 4). Clinical claims need a "
+        "clinician's approval whatever this list says.",
+        *numbers,
     ]
     if warnings:
         lines += ["", "### Warnings", *[f"- {w}" for w in warnings]]
@@ -300,6 +393,8 @@ def main() -> int:
     parser.add_argument("--date", type=dt.date.fromisoformat, help="Defaults to today (US Eastern)")
     parser.add_argument("--pr-body", type=Path, help="Where to write the PR description")
     parser.add_argument("--fixture", type=Path, help="Test without the API (see the docstring)")
+    parser.add_argument("--fact-check-file", type=Path,
+                        help="Where to write the NEEDS FACT-CHECK warning (empty when every number was found)")
     args = parser.parse_args()
 
     date = args.date or agent.today_eastern()
@@ -310,15 +405,29 @@ def main() -> int:
     refresh = bool(target and target.get("refresh_id"))
     print(f"Target: {target['question'] if target else '(none: the agent chooses)'}")
 
-    if args.fixture:
-        fixture = json.loads(args.fixture.read_text(encoding="utf-8"))
+    fixture = json.loads(args.fixture.read_text(encoding="utf-8")) if args.fixture else None
+    answer_schema = schema([c["id"] for c in faq["categories"]])
+    if fixture is not None:
         result, usage = fixture["result"], None
         found = {agent.normalize_url(u) for u in fixture.get("search_urls", [])}
     else:
         result, found, usage = agent.run_claude(
-            build_prompt(target, faq, known, date), system=SYSTEM,
-            schema=schema([c["id"] for c in faq["categories"]]), tools=TOOLS)
+            build_prompt(target, faq, known, date), system=SYSTEM, schema=answer_schema, tools=TOOLS)
         print(f"About ${agent.estimate_cost(usage):.2f}, {usage['searches']} searches.")
+
+    # Fetch the cited sources' own text, and have the answer corrected against
+    # it with no web access, before anything is checked or written (#185).
+    texts = source_texts(result.get("sources", []), fixture)
+    by_url = {s.get("url", ""): texts[n] for n, s in enumerate(result.get("sources", []), 1)}
+    print("Source text: " + ", ".join(f"[{n}] {k or 'unavailable'}" for n, (k, _) in texts.items()))
+    if fixture is not None:
+        result = fixture.get("revised") or result
+    elif any(text for _, text in texts.values()):
+        revised, _, more = agent.run_claude(revise_prompt(result, texts), system=REVISE_SYSTEM,
+                                            schema=answer_schema, tools=[])
+        result = revised
+        usage = {k: usage[k] + more.get(k, 0) for k in usage}
+        print(f"Corrected against the sources' text; about ${agent.estimate_cost(usage):.2f} in all.")
 
     problems, warnings = verify(result, found, known)
     others = [item for item in faq["items"] if not (refresh and item["id"] == target["refresh_id"])]
@@ -352,9 +461,18 @@ def main() -> int:
     save(TARGETS_PATH, targets)
     print(f"{'Refreshed' if refresh else 'Added'} faq-{item['id']}")
 
+    # Every number against the text of the source its sentence cites (#185)
+    final_texts = {n: by_url.get(s["url"], ("", "")) for n, s in enumerate(sources, 1)}
+    report = number_check.check(item["answer"], {n: t for n, (_, t) in final_texts.items()})
+    warning = fact_check_warning(report, sources, final_texts)
+    print(f"Numbers: {sum(r.status == 'found' for r in report.results)} found, "
+          f"{len(report.unverified)} unverified" + (" -> NEEDS FACT-CHECK" if warning else ""))
+    if args.fact_check_file:
+        args.fact_check_file.write_text(warning + ("\n" if warning else ""), encoding="utf-8")
+    agent.set_output("needs_fact_check", "true" if warning else "false")
     if args.pr_body:
-        write_pr_body(args.pr_body, item, target, refresh, warnings,
-                      numbers_to_check(item["answer"], sources, known), result.get("note", ""), usage)
+        write_pr_body(args.pr_body, item, target, refresh, warnings, number_lines(report, sources),
+                      result.get("note", ""), usage, warning)
     agent.set_output("faq_id", item["id"])
     agent.set_output("created", "true")
     return 0
