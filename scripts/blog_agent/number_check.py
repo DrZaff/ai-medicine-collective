@@ -18,7 +18,11 @@ that sentence cites, written the same way:
     0.052 = 0·052 = .052), nothing else is;
   - citation markers such as [1] or [2, 3] are not numbers;
   - a four-digit number is a year (listed, not counted) only with year words
-    before it and no counted noun after it ("in 2024,", "(2024)").
+    before it and only punctuation or the end after it ("In 2024,",
+    "(2024)"); anything else, "in 2024 ICU patients", is checked;
+  - anything the checker cannot read fails closed: scientific notation in
+    any form (1.2e-5, 3×10−4, 10^-3, 10⁻⁵) or digits left over outside every
+    number it read make every number in that sentence unverified.
 
 Not seen at all: numbers written as words ("forty"), units (5 mg vs 5 g),
 and what a number measures; a reviewer checks those.
@@ -67,9 +71,16 @@ YEAR_BEFORE = re.compile(
     r"(?:\b(?:in|from|since|until|till|during|between|published|"
     r"january|february|march|april|may|june|july|august|september|october|november|december|"
     r"jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\s+|\(\s*)$", re.IGNORECASE)
-YEAR_AFTER = re.compile(
-    r"^(?:\s*$|\s*[,.;:)!?]|\s+(?:and|or|to|the|a|an|it|this|that|these|its|their|when|which|with|for|"
-    r"on|was|were|is|are|has|had|have)\b|\s+[A-Z])")
+# Only punctuation or the end may follow a year: "In 2024," or "(2024)".
+# "in 2024 ICU patients" or "in 1980 and" are read as counts and checked
+# (a false alarm at worst, never a missed number).
+YEAR_AFTER = re.compile(r"^(?:\s*$|\s*[,.;:)!?])")
+# Scientific notation in any form: 1.2e-5, 3×10−4, 3 x 10^-4, 10⁻⁵. The
+# checker does not read it, so every number in such a sentence is unverified.
+SCIENTIFIC = re.compile(
+    r"\d\s*[eE]\s*[-+\u2212]?\s*\d|\d\s*[×xX*·]\s*10\b|\b10\s*(?:\^|\*\*|[\u207b\u2070-\u2079\u00b9\u00b2\u00b3])")
+# Digits of any kind, including superscripts, for the "left over" check
+ANY_DIGIT = re.compile(r"[0-9\u2070-\u2079\u00b9\u00b2\u00b3]")
 
 
 def is_year(text: str, m: re.Match) -> bool:
@@ -182,7 +193,10 @@ def check(answer: str, texts: dict[int, str]) -> Report:
     to its retrieved text ("" or missing when it could not be fetched)."""
     texts = {k: normalise_source(v or "") for k, v in texts.items()}
     # Source text with thousands separators removed, for the pair search
-    joined = {k: re.sub(r"(?<=\d)[,    ](?=\d{3}(?!\d))", "", v) for k, v in texts.items()}
+    # and a bare leading decimal written with its zero (.5 -> 0.5), the same
+    # form canon() gives the answer's pair numbers
+    joined = {k: re.sub(r"(?<![\w.])\.(?=\d)", "0.", re.sub(r"(?<=\d)[,    ](?=\d{3}(?!\d))", "", v))
+              for k, v in texts.items()}
     report = Report()
     # Split at every sentence end, whatever follows (a digit, a lowercase
     # word): a sentence must carry its own citation. Splitting too often only
@@ -191,7 +205,21 @@ def check(answer: str, texts: dict[int, str]) -> Report:
         cited = sorted({int(n) for marker in CITATION.findall(sentence) for n in re.findall(r"\d+", marker)})
         plain = CITATION.sub("", sentence)
         claims = [m for m in NUMBER.finditer(plain)]
-        if not claims:
+        if not claims and not ANY_DIGIT.search(plain):
+            continue
+        # Fail closed on anything the checker cannot read: scientific notation,
+        # or digits left over outside every number it did read.
+        covered = [False] * len(plain)
+        for m in claims:
+            for i in range(m.start(), m.end()):
+                covered[i] = True
+        leftover = "".join(c.group() for c in ANY_DIGIT.finditer(plain) if not covered[c.start()])
+        unreadable = ("it uses scientific notation, which is not machine-checked" if SCIENTIFIC.search(plain)
+                      else f"it has digits the checker cannot read ({leftover})" if leftover else "")
+        if unreadable:
+            for item in [m.group(0).strip() for m in claims] or [leftover]:
+                report.results.append(NumberResult(number=item, sentence=sentence.strip(), cited=cited,
+                                                   status="unverified", reason=f"the sentence {unreadable}"))
             continue
         # Pairs ("30 of 32") must appear as that pair in a cited source. Each
         # pair is judged on its own, by position, so a valid pair elsewhere in

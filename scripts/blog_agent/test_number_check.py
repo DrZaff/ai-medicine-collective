@@ -199,6 +199,37 @@ class CodexFindings(unittest.TestCase):
         r = number_check.check("It was trained on 2.5 billion tokens [1].", {1: src})
         self.assertFalse(r.needs_fact_check)
 
+    def test_scientific_notation_fails_closed(self):
+        # Codex's review of 24d9503 (blocking): "1.2e-5" was split, and the
+        # exponent 5 could match an unrelated 5 in the source
+        src = "The difference was significant (p=0.003) across 5 sites."
+        for answer in ("It was significant (p=1.2e-5) [1].", "It was significant (p=3×10−5) [1].",
+                       "It was significant (p = 3 x 10^-5) [1].", "It was significant (p<10⁻⁵) [1]."):
+            r = number_check.check(answer, {1: src})
+            self.assertTrue(r.needs_fact_check, answer)
+            self.assertTrue(all(x.status == "unverified" for x in r.results), answer)
+            self.assertIn("scientific notation", r.results[0].reason, answer)
+
+    def test_unreadable_leftover_digits_fail_closed(self):
+        r = number_check.check("The effect was 2³ times larger [1].", {1: "2 times larger"})
+        self.assertTrue(r.needs_fact_check)
+
+    def test_counts_before_capitalised_words_are_checked(self):
+        # Codex's review of 24d9503: "in 2024 ICU patients" was exempted as a year
+        for answer in ("It was tested in 2024 ICU patients [1].", "It was tested in 1980 and 2,000 controls [1]."):
+            r = number_check.check(answer, {1: MASAI})
+            self.assertNotIn("year", [x.status for x in r.results], answer)
+            self.assertTrue(r.needs_fact_check, answer)
+
+    def test_leading_decimal_pairs_match_the_same_pair_in_the_source(self):
+        # Codex's review of 24d9503: ".5 of 2" in both places was rejected
+        r = number_check.check("It won .5 of 2 points [1].", {1: "It won .5 of 2 points."})
+        self.assertFalse(r.needs_fact_check)
+        r = number_check.check("It won .5 of 2 points [1].", {1: "It won 0·5 of 2 points."})
+        self.assertFalse(r.needs_fact_check)
+        r = number_check.check("It won .5 of 3 points [1].", {1: "It won .5 of 2 points; 3 also appears."})
+        self.assertTrue(r.needs_fact_check)
+
     def test_next_sentence_citation_does_not_cover_an_uncited_sentence(self):
         # Sentences starting with a digit or a lowercase word used not to split
         r = number_check.check("AMIE won on 30 axes. 25 out of 26 axes favoured it too [1].", {1: AMIE})
