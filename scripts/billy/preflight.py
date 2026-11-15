@@ -23,6 +23,68 @@ PERMISSIONS = {'contents': 'write', 'pull_requests': 'write', 'metadata': 'read'
 class SafeFailure(Exception):
     pass
 
+
+# ---------------------------------------------------------------- the stop marker
+# While /var/lib/billy-control/STOP exists, every Billy step refuses to start, and publish
+# refuses each write to GitHub. The folder belongs to billy-stop, a non-root account that only
+# sets the marker; agent and billy-pub can read it but not change it. Only the owner clears it.
+# It stops NEW Billy review and publish steps. Work already running, cloud agents and GitHub
+# Actions are not affected. Every doubt counts as stopped (fail closed).
+CONTROL = Path('/var/lib/billy-control')
+STOP_ACCOUNT = 'billy-stop'
+TRUSTED_UIDS = (0,)  # who may own the folders above the control folder
+STOP_EXIT = 3
+
+
+class Stopped(SafeFailure):
+    pass
+
+
+def stopped():
+    """Why Billy is stopped, or None if it may run. Never follows a symlink."""
+    control = CONTROL
+    for parent in control.parents:
+        try:
+            info = os.lstat(parent)
+        except OSError:
+            return 'a folder above the control folder is unreadable'
+        writable = info.st_mode & 0o022 and not info.st_mode & stat.S_ISVTX
+        if (not stat.S_ISDIR(info.st_mode) or info.st_uid not in TRUSTED_UIDS or writable):
+            return 'a folder above the control folder is not protected'
+    try:
+        info = os.lstat(control)
+    except OSError:
+        return 'the control folder is missing or unreadable; run install.sh'
+    try:
+        owner = pwd.getpwuid(info.st_uid).pw_name
+    except KeyError:
+        owner = None
+    if not stat.S_ISDIR(info.st_mode) or owner != STOP_ACCOUNT or info.st_mode & 0o022:
+        return 'the control folder is not a folder owned by %s that only it can write' % STOP_ACCOUNT
+    try:
+        os.lstat(control / 'STOP')  # a file, folder or symlink (even a dangling one) all count
+        return 'the stop marker is set'
+    except FileNotFoundError:
+        pass
+    except OSError:
+        return 'the stop marker cannot be checked'
+    if not os.access(control, os.R_OK | os.X_OK):
+        return 'the control folder is unreadable'
+    return None
+
+
+def stop_message(reason):
+    return ('Billy is stopped: %s. New review and publish steps are refused; work already '
+            'running, cloud agents and GitHub Actions are not affected. Only the owner clears it '
+            '(docs/agents/billy.md, "The stop marker").' % reason)
+
+
+def require_running():
+    """Raise Stopped if the stop marker (or any doubt about it) is in force."""
+    reason = stopped()
+    if reason:
+        raise Stopped(stop_message(reason))
+
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         raise SafeFailure('Redirect refused.')
@@ -71,6 +133,7 @@ def revoke(token):
     raise SafeFailure('Token revocation could not be confirmed after three attempts; expiry remains the fallback.')
 
 def main():
+    require_running()
     os.umask(0o077)
     cfg = json.loads(read_private(ROOT / 'app.json'))
     key = serialization.load_pem_private_key(read_private(ROOT / 'app.pem'), password=None)
@@ -109,6 +172,9 @@ def main():
 if __name__ == '__main__':
     try:
         main()
+    except Stopped as error:
+        print('STOP: ' + str(error), file=sys.stderr)
+        sys.exit(STOP_EXIT)
     except SafeFailure as error:
         print('STOP: ' + str(error), file=sys.stderr)
         sys.exit(1)

@@ -215,6 +215,7 @@ def journal(entry):
 # ---------------------------------------------------------------- review (as agent)
 
 def review(a):
+    p.require_running()
     readable = [k for k in KEY_PATHS if os.access(k, os.R_OK)]
     if readable:
         raise p.SafeFailure('The reviewer can read Billy\'s key (%s); run the install step first.'
@@ -268,6 +269,7 @@ def review(a):
             raise p.SafeFailure('The checkout changed during the review.')
     finally:
         shutil.rmtree(base, ignore_errors=True)
+    p.require_running()  # a stop set during the review: record nothing
     record = {'repo': a.repo, 'sha': a.sha, 'source': a.source, 'merge_base': merge_base,
               'reviewed_at': time.time(),
               'verdict': report['verdict'], 'summary': report['summary'], 'findings': report['findings']}
@@ -366,6 +368,7 @@ def fetch_step(a):
         from GitHub, never from the builder who made the bundle. The step also prints how many
         files the review covers, which must equal the PR's "Files changed" count on GitHub
         (computed against the real main)."""
+    p.require_running()
     if not REPOS[a.repo]:
         raise p.SafeFailure('%s is public; the review step clones it directly.' % a.repo)
     if not os.path.isdir(SOURCES):
@@ -386,6 +389,7 @@ def fetch_step(a):
             git(base, 'clone', '--quiet', '--no-checkout', carried, repo)
         else:
             from pr_test import mint  # needs the key: publisher only
+            p.require_running()
             _, token = mint('%s/%s' % (OWNER, a.repo), {'contents': 'read', 'metadata': 'read'})
             try:
                 # A full clone (no blob filter), so the bundle holds everything the review needs.
@@ -427,6 +431,7 @@ def fetch_step(a):
 
 
 def publish(a):
+    p.require_running()
     from pr_test import mint  # needs the key: publisher only
     path = record_path(a.sha)
     try:
@@ -444,6 +449,7 @@ def publish(a):
     full = '%s/%s' % (OWNER, a.repo)
     base = tempfile.mkdtemp(dir=WORK)
     try:
+        p.require_running()  # before the key is used
         _, token = mint(full)
         try:
             env = askpass_env(base, token)
@@ -460,6 +466,7 @@ def publish(a):
             ref = 'refs/heads/' + name
             if not ref.startswith(PUSH_PREFIX):
                 raise p.SafeFailure('Refusing to push outside agent/.')
+            p.require_running()  # before the push
             # An empty lease means "this branch must not exist yet": GitHub refuses the push
             # if anything created it, so a branch is never reused or moved.
             r = subprocess.run(['git', '-c', 'credential.helper=', '-c', 'core.hooksPath=/dev/null',
@@ -475,6 +482,10 @@ def publish(a):
                        for l in r.stdout.splitlines()):
                 raise p.SafeFailure('Branch %s already existed; Billy never reuses a branch.' % name)
             print('PASS: pushed %s as %s' % (a.sha[:12], name))
+            reason = p.stopped()  # before the pull request
+            if reason:
+                raise p.Stopped(p.stop_message(reason) + ' The branch %s was already pushed and '
+                                'no pull request was opened: delete the branch on GitHub.' % name)
             pr = p.api('POST', '/repos/%s/pulls' % full, token, {
                 'title': title, 'head': name, 'base': 'main', 'draft': True, 'body': body})
             print('INFO: opened draft PR as %s: %s' % (pr['user']['login'], pr['html_url']))
@@ -532,6 +543,9 @@ def main():
 if __name__ == '__main__':
     try:
         sys.exit(main())
+    except p.Stopped as error:
+        print('STOP: ' + redact(str(error)), file=sys.stderr)
+        sys.exit(p.STOP_EXIT)
     except p.SafeFailure as error:
         print('STOP: ' + redact(str(error)), file=sys.stderr)
         sys.exit(1)

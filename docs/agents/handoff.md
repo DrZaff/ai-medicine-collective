@@ -33,6 +33,8 @@ This builds on the supervised Billy handoff in [billy.md](billy.md) and the rule
 
 Run the command once per commit. A second run for the same commit stops at "already existed": Billy never reuses a branch.
 
+If a step stops with `STOP: Billy is stopped` (exit code 3), the stop marker is set: nothing was reviewed or published. Find out why it was set before clearing it ([billy.md](billy.md), "The stop marker").
+
 For the Mission Control repository (`DrZaff/billy-mission-control`, public since 2026-11-14), run only the review step, with `--repo billy-mission-control`:
 ```sh
 N=/home/agent/.nvm/versions/node/v26.13.0/bin; cd /tmp && \

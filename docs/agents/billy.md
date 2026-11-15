@@ -16,6 +16,7 @@ Two Unix users, so the reviewer can never read the publisher's key (the first ha
 | --- | --- | --- | --- |
 | `agent` | the Codex sign-in (`/home/agent/.codex`, mode `700`) | the **review** step (Codex) | read Billy's key |
 | `billy-pub` (system user, no login) | Billy's key and IDs in `/var/lib/billy-pub/.config/billy/` (`app.pem`, `app.json`, mode `600`) | `preflight.py`, `pr_test.py` and the **publish** step | run Codex or repository code |
+| `billy-stop` (system user, no login) | the control folder `/var/lib/billy-control/` | nothing yet: it only ever **sets** the stop marker (from A4a, through Mission Control's stop helper) | clear the marker in normal use, or read anything of Billy's |
 
 | Path | What |
 | --- | --- |
@@ -23,6 +24,7 @@ Two Unix users, so the reviewer can never read the publisher's key (the first ha
 | `/var/lib/billy-reviews/` (`agent` writes, `billy-pub` reads) | one review record per commit |
 | `/var/lib/billy-sources/` (`billy-pub` writes, `agent` reads) | a git bundle of a private repository's commit, for the reviewer |
 | `~/.local/state/billy/runs/` of each user | a JSON record per step (verdict, findings, PR link; no secrets) |
+| `/var/lib/billy-control/` (`billy-stop` writes, everyone reads) | the stop marker `STOP`, when it is set |
 
 Each publishing step turns the key into a token that lasts at most an hour, is limited to this repository and the three permissions, is never printed, and is revoked when the step ends. Tailscale on the server is the snap package: receive Taildrop files into `/var/snap/tailscale/common/inbox`, not a folder under a home directory. Codex for `agent` is installed through nvm, so its node folder goes on PATH in the launch command.
 
@@ -44,6 +46,33 @@ GitHub carries the work between the three; nothing is copied by hand. How a task
    **Why the bypass box.** Because ruleset 26914500 restricts updates to `main`, the owner's merge always goes through the pull-request bypass ("Merge without waiting for requirements to be met"), even when every requirement is met. That rule is what stops Billy's app from merging a PR the owner has approved. The box also skips failing checks, so tick it only when the merge box shows **Changes approved** and **All checks have passed**, and the one line left is "Cannot update this protected ref". Billy never merges, never pushes to `main`, never force-pushes over a branch and never reuses one. A new commit means a new run and a new approval.
 
 The Codex review is a report, not a GitHub approval, so it can never satisfy the human-approval rule.
+
+## The stop marker
+
+While `/var/lib/billy-control/STOP` exists, **Billy refuses new review and publish steps** (issue #205):
+
+- `handoff.py review`, `fetch` and `publish`, `preflight.py` and `pr_test.py` all refuse at the start, with `STOP: Billy is stopped: …` and exit code **3**. A refusal writes no run record.
+- **Mid-step:**
+  - `review` checks again before it records a verdict.
+  - `fetch` checks again before it mints a token.
+  - `publish` checks again before the key is used, before the push, and before it opens the pull request. A token already minted is still revoked. If the marker appears after the push, the step names the pushed `agent/` branch, which the owner deletes on GitHub.
+- **Every doubt counts as stopped:**
+  - a `STOP` that is a file, a folder or a symlink, even a dangling one (never followed)
+  - a missing or unreadable control folder
+  - a control folder not owned by `billy-stop`, or writable by others
+  - an unprotected folder above it
+
+**What it does not stop:** a Codex review or publish step already past its last check, Claude or Codex sessions, cloud agents and GitHub Actions. It stops *new* Billy steps; it cancels nothing already running.
+
+**Owner commands on the server:**
+
+```sh
+sudo -u billy-stop touch /var/lib/billy-control/STOP && sync   # set: Billy refuses every step
+ls -l /var/lib/billy-control/                                   # check: STOP listed = stopped
+sudo rm /var/lib/billy-control/STOP                             # clear: only after finding out why it was set
+```
+
+Setting it by hand is also the way to stop Billy if Mission Control's button is unavailable. `agent` and `billy-pub` can read the folder but not change it: `install.sh` proves this and prints `stop_marker_protected=yes`. It also prints the marker's state and the SHA-256 of every installed file, to compare with the merged commit.
 
 ## Working together
 
