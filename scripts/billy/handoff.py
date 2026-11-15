@@ -53,7 +53,11 @@ import preflight as p  # noqa: E402
 OWNER = p.REPO.split('/')[0]
 # The only repositories Billy works on, and whether each is private. A private repository's
 # commit reaches the reviewer through the fetch step; a public one is cloned without credentials.
-REPOS = {'ai-medicine-collective': False, 'billy-mission-control': True}
+# billy-mission-control was made public on 2026-11-14 (GitHub doesn't enforce rulesets on a
+# private repository of a free personal account), so it is reviewed like the main site. Billy
+# isn't installed there: after a passing review Claude opens its PRs. The private-repository
+# steps (fetch, and fetch --bundle) stay for any private repository added here later.
+REPOS = {'ai-medicine-collective': False, 'billy-mission-control': False}
 DEFAULT_REPO = p.REPO.split('/')[1]
 SOURCES = '/var/lib/billy-sources'
 REVIEW_REF = 'billy-review'

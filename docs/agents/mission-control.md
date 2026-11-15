@@ -476,9 +476,9 @@ Each journey ends with what happens when something goes wrong.
 8. **Attachment retention:** 30 days by default.
 9. **Clinician:** remains the owner for now. A second clinician for logic that could change care ([architecture.md](architecture.md), "Risk tiers").
 10. **Native iPhone app:** only after phase A proves useful (plan F).
-11. **Where Mission Control's code lives:** a new private repository (recommended), or a folder in this one that Netlify is set up never to publish. Either way, never as pages of the public site. **Decided 2026-11-14: a new private repository, `DrZaff/billy-mission-control`.**
+11. **Where Mission Control's code lives:** a new private repository (recommended), or a folder in this one that Netlify is set up never to publish. Either way, never as pages of the public site. **Decided 2026-11-14: a separate repository, `DrZaff/billy-mission-control`, first private, then made public the same day.** GitHub doesn't enforce rulesets on a private repository of a free personal account, so a private repository's `main` would have had no enforced protection. Public, it gets an enforced owner-merge-only ruleset and free secret scanning with push protection, and Codex reviews it like this repository. The cockpit itself stays private: it runs only on the Dell over Tailscale with a passkey, and the repository holds code only, never data, credentials or details of that machine. It was recreated before going public so its history carries only GitHub's private noreply address.
 
-    Because Codex's review user holds no GitHub credential, it can't clone a private repository. **Decided 2026-11-14:** Billy's publisher user fetches the exact commit with a read-only token for that one repository, and Codex reviews a git bundle of it offline (plan item A0b; [billy.md](billy.md)). The reviewer still never holds a credential.
+    For a private repository, Codex's credential-free review user can't clone it, so `handoff.py` has a `fetch` step that hands Codex a git bundle of the exact commit (plan item A0b; [billy.md](billy.md)). It is kept for any private repository added later.
 
 ## 16. Demo plan: fake data first
 
