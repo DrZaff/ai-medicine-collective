@@ -33,13 +33,14 @@ This builds on the supervised Billy handoff in [billy.md](billy.md) and the rule
 
 Run the command once per commit. A second run for the same commit stops at "already existed": Billy never reuses a branch.
 
-For the private Mission Control repository, add `--repo billy-mission-control` to each step and run the fetch step first. While Billy isn't installed there, Claude sends the owner a bundle file instead: carry it to the server (Taildrop), then run `fetch` with `--bundle <file> --main <main's full SHA>`, then `review`. Copy `main`'s SHA from GitHub yourself (the repository > Commits on `main` > the newest commit's full SHA), never from Claude: the bundle comes from Claude, so `main` must come from somewhere else. Before merging, check that the PR's **Files changed** count equals the count the fetch step printed; skip `publish`, because Claude opens that PR itself. With Billy installed, the commands are:
+For the Mission Control repository (`DrZaff/billy-mission-control`, public since 2026-11-14), run only the review step, with `--repo billy-mission-control`:
 ```sh
 N=/home/agent/.nvm/versions/node/v26.13.0/bin; cd /tmp && \
-sudo -H -u billy-pub python3 /opt/billy/handoff.py fetch <branch> <sha> --repo billy-mission-control && \
-sudo -H -u agent env PATH="$N:/usr/local/bin:/usr/bin:/bin" python3 /opt/billy/handoff.py review <branch> <sha> --repo billy-mission-control && \
-sudo -H -u billy-pub python3 /opt/billy/handoff.py publish <branch> <sha> --repo billy-mission-control --issue <N>
+sudo -H -u agent env PATH="$N:/usr/local/bin:/usr/bin:/bin" python3 /opt/billy/handoff.py review <branch> <sha> --repo billy-mission-control
 ```
+Billy isn't installed there, so there is no publish step: after a passing review, Claude opens the PR, and its head must be the reviewed SHA.
+
+For a **private** repository listed in `handoff.py` (none at present), a `fetch` step runs first, as `billy-pub`: from GitHub with a read-only token if Billy is installed there, or, if not, from a bundle the owner carries to the server (`fetch --bundle <file> --main <main's full SHA>`). Copy `main`'s SHA from GitHub yourself, never from Claude: the bundle comes from Claude, so `main` must come from somewhere else. Before merging, the PR's **Files changed** count must equal the count the fetch step printed.
 
 ## From a phone
 

@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import handoff  # noqa: E402
 
 URL = 'https://github.com/DrZaff/ai-medicine-collective/pull/999'
+PRIVATE = 'test-private'  # a stand-in private repository, listed only during tests
 REPORT = {'findings': [{'severity': 'note', 'file': 'docs/x.md', 'line': 3, 'confidence': 'high',
                         'problem': 'p', 'reproduce': 'r', 'fix': 'f'}],
           'summary': 'No blocking findings.', 'verdict': 'no_blocking_findings'}
@@ -85,25 +86,30 @@ class PrivateRepositories(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        # No listed repository is private at present, so the private path is tested with a
+        # stand-in name added for each test only.
+        self.addCleanup(setattr, handoff, 'REPOS', handoff.REPOS)
+        handoff.REPOS = dict(handoff.REPOS, **{PRIVATE: True})
 
     def test_only_listed_repositories(self):
         self.assertEqual(handoff.DEFAULT_REPO, 'ai-medicine-collective')
         self.assertFalse(handoff.REPOS['ai-medicine-collective'])
-        self.assertTrue(handoff.REPOS['billy-mission-control'])
+        self.assertFalse(handoff.REPOS['billy-mission-control'])  # public since 2026-11-14
         self.assertEqual(handoff.check_repo('billy-mission-control'), 'billy-mission-control')
+        self.assertTrue(handoff.REPOS[PRIVATE])  # the stand-in, during tests only
         for bad in ('other-repo', '../ai-medicine-collective', 'DrZaff/ai-medicine-collective', ''):
             with self.assertRaises(handoff.p.SafeFailure):
                 handoff.check_repo(bad)
 
     def test_fetched_copy_must_match_and_be_fresh(self):
         sha = 'a' * 40
-        meta = {'repo': 'billy-mission-control', 'source': 'claude/x', 'sha': sha,
+        meta = {'repo': PRIVATE, 'source': 'claude/x', 'sha': sha,
                 'fetched_at': time.time()}
-        handoff.check_source_meta(meta, 'billy-mission-control', 'claude/x', sha)
+        handoff.check_source_meta(meta, PRIVATE, 'claude/x', sha)
         for change in ({'repo': 'ai-medicine-collective'}, {'source': 'claude/y'},
                        {'sha': 'b' * 40}, {'fetched_at': time.time() - 3700}):
             with self.assertRaises(handoff.p.SafeFailure):
-                handoff.check_source_meta(dict(meta, **change), 'billy-mission-control',
+                handoff.check_source_meta(dict(meta, **change), PRIVATE,
                                           'claude/x', sha)
 
     def make_origin(self):
@@ -159,7 +165,7 @@ class PrivateRepositories(unittest.TestCase):
         old = handoff.RECORDS
         handoff.RECORDS = records
         self.addCleanup(setattr, handoff, 'RECORDS', old)
-        a = argparse.Namespace(repo='billy-mission-control', source='claude/x', sha=sha, issue=None)
+        a = argparse.Namespace(repo=PRIVATE, source='claude/x', sha=sha, issue=None)
         with self.assertRaises(handoff.p.SafeFailure) as caught:
             handoff.publish(a)
         self.assertIn('different repository', str(caught.exception))
@@ -176,7 +182,7 @@ class PrivateRepositories(unittest.TestCase):
             setattr(handoff, name, folder)
         return path, base_sha, sha
 
-    def fetch_args(self, bundle, sha, main, repo='billy-mission-control'):
+    def fetch_args(self, bundle, sha, main, repo=PRIVATE):
         return argparse.Namespace(repo=repo, source='claude/x', sha=sha, bundle=bundle, main=main)
 
     def test_carried_bundle_reaches_the_reviewer_unchanged(self):
@@ -186,11 +192,11 @@ class PrivateRepositories(unittest.TestCase):
             self.assertEqual(handoff.fetch_step(self.fetch_args(path, sha, base_sha)), 0)
         self.assertIn('covers 1 changed file(s)', out.getvalue())
         self.assertIn('"Files changed"', out.getvalue())
-        bundle, meta_path = handoff.source_paths('billy-mission-control', sha)
+        bundle, meta_path = handoff.source_paths(PRIVATE, sha)
         with open(meta_path) as f:
             meta = json.load(f)
         self.assertEqual((meta['main'], meta['via']), (base_sha, 'carried bundle'))
-        handoff.check_source_meta(meta, 'billy-mission-control', 'claude/x', sha)
+        handoff.check_source_meta(meta, PRIVATE, 'claude/x', sha)
         review = os.path.join(self.tmp, 'review')
         os.makedirs(review)
         _, merge_base, files, _ = handoff.fetch(review, 'claude/x', sha, url=bundle,
@@ -222,7 +228,7 @@ class PrivateRepositories(unittest.TestCase):
         for label, path, main in (('honest', honest, base_sha), ('crafted', crafted, first)):
             with contextlib.redirect_stdout(io.StringIO()):
                 handoff.fetch_step(self.fetch_args(path, sha, main))
-            with open(handoff.source_paths('billy-mission-control', sha)[1]) as f:
+            with open(handoff.source_paths(PRIVATE, sha)[1]) as f:
                 counts[label] = json.load(f)['files']
         self.assertEqual(counts, {'honest': 2, 'crafted': 1})
 
