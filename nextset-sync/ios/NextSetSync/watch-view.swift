@@ -136,6 +136,7 @@ struct WatchView: View {
             Button("Finish the workout on the watch") { Task { await model.demoFinishWorkout() } }
             Button("Mark a moment on the watch") { Task { await model.demoMark() } }
             Button("Morning check-in on the watch") { Task { await model.demoCheckin() } }
+            Button("Go for a walk with the watch") { Task { await model.demoWalk() } }
             if model.connection.isLinked {
                 Button("Walk away (disconnect)") { Task { await model.demoDisconnect() } }
             } else {

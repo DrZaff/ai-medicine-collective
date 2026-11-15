@@ -1,2 +1,3 @@
 0.01: First version: workout logging with rest timer, BLE sync protocol v1, Sleep Log 0.26 relay
 0.02: Workout Ghost (Codex), silent timers and stopwatch that survive leaving the app (Scheduler alarms), moment markers synced to the iPhone, last-set memory follows edits, sync diagnostics
+0.03: Sleep face (approved square-bezel blinking eye), daily steps on the watch and the iPhone, offline Run / Walk with GPS pace, mile or km split buzzes and the route, synced exactly once

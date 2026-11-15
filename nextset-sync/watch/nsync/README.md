@@ -40,6 +40,55 @@ same RIR gets a distinct buzz.
 Needs the **Scheduler** app, which the App Loader installs as a dependency
 of this app. Without it, timers buzz only while their screen is open.
 
+## Run / Walk (outdoors, GPS)
+
+**Run** or **Walk** in the main menu. The watch's own GPS records it; the
+iPhone is not needed until you sync.
+
+* **Before Start**: the GPS warms up ("Searching for GPS", then "GPS ready").
+  Tap **START** (bottom half) when ready, or start anyway: distance counts from
+  the first fix. The button goes back (GPS off).
+* **Moving**: live **pace** is the big number (min/mi or min/km), with distance
+  and elapsed time below and moving time under those. Pace is blank while the
+  GPS is searching, lost (no fresh fix for 10 s) or stalled, and when you stop.
+  The button **pauses**.
+* **Splits**: Run buzzes at every mile by default and shows the mile number and
+  its split time for 5 seconds, then live pace again. **Run & walk settings**:
+  miles or km (also the pace units), buzz on or off for Run and for Walk (Walk
+  is off by default). Each split buzzes exactly once: distance only ever grows,
+  and the split count is saved, so GPS jitter at the boundary, a pause, leaving
+  the app or a restart never repeats one. The phone is not involved.
+* **Paused**: RESUME or FINISH; the button resumes. Distance and time while
+  paused are not counted.
+* **Finish**: SAVE or DISCARD (asks first). Saved runs and walks sync to the
+  iPhone with their route and appear on **Today**.
+* **Leaving the app pauses** the run and switches the GPS off; open NextSet
+  Sync again to resume it. Keep the screen on the Run screen while moving.
+* The GPS is switched off on Save, Discard, back and leaving the app.
+
+How distance is counted (`gps.js`): fixes are averaged over 3 seconds; a point
+counts once it is 10 m from the last counted one, so standing still adds
+nothing; fixes with hdop above 6, a receiver repeating an old fix, and jumps
+faster than 9 m/s are ignored; after a GPS gap the straight line is counted.
+The tests replay seven synthetic tracks (`protocol/fixtures/gps-tracks.json`):
+steady pace, a 60 s gap, a stalled fix, a pause while moving, jitter at a mile
+boundary, a wild fix, and km units.
+
+**Why not Recorder?** BangleApps Recorder was evaluated first. It records well,
+but it is a widget-driven logger with its own track files and settings, has no
+pause that excludes distance, splits or pace, and would make this app depend
+on another app's file format for the one thing that must sync exactly once.
+NextSet Sync therefore keeps its own small route log (one `seconds,lat,lon`
+line every 15 m or 30 s, about 25 bytes a point, so an hour's run is about
+10 KB) and you can still use Recorder for other activities.
+
+## Steps
+
+**Steps today** in the main menu shows the firmware's live count, and the
+screen behind it shows the last seven days (from the Health app's log, by the
+watch's own date). The iPhone gets the same daily totals each sync and replaces
+each day's number, so syncing twice never doubles a day.
+
 ## Sleep
 
 Install **Sleep Log** (0.26) too. Sleep Log records in the background; this
@@ -50,7 +99,9 @@ overnight.
 the night. It blinks once when it opens, then every 30 to 90 seconds, but only
 while the screen is already on: it never turns the screen or backlight on and
 never changes brightness, and when the screen goes off every pending blink is
-cancelled. When the screen comes back on it shows the open eye. No clock and no
+cancelled. When the screen comes back on it shows the open eye. (The Bangle.js 2
+screen normally stays on with the backlight off, so by default the eye keeps
+blinking unlit; if you set the screen to switch off, it stops until you look.) No clock and no
 widgets. While it is open the watch uses your normal lock and backlight times
 (not the longer ones used while lifting). The button (after the press that only
 wakes the screen) goes back to the menu. Sleep Log keeps recording either way;
@@ -75,6 +126,9 @@ Web IDE's storage manager (Storage icon).
 
 Other files: `nsync.mark.a/b.json` (markers, kept like pending records),
 `nsync.timer.json` (running timer), `nsync.sw.json` (stopwatch),
-`nsync.eye0.img` to `nsync.eye3.img` (Sleep face frames, made from
+`nsync.run.a/b.json` (run or walk in progress), `nsync.act.a/b.json` (saved
+runs and walks until the iPhone has them; kept like markers), `nsync.rt<start>`
+(each route until the iPhone has stored it), `nsync.runcfg.json` (units and
+buzz settings), `nsync.eye0.img` to `nsync.eye3.img` (Sleep face frames, made from
 `design/sleep-face/` by `scripts/make-sleep-face.py`; 2-bit images with a
 palette, read memory-mapped, so they use no RAM).

@@ -195,3 +195,75 @@ public struct HealthRow: Codable, Hashable, Sendable {
     public var bpm: Double? { bpmMin > 0 && bpmMax > 0 ? Double(bpmMin + bpmMax) / 2 : nil }
     public var date: Date { Date(timeIntervalSince1970: TimeInterval(t10) * 600) }
 }
+
+/// One point of a run or walk route: seconds since the start, latitude, longitude.
+public struct RoutePoint: Codable, Hashable, Sendable {
+    public var t: Int
+    public var lat: Double
+    public var lon: Double
+    public init(t: Int, lat: Double, lon: Double) { self.t = t; self.lat = lat; self.lon = lon }
+    public init?(_ a: [Double]) {
+        guard a.count >= 3, a[1].isFinite, a[2].isFinite, abs(a[1]) <= 90, abs(a[2]) <= 180 else { return nil }
+        self.init(t: Int(a[0]), lat: a[1], lon: a[2])
+    }
+}
+
+/// An outdoor run or walk recorded on the watch with its own GPS.
+/// Distance and splits are the watch's figures; `units` is what the watch
+/// showed ("mi" or "km"). Stored once by id; the route arrives with it.
+public struct ActivityRecord: Codable, Hashable, Identifiable, Sendable {
+    public var id: String
+    public var rev: Int
+    public var mode: String
+    public var start: Date
+    public var end: Date
+    public var distanceM: Double
+    public var movingS: Int
+    public var elapsedS: Int
+    public var units: String
+    /// Moving seconds for each completed mile (or km).
+    public var splits: [Int]
+    public var route: [RoutePoint]
+    /// The watch ran low on storage and stopped adding route points.
+    public var routeCut: Bool
+    public var receivedAt: Date
+    public var ackState: AckState
+    public var isDemo: Bool
+
+    public var title: String { mode == "walk" ? "Walk" : "Run" }
+    public var unitMeters: Double { units == "km" ? 1000 : 1609.344 }
+    /// Seconds per mile (or km) over moving time; nil for very short ones.
+    public var averagePace: Double? { distanceM >= 50 ? Double(movingS) * unitMeters / distanceM : nil }
+    public var distanceInUnits: Double { distanceM / unitMeters }
+}
+
+/// Steps for one watch-local day ("YYYY-MM-DD"), as the watch last reported
+/// them. The date is the record's identity: a later sync replaces the total.
+public struct DailySteps: Codable, Hashable, Identifiable, Sendable {
+    public var date: String
+    public var steps: Int
+    public var updatedAt: Date
+    public var isDemo: Bool
+    public var id: String { date }
+    public init(date: String, steps: Int, updatedAt: Date, isDemo: Bool = false) {
+        self.date = date; self.steps = steps; self.updatedAt = updatedAt; self.isDemo = isDemo
+    }
+}
+
+/// Formats seconds as "8:05" or "1:02:07".
+public enum Clock {
+    public static func text(_ seconds: Double?) -> String {
+        guard let s = seconds, s.isFinite, s >= 0 else { return "--:--" }
+        let v = Int(s.rounded()), h = v / 3600, m = (v / 60) % 60, x = v % 60
+        return h > 0 ? String(format: "%d:%02d:%02d", h, m, x) : String(format: "%d:%02d", m, x)
+    }
+}
+
+public enum RouteMath {
+    /// Metres between two points (equirectangular, as the watch counts).
+    public static func meters(_ a: RoutePoint, _ b: RoutePoint) -> Double {
+        let k = Double.pi / 180
+        let x = (b.lon - a.lon) * k * cos((a.lat + b.lat) * k / 2), y = (b.lat - a.lat) * k
+        return (x * x + y * y).squareRoot() * 6_371_008.8
+    }
+}
