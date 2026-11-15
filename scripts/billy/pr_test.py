@@ -32,6 +32,7 @@ def message(e):
 def mint(repo=None, permissions=None):
     """A token for ONE repository of the owner's (default: p.REPO) with the given permissions
     (default: Billy's full set). Refuses a token whose permissions differ from those asked for."""
+    p.require_running()  # never use the key while Billy is stopped
     repo = repo or p.REPO
     permissions = permissions or p.PERMISSIONS
     if not repo.startswith('DrZaff/') or repo.count('/') != 1:
@@ -175,6 +176,7 @@ def main():
     mode = sys.argv[1] if len(sys.argv) == 2 else ''
     if mode not in ('setup', 'negative'):
         raise p.SafeFailure('Usage: pr_test.py setup | negative')
+    p.require_running()
     os.umask(0o077)
     os.makedirs(WORK, mode=0o700, exist_ok=True)
     base = tempfile.mkdtemp(dir=WORK)
@@ -197,6 +199,9 @@ def main():
 if __name__ == '__main__':
     try:
         main()
+    except p.Stopped as error:
+        print('STOP: ' + str(error), file=sys.stderr)
+        sys.exit(p.STOP_EXIT)
     except p.SafeFailure as error:
         print('STOP: ' + str(error), file=sys.stderr)
         sys.exit(1)

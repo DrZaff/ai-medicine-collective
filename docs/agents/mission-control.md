@@ -271,7 +271,11 @@ This is the standing division of labour. It is already practiced in the supervis
 ### 9.4 Recovery
 - **Reconciling.** Every step is idempotent and checks GitHub before acting, as `handoff.py` already does: it won't reuse a branch, and it checks the PR head.
 - **After a crash,** the coordinator reconciles `runs` and `events` with GitHub. Where it can't tell what happened, it marks the task `Failed` and asks the owner; it never guesses.
-- **The stop switch** is a file, `~/billy/STOP`, that every step checks before acting, plus one button in Mission Control that creates it. The button is the interface's only write action (§13).
+- **The stop switch** is the stop marker `/var/lib/billy-control/STOP` ([billy.md](billy.md), "The stop marker"; issue #205).
+  - **Who can change it:** the folder belongs to `billy-stop`, a non-root account that only ever sets the marker. Agents and the web app can read it but not change it. Only the owner clears it, on the server.
+  - **What checks it:** every Billy step, at the start and again before each write. Publish checks before the key is used, before the push and before the pull request. Every doubt about the marker counts as stopped.
+  - **What it means:** it stops *new* Billy review and publish steps. It cancels nothing already running, and doesn't reach cloud agents or GitHub Actions. Future orchestrators, schedule runners and worker launchers must honour it in the same way.
+  - **Mission Control's button** (A4a) asks a small stop helper, running as `billy-stop`, to set it. The button is the interface's only write action (§13), and it can only turn the stop on.
 - **Restore.** If `state.db` is lost, the cache rebuilds from GitHub. Proposals, conversations and events come back from the daily export.
 
 ## 10. Unattended execution: blocked until every gate passes
