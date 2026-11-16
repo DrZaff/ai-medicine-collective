@@ -70,6 +70,13 @@ class SignOff(unittest.TestCase):
                        'Billy never merges', "clinician's approval of this exact commit"):
             self.assertIn(needed, text)
 
+    def test_says_how_to_approve_on_an_iphone(self):
+        text = ' '.join(handoff.sign_off(URL))
+        for needed in ('On an iPhone', 'GitHub app', 'Request Desktop Website', '**Approve**'):
+            self.assertIn(needed, text)
+        approve = handoff.sign_off(URL).index('2. Approve: open %s/files' % URL)
+        self.assertIn('On an iPhone', handoff.sign_off(URL)[approve + 2])
+
     def test_description_uses_tab_names_not_links(self):
         text = ' '.join(handoff.sign_off())
         self.assertNotIn('https://', text)

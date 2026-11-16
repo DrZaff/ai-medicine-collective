@@ -316,6 +316,9 @@ def sign_off(url=None):
         '   and press **Ready for review** (Billy opens PRs as drafts).',
         '2. Approve: open %s' % files,
         '   then **Review changes** > **Approve** > **Submit review**.',
+        '   On an iPhone the mobile site hides that button. In the GitHub app, open the PR and tap '
+        '**Review changes** (or **Files changed** > **Review**) > **Approve** > **Submit**. In '
+        'Safari, first tap **aA** > **Request Desktop Website**.',
         '3. Merge: open %s' % page,
         '   and scroll to the merge box. Only if it shows **Changes approved** and **All checks have '
         'passed**, and the one line left is "Cannot update this protected ref", tick **Merge without '
