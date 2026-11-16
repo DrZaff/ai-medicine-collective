@@ -33,7 +33,13 @@ This builds on the supervised Billy handoff in [billy.md](billy.md) and the rule
 
 Run the command once per commit. A second run for the same commit stops at "already existed": Billy never reuses a branch.
 
-If a step stops with `STOP: Billy is stopped` (exit code 3), the stop marker is set: nothing was reviewed or published. Find out why it was set before clearing it ([billy.md](billy.md), "The stop marker").
+If a step stops with `STOP: Billy is stopped` (exit code 3), read the reason after the colon ([billy.md](billy.md), "The stop marker"):
+- **"the stop marker is set":** someone set it on purpose. Find out why before clearing it.
+- **Anything else** (the control folder is missing, owned by the wrong account, writable by others, or a folder above it is unprotected): the marker may not be set, but Billy can't trust it. Re-run `install.sh` and read its output; don't create or loosen the folder by hand.
+- **What was done before the stop:**
+  - a refused review recorded no verdict
+  - a refused fetch minted no token
+  - a refused publish opened no pull request, but it may already have **pushed a branch**: the message names it, and you delete it on GitHub
 
 For the Mission Control repository (`DrZaff/billy-mission-control`, public since 2026-11-14), run only the review step, with `--repo billy-mission-control`:
 ```sh

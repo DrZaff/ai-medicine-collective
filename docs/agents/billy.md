@@ -118,6 +118,18 @@ GitHub is the shared record. Each party reads it before acting, and nothing pass
 
 This shows Billy is not on 26914500's bypass list and cannot push to, merge into or delete `main`. It does not cover a clinician's approval for clinical files: CODEOWNERS lists no clinical paths yet ([architecture.md](architecture.md)).
 
+## Verified: the stop marker (2026-11-16)
+
+Installed from the merged commit `02470be` (PR #206, issue #205), after `sha256sum -c` on the downloaded files.
+
+| Step | Result |
+| --- | --- |
+| Installed files match the merged commit | Matched: `handoff.py` `0d0df5a1…`, `pr_test.py` `fabea6cc…`, `preflight.py` `0f1f3454…`, `review-schema.json` `96f16a7e…` |
+| Control folder | `billy-stop:billy-stop 755 /var/lib/billy-control`, marker clear |
+| `install.sh` proofs | `agent_cannot_read_key=yes`, `stop_marker_protected=yes` (neither `agent` nor `billy-pub` can write to the folder or create a file in it) |
+| Marker set (`sudo -u billy-stop touch …/STOP`), then `preflight.py` as `billy-pub` | **Refused** before reading the key: "STOP: Billy is stopped: the stop marker is set. …", exit code 3 |
+| Marker cleared (`sudo rm …/STOP`), then `preflight.py` again | Passed: identity and scope verified, token revoked, exit code 0 |
+
 ## Remaining setup
 
 | Step | Who | State |
