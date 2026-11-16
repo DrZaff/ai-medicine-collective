@@ -47,3 +47,12 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
     Strict-Transport-Security = "max-age=31536000"
+
+# The site's Netlify address serves the same pages; send it to the real
+# address so search engines see one copy of each page (deploy previews have
+# their own addresses and are unaffected).
+[[redirects]]
+  from = "https://ai-medicine-collective.netlify.app/*"
+  to = "https://www.aimedicinecollective.com/:splat"
+  status = 301
+  force = true

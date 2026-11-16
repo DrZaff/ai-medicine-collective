@@ -1063,7 +1063,7 @@ function initBlog() {
       return;
     }
 
-    const requested = new URLSearchParams(location.search).get("date");
+    const requested = app.dataset.date || new URLSearchParams(location.search).get("date");
     const entry = index.find((e) => e.date === requested) || index[0];
 
     try {
