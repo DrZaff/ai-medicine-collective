@@ -1,0 +1,14 @@
+AI in selection decisions and in dermoscopy: what reviewers and readers should watch for
+
+One review looks at how AI is starting to shape who gets into medical school and residency. The other shows what happened when 104 experienced dermatologists saw an AI risk score before deciding on suspicious skin lesions. Both ask the same question: when AI enters a decision, who checks it, and does it actually make the result better?
+
+Med-ed: Artificial Intelligence in U.S. Medical School Admissions and Residency Selection: A Review and the Door–Gate Matrix for Governing Selection AI (International Medical Education (MDPI))
+AI vs physician: Dermoscopy-Based AI Risk Scoring Enhanced Experienced Dermatologists' Decision-Making: a Large Retrospective Reader Study (Dermatology Practical & Conceptual)
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-11-16 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #Admissions #AiGovernance #AiAssistedDiagnosis #AlgorithmicBias #DeepLearning #Dermatology
