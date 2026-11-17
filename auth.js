@@ -42,6 +42,47 @@ function rememberUnread(count) {
   window.dispatchEvent(new Event("amc-role-changed"));
 }
 
+// Blog alerts (migration 026). Whether they're on is saved as a hint so the
+// Blog page can say "You'll get new posts by email" without the Supabase
+// library; script.js reads BLOG_ALERT_HINT_KEY, so keep the two identical.
+// Cosmetic only: who is emailed is decided by the database.
+const BLOG_ALERTS_STORAGE_KEY = "amc-blog-alerts";
+// Someone who pressed "Email me new blog posts" before they could have them
+// (signed out, or awaiting approval). Kept on this device until the account
+// page can switch alerts on for them.
+const BLOG_ALERTS_WISH_KEY = "amc-want-blog-alerts";
+
+// Longest "About me" (profiles.bio); the database's check (026) matches
+const ABOUT_ME_MAX = 1500;
+
+function rememberBlogAlerts(on) {
+  try {
+    if (on) localStorage.setItem(BLOG_ALERTS_STORAGE_KEY, "on");
+    else localStorage.removeItem(BLOG_ALERTS_STORAGE_KEY);
+  } catch {
+    // localStorage unavailable: the Blog page just shows the button
+  }
+}
+
+function blogAlertsWanted() {
+  try {
+    if (new URLSearchParams(window.location.search).get("alerts") === "blog") {
+      localStorage.setItem(BLOG_ALERTS_WISH_KEY, "1");
+    }
+    return localStorage.getItem(BLOG_ALERTS_WISH_KEY) === "1";
+  } catch {
+    return new URLSearchParams(window.location.search).get("alerts") === "blog";
+  }
+}
+
+function forgetBlogAlertsWish() {
+  try {
+    localStorage.removeItem(BLOG_ALERTS_WISH_KEY);
+  } catch {
+    // nothing to forget
+  }
+}
+
 // Looked up in the background after the profile loads; never blocks the page.
 async function refreshUnread(userId) {
   const { count, error } = await db
@@ -283,6 +324,7 @@ async function getSessionAndProfile() {
   if (!session) {
     rememberRole(null);
     rememberUnread(0);
+    rememberBlogAlerts(false);
     return { session: null, profile: null };
   }
 
@@ -357,6 +399,14 @@ function initAccountPage() {
   function renderSignedOut(message) {
     const panel = el("div", "account-panel");
     if (message) panel.append(el("p", "account-status is-error", message));
+    if (blogAlertsWanted()) {
+      const wish = el("div", "blog-alerts-wish");
+      wish.append(
+        el("p", "account-status", "> EMAIL ME NEW BLOG POSTS"),
+        el("p", null, "Blog alerts are for members, and joining is free. Sign in, or create an account and ask to join below; once a moderator approves you, come back to this page and the alerts switch on.")
+      );
+      panel.append(wish);
+    }
     panel.append(
       el("p", null, "Sign in with your Google account, or with your email and a password."),
       button("> SIGN IN WITH GOOGLE", "signin-btn", async (e) => {
@@ -700,9 +750,28 @@ function initAccountPage() {
           el("p", null, "You're signed in. Tell us a little about yourself below so a moderator can review your request.")
         );
       } else if (profile.role === "pending") {
+        // What happens next, and a few open things to do while waiting
+        const meanwhile = el("ul", "pending-meanwhile");
+        [
+          ["Read AI vs Physician", "ai-vs-physician.html", ": what the studies say when AI and clinicians are compared."],
+          ["Try JungleCards", "https://junglecards.aimedicinecollective.com", ": a member-built flashcard app."],
+          ["Browse Member Creations", "hub.html", ": the tools members have built."],
+        ].forEach(([text, href, rest]) => {
+          const li = el("li");
+          const a = el("a", null, text);
+          a.href = href;
+          if (href.startsWith("https://")) {
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+          }
+          li.append(a, rest);
+          meanwhile.append(li);
+        });
         panel.append(
           el("p", "account-status", "> ACCESS PENDING"),
-          el("p", null, "Your request is with our moderators. Member features unlock once you're approved; check back here to see your status.")
+          el("p", null, "Your request is with our moderators. We'll email you when you're approved, and member features unlock then."),
+          el("p", "pending-meanwhile-title", "// While you wait:"),
+          meanwhile
         );
       } else if (profile.role === "rejected") {
         panel.append(
@@ -731,14 +800,15 @@ function initAccountPage() {
         await db.auth.signOut();
         rememberRole(null);
         rememberUnread(0);
+        rememberBlogAlerts(false);
         renderSignedOut();
       })
     );
     show(panel);
     // Arriving from "EDIT MY PROFILE": the form didn't exist when the page loaded
-    if (window.location.hash === "#profile") {
-      const target = document.getElementById("profile");
-      if (target) target.scrollIntoView();
+    if (window.location.hash === "#profile" || window.location.hash === "#blog-alerts") {
+      const target = document.getElementById(window.location.hash.slice(1)) || document.getElementById("profile");
+      if (target) target.scrollIntoView({ block: target.id === "profile" ? "start" : "center" });
     }
   }
 
@@ -1120,7 +1190,8 @@ function initAccountPage() {
 
     const wrap = el("details", "account-details");
     wrap.id = "profile";
-    wrap.open = empty || !profile.full_name || window.location.hash === "#profile";
+    wrap.open = empty || !profile.full_name || window.location.hash === "#profile"
+      || window.location.hash === "#blog-alerts" || blogAlertsWanted();
     wrap.append(el("summary", "account-details-summary", "// Your profile (visible to members)"));
 
     const form = el("form", "account-details-form");
@@ -1150,12 +1221,29 @@ function initAccountPage() {
       program = textInput("profile-program", current.program || (details && details.program), 120, "e.g. UC Internal Medicine");
       level = textInput("profile-level", current.training_level, 40, "e.g. PGY-2, MS3, Faculty");
       focus = textInput("profile-focus", current.focus_areas, 300, "e.g. clinical workflows, medical education");
-      bio = el("textarea", "join-input");
+      // "About me": a few short paragraphs, shown on the member's profile page.
+      // The column is still called bio; 026 raised its limit to 1500.
+      bio = el("textarea", "join-input about-me-input");
       bio.id = "profile-bio";
-      bio.rows = 4;
-      bio.maxLength = 1000;
+      bio.rows = 7;
+      bio.maxLength = ABOUT_ME_MAX;
       bio.value = current.bio || "";
-      bio.placeholder = "A few lines about you and what you're building or learning.";
+      bio.placeholder = "Who you are, what you're building or learning, and what you'd like to work on with others. A few short paragraphs is plenty.";
+      bio.setAttribute("aria-describedby", "profile-bio-count profile-bio-rule");
+      const counter = el("p", "join-hint about-me-count");
+      counter.id = "profile-bio-count";
+      counter.setAttribute("aria-live", "polite");
+      const count = () => {
+        const left = ABOUT_ME_MAX - bio.value.length;
+        counter.textContent = `${bio.value.length} / ${ABOUT_ME_MAX} characters${left <= 100 ? ` (${left} left)` : ""}`;
+      };
+      bio.addEventListener("input", count);
+      count();
+      const rule = el("p", "join-hint", "// No patient information, ever: no names, dates, places or case details that could identify anyone.");
+      rule.id = "profile-bio-rule";
+      const aboutRow = field("About me", bio, true);
+      aboutRow.classList.add("about-me-row");
+      aboutRow.append(counter, rule);
       contact = textInput("profile-contact", current.contact_email, 120, "optional: an email to show other members", "email");
       link = textInput("profile-link", current.link_url, 300, "optional: https://…", "url");
       link.pattern = "https://.+";
@@ -1163,7 +1251,7 @@ function initAccountPage() {
         field("Program", program),
         field("Level", level),
         field("Focus", focus),
-        field("About", bio, true),
+        aboutRow,
         field("Contact", contact),
         field("Link", link)
       );
@@ -1217,6 +1305,50 @@ function initAccountPage() {
       form.append(chip);
     }
 
+    // New blog posts by email (migration 026). Approved members only; the
+    // database sends only to them, whatever the column says.
+    let blogAlerts = null;
+    let blogAlertsDone = null;
+    const wantsBlogAlerts = blogAlertsWanted();
+    const { data: blogPref, error: blogError } = await db
+      .from("profiles").select("blog_alerts").eq("id", profile.id).maybeSingle();
+    const blogReady = !blogError && blogPref && typeof blogPref.blog_alerts === "boolean";
+    if (blogReady && APPROVED_ROLES.includes(profile.role)) {
+      const chip = el("label", "interest-chip profile-alerts");
+      chip.id = "blog-alerts";
+      blogAlerts = el("input");
+      blogAlerts.type = "checkbox";
+      blogAlerts.checked = blogPref.blog_alerts;
+      chip.append(blogAlerts, " Email me new blog posts");
+      form.append(chip);
+      rememberBlogAlerts(blogPref.blog_alerts);
+
+      // Arrived from "Email me new blog posts": switch it on now and say so
+      if (wantsBlogAlerts) {
+        forgetBlogAlertsWish();
+        let ok = blogPref.blog_alerts;
+        if (!ok) {
+          const { error } = await db.from("profiles").update({ blog_alerts: true }).eq("id", profile.id);
+          ok = !error;
+          if (error) console.error(error);
+        }
+        blogAlertsDone = el("p", ok ? "account-status blog-alerts-done" : "account-status is-error",
+          ok ? "> DONE: you'll get an email when a new blog post goes up. Untick the box below to stop."
+             : "> COULD NOT SWITCH ON BLOG ALERTS. Tick the box below and save.");
+        blogAlertsDone.setAttribute("role", "status");
+        if (ok) {
+          blogAlerts.checked = true;
+          rememberBlogAlerts(true);
+        }
+        form.prepend(blogAlertsDone);
+      }
+    } else if (wantsBlogAlerts && blogReady && profile.role === "pending") {
+      const wait = el("p", "account-status blog-alerts-wish",
+        "> BLOG ALERTS: these switch on once a moderator approves you. Come back to this page after that.");
+      wait.id = "blog-alerts";
+      form.append(wait);
+    }
+
     const save = el("button", "join-submit", "> Save profile");
     save.type = "submit";
     const status = el("p", "join-status");
@@ -1243,6 +1375,7 @@ function initAccountPage() {
       }
       if (alerts) changes.email_alerts = alerts.checked;
       if (digest) changes.email_digest = digest.checked;
+      if (blogAlerts) changes.blog_alerts = blogAlerts.checked;
       if (institution) changes.institution = institution.value.trim() || null;
       if (listing) changes.directory_listing = listing.checked;
       save.disabled = true;
@@ -1255,10 +1388,14 @@ function initAccountPage() {
         // The database explains a refused display name (migration 021)
         status.textContent = error.code === "23514" && /Display names/.test(error.message || "")
           ? `> ${error.message}`
-          : "> COULD NOT SAVE. Check the contact email and link, then try again.";
+          : error.code === "23514" && /bio/.test(error.message || "")
+            ? "> COULD NOT SAVE. About me is too long; please shorten it."
+            : "> COULD NOT SAVE. Check the contact email and link, then try again.";
         status.classList.add("is-error");
         return;
       }
+      if (blogAlerts) rememberBlogAlerts(blogAlerts.checked);
+      if (blogAlertsDone) blogAlertsDone.remove();
       status.textContent = "> SAVED";
       const shown = document.querySelector(".account-name");
       if (shown) shown.textContent = changes.full_name;
@@ -1281,7 +1418,8 @@ function initAccountPage() {
       if (session) {
         // Just signed in, and already a member: on to the home page.
         // (People still waiting for approval stay here to see their status.)
-        if (takeSigningInMark() && profile && APPROVED_ROLES.includes(profile.role)) {
+        // (Except someone who came to switch on blog alerts: they stay to see it done.)
+        if (takeSigningInMark() && profile && APPROVED_ROLES.includes(profile.role) && !blogAlertsWanted()) {
           window.location.replace("index.html");
           return;
         }

@@ -1138,6 +1138,46 @@ button:hover {
   margin: 4px 0 12px;
 }
 
+/* "About me" on the profile form: a roomier box with a counter under it */
+.about-me-input {
+  min-height: 9em;
+  line-height: 1.55;
+  font-family: var(--font-read);
+}
+
+.about-me-row .join-hint {
+  margin: 4px 0 0;
+}
+
+.about-me-count {
+  color: var(--muted);
+}
+
+/* Awaiting approval: things to do meanwhile */
+.pending-meanwhile-title {
+  margin: 12px 0 4px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.pending-meanwhile {
+  margin: 0 0 14px;
+  padding-left: 20px;
+  font-family: var(--font-read);
+  line-height: 1.6;
+}
+
+/* Came from "Email me new blog posts" on the Blog page */
+.blog-alerts-wish {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+}
+
+.blog-alerts-done {
+  margin: 0 0 12px;
+}
+
 .signin-or {
   margin: 10px 0 6px;
   color: var(--muted);
@@ -1753,6 +1793,44 @@ div.roster-card:hover {
 .member-profile-text {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+/* "About me" on a member's profile: their own words, set for reading */
+.about-me {
+  margin: 14px 0 16px;
+  padding-top: 12px;
+  border-top: 1px var(--rule-style) var(--accent);
+}
+
+.about-me-title {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.about-me-text {
+  margin: 0 0 12px;
+  max-width: 68ch;
+  font-family: var(--font-read);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--body);
+  white-space: pre-line;
+}
+
+/* One line of it under a member's name in the directory */
+.roster-about {
+  display: block;
+  margin-top: 2px;
+  max-width: 100%;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .member-profile-items {
@@ -4163,6 +4241,41 @@ textarea.join-input {
 
 .blog-status {
   font-size: 1rem;
+}
+
+/* "Email me new blog posts", under the introduction (initBlogAlerts) */
+.blog-alerts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 4px 0 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.blog-alerts .btn {
+  margin: 0;
+}
+
+.blog-alerts-note {
+  flex: 1 1 260px;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.blog-alerts-on {
+  margin: 0;
+  color: var(--text);
+}
+
+.blog-alerts-on a {
+  margin-left: 4px;
+  font-size: 0.85rem;
 }
 
 .blog-post {

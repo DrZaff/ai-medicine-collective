@@ -24,6 +24,10 @@
 --    email_settings.digest_per_day, so sign-in codes always keep their share
 --    of Resend's 100 emails a day. Nothing here ever returns an email address.
 --
+-- 3. "You're in": when a moderator approves someone (pending -> member, or an
+--    admin sets a pending person's role), they get one welcome email with
+--    three first steps. Sent once per person (profiles.approved_email_at).
+--
 -- One-time setup after running this file (also in the pull request):
 --   select vault.create_secret('<the random secret>', 'blog_alert_secret');
 -- Without that secret every call is refused, so no alert can be sent.
@@ -313,3 +317,117 @@ $$;
 
 revoke execute on function public.queue_blog_alert(text, date, text, text, text) from public, authenticated;
 grant execute on function public.queue_blog_alert(text, date, text, text, text) to anon;
+
+-- ---------------------------------------------------------------------------
+-- 3. "You're in": one email when a membership is approved
+-- ---------------------------------------------------------------------------
+--
+-- Until now nobody heard when a moderator approved them. A trigger on
+-- profiles emails the person once, the first time their role goes from
+-- pending to member, moderator or admin (approve_member, or an admin's
+-- set_member_role). Same machinery as the inbox alert (011/015): Resend
+-- through pg_net with the resend_api_key in Vault. No key means no email, and
+-- a sending failure never blocks the approval. It is one email per approval,
+-- sent at once rather than through the digest's daily allowance.
+
+alter table public.profiles
+  add column approved_email_at timestamptz;
+
+comment on column public.profiles.approved_email_at is
+  'When the "You''re in" email was sent (026). Never sent twice. No grants.';
+
+create function public.send_welcome_email()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  api_key text;
+  first   text;
+  site    constant text := 'https://www.aimedicinecollective.com';
+  hello   text;
+  body    text;
+  html    text;
+  note    constant text := 'The AI Medicine Collective is an independent, volunteer-run group. '
+    || 'Everything on the site is for educational purposes only and is not medical advice.';
+begin
+  if new.email is null or new.approved_email_at is not null then
+    return new;
+  end if;
+
+  select s.decrypted_secret into api_key
+    from vault.decrypted_secrets s
+   where s.name = 'resend_api_key'
+   limit 1;
+  if api_key is null then
+    return new;
+  end if;
+
+  first := nullif(regexp_replace(split_part(btrim(coalesce(new.full_name, '')), ' ', 1), '[^[:alpha:]''-]', '', 'g'), '');
+  hello := case when first is null then 'Hello,' else 'Hi ' || first || ',' end;
+
+  body := hello || E'\n\n'
+    || 'Good news: a moderator has approved your membership of the AI Medicine Collective. '
+    || 'The members'' pages are open to you now.' || E'\n\n'
+    || 'Three good first steps:' || E'\n\n'
+    || '1. Complete your profile, including a few lines "About me", so other members know what you work on:' || E'\n'
+    || '   ' || site || '/account.html#profile' || E'\n\n'
+    || '2. Share your first creation or idea on Member Creations:' || E'\n'
+    || '   ' || site || '/hub.html' || E'\n\n'
+    || '3. Turn on email alerts for new blog posts:' || E'\n'
+    || '   ' || site || '/account.html?alerts=blog' || E'\n\n'
+    || 'Your account page: ' || site || '/account.html' || E'\n\n'
+    || 'Welcome aboard,' || E'\n' || 'The AI Medicine Collective' || E'\n\n'
+    || '--' || E'\n' || note || E'\n'
+    || 'Please never post patient information anywhere on the site.';
+
+  html := '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="color-scheme" content="light"></head>'
+    || '<body style="margin:0;background:#efeae0;">'
+    || '<div style="background:#efeae0;padding:28px 12px;">'
+    || '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#fbf8f2;border:1px solid #ddd5c6;">'
+    || '<tr><td style="padding:34px 38px 30px;font-family:Georgia,''Times New Roman'',serif;color:#1d1d1b;">'
+    || '<p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;letter-spacing:3px;color:#6b665c;">AI MEDICINE COLLECTIVE</p>'
+    || '<p style="margin:0 0 18px;font-size:30px;line-height:1.15;">You''re in.</p>'
+    || '<p style="margin:0 0 14px;font-size:17px;line-height:1.55;">' || replace(replace(replace(hello, '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || '</p>'
+    || '<p style="margin:0 0 18px;font-size:17px;line-height:1.55;">Good news: a moderator has approved your membership. The members&rsquo; pages are open to you now. Three good first steps:</p>'
+    || '<ol style="margin:0 0 22px;padding-left:22px;font-size:17px;line-height:1.55;">'
+    || '<li style="margin-bottom:10px;"><a href="' || site || '/account.html#profile" style="color:#1f5c3f;font-weight:bold;">Complete your profile</a>, including a few lines &ldquo;About me&rdquo;, so other members know what you work on.</li>'
+    || '<li style="margin-bottom:10px;"><a href="' || site || '/hub.html" style="color:#1f5c3f;font-weight:bold;">Share your first creation or idea</a> on Member Creations.</li>'
+    || '<li style="margin-bottom:10px;"><a href="' || site || '/account.html?alerts=blog" style="color:#1f5c3f;font-weight:bold;">Turn on email alerts</a> for new blog posts.</li>'
+    || '</ol>'
+    || '<p style="margin:0 0 26px;"><a href="' || site || '/account.html" style="display:inline-block;background:#1f5c3f;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;padding:12px 22px;border-radius:6px;">Open your account</a></p>'
+    || '<p style="margin:0 0 4px;font-size:17px;line-height:1.55;">Welcome aboard,<br>The AI Medicine Collective</p>'
+    || '<p style="margin:26px 0 0;padding-top:14px;border-top:1px solid #ddd5c6;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:#6b665c;">'
+    || note || ' Please never post patient information anywhere on the site.</p>'
+    || '</td></tr></table></div></body></html>';
+
+  perform net.http_post(
+    url := 'https://api.resend.com/emails',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer ' || api_key,
+      'Content-Type', 'application/json'),
+    body := jsonb_build_object(
+      'from', 'AI Medicine Collective <noreply@mail.aimedicinecollective.com>',
+      'to', jsonb_build_array(new.email),
+      'subject', 'You''re in: welcome to the AI Medicine Collective',
+      'html', html,
+      'text', body));
+
+  new.approved_email_at := now();
+  return new;
+exception when others then
+  -- Email is a courtesy: a failure here must never stop the approval
+  raise warning 'approval email not sent: %', sqlerrm;
+  return new;
+end;
+$$;
+
+revoke execute on function public.send_welcome_email() from public, anon, authenticated;
+
+-- BEFORE update, so the function can stamp approved_email_at on the same row
+create trigger profiles_send_welcome_email
+  before update of role on public.profiles
+  for each row
+  when (old.role = 'pending' and new.role in ('member', 'moderator', 'admin'))
+  execute function public.send_welcome_email();
