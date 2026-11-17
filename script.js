@@ -1287,6 +1287,45 @@ function initBlog() {
 
 document.addEventListener("DOMContentLoaded", initBlog);
 
+// "Email me new blog posts" on the Blog page (migration 026). The page does
+// not load the Supabase library: the account page switches alerts on, and
+// auth.js leaves this hint (its BLOG_ALERTS_STORAGE_KEY) when they are on.
+// Cosmetic only: who is emailed is decided by the database.
+const BLOG_ALERT_HINT_KEY = "amc-blog-alerts";
+
+function initBlogAlerts() {
+  const box = document.getElementById("blog-alerts");
+  if (!box) return;
+  const btn = box.querySelector(".blog-alerts-btn");
+  const note = box.querySelector(".blog-alerts-note");
+  const on = box.querySelector(".blog-alerts-on");
+  const role = readSignedInRole();
+  let hintOn = false;
+  try {
+    hintOn = localStorage.getItem(BLOG_ALERT_HINT_KEY) === "on";
+  } catch {
+    // no hint: show the button
+  }
+  const approved = ["member", "moderator", "admin"].includes(role);
+
+  if (approved && hintOn) {
+    btn.hidden = true;
+    note.hidden = true;
+    on.hidden = false;
+    return;
+  }
+  if (role === null) {
+    note.textContent = "Blog alerts are for members, and joining is free. Sign up and we'll switch them on once you're approved.";
+  } else if (approved) {
+    btn.href = "account.html?alerts=blog#blog-alerts";
+    note.textContent = "One short email when a new post goes up. Switch it off any time on your account page.";
+  } else {
+    note.textContent = "Blog alerts are for approved members. Press the button and they'll switch on once you're approved.";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initBlogAlerts);
+
 /* ========= AI VS PHYSICIAN: the living review ========= */
 
 // Draws evidence/ai-vs-human.json: a paper rewritten each month by the

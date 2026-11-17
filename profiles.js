@@ -13,13 +13,30 @@
 const MEMBER_PROFILE_COLUMNS =
   "id, full_name, avatar_url, role, created_at, program, training_level, focus_areas, bio, contact_email, link_url";
 
-const MEMBER_CARD_COLUMNS = "id, full_name, avatar_url, role, created_at, program, training_level, focus_areas";
+const MEMBER_CARD_COLUMNS = "id, full_name, avatar_url, role, created_at, program, training_level, focus_areas, bio";
 
 // Members who joined in the last two weeks get a NEW tag in the directory
 const MEMBER_NEW_DAYS = 14;
 
 function memberSubtitle(person) {
   return [person.program, person.training_level].filter(Boolean).join(" · ");
+}
+
+// The first lines of a member's "About me", for one line in the directory
+// (CSS cuts it to the card's width)
+function aboutMeTeaser(bio) {
+  return String(bio || "").split(/\n/).map((line) => line.trim()).filter(Boolean).join(" ").slice(0, 240);
+}
+
+// "About me" as paragraphs: a blank line starts a new one, and single line
+// breaks inside a paragraph are kept (white-space: pre-line). textContent only.
+function aboutMeSection(bio, heading) {
+  const section = el("section", "about-me");
+  section.append(el("h4", "about-me-title", heading));
+  String(bio).trim().split(/\n\s*\n/).forEach((para) => {
+    if (para.trim()) section.append(el("p", "member-profile-text about-me-text", para.trim()));
+  });
+  return section;
 }
 
 // Shared gate: resolves to the signed-in member's profile, or shows why not
@@ -107,6 +124,8 @@ function initDirectoryPage() {
           const focus = person.focus_areas.length > 70 ? `${person.focus_areas.slice(0, 70).trimEnd()}…` : person.focus_areas;
           text.append(el("span", "roster-focus", `// ${focus}`));
         }
+        const teaser = aboutMeTeaser(person.bio);
+        if (teaser) text.append(el("span", "roster-about member-profile-text", teaser));
         const isNew = new Date(person.created_at).getTime() > newSince;
         if (person.role !== "member" || person.id === me.id || isNew) {
           const tags = el("span", "roster-tags");
@@ -118,7 +137,7 @@ function initDirectoryPage() {
         const go = el("span", "roster-go", ">");
         go.setAttribute("aria-hidden", "true");
         card.append(avatar(person), text, go);
-        card.dataset.search = `${person.full_name || ""} ${person.program || ""} ${person.training_level || ""} ${person.focus_areas || ""} ${institution}`.toLowerCase();
+        card.dataset.search = `${person.full_name || ""} ${person.program || ""} ${person.training_level || ""} ${person.focus_areas || ""} ${institution} ${person.bio || ""}`.toLowerCase();
         card.dataset.institution = institution;
         grid.append(card);
         return card;
@@ -227,13 +246,15 @@ function initProfilePage() {
       }
       panel.append(head);
 
+      // About me, first and in full: the member's own words
+      if (person.bio && person.bio.trim()) panel.append(aboutMeSection(person.bio, "About me"));
+
       const fields = el("dl", "profile-fields");
       const addField = (label, node) => { fields.append(el("dt", null, label), node); };
 
       const { data: where } = await db.from("profiles").select("institution").eq("id", person.id).maybeSingle();
       if (where && where.institution) addField("Institution", el("dd", "member-profile-text", where.institution));
       if (person.focus_areas) addField("Focus areas", el("dd", "member-profile-text", person.focus_areas));
-      if (person.bio) addField("About", el("dd", "member-profile-text", person.bio));
       if (person.contact_email) {
         const dd = el("dd");
         const mail = el("a", null, person.contact_email);
@@ -256,7 +277,7 @@ function initProfilePage() {
 
       if (!person.focus_areas && !person.bio) {
         panel.append(el("p", "note", isMe
-          ? "// Your profile is empty. Add a few lines so other members know what you work on."
+          ? "// Your profile is empty. Add a few lines under \"About me\" so other members know what you work on."
           : "// This member hasn't filled in their profile yet."));
       }
 

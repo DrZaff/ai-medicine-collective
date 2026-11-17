@@ -120,6 +120,10 @@ for and why the best candidates did not qualify (name them).
 - Write in clear, plain language for busy clinicians. The med-ed summary is 2 \
 to 3 sentences; the AI-vs-physician summary is 3 to 5. "Why it matters" is 1 to 2 \
 sentences aimed at learners and educators.
+- Each item also gets a "teaser": one catchy but accurate line (at most 110 \
+characters) that makes a clinician want to read the review, used in the email \
+to members. No hype, no clickbait, no question it doesn't answer, no claim \
+beyond what the summary says, and no patient information.
 - The headline is a short, specific title for the whole briefing (no \
 clickbait). The intro is 1 to 2 sentences tying the two reviews together.
 - Everything you write except "note" is published for readers. There, never \
@@ -150,6 +154,10 @@ POST_SCHEMA = {
                     "verdict": {"type": "string", "enum": VERDICTS},
                     "summary": {"type": "string"},
                     "why_it_matters": {"type": "string"},
+                    "teaser": {
+                        "type": "string",
+                        "description": "One catchy but accurate line, at most 110 characters, for the members' email",
+                    },
                 },
                 "required": [
                     "title", "source", "url", "published",
@@ -520,6 +528,7 @@ def write_pr_body(path: Path, post: dict, dropped: list[str], usage: dict | None
             f"   - {item['url']}",
             f"   - {item['summary']}",
             f"   - *Why it matters:* {item['why_it_matters']}",
+            *([f"   - *Email teaser:* {item['teaser']}"] if item.get("teaser") else []),
         ]
     if dropped:
         lines += ["", "### Removed automatically", *[f"- {d}" for d in dropped]]
