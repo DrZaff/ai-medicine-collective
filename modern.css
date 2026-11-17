@@ -4242,6 +4242,110 @@ html.terminal::view-transition-new(root) {
   font-size: 0.6875rem;
 }
 
+/* --- a second featured creation, shown with a gameplay screenshot --- */
+.modern .featured-visual--shot {
+  padding: 32px;
+}
+
+.modern .featured-shot {
+  border: 0;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.35);
+}
+
+/* === INTERVIEWS (features/*.html) ===
+   A magazine-style Q&A: Claude's questions in the brand green, the maker's
+   answers as plain reading text, pull quotes in the serif. */
+.modern .interview-kicker {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* a creation's name keeps its own capitals (JungleCards, not Junglecards) */
+.modern .interview .section-title {
+  text-transform: none;
+}
+
+.modern .interview-dek {
+  max-width: 60ch;
+  color: var(--ink);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.modern .interview-byline {
+  font-size: 0.875rem;
+}
+
+.modern .interview-figure img {
+  border: 0;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.modern .interview-figure figcaption {
+  font-size: 0.875rem;
+}
+
+.modern .interview-intro {
+  color: var(--body);
+  font-size: 1.0625rem;
+}
+
+.modern .qa {
+  margin-bottom: 28px;
+}
+
+.modern .qa-who {
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.modern .qa-q .qa-who {
+  color: var(--spark);
+}
+
+.modern .qa-q {
+  color: var(--brand);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.modern .qa-a p,
+.modern .qa-a ul {
+  color: var(--body);
+  font-size: 1.0625rem;
+}
+
+.modern .pull-quote {
+  margin: 36px 0;
+  padding: 6px 0 6px 22px;
+  border-left: 4px solid var(--spark);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: clamp(1.35rem, 2.6vw, 1.7rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.modern .interview-aside {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--page);
+  font-size: 0.875rem;
+}
+
 /* --- the cards: paper and briefing, then tools and games, then the team --- */
 @media (min-width: 901px) {
   .modern .home-panel--review {

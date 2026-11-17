@@ -2771,6 +2771,157 @@ button.onboard-hide {
   }
 }
 
+/* A second featured creation shown with a gameplay screenshot */
+.featured-visual--shot {
+  padding: 20px;
+}
+
+.featured-shot {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  border: 1px solid var(--line-strong);
+}
+
+.featured-actions .btn + .btn {
+  margin-left: 8px;
+}
+
+/* === INTERVIEWS ===
+   features/*.html: a Q&A with the person who built a creation.
+   Claude asks; the maker answers. */
+.interview-kicker {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.interview-dek {
+  margin: 0 0 8px;
+  font-family: var(--font-read);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.interview-byline {
+  margin: 0 0 18px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.interview-figure {
+  margin: 0 0 24px;
+}
+
+.interview-figure img {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  border: 1px solid var(--line-strong);
+}
+
+.interview-figure figcaption {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.interview-figure figcaption a {
+  color: inherit;
+}
+
+.interview-intro,
+.qa-q,
+.qa-a p {
+  max-width: 72ch;
+  font-family: var(--font-read);
+  line-height: 1.65;
+}
+
+.interview-intro {
+  margin: 0 0 24px;
+}
+
+.qa {
+  margin: 0 0 22px;
+}
+
+.qa-who {
+  display: block;
+  margin-bottom: 2px;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.qa-q {
+  margin: 0 0 10px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.qa-a p {
+  margin: 0 0 10px;
+}
+
+.qa-a ul {
+  max-width: 68ch;
+  margin: 0 0 10px;
+  padding-left: 20px;
+  font-family: var(--font-read);
+  line-height: 1.6;
+}
+
+.pull-quote {
+  max-width: 60ch;
+  margin: 28px 0;
+  padding: 4px 0 4px 16px;
+  border-left: 2px solid var(--accent);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.pull-quote p {
+  margin: 0;
+}
+
+.interview-aside {
+  max-width: 72ch;
+  margin: 0 0 22px;
+  padding: 10px 14px;
+  border: 1px var(--rule-style) var(--line-strong);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.interview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 28px 0 20px;
+}
+
+.interview-more {
+  margin: 0 0 20px;
+  padding-left: 20px;
+  font-family: var(--font-read);
+  line-height: 1.8;
+}
+
+.game-interviews {
+  margin-top: 28px;
+}
+
 .home-findings {
   margin: 10px 0 0;
   padding-left: 20px;
