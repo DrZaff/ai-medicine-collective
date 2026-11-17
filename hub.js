@@ -1,4 +1,4 @@
-// === AI Medicine Collective: Tools (the projects table) + Learning Materials ===
+// === AI Medicine Collective: Member Creations (the projects table) + Learning Materials ===
 //
 // Loaded on hub.html, learn.html and moderate.html, after the Supabase
 // library and auth.js (it uses db, el, button, avatar, formatDate,
@@ -15,25 +15,27 @@
 // not by this file.
 
 // The page says which kind it shows: <div id="hub-app" data-kind="material">.
-// Category lists must match the CHECK constraint in migration 004.
+// Category lists must match the CHECK constraint in migration 025 (creations)
+// and 004 (materials).
 const HUB_KINDS = {
   project: {
     page: "hub.html",
-    name: "Tools",
-    noun: "tool",
-    plural: "tools",
-    allLabel: "ALL TOOLS",
-    submitLabel: "> SUBMIT A TOOL",
+    name: "Member Creations",
+    noun: "creation",
+    plural: "creations",
+    allLabel: "ALL CREATIONS",
+    submitLabel: "> SHARE YOUR CREATION",
     categoryLabel: "Category",
     categories: [
-      "Medical education", "Patient care", "Research", "Guidelines",
-      "Learning", "Lifestyle", "Productivity", "Other",
+      "Clinical tools & calculators", "Study tools & Anki add-ons", "Games",
+      "AI assistants & GPTs", "Research tools", "Lifestyle & wellbeing",
+      "Websites", "Other",
     ],
-    intro: "Tools is where the Collective and its members share what they have built.",
+    intro: "Member Creations is where the Collective's members share what they have built.",
     titleHint: "e.g. Discharge summary helper",
     descriptionHint: "What does it do, who is it for, and how do people use it?",
-    linkHint: "https://… (custom GPT, app, repo; optional)",
-    linkText: "Launch",
+    linkHint: "https://… (custom GPT, app, game, website; optional)",
+    linkText: "Open",
   },
   material: {
     page: "learn.html",
@@ -68,6 +70,126 @@ const PROJECT_COLUMNS =
 const PROJECT_PUBLIC_COLUMNS =
   "id, kind, folder, title, category, description, link_url, doc_url, file_path, file_name, status, created_at, " +
   "author:profiles!projects_author_id_fkey(id, full_name, avatar_url)";
+
+/* ========= Member Creations: categories and previews (migration 025) ========= */
+
+// Until migration 025 has run, the database holds (and only accepts) the old
+// categories, and there is no preview_path column. The page asks once which
+// it is (creationsUpgraded) and works either way.
+const LEGACY_CREATION_CATEGORIES = [
+  "Medical education", "Patient care", "Research", "Guidelines",
+  "Learning", "Lifestyle", "Productivity", "Other",
+];
+const LEGACY_CREATION_GROUPS = {
+  "Patient care": "Clinical tools & calculators",
+  Guidelines: "Clinical tools & calculators",
+  "Medical education": "Study tools & Anki add-ons",
+  Learning: "Study tools & Anki add-ons",
+  Research: "Research tools",
+  Lifestyle: "Lifestyle & wellbeing",
+  Productivity: "Other",
+};
+
+// One line per category for the "what are you looking for?" row: the
+// picture (a key of ICON_ART in initHubPage) and who it is for
+const CREATION_INTERESTS = {
+  "Clinical tools & calculators": { art: "calculator", forYou: "For bedside decisions: scores, calculators and algorithms." },
+  "Study tools & Anki add-ons": { art: "cards", forYou: "For exams and boards: flashcards, Anki add-ons and study aids." },
+  Games: { art: "game", forYou: "For the break room: games with a medical twist." },
+  "AI assistants & GPTs": { art: "chat", forYou: "For a second pair of hands: custom GPTs and AI helpers." },
+  "Research tools": { art: "research", forYou: "For papers and projects: searching, analysis and writing help." },
+  "Lifestyle & wellbeing": { art: "fitness", forYou: "For you, off shift: fitness, sleep and wellbeing." },
+  Websites: { art: "globe", forYou: "For browsing: sites and resources members have built." },
+  Other: { art: "spark", forYou: "Everything else worth a look." },
+};
+
+const NEAPOLITAN_GPT = "https://chatgpt.com/g/g-68c8846d98948191a1bfba004e2b1dbf";
+
+// The group a creation is shown under, whichever categories the database has
+function creationGroup(project) {
+  if (project.kind && project.kind !== "project") return project.category;
+  let group = LEGACY_CREATION_GROUPS[project.category] || project.category;
+  // As migration 025 does: the Neapolitan Personality Quiz (an ice-cream
+  // personality quiz) is just for fun, so Games; other custom GPTs are assistants
+  if (group === "Other" && (project.link_url || "").startsWith(NEAPOLITAN_GPT)) group = "Games";
+  else if (group === "Other" && /^https:\/\/chatgpt\.com\/g\//.test(project.link_url || "")) group = "AI assistants & GPTs";
+  return CREATION_INTERESTS[group] ? group : "Other";
+}
+
+// Must match the bucket in migration 025
+const CREATION_PREVIEWS_BUCKET = "creation-previews";
+const CREATION_PREVIEW_MAX_MB = 2;
+const CREATION_PREVIEW_TYPES = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" };
+
+// Screenshots taken of the creations that were published on 2026-11-16,
+// matched by web address (host, or host + path). A preview the author
+// uploads wins over these; anything else gets drawn art.
+const CREATION_SHOTS = {
+  "obesityphenotypetest.netlify.app": "images/creations/obesity-phenotype.webp",
+  "acid-base-calculator.netlify.app": "images/creations/acid-base-calculator.webp",
+  "heart-score-calculator.netlify.app": "images/creations/heart-score-calculator.webp",
+  "qtc-calc.netlify.app": "images/creations/qtc-calc.webp",
+  "thyroid-cascader.netlify.app": "images/creations/thyroid-cascader.webp",
+  "va-night-algorithm.netlify.app": "images/creations/va-night-algorithm.webp",
+};
+
+// Small copies of the Collective's app logos (images/applogos/*_logo_512.png
+// are about 300 KB each), shown on the corner of their previews
+const CREATION_BADGES = {
+  "acid-base-calculator.netlify.app": "images/creations/logo-abg.webp",
+  "heart-score-calculator.netlify.app": "images/creations/logo-hs.webp",
+  "qtc-calc.netlify.app": "images/creations/logo-qtc.webp",
+  "thyroid-cascader.netlify.app": "images/creations/logo-tc.webp",
+  "va-night-algorithm.netlify.app": "images/creations/logo-nf.webp",
+};
+
+// The Collective's own games (games.html) are creations too: shown in the
+// Games group with their gameplay screenshots. Add a new game here as well.
+const SITE_GAMES = [
+  {
+    title: "Bearcat Pinball", href: "games/bearcat-pinball.html", image: "images/games/bearcat-pinball.webp",
+    description: "Night shift pinball. Ride the Medevac ramp, admit to the ICU and work your way from MS1 to Attending.",
+    alt: "Bearcat Pinball in play: red pop bumpers and the Bearcat mascot on the playfield",
+  },
+  {
+    title: "Antibiose", href: "games/antibiose.html", image: "images/games/antibiose.webp",
+    description: "Load an antibiotic, antiviral, antifungal or antiparasitic and hit only the microbes it really kills.",
+    alt: "Antibiose in play: microbes drifting across a microscope field",
+  },
+  {
+    title: "Hospital Kombat", href: "games/hospital-kombat.html", image: "images/games/hospital-kombat.webp",
+    description: "Pick a specialty and fight. Nine fighters, five hospital stages and a Final Procedure for each.",
+    alt: "Hospital Kombat in play: a cardiologist and a hospitalist trading punches in an operating room",
+  },
+  {
+    title: "Hospital Tycoon", href: "games/hospital-tycoon.html", image: "images/games/hospital-tycoon.webp",
+    description: "Build a hospital floor by floor, hire specialists, balance RVUs and patient care, and survive five years of crises.",
+    alt: "Hospital Tycoon in play: a two-floor hospital with busy wards",
+  },
+];
+
+// Other things the site itself offers, listed with the members' creations
+const SITE_CREATIONS = [
+  {
+    title: "Signature Card Studio", href: "signature-card-studio.html", group: "Other", art: "document",
+    description: "Design and download a business card in your browser.",
+  },
+];
+
+let creationsUpgradeCheck = null;
+// Whether migration 025 has run: asks for the new column once per page
+// (before it exists, the database answers this one request with an error)
+function creationsUpgraded() {
+  if (!creationsUpgradeCheck) {
+    creationsUpgradeCheck = db.from("projects").select("preview_path").limit(1)
+      .then(({ error }) => !error, () => false);
+  }
+  return creationsUpgradeCheck;
+}
+
+function creationPreviewUrl(path) {
+  return db.storage.from(CREATION_PREVIEWS_BUCKET).getPublicUrl(path).data.publicUrl;
+}
 
 /* ========= shared pieces ========= */
 
@@ -177,8 +299,16 @@ function initHubPage() {
   // `me` stays null for visitors who aren't approved members. On the
   // Projects hub they get a read-only view of published projects.
   let me = null;
+  let signedIn = false; // has a session, even if not approved yet
   const isModerator = () => !!me && (me.role === "moderator" || me.role === "admin");
-  const columns = () => (me ? PROJECT_COLUMNS : PROJECT_PUBLIC_COLUMNS);
+  // true once migration 025 has run (checked at start, Member Creations only)
+  let upgraded = false;
+  const withPreview = (cols) => (upgraded ? `${cols}, preview_path` : cols);
+  const memberColumns = () => withPreview(PROJECT_COLUMNS);
+  const columns = () => withPreview(me ? PROJECT_COLUMNS : PROJECT_PUBLIC_COLUMNS);
+  // the categories the database accepts right now
+  const categoryChoices = () => (isMaterial || upgraded ? kind.categories : LEGACY_CREATION_CATEGORIES);
+  const shownCategory = (project) => (isMaterial ? project.category : creationGroup(project));
 
   function fail(text) {
     show(el("p", "account-status is-error", text));
@@ -194,7 +324,7 @@ function initHubPage() {
         ]
       : [
           ["all", kind.allLabel, kind.page],
-          ["submit", "> SIGN IN TO SUBMIT OR COMMENT", "account.html"],
+          ["submit", isMaterial ? "> SIGN IN TO SUBMIT OR COMMENT" : "> SIGN IN TO SHARE OR COMMENT", "account.html"],
         ];
     for (const [key, label, href] of items) {
       const link = hubLink(label, href, key === "submit" ? "hub-tab hub-tab--submit" : "hub-tab");
@@ -207,7 +337,7 @@ function initHubPage() {
   function projectCard(project, showStatus) {
     const card = hubLink("", `${kind.page}?project=${encodeURIComponent(project.id)}`, "project-item hub-card");
     const head = el("span", "hub-card-head");
-    head.append(el("span", "project-title", project.title), el("span", "member-tag hub-cat", project.category));
+    head.append(el("span", "project-title", project.title), el("span", "member-tag hub-cat", shownCategory(project)));
     if (showStatus && project.folder) head.append(el("span", "member-tag hub-cat", project.folder));
     if (showStatus) head.append(projectStatusTag(project.status));
     const text = project.description.length > 180 ? `${project.description.slice(0, 180).trimEnd()}…` : project.description;
@@ -239,7 +369,8 @@ function initHubPage() {
       .order("created_at", { ascending: false });
     if (error) return fail(`> COULD NOT LOAD ${kind.plural.toUpperCase()}. Please refresh the page.`);
 
-    const nodes = [toolbar("all")];
+    // Visitors to Member Creations get the invitation in the hero instead
+    const nodes = isMaterial || me ? [toolbar("all")] : [];
     if (message) nodes.push(el("p", "account-status hub-status", message));
 
     if (isMaterial) {
@@ -253,16 +384,15 @@ function initHubPage() {
       } else {
         nodes.push(...shelfNodes);
       }
-    } else if (!projects.length) {
-      nodes.push(emptyState("// No tools published yet", "Be the first to share one.",
-        me ? kind.submitLabel : "> SIGN IN TO SUBMIT", me ? `${kind.page}?view=submit` : "account.html"));
     } else {
-      nodes.push(...categoryNodes(projects));
+      // The site's own games are always there, so this list is never empty
+      nodes.unshift(creationsHero());
+      nodes.push(...creationsNodes(projects));
     }
     show(...nodes);
   }
 
-  /* ---- the Tools page: one card per tool, with Open and Details ---- */
+  /* ---- Member Creations: links, recently opened, drawn icons ---- */
 
   // A tool's link, if it is one that can be opened from here
   function toolUrl(project) {
@@ -304,18 +434,6 @@ function initHubPage() {
     return link;
   }
 
-  function toolIcon(project, url) {
-    const known = url && typeof TOOL_ICONS === "object" ? TOOL_ICONS[url.hostname] : null;
-    if (known) {
-      const img = el("img", "tool-icon");
-      img.src = known.icon;
-      img.alt = "";
-      img.loading = "lazy";
-      return img;
-    }
-    return generatedIcon(project);
-  }
-
   // Tools without their own icon get one drawn for them, in the same line-art
   // style as the Games page: a picture chosen from the tool's name and
   // description (a calculator, a heart, flash cards...), else from its category
@@ -345,6 +463,10 @@ function initHubPage() {
       '<path class="b" d="M20 27l3 3 6-6M20 41l3 3 6-6" stroke-width="3"/><path class="a" d="M34 28h10M34 42h10" stroke-width="3"/>',
     spark: '<path class="a soft" d="M32 6l6 18 18 8-18 8-6 18-6-18-18-8 18-8z" stroke-width="3"/>' +
       '<path class="b" d="M52 6v8M48 10h8M12 48v8M8 52h8" stroke-width="2.5"/>',
+    game: '<path class="a soft" d="M18 20h28c7 0 12 6 13 14l2 12c1 6-6 9-10 4l-6-7H19l-6 7c-4 5-11 2-10-4l2-12c1-8 6-14 13-14z" stroke-width="3"/>' +
+      '<path class="b" d="M20 27v10M15 32h10" stroke-width="3"/><circle class="fa" cx="42" cy="29" r="2.5"/><circle class="fa" cx="48" cy="35" r="2.5"/>',
+    globe: '<circle class="a soft" cx="32" cy="32" r="24" stroke-width="3"/>' +
+      '<path class="b" d="M8 32h48M32 8c-8 8-8 40 0 48M32 8c8 8 8 40 0 48" stroke-width="2.5"/>',
   };
   // First match wins: words in the name or description, then the category
   const ICON_WORDS = [
@@ -370,49 +492,262 @@ function initHubPage() {
     const title = project.title.toLowerCase();
     const about = String(project.description || "").toLowerCase().replace(/custom gpt[^.]*\.?/g, "");
     const found = ICON_WORDS.find(([pattern]) => pattern.test(title)) || ICON_WORDS.find(([pattern]) => pattern.test(about));
-    const art = found ? found[1] : ICON_CATEGORIES[project.category] || "spark";
-    const icon = el("span", "tool-icon tool-icon--made game-icon");
+    const art = found ? found[1]
+      : ICON_CATEGORIES[project.category] || (CREATION_INTERESTS[creationGroup(project)] || {}).art || "spark";
+    return artIcon(art, "tool-icon tool-icon--made game-icon");
+  }
+
+  // One of the ICON_ART drawings in a tile
+  function artIcon(art, className) {
+    const icon = el("span", className);
     icon.setAttribute("aria-hidden", "true");
     // the drawing is our own fixed markup, never text from the tool
-    icon.innerHTML = `<svg viewBox="0 0 64 64">${ICON_ART[art]}</svg>`;
+    icon.innerHTML = `<svg viewBox="0 0 64 64">${ICON_ART[art] || ICON_ART.spark}</svg>`;
     return icon;
   }
 
-  // The icon, the name, what kind of thing it is, one or two lines on what
-  // it does, and two buttons: Open (if it has a link) and Details
-  function toolCard(project) {
+  /* ---- Member Creations: by interest, with a preview of each ---- */
+
+  // The invitation at the top: what this is, and how to add yours
+  function creationsHero() {
+    const hero = el("section", "creations-hero");
+    hero.append(
+      el("h3", "creations-hero-title", "Built by clinicians, for clinicians"),
+      el("p", "creations-hero-text",
+        "Calculators, study aids, custom GPTs and games that members made for their own work. Free to use in your browser.")
+    );
+    const actions = el("div", "creations-cta");
+    if (me) {
+      actions.append(hubLink("> Share your creation", `${kind.page}?view=submit`, "btn btn--primary"),
+        el("span", "note", "// A moderator checks each one before it appears here."));
+    } else if (signedIn) {
+      actions.append(hubLink("> Check your membership", "account.html", "btn btn--primary"),
+        el("span", "note", "// You can share your own once a moderator approves your membership."));
+    } else {
+      const join = hubLink("> Join to share yours", "join.html", "btn btn--primary");
+      join.setAttribute("data-signed-out-only", "");
+      actions.append(join, hubLink("> Sign in", "account.html", "btn"));
+    }
+    hero.append(actions);
+    return hero;
+  }
+
+  // A published creation, in the shape the cards use
+  function creationItem(project) {
     const url = toolUrl(project);
-    const known = url && typeof TOOL_ICONS === "object" ? TOOL_ICONS[url.hostname] : null;
-    const detailsHref = `${kind.page}?project=${encodeURIComponent(project.id)}`;
-    const sort = !url ? "Guide or file" : url.hostname === "chatgpt.com" ? "Custom GPT" : known ? "Web app" : "Web link";
+    let image = null;
+    if (project.preview_path) {
+      image = creationPreviewUrl(project.preview_path);
+    } else if (url) {
+      image = CREATION_SHOTS[url.hostname + url.pathname.replace(/\/$/, "")] || CREATION_SHOTS[url.hostname] || null;
+    }
+    return {
+      project,
+      title: project.title,
+      description: project.description,
+      group: creationGroup(project),
+      author: authorName(project),
+      details: `${kind.page}?project=${encodeURIComponent(project.id)}`,
+      url,
+      // one line on what it is and where it works
+      sort: !url || /\.(xlsx|docx|pptx|pdf)$/i.test(url.pathname) ? "File · download to use"
+        : url.hostname === "chatgpt.com" ? "Custom GPT · opens in ChatGPT"
+        : "Web app · phone or computer",
+      image,
+      alt: `${project.title}: preview`,
+      badge: url ? CREATION_BADGES[url.hostname] || null : null,
+    };
+  }
 
-    const card = el("article", "project-item hub-card toolbox-card");
-    const head = el("div", "toolbox-head");
-    const titles = el("div", "toolbox-titles");
-    const tags = el("span", "hub-card-head");
-    tags.append(el("span", "member-tag hub-cat", project.category), el("span", "member-tag hub-cat toolbox-sort", sort));
-    titles.append(hubLink(project.title, detailsHref, "project-title toolbox-title"), tags);
-    head.append(toolIcon(project, url), titles);
+  function gameItem(game) {
+    return {
+      project: null,
+      title: game.title,
+      description: game.description,
+      group: "Games",
+      author: "AI Medicine Collective",
+      details: "games.html",
+      play: game.href,
+      playLabel: "> PLAY",
+      sort: "Game · plays in your browser",
+      image: game.image,
+      alt: game.alt,
+    };
+  }
 
-    const actions = el("div", "toolbox-actions");
-    if (url) actions.append(openLink(project, url, "> OPEN", "btn btn--primary"));
-    actions.append(hubLink("> DETAILS", detailsHref, "btn"));
-    if (url && known && known.desktop) {
-      const wide = new URL(url.href);
-      wide.searchParams.set("desktop", "1");
-      actions.append(openLink(project, wide, "use on a computer", "toolbox-wide"));
+  function siteItem(entry) {
+    return {
+      project: null,
+      title: entry.title,
+      description: entry.description,
+      group: entry.group,
+      author: "AI Medicine Collective",
+      play: entry.href,
+      playLabel: "> OPEN",
+      sort: "On this site · phone or computer",
+      image: null,
+      art: entry.art,
+    };
+  }
+
+  // The drawn picture used when a creation has no screenshot
+  function creationArt(item) {
+    const art = el("span", "creation-art");
+    art.append(item.project ? generatedIcon(item.project)
+      : artIcon(item.art || CREATION_INTERESTS[item.group].art, "tool-icon tool-icon--made game-icon"));
+    return art;
+  }
+
+  // Preview picture (16:10), title, one line on what it does, who made it,
+  // and Open (or Play) + Details
+  function creationCard(item) {
+    const card = el("article", "creation-card");
+    const pic = el("a", "creation-preview");
+    pic.href = item.play || item.details;
+    pic.tabIndex = -1; // the title link below is the keyboard stop
+    if (item.image) {
+      const img = el("img", "creation-shot");
+      img.src = item.image;
+      img.alt = item.alt;
+      img.width = 720;
+      img.height = 450;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.addEventListener("error", () => img.replaceWith(creationArt(item)), { once: true });
+      pic.append(img);
+    } else {
+      pic.setAttribute("aria-label", item.title);
+      pic.append(creationArt(item));
+    }
+    if (item.badge) {
+      const badge = el("img", "creation-badge");
+      badge.src = item.badge;
+      badge.alt = "";
+      badge.width = 40;
+      badge.height = 40;
+      badge.loading = "lazy";
+      pic.append(badge);
     }
 
-    card.append(
-      head,
-      el("p", "project-desc", project.description),
-      actions,
-      el("span", "hub-card-meta", `// ${authorName(project)} · ${formatDate(project.created_at)}`)
-    );
+    const body = el("div", "creation-body");
+    body.append(el("span", "member-tag hub-cat creation-sort", item.sort));
+    const title = el("h4", "creation-title");
+    title.append(hubLink(item.title, item.play || item.details, "creation-title-link"));
+    body.append(title, el("p", "creation-desc", String(item.description || "").replace(/\s+/g, " ").trim()));
+    body.append(el("span", "hub-card-meta creation-by", `// by ${item.author}`));
+
+    const actions = el("div", "creation-actions");
+    if (item.play) actions.append(hubLink(item.playLabel, item.play, "btn btn--primary"));
+    else if (item.url) actions.append(openLink(item.project, item.url, "> OPEN", "btn btn--primary"));
+    if (item.details) actions.append(hubLink(item.play ? "> ALL GAMES" : "> DETAILS", item.details, "btn"));
+    body.append(actions);
+
+    card.append(pic, body);
+    card.dataset.group = item.group;
+    card.dataset.search = `${item.title} ${item.description} ${item.group} ${item.sort} ${item.author}`.toLowerCase();
     return card;
   }
 
-  // The tools this device opened last, as a row of quick buttons
+  const creationSlug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  // Interest cards with counts, a search box, then one section per category
+  function creationsNodes(projects) {
+    const items = [...SITE_GAMES.map(gameItem), ...projects.map(creationItem), ...SITE_CREATIONS.map(siteItem)];
+    const groups = HUB_KINDS.project.categories;
+    const plural = (n) => `${n} creation${n === 1 ? "" : "s"}`;
+
+    // one section per category that has something in it
+    const sectionsWrap = el("div", "creations-sections");
+    const sections = [];
+    const cards = [];
+    for (const group of groups) {
+      const inGroup = items.filter((item) => item.group === group);
+      if (!inGroup.length) continue;
+      const section = el("section", "creations-section");
+      section.id = `creations-${creationSlug(group)}`;
+      const head = el("div", "creations-section-head");
+      head.append(artIcon(CREATION_INTERESTS[group].art, "game-icon creations-section-icon"),
+        el("h3", "creations-section-title", group),
+        el("span", "creations-count", plural(inGroup.length)));
+      const grid = el("div", "creations-grid");
+      const groupCards = inGroup.map(creationCard);
+      grid.append(...groupCards);
+      cards.push(...groupCards);
+      section.append(head, el("p", "note creations-for", CREATION_INTERESTS[group].forYou), grid);
+      sections.push([section, groupCards]);
+      sectionsWrap.append(section);
+    }
+
+    const search = el("input", "join-input directory-search creations-search");
+    search.type = "search";
+    search.placeholder = "Search creations";
+    search.setAttribute("aria-label", "Search creations by name, description or author");
+    const shown = el("p", "roster-stats");
+    shown.setAttribute("role", "status");
+    const none = el("p", "note", "// Nothing matches that. Try a different word or interest.");
+
+    let chosen = "All";
+    const chips = [];
+    const apply = () => {
+      const term = search.value.trim().toLowerCase();
+      let visible = 0;
+      cards.forEach((card) => {
+        card.hidden = (chosen !== "All" && card.dataset.group !== chosen) || (!!term && !card.dataset.search.includes(term));
+        if (!card.hidden) visible++;
+      });
+      sections.forEach(([section, groupCards]) => { section.hidden = groupCards.every((card) => card.hidden); });
+      chips.forEach((chip) => chip.setAttribute("aria-pressed", String(chip.dataset.group === chosen)));
+      shown.textContent = visible === cards.length ? `> ${plural(cards.length)}` : `> ${visible} of ${plural(cards.length)}`;
+      none.hidden = visible > 0;
+    };
+
+    // "What are you looking for?": one card per interest, with its count
+    const interests = el("div", "creations-interests");
+    interests.setAttribute("role", "group");
+    interests.setAttribute("aria-label", "Browse creations by interest");
+    const choose = (group) => {
+      chosen = chosen === group ? "All" : group;
+      apply();
+      const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      search.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    };
+    for (const group of ["All", ...groups]) {
+      const n = group === "All" ? items.length : items.filter((item) => item.group === group).length;
+      const info = CREATION_INTERESTS[group] || { art: "spark", forYou: "Everything members have shared." };
+      let chip;
+      if (n) {
+        chip = button("", "creation-interest", () => choose(group));
+        chip.dataset.group = group;
+        chips.push(chip);
+      } else {
+        // nothing here yet: an invitation to add the first one
+        chip = hubLink("", me ? `${kind.page}?view=submit` : signedIn ? "account.html" : "join.html", "creation-interest is-empty");
+      }
+      const words = el("span", "creation-interest-words");
+      words.append(
+        el("span", "creation-interest-name", group === "All" ? "Everything" : group),
+        el("span", "creation-interest-for", info.forYou),
+        el("span", "creation-interest-count", n ? plural(n) : "None yet: share the first")
+      );
+      chip.append(artIcon(info.art, "game-icon creation-interest-icon"), words);
+      interests.append(chip);
+    }
+
+    search.addEventListener("input", apply);
+    apply();
+    const recent = recentRow(projects);
+    return [
+      el("h3", "creations-ask", "What are you looking for?"),
+      interests,
+      ...(recent ? [recent] : []),
+      search,
+      shown,
+      sectionsWrap,
+      none,
+    ];
+  }
+
+  // The creations this device opened last, as a row of quick buttons
   function recentRow(projects) {
     const recent = recentTools().map((id) => projects.find((p) => p.id === id)).filter((p) => p && toolUrl(p));
     if (!recent.length) return null;
@@ -420,63 +755,6 @@ function initHubPage() {
     row.append(el("span", "note", "// Recently opened:"));
     recent.forEach((project) => row.append(openLink(project, toolUrl(project), project.title, "hub-tab")));
     return row;
-  }
-
-  // A search box, category filter buttons with counts, and the grid of cards
-  function categoryNodes(projects) {
-    const list = el("div", "projects-list hub-grid");
-    const cards = projects.map((project) => {
-      const card = toolCard(project);
-      card.dataset.category = project.category;
-      card.dataset.search = `${project.title} ${project.description} ${project.category} ${authorName(project)}`.toLowerCase();
-      list.append(card);
-      return card;
-    });
-
-    const search = el("input", "join-input directory-search");
-    search.type = "search";
-    search.placeholder = "Search tools";
-    search.setAttribute("aria-label", "Search tools by name, description or author");
-
-    const shown = el("p", "roster-stats");
-    shown.setAttribute("role", "status");
-    const none = el("p", "note", "// No tools match that. Try a different word or category.");
-
-    let category = "All";
-    const apply = () => {
-      const term = search.value.trim().toLowerCase();
-      let visible = 0;
-      cards.forEach((card) => {
-        card.hidden = (category !== "All" && card.dataset.category !== category)
-          || (!!term && !card.dataset.search.includes(term));
-        if (!card.hidden) visible++;
-      });
-      shown.textContent = visible === cards.length
-        ? `> ${cards.length} tool${cards.length === 1 ? "" : "s"}`
-        : `> ${visible} of ${cards.length} tools`;
-      none.hidden = visible > 0;
-    };
-
-    const used = kind.categories.filter((c) => projects.some((p) => p.category === c));
-    const filter = el("div", "filter-bar");
-    filter.setAttribute("role", "group");
-    filter.setAttribute("aria-label", "Filter tools by category");
-    const buttons = ["All", ...used].map((name) => {
-      const count = name === "All" ? projects.length : projects.filter((p) => p.category === name).length;
-      const btn = button(`${name.toUpperCase()} (${count})`, "filter-btn", () => {
-        category = name;
-        buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-        apply();
-      });
-      btn.setAttribute("aria-pressed", String(name === "All"));
-      filter.append(btn);
-      return btn;
-    });
-
-    search.addEventListener("input", apply);
-    apply();
-    const recent = recentRow(projects);
-    return [...(recent ? [recent] : []), search, filter, shown, list, none];
   }
 
   let foldersOpen = false; // whether the folders fold is open
@@ -538,7 +816,7 @@ function initHubPage() {
   async function renderMine() {
     const { data: projects, error } = await db
       .from("projects")
-      .select(PROJECT_COLUMNS)
+      .select(memberColumns())
       .eq("kind", kindKey)
       .eq("author_id", me.id)
       .order("created_at", { ascending: false });
@@ -582,10 +860,27 @@ function initHubPage() {
     status.setAttribute("role", "status");
 
     const article = el("article", "hub-detail");
+    // A creation's preview picture leads its page
+    if (!isMaterial) {
+      const item = creationItem(project);
+      const figure = el("div", "creation-detail-preview");
+      if (item.image) {
+        const img = el("img", "creation-shot");
+        img.src = item.image;
+        img.alt = item.alt;
+        img.width = 720;
+        img.height = 450;
+        img.addEventListener("error", () => img.replaceWith(creationArt(item)), { once: true });
+        figure.append(img);
+      } else {
+        figure.append(creationArt(item));
+      }
+      article.append(figure);
+    }
     const head = el("div", "hub-card-head");
     head.append(el("h3", "hub-title", project.title));
     if (project.folder) head.append(el("span", "member-tag hub-cat", project.folder));
-    head.append(el("span", "member-tag hub-cat", project.category));
+    head.append(el("span", "member-tag hub-cat", shownCategory(project)));
     if (project.status !== "published") head.append(projectStatusTag(project.status));
     article.append(head);
 
@@ -665,6 +960,7 @@ function initHubPage() {
         }
       }));
       article.append(mod);
+      if (!isMaterial && upgraded) article.append(moderatorPreviewControl(project, status));
     }
 
     article.append(status);
@@ -800,6 +1096,87 @@ function initHubPage() {
     return section;
   }
 
+  /* ---- preview pictures (creations only, once migration 025 has run) ---- */
+
+  function previewInput() {
+    const input = el("input", "join-input");
+    input.id = "project-preview";
+    input.type = "file";
+    input.accept = Object.keys(CREATION_PREVIEW_TYPES).join(",");
+    return input;
+  }
+
+  // A reason the picture can't be used, or null
+  function previewProblem(file) {
+    if (!CREATION_PREVIEW_TYPES[file.type]) return "> THE PREVIEW MUST BE A PNG, JPEG OR WEBP PICTURE.";
+    if (file.size > CREATION_PREVIEW_MAX_MB * 1024 * 1024) return `> THE PREVIEW PICTURE IS LARGER THAN ${CREATION_PREVIEW_MAX_MB} MB.`;
+    return null;
+  }
+
+  // Uploads into the person's own folder; returns the new path, or null
+  async function uploadPreview(file) {
+    const path = `${me.id}/${crypto.randomUUID()}.${CREATION_PREVIEW_TYPES[file.type]}`;
+    const { error } = await db.storage
+      .from(CREATION_PREVIEWS_BUCKET)
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if (error) {
+      console.error(error);
+      return null;
+    }
+    return path;
+  }
+
+  // Removing an old picture is a courtesy: the database rules decide (a
+  // member's own folder, or a moderator) and a failure changes nothing
+  function removePreviewFile(path) {
+    if (path) db.storage.from(CREATION_PREVIEWS_BUCKET).remove([path]).catch(() => {});
+  }
+
+  // Moderators can change the picture of any creation, published or not
+  function moderatorPreviewControl(project, statusNode) {
+    const wrap = el("div", "mod-actions creation-preview-mod");
+    const label = el("label", "note", "// Preview picture:");
+    const input = previewInput();
+    input.id = "mod-preview";
+    label.htmlFor = input.id;
+    input.addEventListener("change", async () => {
+      const file = input.files[0];
+      if (!file) return;
+      const problem = previewProblem(file);
+      statusNode.classList.toggle("is-error", !!problem);
+      if (problem) {
+        statusNode.textContent = problem;
+        return;
+      }
+      statusNode.textContent = "> UPLOADING PICTURE...";
+      const path = await uploadPreview(file);
+      const { error } = path
+        ? await db.rpc("set_project_preview", { target: project.id, new_path: path })
+        : { error: { message: "upload failed" } };
+      if (error) {
+        statusNode.textContent = `> FAILED: ${error.message}`;
+        statusNode.classList.add("is-error");
+        return;
+      }
+      removePreviewFile(project.preview_path);
+      renderProject(project.id);
+    });
+    wrap.append(label, input);
+    if (project.preview_path) {
+      wrap.append(button("REMOVE PICTURE", "mod-decline", async () => {
+        const { error } = await db.rpc("set_project_preview", { target: project.id, new_path: null });
+        if (error) {
+          statusNode.textContent = `> FAILED: ${error.message}`;
+          statusNode.classList.add("is-error");
+          return;
+        }
+        removePreviewFile(project.preview_path);
+        renderProject(project.id);
+      }));
+    }
+    return wrap;
+  }
+
   /* ---- submit form ---- */
 
   // With `existing`, the same form edits an unpublished item instead.
@@ -843,7 +1220,15 @@ function initHubPage() {
     title.placeholder = kind.titleHint;
 
     const folder = isMaterial ? picker("project-folder", folders.map((f) => f.name)) : null;
-    const category = picker("project-category", kind.categories);
+    const category = picker("project-category", categoryChoices());
+    // Creations can carry a preview picture once migration 025 has run
+    const preview = !isMaterial && upgraded ? previewInput() : null;
+    let dropPreview = null;
+    if (preview && existing && existing.preview_path) {
+      dropPreview = el("input");
+      dropPreview.type = "checkbox";
+      dropPreview.id = "project-preview-remove";
+    }
 
     const description = el("textarea", "join-input");
     description.id = "project-description";
@@ -879,7 +1264,9 @@ function initHubPage() {
 
     if (existing) {
       title.value = existing.title;
-      category.value = existing.category;
+      // an item saved under an old category shows its new group (after 025)
+      category.value = categoryChoices().includes(existing.category) ? existing.category
+        : categoryChoices().includes(creationGroup(existing)) ? creationGroup(existing) : "";
       if (folder) folder.value = existing.folder || "";
       description.value = existing.description;
       link.value = existing.link_url || "";
@@ -895,7 +1282,22 @@ function initHubPage() {
       field("File", file),
       el("p", "join-hint", existing && existing.file_name
         ? `// Current file: ${existing.file_name}. Choose a new one only to replace it (up to ${PROJECT_FILE_MAX_MB} MB).`
-        : `// Optional file, up to ${PROJECT_FILE_MAX_MB} MB: PDF, image, Word, PowerPoint, Excel or text.`),
+        : `// Optional file, up to ${PROJECT_FILE_MAX_MB} MB: PDF, image, Word, PowerPoint, Excel or text.`)
+    );
+    if (preview) {
+      form.append(
+        field("Preview image", preview),
+        el("p", "join-hint", existing && existing.preview_path
+          ? `// This has a preview picture. Choose a new one only to replace it (PNG, JPEG or WebP, up to ${CREATION_PREVIEW_MAX_MB} MB).`
+          : `// Optional picture shown on its card: a screenshot works well, wide rather than tall (16:10). PNG, JPEG or WebP, up to ${CREATION_PREVIEW_MAX_MB} MB. No patient information.`)
+      );
+      if (dropPreview) {
+        const removeRow = el("label", "hub-confirm");
+        removeRow.append(dropPreview, " Remove the current preview picture");
+        form.append(removeRow);
+      }
+    }
+    form.append(
       confirmRow,
       submit,
       status,
@@ -917,6 +1319,8 @@ function initHubPage() {
       if (chosen && chosen.size > PROJECT_FILE_MAX_MB * 1024 * 1024) {
         return setError(`> THAT FILE IS LARGER THAN ${PROJECT_FILE_MAX_MB} MB.`);
       }
+      const picture = preview ? preview.files[0] || null : null;
+      if (picture && previewProblem(picture)) return setError(previewProblem(picture));
 
       const row = {
         author_id: me.id,
@@ -946,17 +1350,30 @@ function initHubPage() {
         row.file_name = chosen.name.slice(0, 150);
       }
 
+      // the preview picture (the column exists only after migration 025)
+      const oldPreview = existing ? existing.preview_path || null : null;
+      if (preview) {
+        row.preview_path = dropPreview && dropPreview.checked ? null : oldPreview;
+        if (picture) {
+          status.textContent = "> UPLOADING PREVIEW PICTURE...";
+          row.preview_path = await uploadPreview(picture);
+          if (!row.preview_path) return setError("> COULD NOT UPLOAD THE PREVIEW PICTURE. Check its type and size, then try again.");
+        }
+      }
+
       if (existing) {
         status.textContent = "> SAVING...";
         // author_id and kind can't change; the database only accepts these columns
         const { title: t, category: c, description: d, link_url, file_path, file_name } = row;
         const changes = { title: t, category: c, description: d, link_url, file_path, file_name };
         if (isMaterial) changes.folder = row.folder;
+        if (preview) changes.preview_path = row.preview_path;
         const { error: updateError } = await db.from("projects").update(changes).eq("id", existing.id);
         if (updateError) {
           console.error(updateError);
           return setError("> COULD NOT SAVE. Please try again.");
         }
+        if (preview && oldPreview && oldPreview !== row.preview_path) removePreviewFile(oldPreview);
         if (existing.status === "rejected") {
           const { error: resubmitError } = await db.rpc("resubmit_project", { target: existing.id });
           if (resubmitError) {
@@ -992,7 +1409,7 @@ function initHubPage() {
   // Open the edit form for one of the person's own unpublished items
   async function renderEdit(id) {
     const { data: project, error } = await db
-      .from("projects").select(PROJECT_COLUMNS).eq("id", id).maybeSingle();
+      .from("projects").select(memberColumns()).eq("id", id).maybeSingle();
     if (error) return fail(`> COULD NOT LOAD THIS ${kind.noun.toUpperCase()}. Please refresh the page.`);
     if (!project || !project.author || project.author.id !== me.id || project.status === "published" || project.kind !== kindKey) {
       show(toolbar(null), el("p", "account-status is-error", "> THIS CAN'T BE EDITED"),
@@ -1028,6 +1445,8 @@ function initHubPage() {
         return;
       }
       // Otherwise: a visitor browsing published projects, read-only (me stays null)
+      signedIn = !!session;
+      if (!isMaterial) upgraded = await creationsUpgraded();
 
       if (params.get("view") === "edit" && params.get("project")) await renderEdit(params.get("project"));
       else if (params.get("project")) await renderProject(params.get("project"));
@@ -1112,7 +1531,7 @@ function initProjectModeration() {
     }
     const links = el("p", "hub-mod-links");
     links.append(
-      hubLink("> Open Tools", HUB_KINDS.project.page, "account-mod-link"),
+      hubLink("> Open Member Creations", HUB_KINDS.project.page, "account-mod-link"),
       hubLink("> Open Learning Materials", HUB_KINDS.material.page, "account-mod-link")
     );
     section.append(links);
