@@ -4253,6 +4253,88 @@ html.terminal::view-transition-new(root) {
   box-shadow: 0 18px 40px rgb(0 0 0 / 0.35);
 }
 
+/* --- featured creations with their interview scrolling beside them --- */
+.modern .home-featured--reel .featured-copy {
+  padding: 40px 40px 34px;
+}
+
+.modern .home-featured--reel .featured-title {
+  margin-bottom: 6px;
+}
+
+.modern .interview-reel {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.modern .reel-track .qa {
+  margin-bottom: 24px;
+}
+
+.modern .reel-track .qa-q {
+  font-size: 1.0625rem;
+}
+
+.modern .reel-track .qa-a p {
+  font-size: 1rem;
+}
+
+.modern .reel-track .pull-quote {
+  font-size: clamp(1.2rem, 2vw, 1.4rem);
+}
+
+.modern .reel-end {
+  font-size: 0.875rem;
+}
+
+.modern .reel-toggle,
+.modern .reel-restart {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.modern .reel-toggle:hover,
+.modern .reel-restart:hover {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  box-shadow: none;
+}
+
+.modern .reel-progress {
+  height: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.modern .reel-progress span {
+  background: var(--grad-bright);
+}
+
+.modern .home-featured--reel .featured-actions {
+  margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+  .modern .home-featured--reel .featured-visual {
+    order: -1;
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 600px) {
+  .modern .home-featured--reel .featured-copy {
+    padding: 26px 20px 24px;
+  }
+}
+
 /* === INTERVIEWS (features/*.html) ===
    A magazine-style Q&A: Claude's questions in the brand green, the maker's
    answers as plain reading text, pull quotes in the serif. */

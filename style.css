@@ -2788,6 +2788,150 @@ button.onboard-hide {
   margin-left: 8px;
 }
 
+/* Featured creations with their interview scrolling beside the picture
+   (initInterviewReels in script.js). The flipped one puts the picture
+   on the left. */
+.home-featured--reel {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.home-featured--flip {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+}
+
+.home-featured--reel .featured-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.home-featured--reel .featured-kicker {
+  align-self: flex-start;
+}
+
+.home-featured--reel .featured-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.home-featured--reel .featured-actions .btn + .btn {
+  margin-left: 0;
+}
+
+.interview-reel {
+  position: relative;
+  height: clamp(380px, 58vh, 540px);
+  margin: 4px 0 10px;
+  padding: 6px 14px 0 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: auto;
+  scrollbar-width: thin;
+  border-top: 1px var(--rule-style) var(--line-strong);
+  border-bottom: 1px var(--rule-style) var(--line-strong);
+  /* fade the text in at the top edge and out at the bottom */
+  -webkit-mask-image: linear-gradient(transparent, currentColor 36px, currentColor calc(100% - 56px), transparent);
+  mask-image: linear-gradient(transparent, currentColor 36px, currentColor calc(100% - 56px), transparent);
+}
+
+.interview-reel:focus-visible {
+  outline-offset: 4px;
+}
+
+.reel-track {
+  padding: 30px 0 64px;
+  font-family: var(--font-read);
+  line-height: 1.65;
+}
+
+.reel-track .qa-q,
+.reel-track .qa-a p {
+  max-width: none;
+}
+
+.reel-track .pull-quote {
+  margin: 22px 0;
+}
+
+.reel-end {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.reel-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.reel-controls[hidden] {
+  display: none;
+}
+
+.reel-toggle,
+.reel-restart {
+  min-height: 32px;
+  padding: 4px 12px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  font: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.reel-toggle:hover,
+.reel-restart:hover {
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+.reel-progress {
+  flex: 1;
+  min-width: 80px;
+  height: 3px;
+  background: var(--line);
+}
+
+.reel-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+}
+
+.home-featured--reel .featured-visual {
+  min-height: 100%;
+}
+
+@media (max-width: 720px) {
+  .home-featured--reel,
+  .home-featured--flip {
+    grid-template-columns: 1fr;
+  }
+
+  /* on phones the picture comes first, then the interview */
+  .home-featured--reel .featured-visual {
+    order: -1;
+    min-height: 240px;
+  }
+
+  .interview-reel {
+    height: min(62vh, 440px);
+  }
+
+  .reel-controls button {
+    font-size: 1rem;
+  }
+}
+
 /* === INTERVIEWS ===
    features/*.html: a Q&A with the person who built a creation.
    Claude asks; the maker answers. */

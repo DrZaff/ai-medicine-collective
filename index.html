@@ -60,30 +60,30 @@
         </div>
       </section>
 
-      <!-- Featured creation: one thing a member built, shown large. To feature
-           something else, change this block (and the card in the picture). -->
-      <section class="home-featured" aria-labelledby="featured-title" data-reveal>
+      <!-- Featured creations: a picture on one side, and on the other the
+           creation's interview, which scrolls by itself at reading pace once
+           the panel is on screen (initInterviewReels in script.js reads the
+           Q&A from the interview page). Without the script, the reel shows
+           the short text below and a link to the full interview. -->
+      <section class="home-featured home-featured--reel" aria-labelledby="featured-title" data-reveal>
         <div class="featured-copy">
-          <p class="featured-kicker">// Featured creation</p>
+          <p class="featured-kicker">// Featured creation &middot; interview</p>
           <h3 id="featured-title" class="featured-title">JungleCards</h3>
           <p class="featured-lede">AI-guided precision flashcards for medical students, residents and physicians.</p>
-          <p class="featured-text">The shared decks we all use leave you guessing at your own weak points and
-            matching questions to cards by hand. JungleCards pairs a library of original cards with an AI coach
-            that builds a study plan around you, in a design made to be fun rather than another grey grid.</p>
-          <ul class="featured-points">
-            <li><strong>An original library.</strong> About 16,500 cards written to cover the topics popular decks
-              cover, each reviewed by several AI models for duplicates and questionable statements. Flag any card
-              that looks wrong.</li>
-            <li><strong>A coach that plans with you.</strong> Tell it your exam, past scores, weak spots, timeline
-              and daily limit. It builds a plan you can change any time.</li>
-            <li><strong>Your notes, as cards.</strong> Paste in study notes and AI turns them into cards that join
-              your deck.</li>
-            <li><strong>Free to try.</strong> The free trial is enough to build a plan and try the notes-to-cards
-              tool.</li>
-          </ul>
+          <div class="interview-reel" data-interview="features/junglecards.html" tabindex="0" role="region" aria-label="Interview about JungleCards. It scrolls by itself; hover, touch or focus to pause.">
+            <div class="reel-track">
+              <p>An original library of about 16,500 cards, a coach that builds a study plan around your exam
+                and weak spots, and your own notes turned into cards. Free to try.</p>
+            </div>
+          </div>
+          <div class="reel-controls" hidden>
+            <button type="button" class="reel-toggle" aria-pressed="false">Pause</button>
+            <button type="button" class="reel-restart">Start over</button>
+            <span class="reel-progress" aria-hidden="true"><span></span></span>
+          </div>
           <p class="featured-actions">
             <a class="btn btn--primary" href="https://junglecards.aimedicinecollective.com" target="_blank" rel="noopener noreferrer">&gt; Open JungleCards</a>
-            <a class="btn" href="features/junglecards.html">&gt; Read the interview</a>
+            <a class="btn" href="features/junglecards.html">&gt; Read the full interview</a>
           </p>
         </div>
         <!-- A drawing of a card, for decoration -->
@@ -103,30 +103,31 @@
         </figure>
       </section>
 
-      <!-- Second featured creation, with a gameplay screenshot -->
-      <section class="home-featured" aria-labelledby="featured-title-antibiose" data-reveal>
-        <div class="featured-copy">
-          <p class="featured-kicker">// Featured creation</p>
-          <h3 id="featured-title-antibiose" class="featured-title">Antibiose</h3>
-          <p class="featured-lede">A phone game that teaches which drug kills which germ.</p>
-          <p class="featured-text">Germs drift across a microscope slide, drawn the way they really look. Load a
-            drug and hit only the ones it truly kills. Every wrong shot tells you why.</p>
-          <ul class="featured-points">
-            <li><strong>Pick the best drug, not just one that works.</strong> First-line choices score the most;
-              overusing broad drugs brings on C. diff.</li>
-            <li><strong>Real patient twists.</strong> A penicillin allergy, pregnancy or kidney injury changes the
-              right answer.</li>
-            <li><strong>138 germs and 100 drugs</strong> across bacteria, viruses, fungi and parasites, with a
-              review of your mistakes after every round.</li>
-          </ul>
-          <p class="featured-actions">
-            <a class="btn btn--primary" href="games/antibiose.html">&gt; Play Antibiose</a>
-            <a class="btn" href="features/antibiose.html">&gt; Read the interview</a>
-          </p>
-        </div>
+      <!-- Second featured creation: picture on the left this time -->
+      <section class="home-featured home-featured--reel home-featured--flip" aria-labelledby="featured-title-antibiose" data-reveal>
         <figure class="featured-visual featured-visual--shot">
           <img class="featured-shot" src="images/games/antibiose.webp" width="720" height="540" alt="Antibiose in play: Strep A and MSSA microbes drifting across a microscope field" loading="lazy" />
         </figure>
+        <div class="featured-copy">
+          <p class="featured-kicker">// Featured creation &middot; interview</p>
+          <h3 id="featured-title-antibiose" class="featured-title">Antibiose</h3>
+          <p class="featured-lede">A phone game that teaches which drug kills which germ.</p>
+          <div class="interview-reel" data-interview="features/antibiose.html" tabindex="0" role="region" aria-label="Interview about Antibiose. It scrolls by itself; hover, touch or focus to pause.">
+            <div class="reel-track">
+              <p>Germs drift across a microscope slide, drawn the way they really look. Load a drug and hit only
+                the ones it truly kills; every wrong shot tells you why. 138 germs and 100 drugs.</p>
+            </div>
+          </div>
+          <div class="reel-controls" hidden>
+            <button type="button" class="reel-toggle" aria-pressed="false">Pause</button>
+            <button type="button" class="reel-restart">Start over</button>
+            <span class="reel-progress" aria-hidden="true"><span></span></span>
+          </div>
+          <p class="featured-actions">
+            <a class="btn btn--primary" href="games/antibiose.html">&gt; Play Antibiose</a>
+            <a class="btn" href="features/antibiose.html">&gt; Read the full interview</a>
+          </p>
+        </div>
       </section>
 
       <!-- Live panels. The briefing and project panels are filled by
