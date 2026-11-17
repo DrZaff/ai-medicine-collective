@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-16",
+  "headline": "AI in selection decisions and in dermoscopy: what reviewers and readers should watch for",
+  "intro": "One review looks at how AI is starting to shape who gets into medical school and residency. The other shows what happened when 104 experienced dermatologists saw an AI risk score before deciding on suspicious skin lesions. Both ask the same question: when AI enters a decision, who checks it, and does it actually make the result better?",
+  "items": [
+    {
+      "title": "Artificial Intelligence in U.S. Medical School Admissions and Residency Selection: A Review and the Door–Gate Matrix for Governing Selection AI",
+      "source": "International Medical Education (MDPI)",
+      "url": "https://www.mdpi.com/2813-141X/5/4/132",
+      "published": "2026-11-16",
+      "category": "education",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "This structured narrative review looks at research, policy, legal and accreditation sources on AI in U.S. medical school admissions and residency selection. It covers AI-assisted screening, predictive analytics, analysis of written and video material, tools aimed at applicants, and applicants' own use of generative AI. Early single-institution studies show that machine-learning models can approximate faculty screening and reduce workload. But the authors say these studies establish feasibility, not effectiveness. Most models are checked against short-term outcomes such as interview invitations, bias across subgroups is not assessed consistently, and one simulation found demographic bias in large language model selection decisions even when qualifications were equal. The authors developed the 'Door–Gate Matrix', a conceptual framework that has not yet been tested. It sorts each AI use by whether it widens or narrows applicants' opportunities and whether applicants can see and challenge it. The authors flag restrictive uses that applicants cannot see or challenge as the main risk.",
+      "why_it_matters": "Applicants and the faculty who sit on admissions or selection committees can use this framework to ask whether an AI screening tool is visible, can be challenged, and has been checked for bias before it shapes who gets an interview."
+    },
+    {
+      "title": "Dermoscopy-Based AI Risk Scoring Enhanced Experienced Dermatologists' Decision-Making: a Large Retrospective Reader Study",
+      "source": "Dermatology Practical & Conceptual",
+      "url": "https://www.dpcj.org/index.php/dpc/article/view/6981",
+      "published": "2026-07-31",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_improved",
+      "summary": "Task: diagnosing skin lesions that might be skin cancer and choosing how to manage them, using dermoscopic images. AI system: a deep-learning neural network that gives a risk score based on dermoscopic images and patient metadata. Humans: 104 experienced dermatologists (median of 10 years' dermoscopy experience) at multiple centres. Between them they assessed batches from a test set of 922 lesions (577 benign, 345 malignant), giving 9,198 observations, and they rated each case first without and then with the AI score. Correct diagnoses rose from 74.6% before AI to 81.6% after AI. Sensitivity for deciding a lesion was malignant rose from 91.7% to 97.6%, and for melanoma and high-grade dysplastic naevi it rose from 79.0% to 93.8%. The correct management choice rose from 53.5% to 59.0%. The most important limitation is that this was a retrospective reader study on images, not real patients in clinic, and the AI score was always shown after the doctor's first answer rather than being tested in a randomised comparison. The authors call for prospective studies in routine practice.",
+      "why_it_matters": "The biggest gain was in catching melanoma, even among experienced dermatologists, which makes this a useful example of measuring AI by how it changes clinicians' decisions rather than by the model's accuracy alone. Learners should note that a before-and-after reader study on images does not show how the tool would perform with real patients."
+    }
+  ],
+  "tags": [
+    "admissions",
+    "ai governance",
+    "ai-assisted diagnosis",
+    "algorithmic bias",
+    "deep learning",
+    "dermatology",
+    "dermoscopy",
+    "graduate medical education",
+    "medical education",
+    "melanoma",
+    "reader study",
+    "residency selection",
+    "skin cancer"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
