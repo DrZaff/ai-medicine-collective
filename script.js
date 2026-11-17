@@ -147,8 +147,10 @@ function initThemeToggle() {
 
 document.addEventListener("DOMContentLoaded", initThemeToggle);
 
-// The footer repeats the menu (the header's own links, so the paths are right
-// on every page), with the Collective's name and Instagram in the light design
+// The footer lists every page (built from the header's own links, so the paths
+// are right on every page), with the Collective's name and Instagram in the light design
+// Footer names for the header's plain links (the header writes them in capitals)
+const FOOTER_NAMES = { hub: "Member Creations", learn: "Learn" };
 const LEGAL_PAGES = [["terms.html", "Terms of use"], ["privacy.html", "Privacy"], ["corrections.html", "Corrections"]];
 
 function initFooterNav() {
@@ -167,8 +169,20 @@ function initFooterNav() {
     name.textContent = "AI Medicine Collective";
     nav.append(name);
   }
+  // The header menu is kept lean (Member Creations, Evidence, Learn,
+  // Community), so the footer lists every page: Home, Member Creations,
+  // Games, the Evidence pages, Learn, the Community pages and Our vision
+  const prefix = brand ? brand.getAttribute("href").replace(/[^/]*$/, "") : "";
   const row = document.createElement("div");
   row.className = "footer-links";
+  const plain = (href, text) => {
+    const a = document.createElement("a");
+    a.href = href;
+    a.textContent = text;
+    a.className = "as-written";
+    return a;
+  };
+  row.append(plain(`${prefix}index.html`, "Home"));
   links.forEach((link) => {
     const href = link.getAttribute("href") || "";
     const group = MENU_GROUPS.find((g) => g.menu === pageOf(href));
@@ -176,12 +190,12 @@ function initFooterNav() {
       row.append(...groupLinks(group, href.replace(/[^/]*$/, ""), "as-written"));
       return;
     }
-    const copy = document.createElement("a");
-    copy.href = href;
-    copy.textContent = link.textContent.trim();
-    if (link.hasAttribute("data-vision")) copy.setAttribute("data-vision", "");
-    row.append(copy);
+    row.append(plain(href, FOOTER_NAMES[pageOf(href)] || link.textContent.trim()));
+    if (pageOf(href) === "hub") row.append(plain(`${prefix}games.html`, "Games"));
   });
+  const vision = plain(`${prefix}index.html#vision`, "Our vision");
+  vision.setAttribute("data-vision", "");
+  row.append(vision);
   const instagram = document.createElement("a");
   instagram.className = "m-only";
   instagram.href = "https://www.instagram.com/aimedicinecollective/";
@@ -192,7 +206,6 @@ function initFooterNav() {
   nav.append(row);
 
   // Terms and privacy, on every page
-  const prefix = brand ? brand.getAttribute("href").replace(/[^/]*$/, "") : "";
   const legal = document.createElement("div");
   legal.className = "footer-links footer-legal";
   LEGAL_PAGES.forEach(([page, label]) => {
@@ -260,7 +273,7 @@ function initVision() {
     const join = make("a", "btn btn--primary", "> Join the Collective");
     join.href = `${prefix}join.html`;
     join.hidden = readSignedInRole() !== null;   // members don't need asking
-    const tools = make("a", "btn", "> Browse the tools");
+    const tools = make("a", "btn", "> See member creations");
     tools.href = `${prefix}hub.html`;
     actions.append(join, tools);
     body.append(actions);
@@ -674,11 +687,19 @@ function initHome() {
 
       // "0-0/16": the part after the slash is the number of tools
       const total = parseInt((response.headers.get("content-range") || "").split("/")[1], 10);
+      // The count and "+N" are hidden in the page's HTML (a written number
+      // goes out of date) and shown only once the live count is known
       const counter = document.getElementById("home-project-count");
-      if (counter && total > 0) counter.textContent = String(total);
-      // The Tools panel shows five icons and "+N" for the rest
+      if (counter && total > 0) {
+        counter.textContent = String(total);
+        if (counter.parentElement) counter.parentElement.hidden = false;
+      }
+      // The Member Creations panel shows five icons and "+N" for the rest
       const more = document.getElementById("home-more-tools");
-      if (more && total > 5) more.textContent = `+${total - 5}`;
+      if (more && total > 5) {
+        more.textContent = `+${total - 5}`;
+        if (more.parentElement) more.parentElement.hidden = false;
+      }
     } catch {
       // keep the plain text
     }
@@ -686,6 +707,16 @@ function initHome() {
 }
 
 document.addEventListener("DOMContentLoaded", initHome);
+
+// Featured creations: a "Read the story" link stays hidden until someone
+// gives it an href (the article about that creation), then it shows
+function initStoryLinks() {
+  document.querySelectorAll("a[data-story]").forEach((link) => {
+    link.hidden = !(link.getAttribute("href") || "").trim();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initStoryLinks);
 
 // Elements marked data-reveal rise into view as the page is scrolled
 // (light design only: the styling lives in modern.css). Without this
