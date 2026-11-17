@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <title>AI Medicine Collective</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="An independent hub for grassroots AI initiatives in medicine, built by clinicians and trainees." />
+  <meta name="description" content="Let's create together: an independent hub where clinicians and trainees build AI tools for medicine, share what they make, and read the evidence." />
   <meta name="theme-color" content="#000000" />
   <link rel="apple-touch-icon" href="images/icon-192.png" />
   <link rel="icon" type="image/png" href="images/icon-192.png" />
   <meta property="og:site_name" content="AI Medicine Collective" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="AI Medicine Collective" />
-  <meta property="og:description" content="An independent hub for grassroots AI initiatives in medicine, built by clinicians and trainees." />
+  <meta property="og:title" content="AI Medicine Collective: let's create together" />
+  <meta property="og:description" content="Let's create together: an independent hub where clinicians and trainees build AI tools for medicine, share what they make, and read the evidence." />
   <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="stylesheet" href="style.css" />
@@ -27,13 +27,10 @@
       <h1 class="headline"><a href="index.html">:: AI MEDICINE COLLECTIVE ::</a></h1>
 
       <nav class="nav" aria-label="Main">
-        <a href="index.html">HOME</a>
-        <a href="hub.html">TOOLS</a>
-        <a href="games.html">GAMES</a>
+        <a href="hub.html" class="nav-name">Member Creations</a>
         <a href="blog.html">EVIDENCE</a>
         <a href="learn.html">LEARN</a>
         <a href="members.html">COMMUNITY</a>
-        <a href="index.html#vision" data-vision>OUR VISION</a>
         <a href="join.html" class="nav-cta" data-signed-out-only>JOIN</a>
         <a href="account.html" class="nav-account" data-account-link="ACCOUNT">SIGN IN</a>
       </nav>
@@ -48,8 +45,8 @@
         <canvas class="hero-net" aria-hidden="true"></canvas>
         <p class="hero-kicker">// Clinicians building with AI &middot; Est. 2025</p>
         <h2 class="hero-title">
-          Grassroots AI<br />
-          <em class="hero-em">in medicine</em><span class="cursor" aria-hidden="true">_</span>
+          Let&rsquo;s create<br />
+          <em class="hero-em">together</em><span class="cursor" aria-hidden="true">_</span>
         </h2>
         <p class="hero-text">
           <strong>Free AI tools and research briefings for clinicians, built by clinicians.</strong>
@@ -130,6 +127,34 @@
         </div>
       </section>
 
+      <!-- Third featured creation: picture on the right again -->
+      <section class="home-featured home-featured--reel" aria-labelledby="featured-title-kombat" data-reveal>
+        <div class="featured-copy">
+          <p class="featured-kicker">// Featured creation &middot; interview</p>
+          <h3 id="featured-title-kombat" class="featured-title">Hospital Kombat</h3>
+          <p class="featured-lede">The Collective&rsquo;s fighting game: pick a specialty and settle it on the wards.</p>
+          <div class="interview-reel" data-interview="features/hospital-kombat.html" tabindex="0" role="region" aria-label="Interview about Hospital Kombat. It scrolls by itself; hover, touch or focus to pause.">
+            <div class="reel-track">
+              <p>Nine specialty fighters, from the Cardiologist to the Ortho Bro, each with a signature Final
+                Procedure, across five hospital stages. Play Arcade against the computer or two players on one
+                keyboard, in the browser, with a touch pad on phones.</p>
+            </div>
+          </div>
+          <div class="reel-controls" hidden>
+            <button type="button" class="reel-toggle" aria-pressed="false">Pause</button>
+            <button type="button" class="reel-restart">Start over</button>
+            <span class="reel-progress" aria-hidden="true"><span></span></span>
+          </div>
+          <p class="featured-actions">
+            <a class="btn btn--primary" href="games/hospital-kombat.html">&gt; Play Hospital Kombat</a>
+            <a class="btn" href="features/hospital-kombat.html">&gt; Read the full interview</a>
+          </p>
+        </div>
+        <figure class="featured-visual featured-visual--shot">
+          <img class="featured-shot" src="images/games/hospital-kombat.webp" width="720" height="540" alt="Hospital Kombat in play: a cardiologist and a hospitalist trading punches in an operating room" loading="lazy" />
+        </figure>
+      </section>
+
       <!-- Live panels. The briefing and project panels are filled by
            script.js (initHome); the text here shows if that fails.
            The meeting panel is plain HTML. -->
@@ -155,7 +180,7 @@
         </article>
 
         <article class="home-panel home-panel--tools" data-reveal>
-          <h3 class="home-panel-title">// Tools</h3>
+          <h3 class="home-panel-title">// Member Creations</h3>
           <div class="home-panel-body">
             <div class="bento-apps">
               <img src="images/applogos/HS_logo_512.png" alt="HEART Score Calculator" width="56" height="56" loading="lazy" />
@@ -163,12 +188,12 @@
               <img src="images/applogos/QTc_logo_512.png" alt="QT Interval Corrector" width="56" height="56" loading="lazy" />
               <img src="images/applogos/TC_logo_512.png" alt="Thyroid Workup Assistant" width="56" height="56" loading="lazy" />
               <img src="images/applogos/NF_logo_512.png" alt="VA Night Float Algorithm" width="56" height="56" loading="lazy" />
-              <a class="bento-more" href="hub.html" aria-label="All tools"><span id="home-more-tools">+10</span></a>
+              <a class="bento-more" href="hub.html" aria-label="All member creations" hidden><span id="home-more-tools">+</span></a>
             </div>
-            <p class="home-stat"><span id="home-project-count">15</span> tools, free to use</p>
-            <p>Clinical calculators and assistants built by members. One tap to open, on a phone or a computer.</p>
+            <p class="home-stat" hidden><span id="home-project-count"></span> creations, free to use</p>
+            <p>Clinical calculators, assistants and study tools built by members. One tap to open, on a phone or a computer.</p>
           </div>
-          <a class="home-panel-link" href="hub.html">&gt; OPEN TOOLS</a>
+          <a class="home-panel-link" href="hub.html">&gt; SEE ALL CREATIONS</a>
         </article>
 
         <article class="home-panel home-panel--hub" data-reveal>
@@ -275,6 +300,20 @@
 
       </section>
 
+      <!-- Closing band, for visitors who haven't joined (hidden once signed in) -->
+      <section class="home-closing" aria-labelledby="closing-title" data-signed-out-only data-reveal>
+        <p class="closing-kicker">// Join the Collective</p>
+        <h3 id="closing-title" class="closing-title">Let&rsquo;s create together</h3>
+        <ul class="closing-points">
+          <li><strong>Share what you make.</strong> Publish your creations and get feedback from other clinicians.</li>
+          <li><strong>Get credit for it.</strong> Every published creation has a ready-made citation, and your profile
+            copies them all for your CV.</li>
+          <li><strong>Learn alongside us.</strong> Monthly meetings, member chat, tool requests and the learning
+            library.</li>
+        </ul>
+        <p class="closing-actions"><a class="btn btn--primary" href="join.html" data-signed-out-only>&gt; Join free</a></p>
+      </section>
+
       <p class="site-social"><a href="https://www.instagram.com/aimedicinecollective/" target="_blank" rel="noopener noreferrer"><svg class="site-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg><span>&gt; INSTAGRAM: @aimedicinecollective</span></a></p>
 
       <p class="site-note">// The AI Medicine Collective is an independent, volunteer-run group.
@@ -286,7 +325,7 @@
       <div class="horizontal-rule bottom-rule"></div>
 
       <footer class="footer">
-        &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+        &gt; echo "LET'S CREATE TOGETHER"
         <span class="cursor">█</span>
       </footer>
 
