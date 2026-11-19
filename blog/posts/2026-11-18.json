@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-18",
+  "headline": "AI in the sim lab, and a rheumatology chatbot that saved time but not accuracy",
+  "intro": "A new scoping review maps how medical schools are using AI-driven virtual patients and chatbots for clinical simulation. A multicentre randomised trial offers a reality check: physicians given a certified LLM diagnostic assistant worked faster than colleagues without it, but were no more accurate.",
+  "items": [
+    {
+      "title": "Artificial intelligence–based clinical simulation in undergraduate medical education: contributions of virtual patients, chatbots, and immersive environments - a scoping review",
+      "source": "BMC Medical Education",
+      "url": "https://link.springer.com/article/10.1186/s12909-026-10793-8",
+      "published": "2026-11-16",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "This open-access scoping review maps how AI is being used in clinical simulation for medical students. Most of the included studies looked at AI-enabled virtual patients (some built on natural language processing, some on language models), chatbot or LLM conversations, and platforms that give automated feedback. Far fewer looked at immersive environments such as VR, or at social robots. The outcomes measured most often were history-taking, communication skills, OSCE-style performance, clinical reasoning and decision-making.",
+      "why_it_matters": "Educators planning AI virtual-patient or chatbot practice for history-taking and communication can use this review to see what has already been tried. It also shows that immersive AI simulation has much less evidence behind it so far."
+    },
+    {
+      "title": "Certified large language model-based diagnostic decision support in rheumatology: the ALLIANCE multicentre randomised controlled trial",
+      "source": "medRxiv (preprint, not peer reviewed)",
+      "url": "https://www.medrxiv.org/content/10.64898/2026.08.29.26361715v1",
+      "published": "2026-09-02",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_no_benefit",
+      "summary": "Physicians had to diagnose three written rheumatology vignettes, both before and after receiving diagnostic help. The help being tested was Prof. Valmed, a certified LLM-based clinical decision support system, used alongside conventional resources and compared with conventional resources alone. In this open-label randomised trial, which is a preprint that has not yet been peer reviewed, 82 physicians from seven hospitals in Germany and Norway were randomised 1:1. On the primary outcome, top-1 accuracy, the LLM group rose from 22.2% to 33.3% and the control group from 23.3% to 35.0%, with no between-group difference in improvement (adjusted OR 0.99, 95% CI 0.45 to 2.19; p=0.979). Top-3 accuracy, diagnostic reasoning and confidence also did not differ significantly, but case-processing time was shorter with the LLM (94 vs 206 s), and the authors report persistent overconfidence and substantial over-reliance on the AI. The main limitation is that there were only three vignettes, based solely on history with no examination, lab or imaging data. In addition, the tool was used through a study coordinator rather than directly, and participants were a voluntary convenience sample.",
+      "why_it_matters": "An AI tool that makes the work faster does not necessarily make diagnoses more accurate, and over-reliance appeared even with a certified product. Learners and educators should check AI suggestions against their own reasoning rather than treating speed or confidence as a sign of being right."
+    }
+  ],
+  "tags": [
+    "automation bias",
+    "chatbots",
+    "clinical decision support",
+    "diagnostic accuracy",
+    "large language models",
+    "medical education",
+    "preprint",
+    "randomised controlled trial",
+    "rheumatology",
+    "scoping review",
+    "simulation",
+    "undergraduate medical education",
+    "virtual patients"
+  ],
+  "generated_by": "claude-opus-5-5"
+}

@@ -1,0 +1,14 @@
+AI in the sim lab, and a rheumatology chatbot that saved time but not accuracy
+
+A new scoping review maps how medical schools are using AI-driven virtual patients and chatbots for clinical simulation. A multicentre randomised trial offers a reality check: physicians given a certified LLM diagnostic assistant worked faster than colleagues without it, but were no more accurate.
+
+Med-ed: Artificial intelligence–based clinical simulation in undergraduate medical education: contributions of virtual patients, chatbots, and immersive environments - a scoping review (BMC Medical Education)
+AI vs physician: Certified large language model-based diagnostic decision support in rheumatology: the ALLIANCE multicentre randomised controlled trial (medRxiv (preprint, not peer reviewed))
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-11-18 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AutomationBias #Chatbots #ClinicalDecisionSupport #DiagnosticAccuracy #LargeLanguageModels #Preprint
