@@ -3,21 +3,25 @@ Weekly digest, Nov 14 - Nov 20, 2026
 
 [[AMC:NOTE]]
 // THE ONE THING
-Artificial intelligence–based clinical simulation in undergraduate medical education: contributions of virtual patients, chatbots, and immersive environments - a scoping review
-Educators planning AI virtual-patient or chatbot practice for history-taking and communication can use this review to see what has already been tried. It also shows that immersive AI simulation has much less evidence behind it so far.
-https://link.springer.com/article/10.1186/s12909-026-10793-8
+Exploring prompt literacy in allied health professions education: an explanatory sequential mixed-methods study of student and educator perspectives
+Most learners are using AI without any formal training. This study offers a practical breakdown of the skills that curricula and faculty development could build step by step, and it applies to medical programmes as well as allied health.
+https://link.springer.com/article/10.1186/s12909-026-10829-z
 
 // AI VS PHYSICIAN
-This week: AI helped improve
-Dermoscopy-Based AI Risk Scoring Enhanced Experienced Dermatologists' Decision-Making: a Large Retrospective Reader Study
-The biggest gain was in catching melanoma, even among experienced dermatologists, which makes this a useful example of measuring AI by how it changes clinicians' decisions rather than by the model's accuracy alone. Learners should note that a before-and-after reader study on images does not show how the tool would perform with real patients.
-https://www.dpcj.org/index.php/dpc/article/view/6981
+This week: Physicians outperformed AI
+Diagnostic Accuracy of Large Language Models for Pediatric Chest Radiograph: Comparison With Pediatricians and Radiologists
+Trainees who upload images to general-purpose chatbots should know that these tools gave only fair screening and fell off sharply on specific diagnoses. Pediatricians did better on most measures in this study.
+https://pubmed.ncbi.nlm.nih.gov/43033194
 
 // ALSO THIS WEEK
+> Artificial intelligence–based clinical simulation in undergraduate medical education: contributions of virtual patients, chatbots, and immersive environments - a scoping review (BMC Medical Education)
+  https://link.springer.com/article/10.1186/s12909-026-10793-8
 > Certified large language model-based diagnostic decision support in rheumatology: the ALLIANCE multicentre randomised controlled trial (medRxiv (preprint, not peer reviewed))
   https://www.medrxiv.org/content/10.64898/2026.08.29.26361715v1
 > Artificial Intelligence in U.S. Medical School Admissions and Residency Selection: A Review and the Door–Gate Matrix for Governing Selection AI (International Medical Education (MDPI))
   https://www.mdpi.com/2813-141X/5/4/132
+> Dermoscopy-Based AI Risk Scoring Enhanced Experienced Dermatologists' Decision-Making: a Large Retrospective Reader Study (Dermatology Practical & Conceptual)
+  https://www.dpcj.org/index.php/dpc/article/view/6981
 
 // TOOL OF THE WEEK
 VA Night Float Algorithm – App
