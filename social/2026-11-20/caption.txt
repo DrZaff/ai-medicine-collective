@@ -1,0 +1,14 @@
+Prompt literacy gaps in health-professions students; pediatricians outperform chatbots on children's chest X-rays
+
+This briefing's two reviews look at general-purpose AI chatbots from two angles. One study asks whether students are taught to use them well, and the other tests how well they read children's chest radiographs compared with doctors.
+
+Med-ed: Exploring prompt literacy in allied health professions education: an explanatory sequential mixed-methods study of student and educator perspectives (BMC Medical Education)
+AI vs physician: Diagnostic Accuracy of Large Language Models for Pediatric Chest Radiograph: Comparison With Pediatricians and Radiologists (Pediatric Pulmonology)
+
+Full summaries and links to every source: aimedicinecollective.com/blog?date=2026-11-20 (link in bio).
+
+Follow @aimedicinecollective for three briefings a week on AI in medicine.
+
+AI-drafted and reviewed by clinicians before publishing. Always check the original source. Not medical advice.
+
+#AIinMedicine #MedEd #MedicalEducation #DigitalHealth #AiLiteracy #AiVsPhysician #ChestRadiography #GenerativeAi #LargeLanguageModels #Pediatrics
