@@ -228,7 +228,7 @@ def blog_html(posts: list[dict]) -> str:
     out = ['<section class="blog-prerender">']
     for post in posts[:BLOG_POSTS_SHOWN]:
         out.append(f'<article class="blog-post"><p class="blog-date">{esc(nice(post["date"]))}</p>'
-                   f'<h3 class="blog-headline"><a href="blog.html?date={esc(post["date"])}">{esc(post.get("headline"))}</a></h3>'
+                   f'<h3 class="blog-headline"><a href="{post_file(post)}">{esc(post.get("headline"))}</a></h3>'
                    f'<p class="blog-intro">{esc(post.get("intro"))}</p>')
         for item in post["items"]:
             out.append(f'<div class="blog-item"><h4 class="blog-item-title"><a href="{esc(item.get("url"))}" rel="noopener noreferrer">'
@@ -241,6 +241,50 @@ def blog_html(posts: list[dict]) -> str:
     return "\n".join(out)
 
 
+def post_file(post: dict) -> str:
+    """Each briefing's own page, written at build time from blog.html. Before
+    2026-11-16 a briefing lived only at blog.html?date=..., which search engines
+    saw as copies of one page ("duplicate without user-selected canonical")."""
+    return f'briefing-{post["date"]}.html'
+
+
+def short(text: str, limit: int = 158) -> str:
+    """A description of at most `limit` characters, cut at a word."""
+    text = " ".join(str(text or "").split())
+    if len(text) <= limit:
+        return text
+    return text[:limit].rsplit(" ", 1)[0].rstrip(",;:") + "…"
+
+
+def post_page(template: str, post: dict) -> str:
+    """blog.html made into one briefing's page: its title, description, the
+    post written in, a canonical link to itself and BlogPosting data. The
+    page's script shows the same post (data-date on #blog-app)."""
+    title = f'{post.get("headline") or "Briefing"} – {NAME}'
+    description = short(post.get("intro") or post.get("headline"))
+    url = f"{SITE}/{post_file(post)}"
+    page = re.sub(r"<title>.*?</title>", lambda _: f"<title>{esc(title)}</title>", template, count=1, flags=re.S)
+    for pattern, value in [(r'(<meta name="description" content=")[^"]*', description),
+                           (r'(<meta property="og:description" content=")[^"]*', description),
+                           (r'(<meta property="og:title" content=")[^"]*', title)]:
+        page = re.sub(pattern, lambda m, v=value: m.group(1) + esc(v), page, count=1)
+    page = page.replace('<div id="blog-app"', f'<div id="blog-app" data-date="{esc(post["date"])}"', 1)
+    page, _ = between(page, "blog", blog_html([post]))
+    posting = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": post.get("headline"),
+        "description": description,
+        "datePublished": post["date"],
+        "url": url,
+        "mainEntityOfPage": url,
+        "author": {"@type": "Organization", "name": NAME, "url": SITE},
+        "publisher": {"@type": "Organization", "name": NAME, "logo": {"@type": "ImageObject", "url": LOGO}},
+        "citation": [item.get("url") for item in post["items"] if item.get("url")],
+    }
+    return head_extras(page, url, [posting])
+
+
 def blog_data(posts: list[dict]) -> dict:
     return {
         "@context": "https://schema.org",
@@ -249,7 +293,7 @@ def blog_data(posts: list[dict]) -> dict:
         "url": f"{SITE}/blog.html",
         "publisher": {"@type": "Organization", "name": NAME, "url": SITE},
         "blogPost": [{"@type": "BlogPosting", "headline": p.get("headline"), "datePublished": p["date"],
-                      "url": f'{SITE}/blog.html?date={p["date"]}', "author": {"@type": "Organization", "name": NAME}}
+                      "url": f"{SITE}/{post_file(p)}", "author": {"@type": "Organization", "name": NAME}}
                      for p in posts[:BLOG_POSTS_SHOWN]],
     }
 
@@ -286,7 +330,7 @@ def sitemap(posts: list[dict], faq: dict | None, review: dict | None) -> str:
         mod = f"<lastmod>{lastmod[page]}</lastmod>" if lastmod.get(page) else ""
         rows.append(f"  <url><loc>{xml_escape(loc)}</loc>{mod}</url>")
     for post in posts:
-        rows.append(f'  <url><loc>{xml_escape(f"{SITE}/blog.html?date={post["date"]}")}</loc><lastmod>{post["date"]}</lastmod></url>')
+        rows.append(f'  <url><loc>{xml_escape(f"{SITE}/{post_file(post)}")}</loc><lastmod>{post["date"]}</lastmod></url>')
     return ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
             + "\n".join(rows) + "\n</urlset>\n")
 
@@ -320,7 +364,7 @@ def llms_txt(posts: list[dict], faq: dict | None, review: dict | None) -> str:
         lines += [f'- [{i["question"]}]({SITE}/faq.html#faq-{i["id"]})' for i in faq["items"]]
     if posts:
         lines += ["", "## Recent briefings"]
-        lines += [f'- [{p.get("headline")}]({SITE}/blog.html?date={p["date"]}) ({p["date"]})' for p in posts[:BLOG_POSTS_SHOWN]]
+        lines += [f'- [{p.get("headline")}]({SITE}/{post_file(p)}) ({p["date"]})' for p in posts[:BLOG_POSTS_SHOWN]]
     return "\n".join(lines) + "\n"
 
 
@@ -361,13 +405,17 @@ def build() -> tuple[dict[str, str], list[str]]:
     def do_blog(page):
         page, found = between(page, "blog", blog_html(posts))
         report.append(f"blog.html: {min(len(posts), BLOG_POSTS_SHOWN)} recent posts written in" if found else "blog.html: no PRERENDER:blog marker")
-        # No canonical link: each post is the same file at blog.html?date=..., and a
-        # canonical pointing at blog.html would tell search engines to drop them
-        return head_extras(page, f"{SITE}/blog.html", [blog_data(posts)] if posts else [], canonical=False)
+        # Each post has its own page now (post_file), so blog.html can name itself
+        return head_extras(page, f"{SITE}/blog.html", [blog_data(posts)] if posts else [])
 
     edit("faq.html", do_faq)
     edit("ai-vs-physician.html", do_review)
+    template = (ROOT / "blog.html").read_text(encoding="utf-8") if (ROOT / "blog.html").exists() else ""
     edit("blog.html", do_blog)
+    if template:
+        for post in posts:
+            files[post_file(post)] = post_page(template, post)
+        report.append(f"briefing-<date>.html: {len(posts)} briefing pages")
     edit("index.html", lambda page: head_extras(page, SITE + "/", site_data()))
     for page in PAGES[4:] + sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob(MEMBER_PAGES)):
         edit(page, lambda text, page=page: head_extras(text, f"{SITE}/{page}", []))
