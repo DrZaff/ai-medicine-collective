@@ -120,6 +120,15 @@
           one entry. This works without an account and is not linked to one.
         </li>
         <li>
+          <strong>Hospital Kombat online matches.</strong> When you play with a
+          friend, our database keeps a record of the game room: when it was made,
+          when it expires, and scrambled (hashed) copies of the invite link and
+          each player's seat key, so only the two players can get in. It holds
+          no names or accounts and is deleted a day after the game ends. The
+          match itself (fighter choices and button presses) passes between the
+          two players' browsers through Supabase and is not stored.
+        </li>
+        <li>
           <strong>Basic technical data.</strong> Our hosting and database
           providers keep standard server logs (such as IP address, browser type
           and the time of a request) to keep the site running and secure.
@@ -143,9 +152,11 @@
         The site keeps a few small things in your browser's storage: that you are
         signed in, a hint of your role and unread messages (to draw the menu
         before the page has loaded), your light or dark theme, course progress,
-        the last tools you opened, and your Bearcat Pinball device ID. They are
-        not cookies used for tracking, and except for signing in and the pinball
-        ID, they are never sent to us. Clearing your browser's site data removes
+        the last tools you opened, your Bearcat Pinball device ID and, during a
+        Hospital Kombat online game, that game's seat key (kept only until you
+        close the tab, so a reload can rejoin). They are not cookies used for
+        tracking, and except for signing in, the pinball ID and the seat key,
+        they are never sent to us. Clearing your browser's site data removes
         them.
       </p>
 
@@ -168,12 +179,12 @@
       <p>These companies process data for us so the site can work. They are based in, or store data in, the United States.</p>
       <ul>
         <li><strong>Netlify:</strong> hosts the website.</li>
-        <li><strong>Supabase:</strong> stores accounts, member content and uploaded files, and handles sign-in.</li>
+        <li><strong>Supabase:</strong> stores accounts, member content and uploaded files, handles sign-in, and relays Hospital Kombat online matches between the two players.</li>
         <li><strong>Google:</strong> provides sign-in, if you choose it.</li>
         <li><strong>Resend:</strong> delivers the emails we send.</li>
         <li><strong>Formspree:</strong> emails our organizers when a new membership request arrives.</li>
         <li><strong>Cloudflare:</strong> runs a short automated check on the email sign-in forms to stop bots.</li>
-        <li><strong>jsDelivr:</strong> delivers the code library the member pages use to talk to Supabase.</li>
+        <li><strong>jsDelivr:</strong> delivers the code library the member pages and Hospital Kombat use to talk to Supabase.</li>
         <li><strong>YouTube (Google):</strong> plays videos on the Learning page; nothing loads from YouTube until you press play.</li>
         <li><strong>Instagram (Meta):</strong> we post our public briefings to @aimedicinecollective. We send Instagram only the post's text and pictures, never members' information.</li>
       </ul>
