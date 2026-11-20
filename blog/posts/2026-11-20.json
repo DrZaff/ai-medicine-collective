@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-20",
+  "headline": "Prompt literacy gaps in health-professions students; pediatricians outperform chatbots on children's chest X-rays",
+  "intro": "This briefing's two reviews look at general-purpose AI chatbots from two angles. One study asks whether students are taught to use them well, and the other tests how well they read children's chest radiographs compared with doctors.",
+  "items": [
+    {
+      "title": "Exploring prompt literacy in allied health professions education: an explanatory sequential mixed-methods study of student and educator perspectives",
+      "source": "BMC Medical Education",
+      "url": "https://link.springer.com/article/10.1186/s12909-026-10829-z",
+      "published": "2026-11-13",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "At a public university in Ghana, researchers surveyed 417 undergraduate allied health students and interviewed 18 senior students and eight academic staff about how they prompt generative AI and judge what it produces. Most surveyed students (76.3%, n = 318) said they had never been trained in responsible AI use. The authors argue that prompt literacy means more than writing good prompts: it also covers framing the task, refining the answer through back-and-forth, grounding it in the discipline, checking outputs, ethical awareness and human judgement.",
+      "why_it_matters": "Most learners are using AI without any formal training. This study offers a practical breakdown of the skills that curricula and faculty development could build step by step, and it applies to medical programmes as well as allied health."
+    },
+    {
+      "title": "Diagnostic Accuracy of Large Language Models for Pediatric Chest Radiograph: Comparison With Pediatricians and Radiologists",
+      "source": "Pediatric Pulmonology",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/43033194",
+      "published": "2026-11-16",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "humans_ahead",
+      "summary": "Task: reading pediatric chest radiographs, both to sort them into abnormal or normal and to name specific diagnoses. The AI systems were two general-purpose chatbots, ChatGPT and Perplexity, compared with pediatricians and radiologists; the abstract does not give the number of human readers, but the set included 502 radiographs from 444 patients. Pediatricians had better sensitivity, specificity and positive predictive value than both chatbots, while Perplexity had a higher negative predictive value. ChatGPT agreed with radiologists more closely than Perplexity did (Phi = 0.56; Kappa = 0.34 vs. Phi = 0.33; Kappa = 0.32), and both chatbots' accuracy dropped significantly when asked for specific conditions. The main limitation is that the tools tested are consumer chatbots not built for medical use, so the results do not tell us how dedicated radiology AI would perform.",
+      "why_it_matters": "Trainees who upload images to general-purpose chatbots should know that these tools gave only fair screening and fell off sharply on specific diagnoses. Pediatricians did better on most measures in this study."
+    }
+  ],
+  "tags": [
+    "ai literacy",
+    "ai vs physician",
+    "chest radiography",
+    "generative ai",
+    "large language models",
+    "medical education",
+    "pediatrics",
+    "prompting",
+    "radiology"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
