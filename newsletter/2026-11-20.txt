@@ -1,0 +1,37 @@
+:: AI MEDICINE COLLECTIVE ::
+Weekly digest, Nov 14 - Nov 20, 2026
+
+[[AMC:NOTE]]
+// THE ONE THING
+Artificial intelligence–based clinical simulation in undergraduate medical education: contributions of virtual patients, chatbots, and immersive environments - a scoping review
+Educators planning AI virtual-patient or chatbot practice for history-taking and communication can use this review to see what has already been tried. It also shows that immersive AI simulation has much less evidence behind it so far.
+https://link.springer.com/article/10.1186/s12909-026-10793-8
+
+// AI VS PHYSICIAN
+This week: AI helped improve
+Dermoscopy-Based AI Risk Scoring Enhanced Experienced Dermatologists' Decision-Making: a Large Retrospective Reader Study
+The biggest gain was in catching melanoma, even among experienced dermatologists, which makes this a useful example of measuring AI by how it changes clinicians' decisions rather than by the model's accuracy alone. Learners should note that a before-and-after reader study on images does not show how the tool would perform with real patients.
+https://www.dpcj.org/index.php/dpc/article/view/6981
+
+// ALSO THIS WEEK
+> Certified large language model-based diagnostic decision support in rheumatology: the ALLIANCE multicentre randomised controlled trial (medRxiv (preprint, not peer reviewed))
+  https://www.medrxiv.org/content/10.64898/2026.08.29.26361715v1
+> Artificial Intelligence in U.S. Medical School Admissions and Residency Selection: A Review and the Door–Gate Matrix for Governing Selection AI (International Medical Education (MDPI))
+  https://www.mdpi.com/2813-141X/5/4/132
+
+// TOOL OF THE WEEK
+VA Night Float Algorithm – App
+Clinical micro-app version of the VA night float algorithm, built with ClinicalToolsDEV. Opens in the browser on phone or computer.
+https://www.aimedicinecollective.com/hub.html?project=d295403d-4da7-48da-adcb-df1cd3e37e2d
+
+// FROM THE COLLECTIVE
+[[AMC:COLLECTIVE]]
+
+// ONE ASK
+[[AMC:ASK]]Follow the Collective on Instagram and share one post with someone who would like it. https://www.instagram.com/aimedicinecollective/[[/AMC:ASK]]
+
+Every briefing: https://www.aimedicinecollective.com/blog.html
+Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.
+
+On Instagram: @aimedicinecollective (https://www.instagram.com/aimedicinecollective/)
+You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" under Your profile on your account page: https://www.aimedicinecollective.com/account.html#profile
