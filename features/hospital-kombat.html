@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" class="modern">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hospital Kombat: an interview – AI Medicine Collective</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="How Hospital Kombat, a fighting game for medical specialties, was designed and built: an interview with the founder of the AI Medicine Collective." />
+  <link rel="icon" type="image/png" href="../images/icon-192.png" />
+  <meta property="og:site_name" content="AI Medicine Collective" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Hospital Kombat: an interview – AI Medicine Collective" />
+  <meta property="og:description" content="How Hospital Kombat, a fighting game for medical specialties, was designed and built: an interview with the founder of the AI Medicine Collective." />
+  <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../modern.css" />
+  <script>try{if(localStorage.getItem("amc-theme")==="terminal")document.documentElement.className="terminal"}catch(e){}</script>
+</head>
+<body>
+  <div class="terminal-frame">
+
+    <div class="horizontal-rule"></div>
+
+    <header>
+      <h1 class="headline"><a href="../index.html">:: AI MEDICINE COLLECTIVE ::</a></h1>
+
+      <nav class="nav" aria-label="Main">
+        <a href="../index.html">HOME</a>
+        <a href="../hub.html">TOOLS</a>
+        <a href="../games.html">GAMES</a>
+        <a href="../blog.html">EVIDENCE</a>
+        <a href="../learn.html">LEARN</a>
+        <a href="../members.html">COMMUNITY</a>
+        <a href="../index.html#vision" data-vision>OUR VISION</a>
+        <a href="../join.html" class="nav-cta" data-signed-out-only>JOIN</a>
+        <a href="../account.html" class="nav-account" data-account-link="ACCOUNT">SIGN IN</a>
+      </nav>
+
+      <div class="horizontal-rule"></div>
+    </header>
+
+    <main class="section interview">
+      <p class="interview-kicker">// Creation interview</p>
+      <h2 class="section-title">Hospital Kombat</h2>
+      <p class="interview-dek">Who would win: ortho or derm? A nostalgic fighting game settles it.</p>
+      <p class="interview-byline">// Claude (Anthropic's AI) interviews Brandon Zaffuto, founder of the AI Medicine Collective &middot; Nov 17, 2026. Answers lightly edited for length and clarity.</p>
+      <figure class="interview-figure">
+        <img src="../images/games/hospital-kombat.webp" width="720" height="540" alt="Hospital Kombat in play: a cardiologist and a hospitalist trading punches in an operating room" />
+        <figcaption>Hospital Kombat in play: a cardiologist and a hospitalist square off in the OR.</figcaption>
+      </figure>
+
+      <blockquote class="pull-quote"><p>&ldquo;It&rsquo;s affectionate teasing, not a knock on any specialty (except the ortho bros).&rdquo;</p></blockquote>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>How does a fighting game about medical specialties happen?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>A friend once asked me, &ldquo;Who would win, a bear or a gorilla?&rdquo; Somehow that made me ask the same question about medical specialties. I&rsquo;d been on Reddit, really getting into the tropes of each specialty. I also grew up on the Sega Genesis, and Mortal Kombat was one of my favorite games. Then I came across a prompt for making video games with Claude in an AI newsletter I subscribe to (Superhuman, by Zain Khan), and figured I&rsquo;d give it a shot.</p>
+        </div>
+      </div>
+
+      <p class="interview-aside">// Hospital Kombat is an original game. Its characters, art and moves are its own, inspired by the fighting games its maker grew up with.</p>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>Who is it for?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>Clinicians and trainees who want a laugh, or anyone who wants some nostalgic fun.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What can you do in it?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>You can play as nine specialties: Ortho Bro (orthopedic surgery), Nephrologist, Anesthesiologist, Hospitalist, Family Medicine, Cardiologist, OB/GYN, Dermatologist and Radiologist. The version on the site now is the Night Shift Edition, an upgrade with painted hospital arenas, new fighter art, redesigned Final Procedures, a matchup screen before each fight and a licensed fight soundtrack.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What&rsquo;s a Final Procedure? Do you have a favorite?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>It&rsquo;s each fighter&rsquo;s finishing move. My favorite is the hospitalist&rsquo;s, called <strong>Discharged!</strong> When the opponent is nearly beaten, the hospitalist points them toward the door. A wheelchair rolls in behind them, they sit down, and they&rsquo;re wheeled off the screen. A big &ldquo;DISCHARGED&rdquo; stamp lands, and the status on screen flips from &ldquo;PROCESSING&rdquo; to &ldquo;COMPLETE.&rdquo; The victory line: &ldquo;Out before noon. Case management is thrilled.&rdquo;</p>
+          <p>It&rsquo;s my favorite of the nine, because hospital medicine is my future specialty.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What didn&rsquo;t work at first?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>Claude (Opus 5.5) was phenomenal at building the game engine, but the graphics looked terrible. So I had ChatGPT work on the graphics on its own, and that gave the polished look you see now. ChatGPT worked really well with Claude to make sure the new art also ran smoothly. I did it as a series of handoffs between them.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>How long did it take?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>About six hours in total.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What&rsquo;s been the hardest part?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>Online play. I&rsquo;m working on making it possible to send friends a link, so you can crush your resident colleagues in other specialties. My dev team is handling the details. I recently bought a computer just to run my AI models as a dev team, so hopefully they&rsquo;ll soon iterate without me passing work between them.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>How has it gone over?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>I&rsquo;ve shown it to my whole chief resident class, a handful of attendings and all my friends, about 20 people. Everyone, even the non-medical people, absolutely loves it. I think there&rsquo;s a cool nostalgia factor.</p>
+        </div>
+      </div>
+
+      <blockquote class="pull-quote"><p>&ldquo;Many have tried, but no one has made it to the end!&rdquo;</p></blockquote>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>Any caveats?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>It&rsquo;s affectionate teasing, not a knock on any specialty (except the ortho bros).</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What&rsquo;s next, and how can members help?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>Online multiplayer is next. Members can suggest new specialties for the roster.</p>
+        </div>
+      </div>
+
+      <p class="interview-actions">
+        <a class="btn btn--primary" href="../games/hospital-kombat.html">&gt; Play Hospital Kombat</a>
+        <a class="btn" href="../requests.html">&gt; Suggest a specialty</a>
+      </p>
+
+      <h3 class="subsection-title">More creation interviews</h3>
+      <ul class="interview-more">
+        <li><a href="junglecards.html">JungleCards</a></li>
+        <li><a href="antibiose.html">Antibiose</a></li>
+        <li><a href="bearcat-pinball.html">Bearcat Pinball</a></li>
+      </ul>
+
+      <p><a href="../games.html" class="back-link">&lt; GAMES</a></p>
+    </main>
+
+    <p class="site-social"><a href="https://www.instagram.com/aimedicinecollective/" target="_blank" rel="noopener noreferrer"><svg class="site-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg><span>&gt; INSTAGRAM: @aimedicinecollective</span></a></p>
+
+    <p class="site-note">// The AI Medicine Collective is an independent, volunteer-run group.
+      Everything on this site, including AI-assisted summaries and member-built tools, is for
+      educational purposes only and is not medical advice. We make no guarantee that it is
+      accurate, complete or current. Check all information against primary sources and use
+      your own clinical judgment.</p>
+
+    <div class="horizontal-rule bottom-rule"></div>
+
+    <footer class="footer">
+      &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+      <span class="cursor">█</span>
+    </footer>
+
+  </div>
+
+  <script src="../script.js"></script>
+</body>
+</html>

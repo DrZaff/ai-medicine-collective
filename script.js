@@ -838,6 +838,192 @@ function initHeroNet() {
 
 document.addEventListener("DOMContentLoaded", initHeroNet);
 
+/* ========= HOME PAGE: featured interviews that scroll themselves =========
+   Each .interview-reel names an interview page (data-interview). Its Q&A
+   and pull quotes are copied in, and once at least half the reel is on
+   screen it scrolls from the top at an easy reading pace (READ_WPM). It
+   pauses while the pointer is over it, while it has keyboard focus, while
+   someone scrolls it by hand, and with the Pause button; it starts over
+   from the top each time it comes back on screen, and after the end. With
+   reduced motion it never moves on its own: it is an ordinary scroll box. */
+const READ_WPM = 190;
+
+function initInterviewReels() {
+  const reels = document.querySelectorAll(".interview-reel[data-interview]");
+  if (!reels.length) return;
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  reels.forEach((reel) => loadInterviewReel(reel, still));
+}
+
+function loadInterviewReel(reel, still) {
+  const track = reel.querySelector(".reel-track");
+  const pageUrl = new URL(reel.dataset.interview, location.href);
+  fetch(pageUrl)
+    .then((r) => (r.ok ? r.text() : Promise.reject(r.status)))
+    .then((html) => {
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const parts = doc.querySelectorAll(".interview .qa, .interview .pull-quote");
+      if (!parts.length) return;
+      const frag = document.createDocumentFragment();
+      parts.forEach((part) => {
+        const node = document.importNode(part, true);
+        node.querySelectorAll("[href]").forEach((a) => {
+          a.href = new URL(a.getAttribute("href"), pageUrl).href;
+        });
+        frag.appendChild(node);
+      });
+      const end = document.createElement("p");
+      end.className = "reel-end";
+      const link = document.createElement("a");
+      link.href = pageUrl.href;
+      link.textContent = "Read the full interview, with pictures";
+      end.append("End of the interview. ", link);
+      frag.appendChild(end);
+      track.replaceChildren(frag);
+      reel.classList.add("is-loaded");
+      if (!still) runInterviewReel(reel);
+    })
+    .catch(() => {
+      /* keep the short text and the link to the full interview */
+    });
+}
+
+function runInterviewReel(reel) {
+  const box = reel.parentElement;
+  const controls = box.querySelector(".reel-controls");
+  const toggle = box.querySelector(".reel-toggle");
+  const restart = box.querySelector(".reel-restart");
+  const bar = box.querySelector(".reel-progress span");
+  const words = reel.textContent.trim().split(/\s+/).length;
+
+  let pos = 0;
+  let onScreen = false;
+  let wasAway = true;   // off screen since the last run: start over
+  let hovered = false;
+  let focused = false;
+  let paused = false;   // the Pause button
+  let holdUntil = 0;    // after a hand scroll, or before the first line
+  let atEnd = false;
+  let frame = 0;
+  let last = 0;
+
+  if (controls) controls.hidden = false;
+
+  const maxScroll = () => Math.max(0, reel.scrollHeight - reel.clientHeight);
+  // pixels per second so that words pass at READ_WPM
+  const speed = () => {
+    const pxPerWord = reel.scrollHeight / words;
+    return Math.min(60, Math.max(8, (READ_WPM / 60) * pxPerWord));
+  };
+
+  function show() {
+    const max = maxScroll();
+    if (bar) bar.style.width = max ? `${(pos / max) * 100}%` : "0%";
+  }
+
+  function jumpTo(y) {
+    pos = y;
+    reel.scrollTop = y;
+    show();
+  }
+
+  function startOver(lead) {
+    atEnd = false;
+    jumpTo(0);
+    holdUntil = performance.now() + lead;
+  }
+
+  function moving() {
+    return onScreen && !hovered && !focused && !paused;
+  }
+
+  function tick(now) {
+    frame = 0;
+    if (!moving()) return;
+    const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
+    last = now;
+    if (!handScrolled() && now >= holdUntil) {
+      const max = maxScroll();
+      if (atEnd) {
+        atEnd = false;
+        startOver(2000);
+      } else if (pos >= max - 1) {
+        // the end: rest a moment on the last lines, then back to the top
+        atEnd = true;
+        holdUntil = now + 6000;
+      } else {
+        pos = Math.min(max, pos + speed() * dt);
+        reel.scrollTop = pos;
+        show();
+      }
+    }
+    frame = requestAnimationFrame(tick);
+  }
+
+  function wake() {
+    if (!frame && moving()) {
+      last = 0;
+      frame = requestAnimationFrame(tick);
+    }
+  }
+
+  // a scroll we didn't make is the reader taking over: follow them and wait
+  function handScrolled() {
+    if (Math.abs(reel.scrollTop - pos) <= 3) return false;
+    pos = reel.scrollTop;
+    atEnd = false;
+    holdUntil = performance.now() + 4000;
+    show();
+    return true;
+  }
+  reel.addEventListener("scroll", handScrolled, { passive: true });
+
+  reel.addEventListener("pointerenter", (e) => {
+    if (e.pointerType === "mouse") hovered = true;
+  });
+  reel.addEventListener("pointerleave", (e) => {
+    if (e.pointerType === "mouse") { hovered = false; wake(); }
+  });
+  reel.addEventListener("touchstart", () => {
+    holdUntil = performance.now() + 5000;
+  }, { passive: true });
+  reel.addEventListener("focusin", () => { focused = true; });
+  reel.addEventListener("focusout", () => { focused = false; wake(); });
+
+  if (toggle) {
+    toggle.addEventListener("click", () => {
+      paused = !paused;
+      toggle.textContent = paused ? "Play" : "Pause";
+      toggle.setAttribute("aria-pressed", String(paused));
+      wake();
+    });
+  }
+  if (restart) {
+    restart.addEventListener("click", () => {
+      startOver(800);
+      wake();
+    });
+  }
+
+  new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) {
+        onScreen = false;
+        wasAway = true;
+        return;
+      }
+      onScreen = entry.intersectionRatio >= 0.5;
+      if (onScreen && wasAway) {
+        wasAway = false;
+        startOver(1500);
+      }
+      wake();
+    });
+  }, { threshold: [0, 0.5] }).observe(reel);
+}
+
+document.addEventListener("DOMContentLoaded", initInterviewReels);
+
 /* ========= TOOLS PAGE: launcher ========= */
 
 // Icons for the Collective's own apps, by web address. Everything else gets
