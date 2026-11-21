@@ -17,7 +17,7 @@ no cloud, no Apple Health.
 | 8 | **Presentation pacing** | A talk timer that knows your slide count: a gentle buzz at each slide's time budget, two buzzes at 1 minute left, all silent. | S | timers (done) |
 | 9 | **Retro watch face** | A 16-bit face showing steps, training days this week, the next timer, a PR trophy and "sets waiting". It only reads local files and redraws once a minute. | M | battery check over 24 h |
 | 10 | **Wrist rep counter (experimental)** | Count reps from the accelerometer for curls, presses and rows; offer the count as the REPS default and never log it silently. A good research spike; accuracy has to be measured. | L | data collection, per-lift tuning |
-| 11 | **Walk ghost** | For GPS walks (Recorder app), race your previous walk on the same route: "12 s ahead". | M | GPS slice, route matching |
+| 11 | **Walk ghost** | Race your previous run or walk on the same route: "12 s ahead". Builds on the Run / Walk routes (watch 0.03, own GPS log). | M | route matching |
 
 **Recommended next three, after the first hardware test:** 1 (protects the
 data), then 2 + 3 + 4 as one "gym-floor polish" PR (all watch-only and

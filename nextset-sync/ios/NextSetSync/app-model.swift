@@ -53,6 +53,12 @@ final class AppModel {
         store = AppModel.openStore(demo: demo)
         seedIfNeeded()
         try? store.recordZone()
+        #if DEBUG && targetEnvironment(simulator)
+        if demo && ProcessInfo.processInfo.arguments.contains("--verify-demo-backup") {
+            verifyDemoBackup()
+            return
+        }
+        #endif
         ble.onEvent = { [weak self] e in MainActor.assumeIsolated { self?.handle(e) } }
         if demo { Task { await startDemoWatch() } } else { reconnectIfPaired() }
     }
@@ -91,6 +97,8 @@ final class AppModel {
     var allSets: [SetRecord] { _ = revision; return store.sets }
     var markers: [MarkerRecord] { _ = revision; return store.markers }
     var checkins: [CheckinRecord] { _ = revision; return store.checkins }
+    var activities: [ActivityRecord] { _ = revision; return store.activities }
+    var dailySteps: [DailySteps] { _ = revision; return store.dailySteps }
     /// Resting heart rate per night (newest first), from the Health log and Sleep Log.
     var recovery: [RecoveryNight] { _ = revision; return RecoveryAnalyzer.nights(nights, rows: store.healthRows) }
     func note(for m: MarkerRecord) -> String { _ = revision; return store.note(for: m.id) ?? "" }
@@ -108,7 +116,7 @@ final class AppModel {
                      "Last error: \(l.lastError ?? "none")",
                      "Watch: app \(st?.appVersion ?? "?")  firmware \(st?.firmware ?? "?")  Sleep Log \(st?.sleepLogVersion ?? "-")  battery \(st?.battery.map(String.init) ?? "?")%",
                      "Waiting on watch: \(st?.pendingSets ?? 0) sets, \(st?.pendingMarkers ?? 0) markers",
-                     "On phone: \(store.sets.count) sets (\(store.awaitingAckCount) awaiting confirmation), \(store.markers.count) markers, \(store.checkins.count) check-ins, \(store.sleepEntries.count) sleep entries, \(store.healthRows.count) heart-rate rows",
+                     "On phone: \(store.sets.count) sets (\(store.awaitingAckCount) awaiting confirmation), \(store.markers.count) markers, \(store.checkins.count) check-ins, \(store.sleepEntries.count) sleep entries, \(store.healthRows.count) heart-rate rows, \(store.activities.count) runs and walks, \(store.dailySteps.count) step days",
                      "Health app: \(st?.healthAppVersion ?? "-")  HRM interval: \(st?.heartRatePolling.map { "\($0) min" } ?? "-")",
                      "Protocol v\(SyncProtocol.version), kinds \(SyncProtocol.storedKinds.joined(separator: ","))",
                      "", "Recent activity:"]
@@ -151,6 +159,10 @@ final class AppModel {
         let demo = DemoData.sleep()
         await w.setSleep(demo.entries, lastCheckT10: demo.dataEndT10)
         await w.setHealth(DemoData.health())
+        await w.setDemoSteps(DemoData.steps())
+        // Yesterday's run, waiting on the "watch" with its route.
+        await w.addActivity(mode: "run", units: "mi", start: Date().addingTimeInterval(-86_400 + 7 * 3600 - Double(Calendar.current.component(.hour, from: Date())) * 3600),
+                            route: DemoData.route(seconds: 1_860, speed: 3.3), pausedS: 45)
         let e = await attachDemoEngine(w)
         engine = e
         if store.link.key == nil {
@@ -162,7 +174,7 @@ final class AppModel {
         _ = try? await e.fetchStatus()
         connection = .connected
         revision += 1
-        log("Demo watch ready: 3 sets and a week of Sleep Log data waiting to sync.")
+        log("Demo watch ready: 3 sets, a run, daily steps and a week of Sleep Log data waiting to sync.")
     }
 
     /// A sync engine wired to the simulated watch. The callbacks capture
@@ -199,6 +211,13 @@ final class AppModel {
         guard let w = demoWatch else { return }
         await w.addCheckin(Int.random(in: 3...5))
         log("Demo: morning check-in on the watch")
+        revision += 1
+    }
+    func demoWalk() async {
+        guard let w = demoWatch else { return }
+        await w.addActivity(mode: "walk", units: "mi", start: Date().addingTimeInterval(-1_500), route: DemoData.route(seconds: 1_380, speed: 1.4))
+        log("Demo: a walk was saved on the watch")
+        if connection == .connected { _ = try? await engine?.fetchStatus() }
         revision += 1
     }
     func demoFinishWorkout() async { await demoWatch?.finishSession(); log("Demo: workout finished on the watch") }
@@ -373,6 +392,44 @@ final class AppModel {
     }
 
     // MARK: workouts and files
+
+    func restoreBackup(from url: URL) {
+        let accessible = url.startAccessingSecurityScopedResource()
+        defer {
+            if accessible { url.stopAccessingSecurityScopedResource() }
+            revision += 1
+        }
+        do {
+            let changed = try store.restoreBackup(Data(contentsOf: url))
+            notice = changed ? "Backup merged." : "This backup is already restored."
+        } catch {
+            errorMessage = "Could not finish restoring the backup. \(error.localizedDescription)"
+        }
+    }
+
+    #if DEBUG && targetEnvironment(simulator)
+    private func verifyDemoBackup() {
+        let scratch = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let demoStore = store
+        defer {
+            store = demoStore
+            try? FileManager.default.removeItem(at: scratch)
+        }
+        do {
+            let file = try LocalBackupFile(store: store).makeFile()
+            defer { try? FileManager.default.removeItem(at: file.deletingLastPathComponent()) }
+            let exported = try Data(contentsOf: file)
+            store = try LocalStore(directory: scratch)
+            restoreBackup(from: file)
+            guard !store.sets.isEmpty, try store.exportBackup() == exported else { return }
+            restoreBackup(from: file)
+            guard notice == "This backup is already restored.", errorMessage == nil else { return }
+            try Data("OK\n".utf8).write(to: AppModel.folder(demo: true).appendingPathComponent("backup-check.txt"))
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    #endif
 
     func save(_ w: Workout) {
         do { try store.saveWorkout(w); revision += 1 } catch { errorMessage = error.localizedDescription }

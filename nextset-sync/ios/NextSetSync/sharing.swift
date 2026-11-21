@@ -28,3 +28,21 @@ struct WorkoutFile: Transferable {
         }
     }
 }
+
+struct LocalBackupFile: Transferable {
+    let store: LocalStore
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(exportedContentType: .json) { backup in
+            try SentTransferredFile(backup.makeFile())
+        }
+    }
+
+    func makeFile() throws -> URL {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let url = folder.appendingPathComponent("nextset-sync-backup.json")
+        try store.exportBackup().write(to: url, options: [.atomic, .completeFileProtection])
+        return url
+    }
+}

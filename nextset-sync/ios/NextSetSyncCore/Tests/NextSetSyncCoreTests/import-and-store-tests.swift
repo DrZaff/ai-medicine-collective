@@ -48,6 +48,65 @@ final class ImportTests: XCTestCase {
 }
 
 final class StoreTests: XCTestCase {
+    func testBackupRoundTripAndRepeatedRestore() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("backup-\(UUID())")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = try LocalStore(directory: directory)
+        let now = Date(timeIntervalSince1970: 1_794_000_000)
+        try store.saveWorkout(Samples.fullBodyA)
+        let set = rec("set", rev: 2)
+        var session = rec("s1", rev: 1); session.k = "ses"; session.n = 1
+        var marker = rec("marker", rev: 3); marker.k = "mark"; marker.label = "Coffee"
+        var deleted = marker; deleted.id = "deleted"; deleted.del = 1
+        var checkin = rec("checkin", rev: 1); checkin.k = "chk"; checkin.score = 4
+        let result = try store.upsert([set, session, marker, deleted, checkin], now: now)
+        try store.markConfirmed(result.acks)
+        try store.setNote("Sample note", for: marker.id)
+        try store.recordZone(TimeZone(secondsFromGMT: 0)!, at: now)
+        try store.updateLink { $0.key = "synthetic-pairing-key" }
+        let sleep = SleepEntry(t10: 2_990_000, status: 2, consec: 1)
+        let row = HealthRow(t10: sleep.t10, steps: 0, bpmMin: 56, bpmMax: 65, movement: 0, activity: 0)
+        try store.importSleep([sleep], dataEndT10: sleep.t10 + 1)
+        try store.importHealth([row])
+        let data = try store.exportBackup()
+        XCTAssertFalse(String(decoding: data, as: UTF8.self).contains("synthetic-pairing-key"))
+
+        try store.eraseAll()
+        XCTAssertTrue(store.sets.isEmpty)
+        XCTAssertTrue(try store.restoreBackup(data))
+        let reopened = try LocalStore(directory: directory)
+        XCTAssertEqual(try reopened.exportBackup(), data)
+        XCTAssertNil(reopened.link.key)
+        XCTAssertFalse(try reopened.restoreBackup(data))
+        XCTAssertEqual(try reopened.exportBackup(), data)
+    }
+
+    func testBackupMergesConflicts() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("backup-\(UUID())")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let source = try LocalStore(directory: directory.appendingPathComponent("source"))
+        let target = try LocalStore(directory: directory.appendingPathComponent("target"))
+        try source.upsert([rec("newer", rev: 2), rec("local", rev: 1), rec("tie", rev: 1, reps: 6)])
+        try target.upsert([rec("newer", rev: 1), rec("local", rev: 2), rec("tie", rev: 1, reps: 9)])
+        try source.setNote("Older", for: "marker")
+        try target.setNote("Local edit", for: "marker")
+        try source.importSleep([SleepEntry(t10: 100, status: 2, consec: 1)], dataEndT10: 101)
+        try target.importSleep([SleepEntry(t10: 100, status: 2, consec: 0)], dataEndT10: 102)
+        try source.importHealth([HealthRow(t10: 100, steps: 0, bpmMin: 60, bpmMax: 66, movement: 0, activity: 0)])
+        try target.importHealth([HealthRow(t10: 100, steps: 0, bpmMin: 63, bpmMax: 66, movement: 0, activity: 0)])
+
+        let data = try source.exportBackup()
+        XCTAssertTrue(try target.restoreBackup(data))
+        XCTAssertFalse(try target.restoreBackup(data))
+        XCTAssertEqual(target.sets.first { $0.id == "newer" }?.rev, 2)
+        XCTAssertEqual(target.sets.first { $0.id == "local" }?.rev, 2)
+        XCTAssertEqual(target.sets.first { $0.id == "tie" }?.reps, 9)
+        XCTAssertEqual(target.note(for: "marker"), "Local edit")
+        XCTAssertEqual(target.sleepEntries, source.sleepEntries)
+        XCTAssertEqual(target.sleepDataEndT10, 102)
+        XCTAssertEqual(target.healthRows, source.healthRows)
+    }
+
     func rec(_ id: String, rev: Int, reps: Int = 8) -> WireRecord {
         WireRecord(k: "set", id: id, rev: rev, sid: "s1", wid: "w", wn: "Upper", xi: 0, xid: "bench", xn: "Bench", set: 1,
                    load: 135, units: "lb", reps: reps, rir: 2, at: 1_794_000_000_000, ed: nil, del: nil, start: nil, end: nil, n: nil)

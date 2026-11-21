@@ -91,6 +91,16 @@ async function shoot(name) {
   writeFile('nsync', read(path.join(APP, 'lib.js')));
   writeFile('nsync.app.js', read(path.join(APP, 'app.js')));
   writeFile('nsync-tools', read(path.join(APP, 'tools.js')));
+  writeFile('nsync-sleep', read(path.join(APP, 'sleep.js')));
+  writeFile('nsync-gps', read(path.join(APP, 'gps.js')));
+  writeFile('nsync-run', read(path.join(APP, 'run.js')));
+  // Sleep face frames: "evaluate": true files hold atob("..."); store the decoded bytes, as the App Loader does.
+  ['open', 'closing', 'nearly', 'closed'].forEach((n, i) => {
+    const b64 = /atob\("([^"]+)"\)/.exec(read(path.join(APP, `eye-${n}.js`)))[1];
+    const size = Buffer.from(b64, 'base64').length; // sent as base64: the console is not 8-bit clean
+    for (let off = 0; off < b64.length; off += 1200)
+      send(`require("Storage").write("nsync.eye${i}.img",atob("${b64.slice(off, off + 1200)}"),${off / 4 * 3},${size})`);
+  });
   writeFile('sched', read(path.join(HERE, 'vendor', 'sched-0.43-lib.js')));
   writeFile('sched.boot.js', read(path.join(HERE, 'vendor', 'sched-0.43-boot.js')));
   // A synthetic workout, a previous set for the Ghost, a paired phone, a marker.
@@ -123,6 +133,29 @@ async function shoot(name) {
   send('showSelfTest()'); await shoot('11-self-test');
   send('showCheckin()'); await shoot('15-check-in');
   send('showSyncInfo()'); await shoot('12-sync-info');
+  send('showSleepFace()'); await shoot('16-sleep-face');
+  for (const [i, n] of [[1, 'closing'], [2, 'nearly-closed'], [3, 'closed']]) {
+    send(`g.drawImage(require("Storage").read("nsync.eye0.img"),0,0);g.drawImage(require("Storage").read("nsync.eye${i}.img"),13,13)`);
+    await shoot(`1${6 + i}-sleep-face-${n}`);
+  }
+  send('Bangle.setUI();showMain()'); await sleep(300);
+  send('showSteps()'); await shoot('20-steps');
+  send('openRun("run")'); await shoot('21-run-start');
+  // A run 31 minutes in: 3.88 km so far, last 30 s at 3.37 m/s (7:58/mi).
+  send('Bangle.emit("touch",1,{x:88,y:150,type:0})'); await sleep(500);
+  send('var RR=require("nsync-run").state().r,NOW=Date.now();' +
+    'RR.start=NOW-1832000;RR.seg=RR.start+60000;RR.mov=0;RR.dist=3881;RR.fixAt=NOW+60000;RR.win=[[NOW-30000,3780],[NOW,3881]];RR.last={lat:40,lon:-100,t:NOW}');
+  send('Bangle.emit("lcdPower",true)'); await shoot('22-run-live');
+  // Two fixes 25 m apart just short of mile 3: the split screen.
+  send('RR.dist=3*1609.344-5;RR.last=null;RR.sm=[];RR.sp=2;RR.splitMov=require("nsync-gps").moving(RR,Date.now())-478000;' +
+    'Bangle.emit("GPS",{fix:1,lat:40,lon:-100,time:new Date(Date.now()+1000),hdop:1,satellites:9});' +
+    'Bangle.emit("GPS",{fix:1,lat:40,lon:-100+25/85300,time:new Date(Date.now()+2000),hdop:1,satellites:9})');
+  await shoot('23-run-split');
+  send('require("nsync-run").open("run",showMain)'); await shoot('24-run-paused');
+  send('Bangle.emit("touch",1,{x:130,y:150,type:0})'); await shoot('25-run-finish');
+  send('Bangle.setUI();require("nsync").eraseDual("nsync.run");Bangle.setGPSPower(0,"nsync");require("nsync-run").settings(showMain)');
+  await shoot('26-run-settings');
+  send('Bangle.setUI();showMain()'); await sleep(300);
   send('showPair()'); await shoot('13-pair-phone');
   send('g.setTheme({fg:"#fff",bg:"#000",fg2:"#fff",bg2:"#004",fgH:"#fff",bgH:"#00f",dark:true});showEntry()');
   await shoot('14-set-entry-dark');

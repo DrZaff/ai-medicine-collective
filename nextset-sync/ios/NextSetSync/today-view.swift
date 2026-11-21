@@ -1,8 +1,8 @@
 import NextSetSyncCore
 import SwiftUI
 
-/// The everyday screen: is everything synced, recent training, moments marked
-/// on the watch (with notes added here), and last night's sleep.
+/// The everyday screen: is everything synced, recent training, steps and runs,
+/// moments marked on the watch (with notes added here), and last night's sleep.
 struct TodayView: View {
     @Environment(AppModel.self) private var model
 
@@ -11,8 +11,8 @@ struct TodayView: View {
             List {
                 Section {
                     LabeledContent("Last sync", value: model.link.lastSync.map { $0.formatted(date: .abbreviated, time: .shortened) } ?? "Never")
-                    if let st = model.link.watchStatus, st.pendingSets + (st.pendingMarkers ?? 0) > 0 {
-                        Label("\(st.pendingSets) sets and \(st.pendingMarkers ?? 0) markers waiting on the watch", systemImage: "clock")
+                    if let st = model.link.watchStatus, st.pendingSets + (st.pendingMarkers ?? 0) + (st.pendingActivities ?? 0) > 0 {
+                        Label("\(st.pendingSets) sets, \(st.pendingMarkers ?? 0) markers and \(st.pendingActivities ?? 0) runs or walks waiting on the watch", systemImage: "clock")
                             .foregroundStyle(.orange)
                     }
                     if model.awaitingAck > 0 {
@@ -30,6 +30,18 @@ struct TodayView: View {
                         NavigationLink { SessionDetail(session: s) } label: {
                             LabeledContent(s.workoutName, value: "\(s.sets.count) sets · \(s.start.formatted(date: .abbreviated, time: .omitted))")
                         }
+                    }
+                }
+                Section("Activity") {
+                    StepsRows()
+                    ForEach(Array(model.activities.prefix(3))) { a in
+                        NavigationLink { ActivityDetail(activity: a) } label: { ActivityRow(activity: a) }
+                    }
+                    if model.activities.isEmpty {
+                        Text("Runs and walks you record on the watch (Run or Walk in NextSet Sync) appear here with their route.")
+                            .foregroundStyle(.secondary)
+                    } else if model.activities.count > 3 {
+                        NavigationLink("All runs and walks (\(model.activities.count))") { ActivitiesView() }
                     }
                 }
                 Section {

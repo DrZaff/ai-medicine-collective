@@ -163,6 +163,7 @@ struct NightCard: View {
 struct SettingsView: View {
     @Environment(AppModel.self) private var model
     @State private var importingSleep = false
+    @State private var importingBackup = false
 
     var body: some View {
         NavigationStack {
@@ -173,6 +174,14 @@ struct SettingsView: View {
                     Text("Demo mode uses a simulated watch and separate sample data, so you can try every screen now. Your real data is kept apart and untouched.")
                 }
                 Section("Data on this iPhone") {
+                    ShareLink("Export backup (JSON)", item: LocalBackupFile(store: model.store), preview: SharePreview("NextSet Sync backup"))
+                    Button("Restore backup") { importingBackup = true }
+                        .fileImporter(isPresented: $importingBackup, allowedContentTypes: [.json]) { result in
+                            switch result {
+                            case .success(let url): model.restoreBackup(from: url)
+                            case .failure(let error): model.errorMessage = error.localizedDescription
+                            }
+                        }
                     ShareLink("Export set history (CSV)", item: SetHistoryCSV(sets: model.allSets), preview: SharePreview("Set history (CSV)"))
                     Button("Import a Sleep Log file") { importingSleep = true }
                     Text("For sleeplog.log or sleeplog_NNNN.log downloaded with the Espruino Web IDE. Normal syncing does this over Bluetooth.")
@@ -186,6 +195,8 @@ struct SettingsView: View {
                 Section("Not yet tested on real hardware") {
                     ForEach(["Bluetooth pairing with a Bangle.js 2", "Overnight Sleep Log recording and morning sync",
                              "Rest-timer vibration on the watch",
+                             "GPS runs and walks outdoors: distance, pace and split buzzes",
+                             "Sleep face blinking and battery overnight",
                              "Background reconnection with the app closed"], id: \.self) { item in
                         Label(item, systemImage: "hourglass")
                     }
@@ -194,7 +205,7 @@ struct SettingsView: View {
                     LabeledContent("Sync protocol", value: "v\(SyncProtocol.version)")
                     LabeledContent("Sleep Log supported", value: "0.26")
                     LabeledContent("Watch firmware targeted", value: "2v29")
-                    Text("Standalone: no account, no cloud, no Apple Health. Workouts, sets and sleep come straight from the watch and stay on this iPhone.").font(.footnote)
+                    Text("Standalone: no account, no cloud, no Apple Health. Workouts, sets, steps, runs and sleep come straight from the watch and stay on this iPhone.").font(.footnote)
                 }
             }
             .navigationTitle("Settings")

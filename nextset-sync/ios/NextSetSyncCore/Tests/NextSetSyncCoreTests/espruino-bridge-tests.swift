@@ -68,6 +68,7 @@ final class EspruinoLink: WatchLink, @unchecked Sendable {
     func personFinishes() { send("F") }
     func personMarks(_ label: String) { send("M \(label)") }
     func personChecksIn(_ score: Int) { send("C \(score)") }
+    func personRuns(seconds: Int) { send("A \(seconds)") }
     func stop() { try? input.fileHandleForWriting.close(); process.terminate() }
 }
 
@@ -112,7 +113,8 @@ final class EspruinoBridgeTests: XCTestCase {
         link.personLogsSet(reps: 11)
         link.personMarks("Coffee")
         link.personChecksIn(5)
-        try await Task.sleep(nanoseconds: 300_000_000)
+        link.personRuns(seconds: 600)
+        try await Task.sleep(nanoseconds: 600_000_000)
 
         // 3. Reconnect: the set arrives exactly once, and Sleep Log comes with it.
         engine = await connect()
@@ -121,6 +123,14 @@ final class EspruinoBridgeTests: XCTestCase {
         XCTAssertEqual(r1.newMarkers, 1, "marker made on the real watch code arrives")
         XCTAssertEqual(store.markers.map(\.label), ["Coffee"])
         XCTAssertEqual(store.checkins.map(\.score), [5], "check-in from the real watch code")
+        XCTAssertEqual(r1.newActivities, 1, "a run saved by the real Run engine arrives")
+        let run = try XCTUnwrap(store.activities.first)
+        XCTAssertEqual(run.distanceM, 2040, accuracy: 30, "10 minutes at 3.4 m/s")
+        XCTAssertEqual(run.splits.count, 1)
+        XCTAssertGreaterThan(run.route.count, 60, "the whole route, read page by page (more than one page)")
+        XCTAssertFalse(run.routeCut)
+        XCTAssertEqual(run.ackState, .confirmed)
+        XCTAssertFalse(store.dailySteps.isEmpty, "daily steps from the real watch code")
         XCTAssertGreaterThan(r1.healthRowsAdded, 1000, "heart rate read through the real Health 0.44 reader")
         XCTAssertEqual(r1.leftOnWatch, 0)
         XCTAssertEqual(r1.sleepLogVersion, "0.26")
@@ -129,6 +139,8 @@ final class EspruinoBridgeTests: XCTestCase {
         let r2 = try await engine.syncAll()
         XCTAssertEqual(r2.newSets, 0)
         XCTAssertEqual(r2.newMarkers, 0, "and only once")
+        XCTAssertEqual(r2.newActivities, 0)
+        XCTAssertEqual(store.activities.count, 1)
         XCTAssertEqual(r2.sleepAdded, 0, "repeat import adds nothing")
         XCTAssertEqual(store.sets.count, 1)
 
