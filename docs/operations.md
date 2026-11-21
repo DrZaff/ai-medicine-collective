@@ -45,7 +45,9 @@ owner is unavailable.
 | Billy's private key and IDs (`app.pem`, `app.json`) | The agent server only: `/var/lib/billy-pub/.config/billy/`, readable by the `billy-pub` user alone. Not in GitHub | the Billy handoff's publish step and `preflight.py` | No. If the server is lost or the key leaks: GitHub > Settings > Developer settings > GitHub Apps > Billy > revoke the key and generate a new one |
 | Codex sign-in | The agent server, `/home/agent/.codex` (mode 700) | the Billy handoff's review step | Per OpenAI's sign-in rules |
 | `SUPABASE_DB_URL`, `BACKUP_PASSPHRASE` | GitHub environment `db-backup` | nightly backup (`docs/backups.md`) | The URL changes if the database password is reset |
-| `resend_api_key` | Supabase Vault | inbox alerts, meeting emails, digest sending | No |
+| `BLOG_ALERT_SECRET` | GitHub Actions secret | `blog-alert.yml`: emailing members a new blog post (the same random value as `blog_alert_secret` in Vault) | No. To change it, change both copies together |
+| `resend_api_key` | Supabase Vault | inbox alerts, meeting emails, digest sending, blog alerts, approval emails | No |
+| `blog_alert_secret` | Supabase Vault | `queue_blog_alert` (migration 026) accepts only calls carrying it | No. Must equal `BLOG_ALERT_SECRET` in GitHub |
 | `github_actions_token` | Supabase Vault | the database's timetable starting the GitHub jobs | **Yes**: when it lapses, the jobs quietly fall back to GitHub's late schedule |
 | Resend SMTP password | Supabase > Authentication > SMTP | sign-in codes | No |
 | Turnstile secret key | Supabase > Authentication > Attack Protection | captcha check | No |

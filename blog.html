@@ -45,6 +45,14 @@
         Collective before it's published. Always check the original source.
       </p>
 
+      <!-- Blog alerts: script.js (initBlogAlerts) picks the wording from the
+           cosmetic sign-in hints; account.html switches them on. -->
+      <div class="blog-alerts" id="blog-alerts">
+        <a href="account.html?alerts=blog" class="btn btn--primary blog-alerts-btn">&#9993; Email me new blog posts</a>
+        <p class="blog-alerts-note">Free for members: one short email when a new post goes up.</p>
+        <p class="blog-alerts-on" hidden>You'll get new posts by email &#10003; <a href="account.html#blog-alerts">(change)</a></p>
+      </div>
+
       <!-- Filled by script.js from blog/index.json and blog/posts/<date>.json -->
       <div id="blog-app" class="blog-app" aria-live="polite">
         <!-- PRERENDER:blog:start --><!-- recent posts, written in at deploy time by scripts/seo/build_seo.py -->
