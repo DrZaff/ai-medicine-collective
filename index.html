@@ -60,31 +60,30 @@
         </div>
       </section>
 
-      <!-- Featured creation: one thing a member built, shown large. To feature
-           something else, change this block (and the card in the picture). -->
-      <section class="home-featured" aria-labelledby="featured-title" data-reveal>
+      <!-- Featured creations: a picture on one side, and on the other the
+           creation's interview, which scrolls by itself at reading pace once
+           the panel is on screen (initInterviewReels in script.js reads the
+           Q&A from the interview page). Without the script, the reel shows
+           the short text below and a link to the full interview. -->
+      <section class="home-featured home-featured--reel" aria-labelledby="featured-title" data-reveal>
         <div class="featured-copy">
-          <p class="featured-kicker">// Featured creation</p>
+          <p class="featured-kicker">// Featured creation &middot; interview</p>
           <h3 id="featured-title" class="featured-title">JungleCards</h3>
-          <p class="featured-lede">AI-guided precision flashcards for medicine, built on spaced repetition.</p>
-          <p class="featured-text">Anki is powerful, but you build and tidy your decks yourself, and it can't tell
-            you what to study next. JungleCards keeps what works, the spaced repetition and the fill-in-the-blank
-            cards, and adds a checked library, a deck that is yours, and a coach.</p>
-          <ul class="featured-points">
-            <li><strong>A curated library.</strong> Every card is checked by a moderator before it goes in. Add one
-              card, a whole topic, or everything that matches a search to your deck.</li>
-            <li><strong>Your own deck.</strong> Study only what you chose: library cards, private cards you write
-              yourself, or cards AI drafts from notes you paste in.</li>
-            <li><strong>A Precision Education coach.</strong> Tell the Claude-powered coach what you are working
-              toward. It looks at your progress, recommends cards to add in one click, and builds a study plan with
-              daily targets.</li>
-            <li><strong>A dashboard that keeps you honest.</strong> Cards due today, your streak, retention, a 7-day
-              forecast and progress by topic, with three simple buttons for each review.</li>
-            <li><strong>Bring your Anki deck.</strong> Submit an Anki export or a spreadsheet, and moderators can add
-              it to the library. It all runs in the browser on any device, with nothing to install or sync.</li>
-          </ul>
+          <p class="featured-lede">AI-guided precision flashcards for medical students, residents and physicians.</p>
+          <div class="interview-reel" data-interview="features/junglecards.html" tabindex="0" role="region" aria-label="Interview about JungleCards. It scrolls by itself; hover, touch or focus to pause.">
+            <div class="reel-track">
+              <p>An original library of about 16,500 cards, a coach that builds a study plan around your exam
+                and weak spots, and your own notes turned into cards. Free to try.</p>
+            </div>
+          </div>
+          <div class="reel-controls" hidden>
+            <button type="button" class="reel-toggle" aria-pressed="false">Pause</button>
+            <button type="button" class="reel-restart">Start over</button>
+            <span class="reel-progress" aria-hidden="true"><span></span></span>
+          </div>
           <p class="featured-actions">
             <a class="btn btn--primary" href="https://junglecards.aimedicinecollective.com" target="_blank" rel="noopener noreferrer">&gt; Open JungleCards</a>
+            <a class="btn" href="features/junglecards.html">&gt; Read the full interview</a>
           </p>
         </div>
         <!-- A drawing of a card, for decoration -->
@@ -102,6 +101,33 @@
           <figcaption class="featured-credit">Background:
             <a href="https://www.vecteezy.com/free-photos/tropical-jungle-pattern" target="_blank" rel="noopener noreferrer">Tropical Jungle Pattern Stock photos by Vecteezy</a></figcaption>
         </figure>
+      </section>
+
+      <!-- Second featured creation: picture on the left this time -->
+      <section class="home-featured home-featured--reel home-featured--flip" aria-labelledby="featured-title-antibiose" data-reveal>
+        <figure class="featured-visual featured-visual--shot">
+          <img class="featured-shot" src="images/games/antibiose.webp" width="720" height="540" alt="Antibiose in play: Strep A and MSSA microbes drifting across a microscope field" loading="lazy" />
+        </figure>
+        <div class="featured-copy">
+          <p class="featured-kicker">// Featured creation &middot; interview</p>
+          <h3 id="featured-title-antibiose" class="featured-title">Antibiose</h3>
+          <p class="featured-lede">A phone game that teaches which drug kills which germ.</p>
+          <div class="interview-reel" data-interview="features/antibiose.html" tabindex="0" role="region" aria-label="Interview about Antibiose. It scrolls by itself; hover, touch or focus to pause.">
+            <div class="reel-track">
+              <p>Germs drift across a microscope slide, drawn the way they really look. Load a drug and hit only
+                the ones it truly kills; every wrong shot tells you why. 138 germs and 100 drugs.</p>
+            </div>
+          </div>
+          <div class="reel-controls" hidden>
+            <button type="button" class="reel-toggle" aria-pressed="false">Pause</button>
+            <button type="button" class="reel-restart">Start over</button>
+            <span class="reel-progress" aria-hidden="true"><span></span></span>
+          </div>
+          <p class="featured-actions">
+            <a class="btn btn--primary" href="games/antibiose.html">&gt; Play Antibiose</a>
+            <a class="btn" href="features/antibiose.html">&gt; Read the full interview</a>
+          </p>
+        </div>
       </section>
 
       <!-- Live panels. The briefing and project panels are filled by

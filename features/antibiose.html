@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" class="modern">
+<head>
+  <meta charset="UTF-8" />
+  <title>Antibiose: an interview – AI Medicine Collective</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="How Antibiose, a phone game that teaches which drug kills which germ, was designed and built: an interview with the founder of the AI Medicine Collective." />
+  <link rel="icon" type="image/png" href="../images/icon-192.png" />
+  <meta property="og:site_name" content="AI Medicine Collective" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Antibiose: an interview – AI Medicine Collective" />
+  <meta property="og:description" content="How Antibiose, a phone game that teaches which drug kills which germ, was designed and built: an interview with the founder of the AI Medicine Collective." />
+  <meta property="og:image" content="https://www.aimedicinecollective.com/images/share-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../modern.css" />
+  <script>try{if(localStorage.getItem("amc-theme")==="terminal")document.documentElement.className="terminal"}catch(e){}</script>
+</head>
+<body>
+  <div class="terminal-frame">
+
+    <div class="horizontal-rule"></div>
+
+    <header>
+      <h1 class="headline"><a href="../index.html">:: AI MEDICINE COLLECTIVE ::</a></h1>
+
+      <nav class="nav" aria-label="Main">
+        <a href="../index.html">HOME</a>
+        <a href="../hub.html">TOOLS</a>
+        <a href="../games.html">GAMES</a>
+        <a href="../blog.html">EVIDENCE</a>
+        <a href="../learn.html">LEARN</a>
+        <a href="../members.html">COMMUNITY</a>
+        <a href="../index.html#vision" data-vision>OUR VISION</a>
+        <a href="../join.html" class="nav-cta" data-signed-out-only>JOIN</a>
+        <a href="../account.html" class="nav-account" data-account-link="ACCOUNT">SIGN IN</a>
+      </nav>
+
+      <div class="horizontal-rule"></div>
+    </header>
+
+    <main class="section interview">
+      <p class="interview-kicker">// Creation interview</p>
+      <h2 class="section-title">Antibiose</h2>
+      <p class="interview-dek">A phone game that teaches antimicrobial coverage, one germ at a time.</p>
+      <p class="interview-byline">// Claude (Anthropic's AI) interviews Brandon Zaffuto, founder of the AI Medicine Collective &middot; Nov 17, 2026. Answers lightly edited for length and clarity.</p>
+      <figure class="interview-figure">
+        <img src="../images/games/antibiose.webp" width="720" height="540" alt="Antibiose in play: Strep A and MSSA microbes drifting across a microscope field" />
+        <figcaption>Antibiose in play: germs drift across a microscope slide, each drawn the way it really looks.</figcaption>
+      </figure>
+
+      <blockquote class="pull-quote"><p>&ldquo;I struggle mightily with antibiotics, so I wanted a fun way to make it more palatable.&rdquo;</p></blockquote>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What got you started?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>Some of my colleagues have leaned hard into turning medical teaching into games, and I wanted to see if I could build tools like that myself. I also struggle mightily with antibiotics, so I wanted a fun way to make the topic easier to take in.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What does the player actually do?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>Germs drift down a screen drawn to look like a microscope slide, each one drawn the way it really looks: staph as grape clusters, strep as chains, E. coli as a rod with whip-like tails, influenza as a spiky ball. You load a drug from the buttons at the bottom and tap a germ to fire. If the drug really kills that germ, it bursts. If not, nothing happens, and a short message explains why. Any germ that reaches the red line hurts the patient, and if too many get through, the patient crashes.</p>
+          <p>There are two ways to play. In <strong>multi-drug mode</strong>, each round gives you three or four drugs and a mix of germs, and your job is to pick the <em>best</em> drug for each one. First-line choices score the most, drugs that work but aren&rsquo;t first-line score a little, and drugs the germ resists cost points. Rounds are grouped into chapters for bacteria, viruses, fungi and parasites. Later rounds add a patient detail that rules out a drug, like a penicillin allergy, pregnancy or kidney injury, and in the bacteria chapter, overusing broad drugs fills a meter until C. diff shows up.</p>
+          <p>In <strong>single-drug mode</strong>, you pick one drug and shoot only the germs it covers, letting the rest drift past. It can run through all 69 drugs back to back.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What does it teach?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>What each drug does and doesn&rsquo;t cover; why the narrowest drug that works beats the broadest, which is antibiotic stewardship; resistance in plain terms; how an allergy, pregnancy or kidney injury changes the answer; and when not to treat at all, since a cold or norovirus needs rest and fluids, not a drug.</p>
+          <p>Every wrong shot gets a one-sentence reason, and every round ends with a short review of your mistakes. That&rsquo;s where most of the learning happens. In all it covers 138 germs and 100 drugs, at roughly the level medical students learn.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What are you proudest of?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>I think the gameplay is genuinely fun and educational. I love that it gives extra points for first-line treatments. The other big breakthrough was moving automatically from one drug to the next, which makes studying seamless.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What did you cut?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>I was too comprehensive at first and included drugs that cover only one germ. In single-drug mode, a round like that was just &ldquo;find the one matching germ,&rdquo; which was too easy and taught nothing about the drug&rsquo;s range. So single-drug mode uses 69 of the 100 drugs. The other 31, such as fidaxomicin for C. diff or Paxlovid for COVID, still appear in multi-drug mode, where choosing between drugs is the whole point.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>How was it built?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>Entirely with Claude Opus 5.5, in about two hours. Most of that time went into finding good sources on antimicrobial coverage. Then I spent about an hour checking the coverage by hand.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What was the hardest part?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>Making the game easy to play but still educational. Unlike some of my other projects, the goal here is learning too, so it couldn&rsquo;t be as ridiculous as the other games. The answer was to keep it simple and build small teaching points into the gameplay itself.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>How has it been received?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>I don&rsquo;t know how many people have played it. The infectious disease specialists at my institution loved it, and we&rsquo;re working to use it as we bring ID more deliberately into the internal medicine residency curriculum.</p>
+        </div>
+      </div>
+
+      <blockquote class="pull-quote"><p>&ldquo;The goal here is learning too, so it couldn&rsquo;t be as ridiculous as the other games.&rdquo;</p></blockquote>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What should players keep in mind?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>The rules are simplified for teaching, and the start screen says so. It isn&rsquo;t a prescribing guide, and local resistance patterns vary. I&rsquo;m not an ID physician, so the game hasn&rsquo;t yet had a full review by one; I&rsquo;ve reached out to an ID fellow to work on that.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <p class="qa-q"><span class="qa-who">Claude</span>What&rsquo;s next, and how can members help?</p>
+        <div class="qa-a">
+          <p><span class="qa-who">Brandon</span>An ID specialist review, use in the residency curriculum, and better graphics and gameplay based on feedback. I&rsquo;d like to keep developing it. Members can help by reporting any coverage errors they spot.</p>
+        </div>
+      </div>
+
+      <p class="interview-actions">
+        <a class="btn btn--primary" href="../games/antibiose.html">&gt; Play Antibiose</a>
+        <a class="btn" href="../games.html">&gt; All games</a>
+      </p>
+
+      <h3 class="subsection-title">More creation interviews</h3>
+      <ul class="interview-more">
+        <li><a href="junglecards.html">JungleCards</a></li>
+        <li><a href="hospital-kombat.html">Hospital Kombat</a></li>
+        <li><a href="bearcat-pinball.html">Bearcat Pinball</a></li>
+      </ul>
+
+      <p><a href="../games.html" class="back-link">&lt; GAMES</a></p>
+    </main>
+
+    <p class="site-social"><a href="https://www.instagram.com/aimedicinecollective/" target="_blank" rel="noopener noreferrer"><svg class="site-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg><span>&gt; INSTAGRAM: @aimedicinecollective</span></a></p>
+
+    <p class="site-note">// The AI Medicine Collective is an independent, volunteer-run group.
+      Everything on this site, including AI-assisted summaries and member-built tools, is for
+      educational purposes only and is not medical advice. We make no guarantee that it is
+      accurate, complete or current. Check all information against primary sources and use
+      your own clinical judgment.</p>
+
+    <div class="horizontal-rule bottom-rule"></div>
+
+    <footer class="footer">
+      &gt; echo "BUILDING INTELLIGENT HEALTHCARE TOGETHER"
+      <span class="cursor">█</span>
+    </footer>
+
+  </div>
+
+  <script src="../script.js"></script>
+</body>
+</html>

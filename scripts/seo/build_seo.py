@@ -46,6 +46,8 @@ LOGO = f"{SITE}/images/icon-512.png"
 PAGES = [
     "index.html", "ai-vs-physician.html", "faq.html", "blog.html", "hub.html", "games.html",
     "members.html", "join.html", "corrections.html", "privacy.html", "terms.html",
+    "features/junglecards.html", "features/antibiose.html", "features/hospital-kombat.html",
+    "features/bearcat-pinball.html",
 ]
 MEMBER_PAGES = "member/*.html"   # the admin team's hand-made pages
 BLOG_POSTS_SHOWN = 12            # recent posts written into blog.html
