@@ -101,7 +101,7 @@ const TURNSTILE_SITE_KEY = "0x4AAAAAAFQNTJzs-R2ztzr7";
 const TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=amcTurnstileReady";
 window.amcTurnstileReady = () => window.dispatchEvent(new Event("amc-turnstile-ready"));
 
-const CONTACT_EMAIL = "zaffutbn@ucmail.uc.edu";
+const CONTACT_EMAIL = "contact@aimedicinecollective.com";
 const ROLE_LABELS = {
   pending: "PENDING",
   rejected: "DECLINED",
@@ -769,7 +769,7 @@ function initAccountPage() {
         });
         panel.append(
           el("p", "account-status", "> ACCESS PENDING"),
-          el("p", null, "Your request is with our moderators. We'll email you when you're approved, and member features unlock then."),
+          el("p", null, "Your request is with our moderators, who usually answer within 2 days. We'll email you when you're approved, and member features unlock then."),
           el("p", "pending-meanwhile-title", "// While you wait:"),
           meanwhile
         );
