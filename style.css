@@ -323,7 +323,8 @@ textarea:focus-visible {
 }
 
 /* The Home button on phones (script.js adds it to every page but the home
-   page). Wider screens have Home in the menu, so it is hidden there. */
+   page). Wider screens have the site name, which links home, in full view,
+   so it is hidden there. */
 .home-button {
   display: none;
 }
@@ -333,7 +334,8 @@ textarea:focus-visible {
   .home-button:visited {
     display: block;
     width: fit-content;
-    margin: 0 auto 6px;
+    margin: 0 auto 2px;
+    padding: 13px 12px;   /* a 44px tap area */
     font-size: 0.78rem;
     letter-spacing: 0.12em;
     color: var(--muted);
@@ -371,6 +373,14 @@ html:not(.modern) .m-only {
 .theme-toggle:hover {
   color: var(--text);
   border-color: var(--accent);
+}
+
+/* phones: header buttons get at least a 44px tap area */
+@media (max-width: 600px) {
+  .theme-toggle {
+    min-height: 44px;
+    padding: 0 14px;
+  }
 }
 
 /* The curtain of digits that brings in the terminal look */
@@ -527,6 +537,12 @@ html.theme-fading body {
   text-transform: uppercase;
 }
 
+/* A menu item written as a name ("Member Creations"): capitals here, as
+   written in the light design */
+.nav a.nav-name {
+  text-transform: uppercase;
+}
+
 /* Phone menu: script.js adds a "> MENU" toggle and .nav--collapsible.
    Without JavaScript the full nav simply stays visible. */
 .nav-toggle {
@@ -539,6 +555,7 @@ html.theme-fading body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    min-height: 44px;
     margin-bottom: 8px;
     padding: 8px 10px;
     font-weight: 700;
@@ -2664,13 +2681,18 @@ button.onboard-hide {
 }
 
 .featured-actions {
-  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin: auto 0 0;
 }
 
 .featured-visual {
   position: relative;
   display: grid;
   place-items: center;
+  min-height: 280px;
   min-width: 0;
   margin: 0;
 }
@@ -2683,8 +2705,7 @@ button.onboard-hide {
 
 /* JungleCards' own background photo, darkened so the card stands out */
 .featured-visual--jungle {
-  min-height: 300px;
-  padding: 32px 20px 40px;
+  padding: 24px 20px 36px;
   background:
     linear-gradient(rgb(var(--surface-rgb) / 0.55), rgb(var(--surface-rgb) / 0.7)),
     url("images/featured/junglecards-bg.jpg") center / cover;
@@ -2768,6 +2789,62 @@ button.onboard-hide {
 @media (max-width: 720px) {
   .home-featured {
     grid-template-columns: 1fr;
+  }
+}
+
+/* The closing band: "Let's create together", what members get, and Join
+   (signed-out visitors only: data-signed-out-only) */
+.home-closing {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--accent);
+  background: var(--panel);
+  text-align: center;
+}
+
+.closing-kicker {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.closing-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-shadow: 0 0 10px rgb(var(--glow-rgb) / 0.6);
+}
+
+.closing-points,
+.section .closing-points {
+  max-width: 60ch;
+  margin: 16px auto 20px;
+  padding-left: 20px;
+  font-family: var(--font-read);
+  line-height: 1.6;
+  text-align: left;
+}
+
+.closing-points li {
+  margin-bottom: 6px;
+}
+
+.closing-points strong {
+  color: var(--text);
+}
+
+.closing-actions {
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .home-closing {
+    padding: 18px 14px;
   }
 }
 

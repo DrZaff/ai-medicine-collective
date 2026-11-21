@@ -589,7 +589,7 @@
 }
 
 .modern .footer::after {
-  content: "AI Medicine Collective \00b7  Building intelligent healthcare together";
+  content: "AI Medicine Collective \00b7  Let\2019s create together";
   font-size: 0.8rem;
   letter-spacing: 0.04em;
   text-align: center;
@@ -3586,7 +3586,7 @@ html.terminal::view-transition-new(root) {
 }
 
 .modern .footer::after {
-  content: "Building intelligent healthcare together";
+  content: "Let\2019s create together";
 }
 
 @media (min-width: 601px) {
@@ -3906,7 +3906,7 @@ html.terminal::view-transition-new(root) {
 .modern .featured-title {
   color: var(--ink);
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-size: clamp(1.8rem, 3vw, 2.3rem);
   font-weight: 500;
   letter-spacing: -0.025em;
   text-transform: none;
@@ -3957,13 +3957,14 @@ html.terminal::view-transition-new(root) {
 }
 
 .modern .featured-actions {
-  margin-top: 24px;
+  margin-top: auto;
+  padding-top: 24px;
 }
 
 /* the picture: a card floating on a jungle-green panel */
 .modern .featured-visual {
-  min-height: 380px;
-  padding: 40px 32px;
+  min-height: 320px;
+  padding: 32px 28px 40px;
   background:
     radial-gradient(circle at 18% 16%, rgb(110 231 183 / 0.28), transparent 42%),
     radial-gradient(circle at 86% 88%, rgb(6 182 212 / 0.22), transparent 46%),
@@ -4232,7 +4233,7 @@ html.terminal::view-transition-new(root) {
 }
 
 .modern .jc-stage {
-  min-height: 300px;
+  min-height: 260px;
 }
 
 .modern .featured-credit {
@@ -5111,4 +5112,116 @@ html.terminal::view-transition-new(root) {
 .modern .faq-share:focus-visible {
   border-color: var(--brand);
   background: var(--brand-soft);
+}
+
+/* === LAUNCH (2026-11-16) ====================================== */
+
+/* "Member Creations" is a name: shown as written, not lower-cased */
+.modern .nav a.nav-name,
+.modern .nav a.nav-name:visited {
+  text-transform: none;
+}
+
+/* phones: the round Home button gets a 44px tap area like its neighbours */
+@media (max-width: 600px) {
+  .modern .home-button,
+  .modern .home-button:visited {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* the closing band: a dark stage like the hero, bookending the page */
+.modern .home-closing {
+  position: relative;
+  margin-top: 56px;
+  padding: 64px 40px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 28px;
+  background:
+    radial-gradient(640px 320px at 50% 120%, rgb(16 185 129 / 0.35), transparent 70%),
+    linear-gradient(165deg, #03211b 0%, var(--night) 60%, #06323a 100%);
+  box-shadow: 0 24px 48px -20px rgb(4 32 26 / 0.55);
+  color: #fff;
+}
+
+.modern .closing-kicker {
+  display: inline-block;
+  margin-bottom: 18px;
+  padding: 6px 14px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.06);
+  color: var(--spark-soft);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.modern .closing-title {
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(2.3rem, 6vw, 3.6rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-shadow: none;
+  text-transform: none;
+}
+
+.modern .closing-points {
+  max-width: 56ch;
+  margin: 28px auto 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.modern .closing-points li {
+  position: relative;
+  margin: 0;
+  padding: 10px 0 10px 26px;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+  color: rgb(226 240 235 / 0.88);
+  font-size: 1.0625rem;
+}
+
+.modern .closing-points li::before {
+  content: "";
+  position: absolute;
+  top: 19px;
+  left: 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--spark);
+  box-shadow: 0 0 0 3px rgb(16 185 129 / 0.25);
+}
+
+.modern .closing-points strong {
+  color: #fff;
+}
+
+.modern .closing-actions .btn--primary,
+.modern .closing-actions .btn--primary:visited {
+  padding: 12px 28px;
+  border-color: transparent;
+  background: var(--spark-soft);
+  box-shadow: 0 6px 22px rgb(16 185 129 / 0.4);
+  color: #04201a;
+  font-size: 0.95rem;
+}
+
+.modern .closing-actions .btn--primary:hover {
+  background: #fff;
+  color: #04201a;
+}
+
+@media (max-width: 600px) {
+  .modern .home-closing {
+    margin-top: 40px;
+    padding: 44px 20px;
+    border-radius: 22px;
+  }
 }
