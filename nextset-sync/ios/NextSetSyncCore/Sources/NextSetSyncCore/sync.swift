@@ -13,7 +13,7 @@ public struct SyncReport: Equatable, Sendable {
     public var at = Date()
     public var newSets = 0, updatedSets = 0, duplicateRecords = 0, sessionsFinished = 0, newMarkers = 0
     public var sleepAdded = 0, sleepChanged = 0, sleepUnchanged = 0
-    public var newCheckins = 0, healthRowsAdded = 0
+    public var newCheckins = 0, healthRowsAdded = 0, newActivities = 0, stepDays = 0
     public var healthSkippedReason: String?
     public var leftOnWatch = 0
     public var sleepLogVersion: String?
@@ -26,6 +26,7 @@ public struct SyncReport: Equatable, Sendable {
         if duplicateRecords > 0 { parts.append("\(duplicateRecords) already here") }
         if newCheckins > 0 { parts.append(newCheckins == 1 ? "1 check-in" : "\(newCheckins) check-ins") }
         if healthRowsAdded > 0 { parts.append("heart rate: \(healthRowsAdded) new readings") }
+        if newActivities > 0 { parts.append(newActivities == 1 ? "1 run or walk" : "\(newActivities) runs and walks") }
         if newMarkers > 0 { parts.append(newMarkers == 1 ? "1 marker" : "\(newMarkers) markers") }
         if sessionsFinished > 0 { parts.append("\(sessionsFinished) workout\(sessionsFinished == 1 ? "" : "s") finished") }
         if let r = sleepSkippedReason { parts.append("sleep: \(r)") }
@@ -204,8 +205,8 @@ public actor SyncEngine {
     private func statusStep() async throws -> WatchStatus {
         try await ensureAuthed()
         let r = try await request(WireMessage(t: "status"))
-        let s = WatchStatus(at: clock(), pendingRecords: (r.pend ?? 0) + (r.pendMarks ?? 0), pendingSets: r.pendSets ?? 0,
-                            pendingMarkers: r.pendMarks, healthAppVersion: hello?.healthLog?.ver,
+        let s = WatchStatus(at: clock(), pendingRecords: (r.pend ?? 0) + (r.pendMarks ?? 0) + (r.pendActs ?? 0), pendingSets: r.pendSets ?? 0,
+                            pendingMarkers: r.pendMarks, pendingActivities: r.pendActs, healthAppVersion: hello?.healthLog?.ver,
                             heartRatePolling: hello?.healthLog?.hrm,
                             activeSession: r.ses.map { "\($0.wn ?? "Workout"): exercise \(($0.xi ?? 0) + 1), \($0.n ?? 0) sets" },
                             loadedWorkout: r.wkt?.name, battery: r.bat, firmware: hello?.firmware,
@@ -237,6 +238,7 @@ public actor SyncEngine {
             try await pullRecords(&report)
             try await pullSleep(&report)
             try await pullHealth(&report)
+            try await pullSteps(&report)
             let st = try await statusStep()
             report.leftOnWatch = st.pendingRecords
             try store.updateLink { $0.lastSync = report.at; $0.lastSyncSummary = report.summary; $0.lastError = nil }
@@ -252,8 +254,13 @@ public actor SyncEngine {
             let r = try await request(m)
             let recs = r.recs ?? []
             if recs.isEmpty { return }
+            // Runs and walks: fetch the whole route first, so it is stored with the record.
+            var routes: [String: [RoutePoint]] = [:]
+            let known = Set(store.activities.map(\.id))
+            for a in recs where a.k == "act" && !known.contains(a.id) { routes[a.id] = try await fetchRoute(a) }
             // 1. durable write, 2. then acknowledge
-            let result = try store.upsert(recs, isDemo: isDemo, now: clock())
+            let result = try store.upsert(recs, routes: routes, isDemo: isDemo, now: clock())
+            report.newActivities += result.insertedActivities
             report.newSets += result.insertedSets
             report.newMarkers += result.insertedMarkers
             report.newCheckins += result.insertedCheckins
@@ -265,6 +272,8 @@ public actor SyncEngine {
             try store.markConfirmed(result.acks)
             let left = ar.left ?? 0
             if left == 0 && !(r.more ?? false) { return }
+            // Only runs whose route did not arrive are left: the next sync retries them.
+            if result.incompleteRoutes > 0 && left <= result.incompleteRoutes { return }
             if left >= lastLeft { stuck += 1; if stuck > 3 { throw WireError.unexpected("The watch keeps sending the same records.") } }
             lastLeft = left
         }
@@ -296,6 +305,40 @@ public actor SyncEngine {
             var s = WireMessage(t: "sack"); s.upto = newest
             _ = try await request(s)
             try store.updateLink { $0.sleepCursorT10 = newest }
+        }
+    }
+
+    /// A run's or walk's route, page by page from point 0, or nil if the watch
+    /// did not finish sending it (it keeps the route until it gets the ack, so
+    /// the next sync simply reads it again). A route the watch ends early is
+    /// stored as cut short rather than blocking the record forever.
+    private func fetchRoute(_ a: WireRecord) async throws -> [RoutePoint]? {
+        let total = a.n ?? 0
+        var pts: [RoutePoint] = []
+        for _ in 0..<1000 {
+            if pts.count >= total { return pts }
+            var m = WireMessage(t: "route"); m.id = a.id; m.from = pts.count; m.max = 40
+            let r = try await request(m)
+            guard r.t == "rte", r.from == pts.count else { return nil }
+            pts += (r.pts ?? []).compactMap(RoutePoint.init)
+            if r.more != true {
+                if pts.count < total { logger("route for \(a.id): the watch had \(pts.count) of \(total) points") }
+                return pts
+            }
+        }
+        return nil
+    }
+
+    /// Daily step totals for the last 7 watch-local days (replaced each sync).
+    /// A watch app older than 0.03 answers "unknown": skipped quietly.
+    private func pullSteps(_ report: inout SyncReport) async throws {
+        var m = WireMessage(t: "steps"); m.n = 7
+        do {
+            let r = try await request(m)
+            let imp = try store.importSteps(r.days ?? [], isDemo: isDemo, now: clock())
+            report.stepDays = imp.added + imp.changed
+        } catch WireError.watch(let code, _) where code == "unknown" {
+            logger("watch app has no daily steps yet (update it to 0.03)")
         }
     }
 

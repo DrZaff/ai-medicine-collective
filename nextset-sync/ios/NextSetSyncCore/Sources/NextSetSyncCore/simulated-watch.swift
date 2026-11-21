@@ -21,6 +21,12 @@ public actor SimulatedWatch: WatchLink {
     public var sleepLogVersion: String? = "0.26"
     public var healthLogVersion: String? = "0.44"
     public var health: [HealthRow] = []
+    /// Finished runs and walks with their routes ([seconds, lat, lon]), until acknowledged.
+    public private(set) var acts: [String: WireRecord] = [:]
+    public private(set) var routes: [String: [[Double]]] = [:]
+    public private(set) var syncedActs: Set<String> = []
+    /// Daily steps the watch reports (watch-local dates, oldest first); nil = an app older than 0.03.
+    public var stepDays: [WireDaySteps]? = []
     public private(set) var sleepAck = 0
     public private(set) var timeZoneMinutes: Int?
     public var confirmPairing = true
@@ -62,6 +68,7 @@ public actor SimulatedWatch: WatchLink {
     public func setSleep(_ entries: [SleepEntry], lastCheckT10: Int?) { sleep = entries; sleepLastCheckT10 = lastCheckT10 }
     public func setSleepLogVersion(_ v: String?) { sleepLogVersion = v }
     public func setHealth(_ rows: [HealthRow]) { health = rows.sorted { $0.t10 < $1.t10 } }
+    public func setDemoSteps(_ days: [WireDaySteps]?) { stepDays = days }
 
     // MARK: connection
 
@@ -123,9 +130,9 @@ public actor SimulatedWatch: WatchLink {
         switch m.t {
         case "hello":
             pid = m.phone; mtu = max(20, min(128, m.mtu ?? 20)); authed = false; nonce = randomHex(8)
-            kinds = (m.kinds ?? ["set", "ses"]).filter { ["set", "ses", "mark", "chk"].contains($0) }
+            kinds = (m.kinds ?? ["set", "ses"]).filter { ["set", "ses", "mark", "chk", "act"].contains($0) }
             var r = WireMessage(t: "hi")
-            r.v = 1; r.min = 1; r.watch = watchId; r.app = "0.02-sim"; r.fw = "2v29 (simulated)"; r.kinds = ["set", "ses", "mark", "chk"]
+            r.v = 1; r.min = 1; r.watch = watchId; r.app = "0.03-sim"; r.fw = "2v29 (simulated)"; r.kinds = ["set", "ses", "mark", "chk", "act"]
             r.hl = WireMessage.HealthLogInfo(ver: healthLogVersion, hrm: 10, utc: true)
             r.paired = pid.map { phones[$0] != nil } ?? false; r.nonce = nonce
             r.sl = WireMessage.SleepLogInfo(ver: sleepLogVersion, on: sleepLogVersion != nil, last: sleepLastCheckT10)
@@ -155,6 +162,7 @@ public actor SimulatedWatch: WatchLink {
             var r = WireMessage(t: "st")
             r.pend = pending.count; r.pendSets = pending.values.filter { $0.k == "set" }.count
             r.pendMarks = marks.keys.filter { !syncedMarks.contains($0) }.count
+            r.pendActs = unsyncedActs.count
             if let s = sessionId {
                 r.ses = .init(sid: s, wn: workout?.name, xi: 0, sn: 1, n: setCounter.values.reduce(0, +), start: sessionStart.map { $0.timeIntervalSince1970 * 1000 })
             }
@@ -171,6 +179,7 @@ public actor SimulatedWatch: WatchLink {
         case "pull":
             var all = pending.values.filter { kinds.contains($0.k) }
             all += marks.values.filter { !syncedMarks.contains($0.id) && kinds.contains($0.k) }
+            if kinds.contains("act") { all += unsyncedActs }
             all.sort { ($0.at, $0.id) < ($1.at, $1.id) }
             let mx = max(1, min(20, m.max ?? 8))
             var r = WireMessage(t: "recs"); r.recs = Array(all.prefix(mx)); r.more = all.count > mx; r.total = all.count
@@ -180,9 +189,11 @@ public actor SimulatedWatch: WatchLink {
             for a in m.ids ?? [] {
                 if let rec = pending[a.id], rec.rev <= a.rev { pending[a.id] = nil; n += 1 }
                 else if let mk = marks[a.id], mk.rev <= a.rev, !syncedMarks.contains(a.id) { syncedMarks.insert(a.id); n += 1 }
+                else if let ac = acts[a.id], ac.rev <= a.rev, !syncedActs.contains(a.id) { syncedActs.insert(a.id); routes[a.id] = nil; n += 1 }
             }
             var left = pending.values.filter { kinds.contains($0.k) }.count
             left += marks.values.filter { !syncedMarks.contains($0.id) && kinds.contains($0.k) }.count
+            if kinds.contains("act") { left += unsyncedActs.count }
             var r = WireMessage(t: "acked"); r.n = n; r.left = left; return r
         case "sleep":
             guard sleepLogVersion != nil else { return err("no_sleeplog", "sleep") }
@@ -206,6 +217,16 @@ public actor SimulatedWatch: WatchLink {
             r.more = after.count > mx
             r.hl = WireMessage.HealthLogInfo(ver: healthLogVersion, hrm: 10, utc: true)
             return r
+        case "route":
+            guard let id = m.id, acts[id] != nil, let pts = routes[id] else { return err("no_route", "route") }
+            let from = max(0, m.from ?? 0), mx = max(5, min(60, m.max ?? 40))
+            var r = WireMessage(t: "rte"); r.id = id; r.from = from
+            r.pts = Array(pts.dropFirst(from).prefix(mx)); r.more = pts.count > from + mx
+            return r
+        case "steps":
+            guard let days = stepDays else { return err("unknown", "steps") }
+            var r = WireMessage(t: "stp"); r.days = Array(days.suffix(max(1, min(14, m.n ?? 7)))); r.today = days.last?.date
+            return r
         case "sack":
             sleepAck = max(sleepAck, m.upto ?? 0)
             var r = WireMessage(t: "ok"); r.re = "sack"; return r
@@ -218,7 +239,33 @@ public actor SimulatedWatch: WatchLink {
         }
     }
 
+    private var unsyncedActs: [WireRecord] { acts.values.filter { !syncedActs.contains($0.id) } }
+
     // MARK: what the person does on the watch (demo buttons and tests)
+
+    /// A finished run or walk with its route, as Save on the watch's Run
+    /// screen stores it. Distance and splits are worked out from the route
+    /// the way the watch counts them (straight lines between points).
+    @discardableResult
+    public func addActivity(mode: String = "run", units: String = "mi", start: Date, route: [RoutePoint], pausedS: Int = 0,
+                            claimedPoints: Int? = nil) -> WireRecord {
+        let id = "\(watchId)-a\(String(Int(start.timeIntervalSince1970 * 1000), radix: 36))"
+        let unit = units == "km" ? 1000.0 : 1609.344
+        var dist = 0.0, splits: [Int] = [], lastSplitT = 0
+        for (a, b) in zip(route, route.dropFirst()) {
+            dist += RouteMath.meters(a, b)
+            if dist >= Double(splits.count + 1) * unit { splits.append(b.t - lastSplitT); lastSplitT = b.t }
+        }
+        let el = (route.last?.t ?? 0) + pausedS
+        var r = WireRecord(k: "act", id: id, rev: 1, sid: nil, wid: nil, wn: nil, xi: nil, xid: nil, xn: nil, set: nil,
+                           load: nil, units: units, reps: nil, rir: nil, at: start.timeIntervalSince1970 * 1000, ed: nil,
+                           del: nil, start: nil, end: start.addingTimeInterval(TimeInterval(el)).timeIntervalSince1970 * 1000,
+                           n: claimedPoints ?? route.count)
+        r.mode = mode; r.dist = dist.rounded(); r.mov = route.last?.t ?? 0; r.el = el; r.splits = splits
+        acts[id] = r
+        routes[id] = route.map { [Double($0.t), $0.lat, $0.lon] }
+        return r
+    }
 
     /// Logs the next set of the loaded workout, as tapping LOG would.
     @discardableResult

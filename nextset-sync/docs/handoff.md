@@ -22,13 +22,13 @@ companion for the owner's iPhone, with no vendor app and no cloud:
 The owner has **no Mac**: builds run on GitHub Actions macOS runners and
 installs go through TestFlight ([no-mac-setup.md](no-mac-setup.md)).
 
-## State on 2026-11-14
+## State on 2026-11-15
 
 | Area | Status | Evidence |
 |---|---|---|
-| Watch app (`watch/nsync`) | Done, v0.02 | 90/90 checks in the real Espruino 2v29 interpreter; screenshots from the official emulator each build; BangleApps sanity check clean |
+| Watch app (`watch/nsync`) | Done, v0.03 (Sleep face, steps, Run / Walk) | 167/167 checks in the real Espruino 2v29 interpreter; screenshots from the official emulator each build; BangleApps sanity check clean |
 | Protocol v1 | Done | [protocol.md](protocol.md); shared vectors; Swift engine tested against the real watch code (bridge test) |
-| Swift core | Done | 45 tests on Linux and macOS (GitHub) |
+| Swift core | Done | 54 tests on Linux and macOS (GitHub) |
 | iOS app | **Compiles** with Xcode 26.3 for simulator and device (GitHub macOS runner, `BUILD SUCCEEDED`); never run on a phone | CI run 43484568933 |
 | TestFlight pipeline | Written, **not yet run** (needs the owner's Apple setup and a separate repo) | `.github/workflows/testflight.yml` |
 | Hardware | Watch arriving next week. Nothing tested on a real Bangle or iPhone yet | first-day-checklist.md |
@@ -108,7 +108,8 @@ How to hand work over:
      launch → Watch → Sync Now → History shows sets → Today shows Moments and
      Recovery. Also save the simulator screenshots as artifacts (they double
      as App Store screenshots later). Acceptance: green in the `ios` job.
-* Later: retro watch face, GPS walks via Recorder, slide remote (needs its own
+* Later (issue #198): weekly activity meter, the approved retro day face,
+  cycling/treadmill, the full NextSet strength round trip; slide remote (needs its own
   feasibility test: one BLE connection at a time).
 
 ### P1: make it great (pick up anytime; independent of each other)
@@ -184,3 +185,4 @@ until it exists, `DrZaff/ai-medicine-collective` branch
 | 2026-11-13 | Claude | Fixed the review findings (timers via Scheduler, unlock guard, crash-safe markers with ids, last-set memory, Ghost legibility, Today demo bug); kinds negotiation + ack-only-stored (fixes silent loss of new record kinds); marker sync end to end; Moments with phone-only notes; diagnostics; watch-files CI artifact; features.md, health-log.md. Watch 74 checks, Swift 41 tests. |
 | 2026-11-14 | Claude | Watch Self-test screen; every watch screen from the official Bangle.js 2 emulator in CI (watch-screens artifact; found and fixed "1 sets" wording and a confusing pairing screen); heart rate from BangleApps Health 0.44 + morning check-ins + Recovery on Today. Watch 90 checks, Swift 45 tests. |
 | 2026-11-14 | Codex | PR #189 adds one-file local backup and merge restore, Swift round-trip and conflict tests, and a demo-mode simulator backup check. |
+| 2026-11-15 | Claude | Issue #198 / PR #203: Sleep face from the approved frames (bezel fixed, blinks only while the LCD is on, never wakes it); daily steps on the watch and iPhone (watch-local days, replaced per date); offline Run / Walk (own GPS log after evaluating Recorder) with live pace, pause, mile/km split buzz exactly once, route synced exactly once with retry-safe ids and drawn on the iPhone. Watch 167 checks, Swift 54 tests. Needs Codex review of the commit and outdoor tests. |

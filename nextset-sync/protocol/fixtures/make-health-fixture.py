@@ -7,7 +7,10 @@ Writes, next to this script:
                          daily summary) x 10 bytes; unused slots are 0xFF.
                          Slots here are UTC wall-clock (the tests run the watch
                          with time zone 0, so local == UTC).
-  health-expected.json   resting heart rate per wake date, for the phone tests.
+  health-expected.json   resting heart rate per wake date, for the phone tests,
+                         and the daily step totals the watch must report for
+                         the 7 watch-local days ending at the last slot, with
+                         the watch at UTC and at UTC+10 (local midnight falls mid-afternoon UTC).
 
 Heart rate during each fixture night (the same nights as sleeplog-sample.log)
 sits at R+5..R+9 bpm, with exactly one 30-minute window (3 slots) at R, so the
@@ -45,7 +48,7 @@ slots = {}
 t = datetime(2026, 11, 1, tzinfo=timezone.utc)
 while t <= LAST_SLOT:
     h = t.hour
-    slots[t] = record(steps=0 if h < 7 or h > 22 else 40 + (h * 37 + t.minute) % 160, bmin=72 + h % 7, bmax=88 + h % 8,
+    slots[t] = record(steps=0 if h < 7 or h > 22 else 40 + (h * 37 + t.minute + t.day * 53) % 160, bmin=72 + h % 7, bmax=88 + h % 8,
                       movement=300 + h * 10, battery=80, temp=31.5, alt=120, act="WALKING" if 7 <= h <= 22 else "UNKNOWN")
     t += timedelta(minutes=10)
 
@@ -69,10 +72,28 @@ for day in range(31):
             data += slots.get(t, b"\xff" * 10)
     data += b"\xff" * 10  # daily summary (unused here)
 (HERE / "health-2026-11.raw").write_bytes(bytes(data))
+
+
+def daily_steps(offset_min, days=7):
+    """Steps per watch-local date, as lib.js dailySteps(days, now) adds them up."""
+    off = timedelta(minutes=offset_min)
+    now = LAST_SLOT + timedelta(minutes=5)
+    local_now = now + off
+    first = (local_now.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=days - 1))
+    out = {}
+    for t, rec in slots.items():
+        lt = t + off
+        if first <= lt and t <= now:
+            k = lt.strftime("%Y-%m-%d")
+            out[k] = out.get(k, 0) + ((rec[0] << 8) | rec[1])
+    return {"nowMs": int(now.timestamp() * 1000), "days": sorted([k, v] for k, v in out.items())}
+
+
 (HERE / "health-expected.json").write_text(json.dumps({
     "file": "health-2026-11.raw", "lastSlotT10": int(LAST_SLOT.timestamp()) // 600,
     "resting": dict(zip(WAKE, RESTING)),
     # 7-night median before the last night (2026-11-13): median of the first 7 values
     "baselineFor": {"2026-11-13": sorted(RESTING[:7])[3]},
+    "dailySteps": {"0": daily_steps(0), "600": daily_steps(600)},
 }, indent=1))
 print(len(data), "bytes;", len(slots), "records")

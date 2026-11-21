@@ -34,6 +34,7 @@ public struct WatchStatus: Codable, Equatable, Sendable {
     public var pendingRecords: Int
     public var pendingSets: Int
     public var pendingMarkers: Int?
+    public var pendingActivities: Int?
     public var healthAppVersion: String?
     public var heartRatePolling: Int?
     public var activeSession: String?
@@ -62,6 +63,9 @@ public struct ZoneMark: Codable, Hashable, Sendable {
 
 public struct UpsertResult: Equatable, Sendable {
     public var insertedSets = 0, insertedSessions = 0, insertedMarkers = 0, insertedCheckins = 0, updated = 0, duplicates = 0, stale = 0
+    public var insertedActivities = 0
+    /// Runs or walks whose route did not arrive complete: NOT acknowledged, fetched again next sync.
+    public var incompleteRoutes = 0
     /// Records of a kind this build does not store: NOT acknowledged, so the watch keeps them.
     public var skippedUnknown = 0
     /// What to acknowledge: every received record, at the rev received.
@@ -97,6 +101,8 @@ public final class LocalStore: @unchecked Sendable {
     private var notes: [String: String] = [:]
     private var checkinIndex: [String: CheckinRecord] = [:]
     private var healthIndex: [Int: HealthRow] = [:]
+    private var activityIndex: [String: ActivityRecord] = [:]
+    private var stepsIndex: [String: DailySteps] = [:]
 
     public init(directory: URL) throws {
         self.directory = directory
@@ -111,6 +117,8 @@ public final class LocalStore: @unchecked Sendable {
         checkinIndex = try load("checkins.json") ?? [:]
         let rows: [HealthRow] = try load("health.json") ?? []
         healthIndex = Dictionary(rows.map { ($0.t10, $0) }, uniquingKeysWith: { _, b in b })
+        activityIndex = try load("activities.json") ?? [:]
+        stepsIndex = try load("steps.json") ?? [:]
     }
 
     private func url(_ name: String) -> URL { directory.appendingPathComponent(name) }
@@ -278,13 +286,34 @@ public final class LocalStore: @unchecked Sendable {
     /// watch); a lower rev is stale and ignored. Every record is acknowledged
     /// at the rev received, because the watch only deletes a record whose rev
     /// is at most the acknowledged one.
-    public func upsert(_ incoming: [WireRecord], isDemo: Bool = false, now: Date = Date()) throws -> UpsertResult {
+    /// Runs and walks (`act`) are stored only with their complete route
+    /// (`routes[id]`, as far as the watch had it); without one they are not
+    /// acknowledged, so the watch keeps them and the route is fetched again.
+    public func upsert(_ incoming: [WireRecord], routes: [String: [RoutePoint]] = [:], isDemo: Bool = false,
+                       now: Date = Date()) throws -> UpsertResult {
         try locked {
             var r = UpsertResult()
-            var markersChanged = false, checkinsChanged = false
+            var markersChanged = false, checkinsChanged = false, activitiesChanged = false
             for w in incoming {
                 // Acknowledge only kinds this build stores; the watch keeps the rest.
                 guard SyncProtocol.storedKinds.contains(w.k) else { r.skippedUnknown += 1; continue }
+                if w.k == "act" {
+                    if let old = activityIndex[w.id], old.rev >= w.rev {
+                        r.acks.append(WireAck(id: w.id, rev: w.rev)); r.duplicates += 1; continue
+                    }
+                    guard let route = routes[w.id] else { r.incompleteRoutes += 1; continue }
+                    r.acks.append(WireAck(id: w.id, rev: w.rev))
+                    let start = Date(timeIntervalSince1970: w.at / 1000)
+                    activityIndex[w.id] = ActivityRecord(
+                        id: w.id, rev: w.rev, mode: w.mode == "walk" ? "walk" : "run", start: start,
+                        end: Date(timeIntervalSince1970: (w.end ?? w.at) / 1000), distanceM: w.dist ?? 0,
+                        movingS: w.mov ?? 0, elapsedS: w.el ?? 0, units: w.units == "km" ? "km" : "mi",
+                        splits: w.splits ?? [], route: route, routeCut: (w.cut ?? 0) != 0 || route.count < (w.n ?? 0), receivedAt: now,
+                        ackState: .awaitingWatchAck, isDemo: isDemo)
+                    r.insertedActivities += 1
+                    activitiesChanged = true
+                    continue
+                }
                 r.acks.append(WireAck(id: w.id, rev: w.rev))
                 if w.k == "chk" {
                     if let old = checkinIndex[w.id] {
@@ -339,6 +368,7 @@ public final class LocalStore: @unchecked Sendable {
             try save(records, "records.json")
             if markersChanged { try save(markerIndex, "markers.json") }
             if checkinsChanged { try save(checkinIndex, "checkins.json") }
+            if activitiesChanged { try save(activityIndex, "activities.json") }
             return r
         }
     }
@@ -351,7 +381,9 @@ public final class LocalStore: @unchecked Sendable {
                 if var s = records.sessions[a.id], s.rev <= a.rev { s.ackState = .confirmed; records.sessions[a.id] = s }
                 if var m = markerIndex[a.id], m.rev <= a.rev { m.ackState = .confirmed; markerIndex[a.id] = m }
                 if var c = checkinIndex[a.id], c.rev <= a.rev { c.ackState = .confirmed; checkinIndex[a.id] = c }
+                if var x = activityIndex[a.id], x.rev <= a.rev { x.ackState = .confirmed; activityIndex[a.id] = x }
             }
+            try save(activityIndex, "activities.json")
             try save(checkinIndex, "checkins.json")
             try save(records, "records.json")
             try save(markerIndex, "markers.json")
@@ -403,6 +435,31 @@ public final class LocalStore: @unchecked Sendable {
         }
     }
     public var healthRows: [HealthRow] { locked { healthIndex.values.sorted { $0.t10 < $1.t10 } } }
+
+    /// Runs and walks, newest first.
+    public var activities: [ActivityRecord] { locked { activityIndex.values.sorted { $0.start > $1.start } } }
+
+    /// Daily step totals from the watch. Each date is replaced by the newest
+    /// report (the watch's count for a day only grows until its midnight).
+    @discardableResult
+    public func importSteps(_ days: [WireDaySteps], isDemo: Bool = false, now: Date = Date()) throws -> SleepImportResult {
+        try locked {
+            var r = SleepImportResult()
+            for d in days where Self.isDate(d.date) && d.steps >= 0 {
+                if let old = stepsIndex[d.date], old.steps == d.steps { r.unchanged += 1; continue }
+                if stepsIndex[d.date] == nil { r.added += 1 } else { r.changed += 1 }
+                stepsIndex[d.date] = DailySteps(date: d.date, steps: d.steps, updatedAt: now, isDemo: isDemo)
+            }
+            if r.added + r.changed > 0 { try save(stepsIndex, "steps.json") }
+            return r
+        }
+    }
+    /// Daily steps, oldest first.
+    public var dailySteps: [DailySteps] { locked { stepsIndex.values.sorted { $0.date < $1.date } } }
+    static func isDate(_ s: String) -> Bool {
+        let p = s.split(separator: "-")
+        return s.count == 10 && p.count == 3 && p.allSatisfy { $0.allSatisfy(\.isNumber) }
+    }
     public func setNote(_ text: String?, for markerId: String) throws {
         try locked {
             let t = text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -452,11 +509,11 @@ public final class LocalStore: @unchecked Sendable {
     /// Erases everything in this store's folder.
     public func eraseAll() throws {
         try locked {
-            for name in ["records.json", "sleep.json", "state.json", "workouts.json", "markers.json", "notes.json", "checkins.json", "health.json"] {
+            for name in ["records.json", "sleep.json", "state.json", "workouts.json", "markers.json", "notes.json", "checkins.json", "health.json", "activities.json", "steps.json"] {
                 try? FileManager.default.removeItem(at: url(name))
             }
             records = Records(); sleepData = Sleep(); sleepIndex = [:]; state = State(); workoutList = []
-            markerIndex = [:]; notes = [:]; checkinIndex = [:]; healthIndex = [:]
+            markerIndex = [:]; notes = [:]; checkinIndex = [:]; healthIndex = [:]; activityIndex = [:]; stepsIndex = [:]
             try save(state, "state.json")
         }
     }

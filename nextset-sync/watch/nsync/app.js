@@ -419,6 +419,41 @@ function showSelfTest() {
   });
   E.showMenu(m);
 }
+// Overnight screen: the user's own lock and backlight times while it is open
+// (not the longer ones used while lifting).
+function showSleepFace() {
+  screen = "sleep";
+  if (savedOpts) Bangle.setOptions({ lockTimeout: savedOpts.lockTimeout, backlightTimeout: savedOpts.backlightTimeout });
+  require("nsync-sleep").open(function() {
+    Bangle.setOptions({ lockTimeout: 30000, backlightTimeout: 15000 });
+    showMain();
+  });
+}
+function openRun(mode) {
+  screen = "run";
+  require("nsync-run").open(mode, showMain);
+}
+// Today's steps (the firmware's live count) and the six days before it.
+function showSteps() {
+  screen = "steps";
+  Bangle.setUI();
+  E.showMessage("Reading steps...");
+  var days = L.dailySteps(7), max = 1;
+  days.forEach(function(d) { max = Math.max(max, d[1]); });
+  var today = days.length ? days[days.length - 1][1] : L.stepsToday();
+  g.reset().clearRect(0, 0, 175, 175).setFontAlign(0, 0);
+  g.setFont("6x15").drawString("Steps today", 88, 12);
+  g.setFont("Vector", 44).drawString("" + today, 88, 48);
+  if (days.length < 2) g.setFont("6x15").drawString(S.read("health") ? "Earlier days appear" : "Install Health for", 88, 100).drawString(S.read("health") ? "as the Health app logs" : "earlier days", 88, 118);
+  var bw = 22;
+  days.forEach(function(d, i) {
+    var x = 4 + i * 24 + (7 - days.length) * 24, h = Math.round(70 * d[1] / max);
+    g.fillRect(x, 160 - h, x + bw - 2, 160);
+    g.setFont("6x8").drawString(["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"][new Date(+d[0].substr(0, 4), +d[0].substr(5, 2) - 1, +d[0].substr(8, 2)).getDay()], x + bw / 2 - 1, 169);
+  });
+  Bangle.setUI({ mode: "custom", btn: function() { if (Date.now() - lastUnlock >= 400) showMain(); },
+    touch: function() { showMain(); } });
+}
 function showMain() {
   clearTimer();
   screen = "main";
@@ -429,12 +464,18 @@ function showMain() {
   else if (w) m["Start " + short(w.name)] = startSession;
   else m["No workout yet"] = function() { E.showAlert("Send a workout from the iPhone app.").then(showMain); };
   m[(p.sets ? p.sets + (p.sets == 1 ? " set" : " sets") + " to sync" : "All synced")] = showSyncInfo;
-  m["Pair phone"] = showPair;
+  var run = L.readDual(F.run);
+  if (run) m["Resume " + (run.mode == "walk" ? "walk" : "run")] = function() { openRun(run.mode); };
+  else { m["Run"] = function() { openRun("run"); }; m["Walk"] = function() { openRun("walk"); }; }
+  m["Steps today: " + L.stepsToday()] = showSteps;
+  m["Sleep face"] = showSleepFace;
   m["Check-in"] = showCheckin;
-  m["Self-test"] = showSelfTest;
-  m["Timers"] = function() { require("nsync-tools").open(showMain); };
   m["Mark a moment"] = function() { require("nsync-tools").markers(showMain); };
+  m["Timers"] = function() { require("nsync-tools").open(showMain); };
   m["Retro progress"] = function() { require("nsync-tools").progress(showMain); };
+  m["Run & walk settings"] = function() { require("nsync-run").settings(showMain); };
+  m["Pair phone"] = showPair;
+  m["Self-test"] = showSelfTest;
   E.showMenu(m);
 }
 
