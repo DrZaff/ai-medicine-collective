@@ -30,11 +30,14 @@ function clock(ms, tenths) {
 }
 function display(title, value, left, right, note) {
   g.reset().clearRect(0, 0, 175, 175);
-  g.setFont("6x15").setFontAlign(0, 0).drawString(title, 88, 22);
-  g.setFont("Vector", 34).drawString(value, 88, 72);
-  if (note) g.setFont("6x15").drawString(note, 88, 100);
-  g.setFont("6x15").drawRect(1, 116, 86, 174).drawRect(89, 116, 174, 174);
-  g.drawString(left, 44, 146).drawString(right, 132, 146);
+  g.setColor(g.theme.bg2).fillRect(2, 2, 173, 25);
+  g.setColor(g.theme.fg2).setFont("6x15").setFontAlign(0, 0).drawString(title, 88, 13);
+  g.setColor(g.theme.bgH).setFont("6x8", value.length <= 5 ? 4 : 3).drawString(value, 88, 65);
+  if (note) g.setColor(g.theme.fg).setFont("6x15").drawString(note, 88, 100);
+  g.setColor(g.theme.bgH).fillRect(2, 116, 84, 171);
+  g.setColor(g.theme.bg2).fillRect(90, 116, 172, 171);
+  g.setColor(g.theme.fgH).setFont("6x15").drawString(left, 44, 144);
+  g.setColor(g.theme.fg).drawString(right, 132, 144);
 }
 function ui(touch, back) {
   Bangle.setUI({ mode: "custom", touch: function(_, xy) {
@@ -149,11 +152,13 @@ function progress() {
     var now = new Date(), pending = L.pendCount(), t = running();
     var steps = Bangle.getHealthStatus ? Bangle.getHealthStatus("day").steps : 0;
     var time = ("0" + now.getHours()).substr(-2) + ":" + ("0" + now.getMinutes()).substr(-2);
-    g.reset().setColor("#102").fillRect(0, 0, 175, 175);
-    g.setColor("#ff8").setFont("Vector", 42).setFontAlign(0, 0).drawString(time, 88, 46);
-    g.setColor("#0ff").setFont("6x15").drawString(steps + " STEPS", 88, 92);
-    g.setColor("#faf").drawString(pending.sets ? pending.sets + (pending.sets == 1 ? " SET" : " SETS") + " TO SYNC" : "ALL SYNCED", 88, 116);
-    if (t) g.setColor("#ff0").drawString(t.title + " " + clock(t.end - Date.now()), 88, 140);
+    g.reset().clearRect(0, 0, 175, 175);
+    g.setColor(g.theme.bg2).fillRect(2, 2, 173, 24).fillRect(2, 81, 173, 151);
+    g.setColor(g.theme.fg2).setFont("6x15").setFontAlign(0, 0).drawString("PROGRESS", 88, 13);
+    g.setColor(g.theme.bgH).setFont("6x8", 4).drawString(time, 88, 53);
+    g.setColor(g.theme.fg2).setFont("6x15").drawString(steps + " STEPS", 88, 95);
+    g.setColor(g.theme.fg).drawString(pending.sets ? pending.sets + (pending.sets == 1 ? " SET" : " SETS") + " TO SYNC" : "ALL SYNCED", 88, 116);
+    if (t) g.setColor(g.theme.bgH).drawString(t.title + " " + clock(t.end - Date.now()), 88, 139);
   }
   Bangle.setUI({ mode: "custom", btn: function() { if (!justUnlocked()) leave(); }, remove: stopTick });
   every(5000, draw);
@@ -178,3 +183,4 @@ function showMenu() {
 exports.open = function(back) { backToApp = back; if (running()) showTimer(); else showMenu(); };
 exports.markers = function(back) { backToApp = back; showMarkers(); };
 exports.progress = function(back) { backToApp = back; progress(); };
+exports.stopwatch = function(back) { backToApp = back; stopwatch(); };

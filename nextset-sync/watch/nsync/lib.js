@@ -34,6 +34,49 @@ exports.KINDS = ["set", "ses", "mark", "chk", "act"];
 exports.MAX_ACTS = 40;        // unsynced runs and walks; Start refuses beyond this
 exports.KEEP_ACTS = 10;       // synced summaries kept for the watch's own list
 
+exports.restSeconds = function(base, rir) {
+  if (base <= 0) return 0;
+  return Math.max(0, base + (rir <= 1 ? 30 : rir >= 4 ? -15 : 0));
+};
+
+exports.tempoPhases = function(tempo) {
+  if (typeof tempo != "string") return [];
+  var parts = tempo.split("-");
+  if (parts.length < 3 || parts.length > 4) return [];
+  var total = 0;
+  for (var i = 0; i < parts.length; i++) {
+    var text = parts[i];
+    if (!text.length || text.length > 2) return [];
+    for (var j = 0; j < text.length; j++) {
+      var digit = text.charCodeAt(j);
+      if (digit < 48 || digit > 57) return [];
+    }
+    var sec = parseInt(text, 10);
+    if (sec > 30) return [];
+    total += sec;
+    parts[i] = sec;
+  }
+  if (!total) return [];
+  return parts;
+};
+
+exports.plates = function(load, units) {
+  var kg = units == "kg", bar = kg ? 20 : 45;
+  var sizes = kg ? [25, 20, 15, 10, 5, 2.5, 1.25] : [45, 35, 25, 10, 5, 2.5];
+  var smallest = sizes[sizes.length - 1];
+  var each = smallest * Math.max(0, Math.round((load - bar) / (2 * smallest)));
+  var left = each, plates = [];
+  sizes.forEach(function(size) {
+    var count = Math.floor(left / size);
+    if (count) { plates.push({ size: size, count: count }); left -= count * size; }
+  });
+  return { bar: bar, load: bar + 2 * each, plates: plates };
+};
+
+exports.warmup = function(load, units) {
+  return [0.45, 0.60, 0.75].map(function(ratio) { return exports.plates(load * ratio, units).load; });
+};
+
 function hex(nbytes) {
   var s = "";
   while (s.length < nbytes * 2) {

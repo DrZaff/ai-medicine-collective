@@ -1,5 +1,12 @@
 # NextSet Sync (Bangle.js 2)
 
+During a workout, swipe sideways on the load box or open **Plate calculator**
+from the session menu. It assumes a 45 lb or 20 kg bar and standard paired
+plates. The first exercise includes a 45%, 60%, and 75% warm-up ramp. Use
+**Start tempo** in the session menu for an exercise with a tempo prescription.
+End tempo when you finish the set, then log it. Automatic rest uses the RIR
+you log: 0–1 adds 30 seconds and 4 or more subtracts 15 seconds.
+
 Logs strength-training sets on the watch and syncs them, plus your Sleep Log
 data, straight to the NextSet Sync iPhone app over Bluetooth LE. No
 Gadgetbridge, vendor app or cloud account.

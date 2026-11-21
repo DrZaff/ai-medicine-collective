@@ -17,8 +17,12 @@ var F = L.F;
 global.NSYNC_APP = 1;
 var W = g.getWidth(), H = g.getHeight();
 var ses = L.readSes();
-var screen = "", sel = 0, draft = null, editing = null, timer;
+var screen = "", sel = 0, draft = null, editing = null, timer, tempoTimer;
 var lastUnlock = 0;
+var oldTheme = g.theme;
+var arcade = { fg: "#fff5db", bg: "#18132e", fg2: "#75f4df", bg2: "#30234f",
+  fgH: "#18132e", bgH: "#ffcf57", dark: true };
+g.setTheme(arcade);
 
 // Longer lock/backlight while lifting; restored on exit.
 var savedOpts = Bangle.getOptions ? Bangle.getOptions() : null;
@@ -27,6 +31,7 @@ Bangle.on("lock", function(locked) { if (!locked) lastUnlock = Date.now(); });
 
 function save() { if (ses) L.writeSes(ses); }
 E.on("kill", function() {
+  g.setTheme(oldTheme);
   save();
   if (savedOpts) Bangle.setOptions({ lockTimeout: savedOpts.lockTimeout, backlightTimeout: savedOpts.backlightTimeout });
   delete global.NSYNC_PAIR;
@@ -43,8 +48,23 @@ function fit(str, w, f) {
 }
 function short(s) { return ("" + s).length > 14 ? ("" + s).substr(0, 13) + "." : "" + s; }
 function num(v) { return Math.round(v) == v ? "" + v : v.toFixed(1); }
-function clearTimer() { if (timer) clearInterval(timer); timer = undefined; }
+function clearTimer() {
+  if (timer !== undefined) clearInterval(timer);
+  if (tempoTimer !== undefined) clearTimeout(tempoTimer);
+  timer = tempoTimer = undefined;
+}
 function hhmm() { var d = new Date(); return ("0" + d.getHours()).substr(-2) + ":" + ("0" + d.getMinutes()).substr(-2); }
+function panel(x, y, right, bottom, active) {
+  g.setColor("#09071a").fillRect(x + 2, y + 2, right, bottom);
+  g.setColor(active ? g.theme.bgH : g.theme.bg2).fillRect(x, y, right - 2, bottom - 2);
+  g.setColor(active ? "#fff5db" : "#7962a4").drawRect(x, y, right - 2, bottom - 2);
+  g.setColor(active ? g.theme.fgH : g.theme.fg);
+}
+function banner(title) {
+  panel(2, 2, W - 2, 25, false);
+  g.setColor(g.theme.fg2).setFontAlign(0, 0).drawString(fit(title, W - 16, "6x15"), W / 2, 12);
+  g.setColor(g.theme.fg);
+}
 
 // ---- session model -------------------------------------------------------
 function curEx() { return ses.ex[ses.xi]; }
@@ -129,7 +149,10 @@ function logSet() {
   else { ses.done = 1; nextLabel = "Finish workout"; }
   draft = null;
   ses.draft = null;
-  startRest(ex.rest || 90, nextLabel);
+  var base = ex.rest === undefined ? 90 : ex.rest;
+  var seconds = L.restSeconds(base, rec.rir);
+  if (seconds > 0) startRest(seconds, nextLabel, seconds > base ? "HARD SET +30S" : seconds < base ? "EASY SET -15S" : "");
+  else { save(); showEntry(); }
 }
 function finishSession() {
   var n = (ses.recs || []).filter(function(r) { return !r.del; }).length;
@@ -150,8 +173,8 @@ var BY = 46, BH = 64, BW = 56, KY = 116, KH = 58;
 function drawEntry() {
   var ex = editing ? ses.ex[editing.xi] : curEx();
   g.reset().clearRect(0, 0, W - 1, H - 1);
+  banner(editing ? "Edit: " + editing.xn : ex.name);
   g.setFontAlign(-1, -1);
-  g.drawString(fit(editing ? "Edit: " + editing.xn : ex.name, W - 4, "Vector:20"), 2, 2);
   font("6x15");
   // Line 2: the Ghost (last time) when there is one, otherwise the prescription.
   var previous = editing ? null : ghost(ex);
@@ -163,21 +186,17 @@ function drawEntry() {
   var labels = [(ses.units || "lb").toUpperCase(), "REPS", "RIR"];
   BOX.forEach(function(b, i) {
     var on = i == sel;
-    g.setColor(on ? g.theme.bgH : g.theme.bg).fillRect(b.x, BY, b.x + BW - 1, BY + BH - 1);
-    g.setColor(g.theme.fg).drawRect(b.x, BY, b.x + BW - 1, BY + BH - 1);
-    g.setColor(on ? g.theme.fgH : g.theme.fg);
+    panel(b.x, BY, b.x + BW - 1, BY + BH - 1, on);
     font("6x8"); g.setFontAlign(0, -1).drawString(labels[i], b.x + BW / 2, BY + 4);
-    var v = num(draft[b.k]), size = 30;
-    g.setFont("Vector", size);
-    while (size > 14 && g.stringWidth(v) > BW - 6) { size -= 2; g.setFont("Vector", size); }
+    var v = num(draft[b.k]);
+    g.setFont("6x8", v.length <= 3 ? 2 : 1);
     g.setFontAlign(0, 0).drawString(v, b.x + BW / 2, BY + 38);
   });
   var keys = ["-", "+", editing ? "SAVE" : "LOG"];
   keys.forEach(function(k, i) {
     var x = BOX[i].x;
-    if (i == 2) g.setColor("#0f0").fillRect(x, KY, x + BW - 1, KY + KH - 1).setColor("#000");
-    else g.setColor(g.theme.fg).drawRect(x, KY, x + BW - 1, KY + KH - 1);
-    g.setFont("Vector", i == 2 ? 18 : 34).setFontAlign(0, 0).drawString(k, x + BW / 2, KY + KH / 2 + 1);
+    panel(x, KY, x + BW - 1, KY + KH - 1, i == 2);
+    g.setFont("6x8", 2).setFontAlign(0, 0).drawString(k, x + BW / 2, KY + KH / 2 + 1);
     g.setColor(g.theme.fg);
   });
 }
@@ -208,7 +227,7 @@ function showEntry() {
   if (!editing && ses.restEnd > Date.now()) return showRest();
   if (!editing && ses.done) return askFinish();
   if (!draft) draft = editing ? { load: editing.load, reps: editing.reps, rir: editing.rir } : (ses.draft || defaults(curEx()));
-  var dragAcc = 0;
+  var dragAcc = 0, dragX = 0, dragY = 0, dragging = false, fromLoad = false;
   Bangle.setUI({
     mode: "custom",
     touch: function(_, xy) {
@@ -221,7 +240,20 @@ function showEntry() {
       }
     },
     drag: function(e) {
-      if (e.y < BY || e.y > BY + BH + 20) return;
+      if (!dragging && e.b) {
+        dragging = true;
+        fromLoad = e.x - e.dx < 58 && e.y - e.dy >= BY && e.y - e.dy < BY + BH;
+      }
+      dragX += e.dx;
+      dragY += e.dy;
+      if (!e.b) {
+        var plateSwipe = fromLoad && Math.abs(dragX) >= 38 && Math.abs(dragX) > Math.abs(dragY) * 2;
+        dragging = fromLoad = false;
+        dragX = dragY = 0;
+        if (plateSwipe && !editing) return showPlates();
+      }
+      if (e.y < BY || e.y > BY + BH + 20) { if (!e.b) dragAcc = 0; return; }
+      if (fromLoad && Math.abs(dragX) > Math.abs(dragY) * 2) return;
       dragAcc += e.dy;
       while (dragAcc <= -16) { dragAcc += 16; bump(1); }
       while (dragAcc >= 16) { dragAcc -= 16; bump(-1); }
@@ -244,20 +276,22 @@ function showEntry() {
 function scheduleRest() {
   ses.restAlarm = L.setAlarm("nsync.rest", ses.restEnd - Date.now(), "- -");
 }
-function startRest(sec, nextLabel) {
+function startRest(sec, nextLabel, reason) {
   ses.restEnd = Date.now() + sec * 1000;
   scheduleRest();
   ses.restTotal = sec;
   ses.restNext = nextLabel;
+  ses.restReason = reason || "";
   save();
   showRest();
 }
 function drawRest() {
   var left = Math.max(0, Math.ceil((ses.restEnd - Date.now()) / 1000));
   g.reset().clearRect(0, 0, W - 1, KY - 2);
-  font("6x15"); g.setFontAlign(0, -1).drawString("REST", W / 2, 4);
-  g.setFont("Vector", 56).setFontAlign(0, 0).drawString(Math.floor(left / 60) + ":" + ("0" + left % 60).substr(-2), W / 2, 56);
-  g.drawString(fit("Next: " + (ses.restNext || ""), W - 4, "6x15"), W / 2, 96);
+  banner("REST");
+  g.setColor(g.theme.bgH).setFont("6x8", 4).setFontAlign(0, 0).drawString(Math.floor(left / 60) + ":" + ("0" + left % 60).substr(-2), W / 2, 51);
+  g.setColor(g.theme.fg2).drawString(fit(ses.restReason || "", W - 4, "6x15"), W / 2, 79);
+  g.setColor(g.theme.fg).drawString(fit("Next: " + (ses.restNext || ""), W - 4, "6x15"), W / 2, 99);
   return left;
 }
 function endRest(skipped) {
@@ -279,8 +313,8 @@ function showRest() {
   g.reset().clearRect(0, 0, W - 1, H - 1);
   ["-15", "+30", "SKIP"].forEach(function(k, i) {
     var x = BOX[i].x;
-    g.setColor(g.theme.fg).drawRect(x, KY, x + BW - 1, KY + KH - 1);
-    g.setFont("Vector", 18).setFontAlign(0, 0).drawString(k, x + BW / 2, KY + KH / 2 + 1);
+    panel(x, KY, x + BW - 1, KY + KH - 1, i == 2);
+    g.setFont("6x8", k.length > 3 ? 1 : 2).setFontAlign(0, 0).drawString(k, x + BW / 2, KY + KH / 2 + 1);
   });
   Bangle.setUI({
     mode: "custom",
@@ -298,13 +332,65 @@ function showRest() {
 }
 
 // ---- menus ---------------------------------------------------------------
+function showPlates() {
+  clearTimer();
+  screen = "plates";
+  var units = ses.units, load = draft.load;
+  var p = L.plates(load, units);
+  var m = { "": { title: "Plates / side", back: showEntry } };
+  if (ses.xi == 0 && load > p.bar) m["Warm-up ramp"] = showWarmup;
+  m["Bar: " + p.bar + " " + units] = function() {};
+  m["Total: " + p.load + " " + units] = function() {};
+  if (load < p.bar) m["Load below bar"] = function() {};
+  else if (!p.plates.length) m["Empty bar"] = function() {};
+  p.plates.forEach(function(plate) {
+    m[plate.count + " x " + plate.size + " " + units] = function() {};
+  });
+  E.showMenu(m);
+}
+function showWarmup() {
+  screen = "warmup";
+  var m = { "": { title: "Warm-up", back: showPlates } };
+  L.warmup(draft.load, ses.units).forEach(function(load, i) {
+    m[[45, 60, 75][i] + "%: " + load + " " + ses.units] = function() {};
+  });
+  E.showMenu(m);
+}
+function showTempo() {
+  var phases = L.tempoPhases(curEx().tempo);
+  if (!phases.length) return showEntry();
+  clearTimer();
+  Bangle.setUI({ mode: "custom", btn: function() {
+    if (Date.now() - lastUnlock >= 400) showEntry();
+  }, touch: function(_, xy) {
+    if (xy && xy.y >= KY) showEntry();
+  }, remove: clearTimer });
+  screen = "tempo";
+  var phase = phases.length - 1;
+  function beat() {
+    do { phase = (phase + 1) % phases.length; } while (!phases[phase]);
+    Bangle.buzz(65, 0.45);
+    g.reset().clearRect(0, 0, W - 1, H - 1);
+    banner("TEMPO " + curEx().tempo);
+    g.setColor(g.theme.fg2).setFont("6x8", 3).setFontAlign(0, 0)
+      .drawString(["LOWER", "HOLD", "LIFT", "RESET"][phase], W / 2, 64);
+    g.setColor(g.theme.fg).setFont("6x15").drawString(phases[phase] + " SEC", W / 2, 94);
+    panel(2, KY, W - 2, H - 2, true);
+    g.setFont("6x8", 2).drawString("END TEMPO", W / 2, 143);
+    tempoTimer = setTimeout(beat, phases[phase] * 1000);
+  }
+  beat();
+}
 function showSessionMenu() {
   clearTimer();
   screen = "menu";
   Bangle.setUI();
   var ex = curEx();
   var m = { "": { title: short(ex.name), back: showEntry } };
-  m["Rest " + (ex.rest || 90) + "s"] = function() { startRest(ex.rest || 90, ex.name + " " + ses.sn + "/" + ex.sets); };
+  var rest = ex.rest === undefined ? 90 : ex.rest;
+  if (rest > 0) m["Rest " + rest + "s"] = function() { startRest(rest, ex.name + " " + ses.sn + "/" + ex.sets); };
+  if (L.tempoPhases(ex.tempo).length) m["Start tempo " + ex.tempo] = showTempo;
+  m["Plate calculator"] = showPlates;
   m["Edit logged sets"] = showSetList;
   m["Extra set"] = function() { ses.sn = liveSets(ses.xi).length + 1; if (ses.sn > ex.sets) ex.sets = ses.sn; draft = null; save(); showEntry(); };
   if (ses.xi < ses.ex.length - 1) m["Next exercise"] = function() { ses.xi++; ses.sn = liveSets(ses.xi).length + 1; ses.draft = null; draft = null; save(); showEntry(); };
