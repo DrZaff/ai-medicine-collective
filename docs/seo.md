@@ -49,3 +49,14 @@ Bing Webmaster Tools offers **IndexNow**, which lets the site tell Bing about ne
 - After the next deploy, open https://www.aimedicinecollective.com/sitemap.xml and https://www.aimedicinecollective.com/llms.txt; both should show text.
 - Paste `https://www.aimedicinecollective.com/faq.html` into the Schema Markup Validator (https://validator.schema.org); it should find an FAQPage with every question. (Google shows FAQ drop-downs in its own results only for a few well-known government and health sites, so don't expect those; the structured data still helps search engines and AI assistants understand and quote the answers.)
 - In Search Console, **Performance** shows which searches bring people to the site, a few weeks after verification. Share the top queries with Claude now and then: they are the best guide to which questions to answer next.
+
+## What Google's "reasons preventing your pages from being indexed" email means
+
+Search Console lists every address it found and could not index, including the ones that are excluded on purpose. As of 2026-11-16:
+
+- **Excluded by 'noindex' tag**: intended. The courses, sign-in, account, moderation and other members-only pages tell search engines to stay out.
+- **Page with redirect**: intended. The old addresses that forward somewhere else (`tools.html`, `projects.html`, `about.html`, `ai-vs-human.html`, `http://` and the bare domain without `www`) are not pages in their own right.
+- **Alternate page with proper canonical tag**: intended. Google found a copy of a page (for example `index.html` or the Netlify address) that correctly points at the real one.
+- **Duplicate without user-selected canonical**: this one was a real problem. Every briefing lived at `blog.html?date=…`, which Google saw as copies of one page. Each briefing now has its own page (`briefing-<date>.html`) with its own title and canonical link, listed in the sitemap, and the Netlify address forwards to www.
+
+After the fix is live, open **Pages** in Search Console and press **Validate fix** on "Duplicate without user-selected canonical". Google rechecks over a few days to a few weeks. The other three need no action.
