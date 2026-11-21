@@ -191,10 +191,18 @@ def checked_sources() -> dict[str, dict]:
     return known
 
 
-def pick_target(targets: dict, faq: dict) -> dict | None:
+def pick_target(targets: dict, faq: dict, drafted: list[str] | None = None) -> dict | None:
+    """The highest-priority open target. `drafted` are questions already answered
+    in FAQ drafts still waiting for review: a target that matches one is passed
+    over this time but stays open, so it comes back if that draft is closed.
+    (Before 2026-11-21 the agent answered "Will AI replace radiologists?" three
+    runs in a row, because a draft only marks its target answered on its own
+    branch.)"""
     existing = [item["question"] for item in faq["items"]]
     for target in sorted(targets["targets"], key=lambda t: (-int(t.get("priority", 0)), t.get("added", ""))):
         if target.get("status") != "open":
+            continue
+        if not target.get("refresh_id") and any(similarity(target["question"], q) >= SIMILAR for q in drafted or []):
             continue
         if target.get("refresh_id"):
             if any(item["id"] == target["refresh_id"] for item in faq["items"]):
@@ -208,9 +216,10 @@ def pick_target(targets: dict, faq: dict) -> dict | None:
     return None
 
 
-def build_prompt(target: dict | None, faq: dict, known: dict[str, dict], date: dt.date) -> str:
+def build_prompt(target: dict | None, faq: dict, known: dict[str, dict], date: dt.date,
+                 drafted: list[str] | None = None) -> str:
     categories = "\n".join(f'- "{c["id"]}": {c["name"]}' for c in faq["categories"])
-    existing = "\n".join(f'- {item["question"]}' for item in faq["items"])
+    existing = "\n".join(f'- {q}' for q in [item["question"] for item in faq["items"]] + list(drafted or []))
     register = "\n".join(f'- {k["title"]} ({k["source"]}, {k["published"]}): {k["url"]}'
                          for k in list(known.values())[:120])
     if target and target.get("refresh_id"):
@@ -395,13 +404,19 @@ def main() -> int:
     parser.add_argument("--fixture", type=Path, help="Test without the API (see the docstring)")
     parser.add_argument("--fact-check-file", type=Path,
                         help="Where to write the NEEDS FACT-CHECK warning (empty when every number was found)")
+    parser.add_argument("--drafted", type=Path,
+                        help="Questions already answered in open FAQ draft pull requests, one per line")
     args = parser.parse_args()
 
     date = args.date or agent.today_eastern()
     agent.set_output("date", date.isoformat())
     faq, targets = load(FAQ_PATH), load(TARGETS_PATH)
     known = checked_sources()
-    target = pick_target(targets, faq)
+    drafted = [line.strip() for line in args.drafted.read_text(encoding="utf-8").splitlines()
+               if line.strip()] if args.drafted and args.drafted.exists() else []
+    if drafted:
+        print(f"Waiting in open drafts (not answered again): {'; '.join(drafted)}")
+    target = pick_target(targets, faq, drafted)
     refresh = bool(target and target.get("refresh_id"))
     print(f"Target: {target['question'] if target else '(none: the agent chooses)'}")
 
@@ -412,7 +427,7 @@ def main() -> int:
         found = {agent.normalize_url(u) for u in fixture.get("search_urls", [])}
     else:
         result, found, usage = agent.run_claude(
-            build_prompt(target, faq, known, date), system=SYSTEM, schema=answer_schema, tools=TOOLS)
+            build_prompt(target, faq, known, date, drafted), system=SYSTEM, schema=answer_schema, tools=TOOLS)
         print(f"About ${agent.estimate_cost(usage):.2f}, {usage['searches']} searches.")
 
     # Fetch the cited sources' own text, and have the answer corrected against

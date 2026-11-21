@@ -74,6 +74,21 @@ jobs:
         if: steps.today.outputs.todo == 'true'
         run: pip install -r scripts/blog_agent/requirements.txt
 
+      # A question waiting in an open draft is not answered again: each draft
+      # marks its target answered only on its own branch
+      - name: List questions already waiting in open drafts
+        if: steps.today.outputs.todo == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          : > "$RUNNER_TEMP/drafted.txt"
+          for branch in $(gh pr list --state open --json headRefName --jq '.[].headRefName | select(startswith("faq/"))'); do
+            git fetch -q --depth 1 origin "$branch" || continue
+            git show FETCH_HEAD:faq/faq.json > "$RUNNER_TEMP/draft.json" || continue
+            python -c "import json,sys; main={i['id'] for i in json.load(open('faq/faq.json',encoding='utf-8'))['items']}; [print(i['question']) for i in json.load(open(sys.argv[1],encoding='utf-8'))['items'] if i['id'] not in main]" "$RUNNER_TEMP/draft.json" >> "$RUNNER_TEMP/drafted.txt"
+          done
+          cat "$RUNNER_TEMP/drafted.txt"
+
       - name: Draft the answer
         id: draft
         if: steps.today.outputs.todo == 'true'
@@ -84,7 +99,7 @@ jobs:
         # cannot match go in fact-check.txt and set needs_fact_check.
         run: >-
           python scripts/blog_agent/faq_agent.py --date "$DATE" --pr-body "$RUNNER_TEMP/pr-body.md"
-          --fact-check-file "$RUNNER_TEMP/fact-check.txt"
+          --fact-check-file "$RUNNER_TEMP/fact-check.txt" --drafted "$RUNNER_TEMP/drafted.txt"
 
       - name: Open pull request
         id: pr
