@@ -5223,5 +5223,214 @@ html.terminal::view-transition-new(root) {
     margin-top: 40px;
     padding: 44px 20px;
     border-radius: 22px;
+
+/* === MEMBER CREATIONS (hub.html) ============================= */
+
+.modern .creations-hero {
+  position: relative;
+  overflow: hidden;
+  margin: 8px 0 22px;
+  padding: 30px 32px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--icon-bg);
+  box-shadow: var(--shadow-lift);
+}
+
+/* the mint-to-cyan sweep along the top edge */
+.modern .creations-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--grad-bright);
+}
+
+.modern .creations-hero-title {
+  color: var(--card);
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.modern .creations-hero-text {
+  color: rgb(var(--surface-rgb) / 0.82);
+  font-size: 1.05rem;
+}
+
+.modern .creations-cta .note {
+  color: rgb(var(--surface-rgb) / 0.7);
+  font-size: 0.875rem;
+}
+
+.modern .creations-cta .btn:not(.btn--primary) {
+  border-color: rgb(var(--surface-rgb) / 0.4);
+  background: transparent;
+  color: var(--card);
+}
+
+.modern .creations-ask {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.modern .creation-interest,
+.modern .creation-interest:visited {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+.modern .creation-interest:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-lift);
+}
+
+.modern .creation-interest[aria-pressed="true"] {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+
+.modern .creation-interest[aria-pressed="true"] .creation-interest-name {
+  text-decoration: none;
+}
+
+.modern .creation-interest.is-empty {
+  background: transparent;
+  box-shadow: none;
+}
+
+.modern .creation-interest .creation-interest-icon,
+.modern .creations-section-head .creations-section-icon {
+  border: 0;
+  border-radius: 10px;
+}
+
+.modern .creation-interest-name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.modern .creation-interest-for {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.modern .creation-interest-count,
+.modern .creations-count {
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.modern .creation-interest.is-empty .creation-interest-count {
+  color: var(--muted);
+}
+
+.modern .creations-section {
+  margin-top: 36px;
+}
+
+.modern .creations-section-title {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  text-transform: none;
+}
+
+.modern .creations-grid {
+  gap: 18px;
+}
+
+.modern .creation-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.modern .creation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
+}
+
+.modern .creation-preview {
+  border-bottom: 1px solid var(--line);
+}
+
+.modern .creation-badge {
+  border: 0;
+  border-radius: 10px;
+  box-shadow: var(--shadow-lift);
+}
+
+.modern .creation-body {
+  gap: 10px;
+  padding: 16px 18px 18px;
+}
+
+.modern .creation-sort {
+  border: 0;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+}
+
+.modern .creation-title {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.modern .creation-title-link,
+.modern .creation-title-link:visited {
+  color: var(--ink);
+}
+
+.modern .creation-title-link:hover {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.modern .creation-desc {
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.modern .creation-body .creation-by {
+  font-size: 0.875rem;
+}
+
+.modern .creation-detail-preview {
+  border: 0;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 600px) {
+  .modern .creations-hero {
+    padding: 22px 18px;
+  }
+
+  .modern .creation-interest,
+  .modern .creation-interest:visited {
+    padding: 12px;
   }
 }
