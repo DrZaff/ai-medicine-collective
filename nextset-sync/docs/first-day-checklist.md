@@ -91,6 +91,10 @@ About 45 minutes of setup spread over the week, plus one night.
 | L | Start the Quick test again: is line 2's **"Last …"** (your Ghost: last time's set) readable at arm's length? Log a set that matches or beats it at the same RIR | A **distinct double buzz** (first match) instead of the short one |
 | M | Watch: main menu → **Check-in → 4 Good**; iPhone: **Sync Now** → **Today** | *Check-in today: 4/5 Good* under Recovery |
 | N | Watch: main menu → **Self-test** | No **XX** lines; fix any **!!** it explains (e.g. Health → HRM interval) |
+| O | Watch: main menu → **Sleep face**. Watch for two minutes while the watch locks and the backlight goes off, then press the button once | The eye blinks once at the start, then every 30–90 s; the bezel never moves; a blink never turns the **backlight** on (the Bangle.js 2 screen itself normally stays on, so it keeps blinking unlit); after the press it shows the open eye. A second press returns to the menu |
+| P | Watch: **Steps today** in the main menu; iPhone: **Sync Now** → **Today** | The watch's number matches **Steps today** on the iPhone (give or take steps taken in between); sync again: the number is replaced, not added |
+| Q | Outdoors: watch **Run**, wait for "GPS ready" (can take a few minutes the first time), **START**, walk or run past the first mile (or set km in **Run & walk settings**), press the button to pause, **RESUME**, then **FINISH → SAVE** | Pace shows after about 10 s of moving and is blank while paused; **one** buzz and MILE 1 with its time at the mile; distance roughly matches a known route |
+| R | iPhone: **Sync Now** → **Today** → the run | Distance, moving time, average pace, splits and the route drawn; sync again: still one run |
 
 ## First night
 
@@ -108,7 +112,9 @@ These are built and tested in software only. Tick each off on the day:
 - [ ] Rest-timer vibration (D), and touch sizes being comfortable mid-workout
 - [ ] Scheduler-backed buzzes after leaving the app (K), Ghost legibility and buzz (L)
 - [ ] Text previews (BangleApps *iOS Integration*, watch bonded in iOS **Settings → Bluetooth**) arriving while NextSet syncs
-- [ ] Overnight Sleep Log recording and the morning sync (14–15)
+- [ ] Overnight Sleep Log recording and the morning sync (14–15), also with the Sleep face open all night (O): check the battery in the morning
+- [ ] Sleep face colours and dithering on the real screen (O), blink speed
+- [ ] GPS time to first fix, distance and pace accuracy outdoors, split buzz strength, battery use per hour (Q)
 - [ ] Reconnection while the app is in the background (lock the iPhone during C to F)
 
 ## If something goes wrong

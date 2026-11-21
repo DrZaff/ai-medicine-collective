@@ -18,7 +18,9 @@ const log = read(join(fx, 'sleeplog-sample.log'));
 const lines = log.trim().split('\n').filter(l => !l.startsWith(','));
 const FILES = {
   lib: read(join(app, 'lib.js')), boot: read(join(app, 'boot.js')), app: read(join(app, 'app.js')),
-  tools: read(join(app, 'tools.js')),
+  tools: read(join(app, 'tools.js')), sleep: read(join(app, 'sleep.js')),
+  gps: read(join(app, 'gps.js')), run: read(join(app, 'run.js')),
+  eyes: ['open', 'closing', 'nearly', 'closed'].map(n => read(join(app, `eye-${n}.js`))),
   schedLib: read(join(here, 'vendor', 'sched-0.43-lib.js')),
   healthLib: read(join(here, 'vendor', 'health-0.44-lib.js')),
   healthRawB64: readFileSync(join(fx, 'health-2026-11.raw')).toString('base64'), // binary: via atob, not JSON text
@@ -29,7 +31,10 @@ const FILES = {
 const FIXTURE = {log, archive, archiveName: expected.archiveFileName,
   first: archive[0][0], lastT10: Number(lines.at(-1).split(',')[0])};
 const VECTORS = JSON.parse(read(join(here, '..', '..', 'protocol', 'vectors.json')));
-const script = `var FILES=${JSON.stringify(FILES)};\nvar FIXTURE=${JSON.stringify(FIXTURE)};\nvar VECTORS=${JSON.stringify(VECTORS)};\n` + read(join(here, 'watch-test.js'));
+// Tracks go in as text and are parsed one at a time on the watch side (memory).
+const gpsFx = JSON.parse(read(join(fx, 'gps-tracks.json')));
+const GPSFX = {origin: gpsFx.origin, tracks: gpsFx.tracks.map(t => JSON.stringify(t))};
+const script = `var FILES=${JSON.stringify(FILES)};\nvar FIXTURE=${JSON.stringify(FIXTURE)};\nvar VECTORS=${JSON.stringify(VECTORS)};\nvar GPSFX=${JSON.stringify(GPSFX)};\n` + read(join(here, 'watch-test.js'));
 const dir = mkdtempSync(join(tmpdir(), 'nsync-esp-'));
 writeFileSync(join(dir, 'test.js'), script);
 const bin = process.env.ESPRUINO || 'espruino';

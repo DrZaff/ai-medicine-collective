@@ -21,7 +21,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const read = p => readFileSync(join(here, p), 'utf8');
 const expected = JSON.parse(read('../../protocol/fixtures/sleep-expected.json'));
 const FILES = {
-  lib: read('../nsync/lib.js'), boot: read('../nsync/boot.js'), sleeplog: read('vendor/sleeplog-0.26-lib.js'),
+  lib: read('../nsync/lib.js'), boot: read('../nsync/boot.js'), gps: read('../nsync/gps.js'), sleeplog: read('vendor/sleeplog-0.26-lib.js'),
   health: read('vendor/health-0.44-lib.js'),
   healthB64: readFileSync(join(here, '../../protocol/fixtures/health-2026-11.raw')).toString('base64'),
   log: read('../../protocol/fixtures/sleeplog-sample.log'),
@@ -30,7 +30,7 @@ const FILES = {
 const body = `
 var S = require("Storage");
 S.eraseAll();
-S.write("nsync", FILES.lib); S.write("sleeplog", FILES.sleeplog);
+S.write("nsync", FILES.lib); S.write("nsync-gps", FILES.gps); S.write("sleeplog", FILES.sleeplog);
 S.writeJSON("sleeplog.info", {id: "sleeplog", version: "0.26"});
 S.write("health", FILES.health); S.writeJSON("health.info", {id: "health", version: "0.44"});
 S.write("health-2026-11.raw", atob(FILES.healthB64)); S.writeJSON("health.json", {hrm: 10, useUTC: true});
@@ -60,6 +60,16 @@ function finish() {
     end: Date.now(), n: ses.n, at: Date.now()});
   L.eraseSes();
 }
+// A run of n seconds at 3.4 m/s due east, through the real Run engine, saved as Save does.
+function run(n) {
+  var G = require("nsync-gps"), t0 = Date.now() - n * 1000, r = G.create("run", "mi", true, t0);
+  for (var i = 0; i <= n; i++) {
+    var o = G.onFix(r, {fix: 1, lat: 40, lon: -100 + i * 3.4 / 85300, time: new Date(t0 + i * 1000), hdop: 0.9}, t0 + i * 1000);
+    if (o.pt) S.open(L.routeFile(r.start), "a").write(o.pt.join(",") + "\\n");
+  }
+  G.pause(r, t0 + n * 1000);
+  L.addAct(G.summary(r, t0 + n * 1000));
+}
 var done = 0;
 setInterval(function() {
   var c = require("fs").readFileSync("cmd.txt");
@@ -75,6 +85,7 @@ setInterval(function() {
       else if (l[0] == "F") finish();
       else if (l[0] == "M") L.addMark(l.substr(2));
       else if (l[0] == "C") L.addCheckin(parseInt(l.substr(2), 10));
+      else if (l[0] == "A") run(parseInt(l.substr(2), 10));
     } catch (e) { print("E " + e); }
   }
 }, 10);

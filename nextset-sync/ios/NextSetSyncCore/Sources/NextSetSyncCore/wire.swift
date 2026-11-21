@@ -14,7 +14,7 @@ public enum SyncProtocol {
     public static let minChunk = 20
     /// Record kinds this phone stores. The watch sends only these; anything
     /// else stays on the watch until a phone that understands it connects.
-    public static let storedKinds = ["set", "ses", "mark", "chk"]
+    public static let storedKinds = ["set", "ses", "mark", "chk", "act"]
 }
 
 /// Every message in either direction. Fields are optional; `t` says which apply.
@@ -67,6 +67,13 @@ public struct WireMessage: Codable, Equatable, Sendable {
     public var sAck: Int?
     public var bat: Int?
     public var free: Int?
+    public var pendActs: Int?
+    /// `stp`: [date, steps] per watch-local day, oldest first; `today` = the watch's date.
+    public var days: [WireDaySteps]?
+    public var today: String?
+    /// `route` / `rte`: first point index, and points [seconds, lat, lon].
+    public var from: Int?
+    public var pts: [[Double]]?
 
     public init(t: String) { self.t = t }
 
@@ -107,6 +114,21 @@ public struct WireAck: Codable, Equatable, Sendable {
     public func encode(to encoder: Encoder) throws {
         var c = encoder.unkeyedContainer()
         try c.encode(id); try c.encode(rev)
+    }
+}
+
+/// One day's steps on the wire: ["YYYY-MM-DD", steps].
+public struct WireDaySteps: Codable, Equatable, Sendable {
+    public var date: String
+    public var steps: Int
+    public init(date: String, steps: Int) { self.date = date; self.steps = steps }
+    public init(from decoder: Decoder) throws {
+        var c = try decoder.unkeyedContainer()
+        date = try c.decode(String.self); steps = try c.decode(Int.self)
+    }
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.unkeyedContainer()
+        try c.encode(date); try c.encode(steps)
     }
 }
 
@@ -166,6 +188,14 @@ public struct WireRecord: Codable, Equatable, Sendable {
     public var label: String?
     /// Check-ins (`k` = "chk"): how you feel, 1-5.
     public var score: Int?
+    /// Runs and walks (`k` = "act"): "run" or "walk", metres, moving and
+    /// elapsed seconds, seconds per split, `n` route points, `cut` = route cut short.
+    public var mode: String?
+    public var dist: Double?
+    public var mov: Int?
+    public var el: Int?
+    public var splits: [Int]?
+    public var cut: Int?
 }
 
 public enum WireError: Error, Equatable, LocalizedError {
@@ -186,6 +216,7 @@ public enum WireError: Error, Equatable, LocalizedError {
             case "unauthorized": return "The watch needs this iPhone to pair first."
             case "no_sleeplog": return "Sleep Log is not installed on the watch."
             case "no_health": return "The Health app is not installed on the watch."
+            case "no_route": return "The watch no longer has that route."
             case "bad_workout": return "The watch rejected the workout (check sets and exercises)."
             default: return "Watch error: \(code)."
             }

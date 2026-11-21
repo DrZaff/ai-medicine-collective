@@ -91,6 +91,8 @@ final class AppModel {
     var allSets: [SetRecord] { _ = revision; return store.sets }
     var markers: [MarkerRecord] { _ = revision; return store.markers }
     var checkins: [CheckinRecord] { _ = revision; return store.checkins }
+    var activities: [ActivityRecord] { _ = revision; return store.activities }
+    var dailySteps: [DailySteps] { _ = revision; return store.dailySteps }
     /// Resting heart rate per night (newest first), from the Health log and Sleep Log.
     var recovery: [RecoveryNight] { _ = revision; return RecoveryAnalyzer.nights(nights, rows: store.healthRows) }
     func note(for m: MarkerRecord) -> String { _ = revision; return store.note(for: m.id) ?? "" }
@@ -108,7 +110,7 @@ final class AppModel {
                      "Last error: \(l.lastError ?? "none")",
                      "Watch: app \(st?.appVersion ?? "?")  firmware \(st?.firmware ?? "?")  Sleep Log \(st?.sleepLogVersion ?? "-")  battery \(st?.battery.map(String.init) ?? "?")%",
                      "Waiting on watch: \(st?.pendingSets ?? 0) sets, \(st?.pendingMarkers ?? 0) markers",
-                     "On phone: \(store.sets.count) sets (\(store.awaitingAckCount) awaiting confirmation), \(store.markers.count) markers, \(store.checkins.count) check-ins, \(store.sleepEntries.count) sleep entries, \(store.healthRows.count) heart-rate rows",
+                     "On phone: \(store.sets.count) sets (\(store.awaitingAckCount) awaiting confirmation), \(store.markers.count) markers, \(store.checkins.count) check-ins, \(store.sleepEntries.count) sleep entries, \(store.healthRows.count) heart-rate rows, \(store.activities.count) runs and walks, \(store.dailySteps.count) step days",
                      "Health app: \(st?.healthAppVersion ?? "-")  HRM interval: \(st?.heartRatePolling.map { "\($0) min" } ?? "-")",
                      "Protocol v\(SyncProtocol.version), kinds \(SyncProtocol.storedKinds.joined(separator: ","))",
                      "", "Recent activity:"]
@@ -151,6 +153,10 @@ final class AppModel {
         let demo = DemoData.sleep()
         await w.setSleep(demo.entries, lastCheckT10: demo.dataEndT10)
         await w.setHealth(DemoData.health())
+        await w.setDemoSteps(DemoData.steps())
+        // Yesterday's run, waiting on the "watch" with its route.
+        await w.addActivity(mode: "run", units: "mi", start: Date().addingTimeInterval(-86_400 + 7 * 3600 - Double(Calendar.current.component(.hour, from: Date())) * 3600),
+                            route: DemoData.route(seconds: 1_860, speed: 3.3), pausedS: 45)
         let e = await attachDemoEngine(w)
         engine = e
         connection = .connected
@@ -162,7 +168,7 @@ final class AppModel {
         for i in 0..<3 { await w.logSet(exercise: 0, load: 50, reps: 10 - i, rir: Double(2 - min(i, 1)), at: Date().addingTimeInterval(Double(i * 150 - 900))) }
         _ = try? await e.fetchStatus()
         revision += 1
-        log("Demo watch ready: 3 sets and a week of Sleep Log data waiting to sync.")
+        log("Demo watch ready: 3 sets, a run, daily steps and a week of Sleep Log data waiting to sync.")
     }
 
     /// A sync engine wired to the simulated watch. The callbacks capture
@@ -199,6 +205,13 @@ final class AppModel {
         guard let w = demoWatch else { return }
         await w.addCheckin(Int.random(in: 3...5))
         log("Demo: morning check-in on the watch")
+        revision += 1
+    }
+    func demoWalk() async {
+        guard let w = demoWatch else { return }
+        await w.addActivity(mode: "walk", units: "mi", start: Date().addingTimeInterval(-1_500), route: DemoData.route(seconds: 1_380, speed: 1.4))
+        log("Demo: a walk was saved on the watch")
+        if connection == .connected { _ = try? await engine?.fetchStatus() }
         revision += 1
     }
     func demoFinishWorkout() async { await demoWatch?.finishSession(); log("Demo: workout finished on the watch") }

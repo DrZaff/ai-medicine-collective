@@ -16,11 +16,13 @@ var F = {
   ses: "nsync.ses",        // active session: nsync.ses.a.json / .b.json
   pend: "nsync.pend",      // unacknowledged records: nsync.pend.a.json / .b.json
   mark: "nsync.mark",      // moment markers: nsync.mark.a.json / .b.json
-  last: "nsync.last.json"  // last load/reps/RIR per exercise id (prefill)
+  last: "nsync.last.json", // last load/reps/RIR per exercise id (prefill)
+  act: "nsync.act",        // finished runs and walks: nsync.act.a.json / .b.json
+  run: "nsync.run"         // run or walk in progress: nsync.run.a.json / .b.json
 };
 exports.F = F;
 exports.SVC = SVC;
-exports.VERSION = "0.02";
+exports.VERSION = "0.03";
 exports.PROTO = 1;
 exports.MAX_PEND = 600;
 exports.MAX_MARKS = 300;      // unsynced markers; synced ones beyond KEEP_MARKS are pruned
@@ -28,7 +30,9 @@ exports.KEEP_MARKS = 30;
 exports.MIN_FREE = 16000;     // bytes of Storage kept free so set logging always fits
 // Record kinds this watch can send. A phone lists the kinds it stores in
 // `hello`; an older phone that sends no list gets only sets and sessions.
-exports.KINDS = ["set", "ses", "mark", "chk"];
+exports.KINDS = ["set", "ses", "mark", "chk", "act"];
+exports.MAX_ACTS = 40;        // unsynced runs and walks; Start refuses beyond this
+exports.KEEP_ACTS = 10;       // synced summaries kept for the watch's own list
 
 exports.restSeconds = function(base, rir) {
   if (base <= 0) return 0;
@@ -188,6 +192,80 @@ exports.addMark = function(label, at) {
   if (E.emit) E.emit("nsync", "mark");
   return m[id];
 };
+// ---- runs and walks ------------------------------------------------------------------
+// A finished run or walk is a summary record (kind "act") kept like markers,
+// plus its route: one "seconds,lat,lon" line per point in a StorageFile
+// written while you move. The phone reads the route page by page, stores it,
+// and only then acknowledges the summary; the route file is erased on that ack.
+exports.routeFile = function(at) { return "nsync.rt" + Math.round(at).toString(36); };
+exports.acts = function() { return readDual(F.act) || {}; };
+function unsyncedActs(kinds) {
+  if (kinds.indexOf("act") < 0) return [];
+  var a = exports.acts(), out = [];
+  for (var k in a) if (!a[k].synced) out.push(a[k]);
+  return out;
+}
+exports.actCount = function() { return unsyncedActs(["act"]).length; };
+exports.addAct = function(sum) {
+  var a = exports.acts(), id = exports.cfg().wid + "-a" + Math.round(sum.at).toString(36);
+  if (a[id]) return a[id]; // saved already (finish pressed again after a restart)
+  sum.id = id; sum.rev = 1;
+  a[id] = sum;
+  writeDual(F.act, a);
+  if (E.emit) E.emit("nsync", "act");
+  return sum;
+};
+// Route points [seconds since start, lat, lon] from line `from`, at most `max`.
+exports.routePage = function(id, from, max) {
+  var a = exports.acts()[id];
+  if (!a) return null;
+  var f = S.open(exports.routeFile(a.at), "r"), pts = [], i = 0, l;
+  while ((l = f.readLine()) !== undefined) {
+    if (i++ < from) continue;
+    if (pts.length >= max) return { pts: pts, more: true };
+    var x = l.trim().split(",");
+    if (x.length == 3) pts.push([parseInt(x[0], 10), parseFloat(x[1]), parseFloat(x[2])]);
+  }
+  return { pts: pts, more: false };
+};
+function pruneActs(a) {
+  var synced = Object.keys(a).filter(function(k) { return a[k].synced; })
+    .sort(function(x, y) { return a[x].at - a[y].at; });
+  while (synced.length > exports.KEEP_ACTS) delete a[synced.shift()];
+}
+
+// ---- daily steps ---------------------------------------------------------------
+function ymd(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).substr(-2) + "-" + ("0" + d.getDate()).substr(-2); }
+exports.ymd = ymd;
+exports.stepsToday = function() {
+  var h = global.Bangle && Bangle.getHealthStatus ? Bangle.getHealthStatus("day") : null;
+  return h ? h.steps | 0 : 0;
+};
+// [["YYYY-MM-DD", steps], ...] oldest first, for the last `days` watch-local
+// days. Past days add up the Health log's 10-minute records by the watch's
+// own date (UTC or local filing alike); today also takes the firmware's live
+// count, which includes the minutes not yet logged. `now` is for tests and
+// skips the live count.
+exports.dailySteps = function(days, now) {
+  var live = now === undefined, out = {}, today;
+  now = live ? Date.now() : now;
+  today = ymd(new Date(now));
+  var d0 = new Date(now); d0.setHours(0, 0, 0, 0);
+  var from = d0.getTime() - (days - 1) * 864E5;
+  if (S.read("health")) {
+    var H = require("health"), utc = healthInfo().utc;
+    H.readAllRecordsSince(new Date(from - 864E5), function(r) {
+      var ms = r.date.getTime() - (utc ? r.date.getTimezoneOffset() * 60000 : 0);
+      if (ms < from || ms > now) return;
+      var k = ymd(new Date(ms));
+      out[k] = (out[k] | 0) + (r.steps | 0);
+    });
+    if (Modules.getCached().indexOf("health") >= 0) Modules.removeCached("health");
+  }
+  if (live) out[today] = Math.max(out[today] | 0, exports.stepsToday());
+  return Object.keys(out).sort().map(function(k) { return [k, out[k]]; });
+};
+
 function pruneMarks(m) {
   var synced = Object.keys(m).filter(function(k) { return m[k].synced; })
     .sort(function(a, b) { return m[a].at - m[b].at; });
@@ -412,7 +490,7 @@ function handle(st, m) {
       c = exports.cfg();
       var ses = exports.readSes(), w = S.readJSON(F.wkt, 1), pc = exports.pendCount();
       return {
-        t: "st", pend: pc.n, pendSets: pc.sets, pendMarks: exports.markCount().unsynced,
+        t: "st", pend: pc.n, pendSets: pc.sets, pendMarks: exports.markCount().unsynced, pendActs: exports.actCount(),
         ses: ses ? { sid: ses.sid, wn: ses.wn, xi: ses.xi, sn: ses.sn, n: (ses.recs || []).length, start: ses.start } : null,
         wkt: w ? { id: w.id, rev: w.rev || 0, name: w.name } : null,
         sAck: c.sAck || 0, bat: E.getBattery ? E.getBattery() : null,
@@ -429,22 +507,29 @@ function handle(st, m) {
       var p = exports.pend(), kinds = st.kinds || ["set", "ses"];
       var all = Object.keys(p).map(function(k) { return p[k]; })
         .filter(function(r) { return kinds.indexOf(r.k) >= 0; });
-      all = all.concat(unsyncedMoments(kinds));
+      all = all.concat(unsyncedMoments(kinds), unsyncedActs(kinds));
       all.sort(function(a, b) { return (a.at - b.at) || (a.id < b.id ? -1 : 1); });
       var max = Math.max(1, Math.min(20, m.max | 0 || 8));
       return { t: "recs", recs: all.slice(0, max), more: all.length > max, total: all.length };
     case "ack":
       if (!Array.isArray(m.ids)) return err("bad_ack", "ack");
-      var pa = exports.pend(), ma = exports.marks(), n = 0, nm = 0;
+      var pa = exports.pend(), ma = exports.marks(), aa = exports.acts(), n = 0, nm = 0, na = 0;
       m.ids.forEach(function(e) {
         if (!Array.isArray(e)) return;
-        var r = pa[e[0]], mr = ma[e[0]];
+        var r = pa[e[0]], mr = ma[e[0]], ar = aa[e[0]];
         if (r && r.rev <= e[1]) { delete pa[e[0]]; n++; }
         else if (mr && !mr.synced && mr.rev <= e[1]) { mr.synced = 1; nm++; }
+        else if (ar && !ar.synced && ar.rev <= e[1]) { ar.synced = 1; na++; }
       });
       if (n) writeDual(F.pend, pa);
       if (nm) { pruneMarks(ma); writeDual(F.mark, ma); }
-      n += nm;
+      if (na) {
+        writeDual(F.act, aa); // first record the ack, then free the routes
+        for (var ak in aa) if (aa[ak].synced && !aa[ak].gone) { S.open(exports.routeFile(aa[ak].at), "r").erase(); aa[ak].gone = 1; }
+        pruneActs(aa);
+        writeDual(F.act, aa);
+      }
+      n += nm + na;
       c = exports.cfg();
       c.lastSync = Date.now();
       exports.saveCfg(c);
@@ -452,7 +537,7 @@ function handle(st, m) {
       // Count only what this phone will receive, or an older phone would wait forever.
       var ks = st.kinds || ["set", "ses"], left = 0;
       for (var id in pa) if (ks.indexOf(pa[id].k) >= 0) left++;
-      left += unsyncedMoments(ks).length;
+      left += unsyncedMoments(ks).length + unsyncedActs(ks).length;
       return { t: "acked", n: n, left: left };
     case "sleep":
       if (!S.read("sleeplog")) return err("no_sleeplog", "sleep");
@@ -469,6 +554,12 @@ function handle(st, m) {
       if (!S.read("health")) return err("no_health", "health");
       var hr = exports.healthRows(Math.max(0, m.since | 0), Math.max(10, Math.min(300, m.max | 0 || 144)));
       return { t: "hlt", rows: hr.rows, more: hr.more, hl: healthInfo(), now: (Date.now() / 6E5) | 0 };
+    case "route":
+      var rp = exports.routePage("" + m.id, Math.max(0, m.from | 0), Math.max(5, Math.min(60, m.max | 0 || 40)));
+      if (!rp) return err("no_route", "route");
+      return { t: "rte", id: "" + m.id, from: m.from | 0, pts: rp.pts, more: rp.more };
+    case "steps":
+      return { t: "stp", days: exports.dailySteps(Math.max(1, Math.min(14, m.n | 0 || 7))), today: ymd(new Date()) };
     case "sack":
       c = exports.cfg();
       if ((m.upto | 0) > (c.sAck || 0)) { c.sAck = m.upto | 0; exports.saveCfg(c); }

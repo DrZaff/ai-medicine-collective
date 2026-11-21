@@ -185,6 +185,8 @@ struct SettingsView: View {
                 Section("Not yet tested on real hardware") {
                     ForEach(["Bluetooth pairing with a Bangle.js 2", "Overnight Sleep Log recording and morning sync",
                              "Rest-timer vibration on the watch",
+                             "GPS runs and walks outdoors: distance, pace and split buzzes",
+                             "Sleep face blinking and battery overnight",
                              "Background reconnection with the app closed"], id: \.self) { item in
                         Label(item, systemImage: "hourglass")
                     }
@@ -193,7 +195,7 @@ struct SettingsView: View {
                     LabeledContent("Sync protocol", value: "v\(SyncProtocol.version)")
                     LabeledContent("Sleep Log supported", value: "0.26")
                     LabeledContent("Watch firmware targeted", value: "2v29")
-                    Text("Standalone: no account, no cloud, no Apple Health. Workouts, sets and sleep come straight from the watch and stay on this iPhone.").font(.footnote)
+                    Text("Standalone: no account, no cloud, no Apple Health. Workouts, sets, steps, runs and sleep come straight from the watch and stay on this iPhone.").font(.footnote)
                 }
             }
             .navigationTitle("Settings")

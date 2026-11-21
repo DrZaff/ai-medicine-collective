@@ -16,6 +16,10 @@ S.write("nsync", FILES.lib);
 S.write("nsync.boot.js", FILES.boot);
 S.write("nsync.app.js", FILES.app);
 S.write("nsync-tools", FILES.tools);
+S.write("nsync-sleep", FILES.sleep);
+S.write("nsync-gps", FILES.gps);
+S.write("nsync-run", FILES.run);
+FILES.eyes.forEach(function(e, i) { S.write("nsync.eye" + i + ".img", eval(e)); }); // "evaluate": true, as the App Loader does
 S.write("sleeplog", FILES.sleeplog);
 S.write("sched", FILES.schedLib);           // Scheduler 0.43 (this app's dependency)
 S.write("sched.boot.js", FILES.schedBoot);
@@ -49,16 +53,21 @@ global.Bangle = {
   getHealthStatus: function() { return { steps: 123 }; },
   ev: {}, on: function(e, f) { (this.ev[e] = this.ev[e] || []).push(f); },
   emit: function(e, a) { (this.ev[e] || []).forEach(function(f) { f(a); }); },
-  isLCDOn: function() { return true; },
-  setOptions: function() {}, setLCDPower: function() {}, setLocked: function() {},
+  lcd: true, lcdCalls: 0, isLCDOn: function() { return Bangle.lcd; },
+  gpsPower: {}, setGPSPower: function(on, id) { Bangle.gpsPower[id] = on; },
+  removeListener: function(e, f) { var a = this.ev[e] || [], i = a.indexOf(f); if (i >= 0) a.splice(i, 1); },
+  setOptions: function() {}, setLocked: function() {},
+  setLCDPower: function() { Bangle.lcdCalls++; }, setLCDBrightness: function() { Bangle.lcdCalls++; }, setBacklight: function() { Bangle.lcdCalls++; },
   buzz: function() { buzzes++; return Promise.resolve(); },
   setUI: function(o) { if (ui && ui.remove) ui.remove(); ui = o || null; }
 };
 function stubG() {
   var o = { theme: { fg: 7, bg: 0, fgH: 0, bgH: 7 } };
-  ["reset", "clearRect", "fillRect", "drawRect", "setColor", "setFont", "setFontAlign", "drawString", "clear", "flip"].forEach(function(k) {
+  ["reset", "clearRect", "fillRect", "drawRect", "drawLine", "setColor", "setFont", "setFontAlign", "drawString", "clear", "flip"].forEach(function(k) {
     o[k] = function() { return o; };
   });
+  o.images = [];
+  o.drawImage = function(im, x, y) { o.images.push({ w: im.charCodeAt(0), h: im.charCodeAt(1), bpp: im.charCodeAt(2), len: im.length, x: x, y: y, t: getTime() }); return o; };
   o.getWidth = function() { return 176; }; o.getHeight = function() { return 176; };
   o.setTheme = function(theme) { o.theme = theme; return o; };
   o.stringWidth = function(s) { return ("" + s).length * 9; };
@@ -182,7 +191,7 @@ step(function() {
   eval(S.read("nsync.app.js"));
   // The app is evaluated in this step's scope; hand later steps what they need.
   global.APPX = { matchesGhost: matchesGhost, rememberLast: rememberLast, scheduleRest: scheduleRest, save: save,
-    setSes: function(v) { ses = v; } };
+    setSes: function(v) { ses = v; }, showSleepFace: showSleepFace, openRun: openRun, showSteps: showSteps };
   ok(menu && Object.keys(menu).some(function(k) { return k.indexOf("Start Upper A") == 0; }), "main menu offers Start Upper A");
   // Silent timer: saved, buzzes via the Scheduler, survives the button.
   menu["Timers"]();
@@ -510,5 +519,204 @@ step(function() {
   var m = last();
   ok(m.t == "hlt" && m.rows.length == 6 && m.hl.ver == "0.44", "the phone's health request returns rows over Bluetooth");
 });
+
+// ---- Sleep face ------------------------------------------------------------------
+var SF, sfBack = 0, sfOff;
+step(function() {
+  var sizes = [0, 1, 2, 3].map(function(i) { var im = S.read("nsync.eye" + i + ".img"); return [im.charCodeAt(0), im.charCodeAt(1), im.charCodeAt(2), im.length]; });
+  ok(sizes[0][0] == 176 && sizes[0][1] == 176 && sizes[0][2] == (2 | 64) && sizes[0][3] == 3 + 8 + 176 * 176 / 4, "open frame: 176x176, 2 bits with palette");
+  ok([1, 2, 3].every(function(i) { var z = sizes[i]; return z[0] == sizes[1][0] && z[1] == sizes[1][1] && z[2] == (2 | 64) && 13 + z[0] <= 176 && 13 + z[1] <= 176 && z[3] == 3 + 8 + Math.ceil(z[0] * z[1] / 4); }),
+    "blink frames share one rectangle inside the screen (" + sizes[1][0] + "x" + sizes[1][1] + " at 13,13)");
+  SF = require("nsync-sleep");
+  SF.cfg.min = SF.cfg.max = 100000;
+  Bangle.lcd = true; Bangle.lcdCalls = 0; g.images = [];
+  APPX.showSleepFace();
+  SF = require("nsync-sleep");
+  var first = g.images[0];
+  ok(first && first.w == 176 && first.x == 0 && first.y == 0, "Sleep face draws the whole open frame first");
+});
+step(function() {});
+step(function() {
+  var st = SF.state(), ims = g.images;
+  ok(st.frames.join() == "0,1,2,3,2,1,0" && st.blinks == 1, "blinks once on entry: open, closing, nearly, closed, nearly, closing, open (" + st.frames.join() + ")");
+  var gaps = [], want = [50, 40, 70, 50, 60];
+  for (var i = 2; i < ims.length; i++) gaps.push(Math.round((ims[i].t - ims[i - 1].t) * 1000));
+  ok(gaps.length == 5 && gaps.every(function(d, i) { return d >= want[i] - 5 && d < want[i] + 60; }), "frame timings 50/40/70/50/60 ms (" + gaps.join("/") + ")");
+  ok(ims.slice(1).every(function(m) { return m.w == 176 ? m.x == 0 : m.x == 13 && m.y == 13; }), "blink frames drawn at 13,13 over the open frame; the bezel is never redrawn");
+  ok(st.blinkT !== undefined && st.frameT === undefined, "the next blink is scheduled");
+  Bangle.lcd = false; Bangle.emit("lcdPower", false);
+  ok(SF.state().blinkT === undefined && SF.state().frameT === undefined, "LCD off cancels the blink timers");
+  SF.cfg.min = SF.cfg.max = 1; g.images = [];
+});
+step(function() {
+  ok(g.images.length == 0, "nothing drawn while the LCD is off");
+  Bangle.lcd = true; Bangle.emit("lcdPower", true);
+  ok(g.images.length == 1 && g.images[0].w == 176, "LCD on restores the open frame");
+  sfOff = setTimeout(function() { Bangle.lcd = false; Bangle.emit("lcdPower", false); }, 80); // mid-blink
+});
+step(function() {
+  var st = SF.state(), n = g.images.length;
+  ok(st.blinks == 2 && st.frames[st.frames.length - 1] != 0, "a blink starts while the LCD is on and stops part-way when it goes off");
+  ok(st.frameT === undefined && st.blinkT === undefined, "no frame or blink timer left pending after LCD off");
+  sfOff = n;
+});
+step(function() {
+  ok(g.images.length == sfOff, "no frame drawn after LCD off");
+  Bangle.lcd = true; Bangle.emit("lcdPower", true);
+  var st = SF.state();
+  ok(st.frames[st.frames.length - 1] == 0, "returning shows the open frame, not a half-closed eye");
+  ok(Bangle.lcdCalls == 0, "Sleep face never turned the LCD or backlight on or changed brightness");
+  Bangle.emit("lock", false); ui.btn();
+  ok(SF.state() !== null, "the press that only woke the screen does not leave");
+  SF.state().lastUnlock = 0; SF.cfg.min = SF.cfg.max = 100000;
+  ui.btn();
+  ok(SF.state() === null && Bangle.ev.lcdPower.length == 0, "button leaves: listeners removed, timers cancelled");
+  ok(menu && menu["Sleep face"], "back on the main menu");
+});
+
+// ---- daily steps ----------------------------------------------------------------------
+step(function() {
+  var L = require("nsync"), dx = FILES.healthExpected.dailySteps;
+  var a = L.dailySteps(7, dx["0"].nowMs);
+  ok(JSON.stringify(a) == JSON.stringify(dx["0"].days), "daily steps: 7 watch-local days added up from the Health log (" + a.map(function(d) { return d[1]; }).join(",") + ")");
+  E.setTimeZone(10);
+  var b = L.dailySteps(7, dx["600"].nowMs);
+  E.setTimeZone(0);
+  ok(JSON.stringify(b) == JSON.stringify(dx["600"].days), "steps roll over at the watch's own midnight (UTC+10: today " + (b.length && b[b.length - 1][1]) + ", expected " + dx["600"].days[6][1] + ")");
+  var live = L.dailySteps(3);
+  ok(live.length && live[live.length - 1][0] == L.ymd(new Date()) && live[live.length - 1][1] == 123, "today takes the firmware's live count");
+  APPX.showSteps();
+  ok(ui && ui.btn, "steps screen opens");
+  phone({ t: "steps", n: 7 });
+});
+step(function() {
+  var m = last();
+  ok(m.t == "stp" && m.today == require("nsync").ymd(new Date()) && m.days[m.days.length - 1][1] == 123, "steps request answers watch-local dates with stable ids");
+  ui.btn();
+});
+
+// ---- Run / Walk engine on the synthetic GPS tracks ---------------------------------------
+GPSFX.tracks.forEach(function(text) {
+  step(function() {
+    var Gm = require("nsync-gps"), t = JSON.parse(text), e = t.expect, T0 = 1.8e12;
+    var lat0 = GPSFX.origin[0], lon0 = GPSFX.origin[1];
+    var kLat = 1 / 111320 / 10, kLon = 1 / (111320 * Math.cos(lat0 * Math.PI / 180)) / 10;
+    var r, ev = {}, splitEvents = [], blankOk = true, lostSeen = !(t.gap || t.stall), pausedBlank = true, paceAt = null;
+    var bad = t.gap || t.stall, at80 = Math.round(e.elapsed_s * 0.8);
+    t.events.forEach(function(x) { ev[x[0]] = x[1]; });
+    t.rows.forEach(function(row) {
+      var now = T0 + row[0] * 1000, x = ev[row[0]];
+      if (x == "start") r = Gm.create(t.mode, t.units, t.buzz, now);
+      else if (x == "pause") Gm.pause(r, now);
+      else if (x == "resume") Gm.resume(r, now);
+      var o = Gm.onFix(r, { fix: row[3], lat: row[3] ? lat0 + row[2] * kLat : NaN, lon: row[3] ? lon0 + row[1] * kLon : NaN,
+        time: new Date(T0 + row[4] * 1000), hdop: row[5] / 10, satellites: 8 }, now);
+      if (o.split) splitEvents.push(o.split.n);
+      var p = Gm.pace(r, now);
+      if (bad && row[0] >= bad[0] + 6 && row[0] < bad[1] && p !== null) blankOk = false;
+      if (bad && row[0] >= bad[0] + 11 && row[0] < bad[1] && Gm.status(r, now) == "lost") lostSeen = true;
+      if (r.paused && p !== null) pausedBlank = false;
+      if (row[0] == at80) paceAt = p;
+    });
+    var s = Gm.summary(r, T0 + e.elapsed_s * 1000), err = Math.abs(s.dist - e.dist_m);
+    ok(err <= e.dist_m * t.tol + t.slack_m, t.name + ": distance " + s.dist + " m (true " + e.dist_m + ")");
+    ok(s.splits.length == e.splits && splitEvents.join() == s.splits.map(function(_, i) { return i + 1; }).join(),
+      t.name + ": " + e.splits + " split" + (e.splits == 1 ? "" : "s") + ", each signalled once (" + s.splits.join("/") + " s)");
+    ok(s.mov == e.moving_s && s.el == e.elapsed_s, t.name + ": moving " + s.mov + " s, elapsed " + s.el + " s");
+    ok(paceAt !== null && Math.abs(paceAt - e.pace_s) <= e.pace_s * 0.1, t.name + ": live pace " + Gm.clock(paceAt) + " per " + t.units + " (true " + Gm.clock(e.pace_s) + ")");
+    if (bad) ok(blankOk && lostSeen, t.name + ": pace blank and GPS LOST while the fix is " + (t.gap ? "missing" : "stalled"));
+    if (ev[600] == "pause" || t.name == "run-split-jitter") ok(pausedBlank, t.name + ": pace blank while paused; paused distance not counted");
+    if (t.name == "run-steady") ok(s.n > 50 && s.n < 300, "route: " + s.n + " points for " + s.dist + " m (every 15 m or 30 s)");
+  });
+});
+
+// ---- Run screen: start, split buzz, pause, restart, finish, save, sync ----------------------
+var RUN, runAct, fixT = 0;
+function fixAt(dEast) { fixT++; return { fix: 1, lat: 40, lon: -100 + dEast / 85300, time: new Date(Date.now() + fixT * 1000), hdop: 0.9, satellites: 9 }; }
+step(function() {
+  NRF.connected = true;
+  APPX.openRun("run");
+  RUN = require("nsync-run");
+  ok(RUN.state().screen == "start" && Bangle.gpsPower.nsync == 1, "Run: GPS on while waiting to start");
+  ui.touch(1, { x: 88, y: 140 });
+  ok(RUN.state().screen == "live" && require("nsync").readDual("nsync.run").mode == "run", "START begins a run, saved at once");
+  Bangle.emit("GPS", fixAt(0));
+  RUN.state().r.dist = 1600; // just short of a mile
+  var b0 = buzzes;
+  Bangle.emit("GPS", fixAt(25));
+  var st = RUN.state();
+  ok(st.r.sp == 1 && st.overlay && st.overlay.n == 1 && buzzes > b0, "crossing the mile buzzes and shows MILE 1 with its split");
+  ok(require("nsync").readDual("nsync.run").sp == 1, "the split is saved at once (no second buzz after a restart)");
+  b0 = buzzes;
+  RUN.state().r.last.t -= 5000; // as if 5 s had passed (the test runs faster than a runner)
+  Bangle.emit("GPS", fixAt(50));
+  ok(RUN.state().r.sp == 1 && buzzes == b0, "more fixes past the mile: no second buzz");
+  ui.btn();
+  ok(RUN.state().r.paused && RUN.state().screen == "paused", "button pauses");
+  RUN.open("run", function() {}); // the app was closed and opened again
+  ok(RUN.state().screen == "paused" && RUN.state().r.sp == 1 && RUN.state().r.dist > 1609, "reopening shows the run paused, distance and splits kept");
+  ui.touch(1, { x: 130, y: 140 });
+  ok(RUN.state().screen == "finish" && !RUN.state().gps && Bangle.gpsPower.nsync == 0, "FINISH: GPS released");
+  var rf = require("nsync").routeFile(RUN.state().r.start), n = 0, f = S.open(rf, "r");
+  while (f.readLine() !== undefined) n++;
+  ok(n == RUN.state().r.n && n >= 2, "route on the watch: " + n + " points");
+  ui.touch(1, { x: 40, y: 140 });
+});
+step(function() {
+  var L = require("nsync"), acts = L.acts(), ids = Object.keys(acts);
+  runAct = acts[ids[0]];
+  ok(ids.length == 1 && runAct.k == "act" && runAct.mode == "run" && runAct.splits.length == 1 && runAct.dist > 1609, "SAVE keeps the run as a record to sync");
+  ok(!L.readDual("nsync.run") && menu && menu["Run"], "run in progress cleared; back on the main menu");
+  APPX.openRun("walk");
+  ui.touch(1, { x: 88, y: 140 });
+  Bangle.emit("GPS", fixAt(0));
+  ui.btn();
+  ui.touch(1, { x: 130, y: 140 });
+  ui.touch(1, { x: 130, y: 140 }); // DISCARD
+  ok(prompt && /Discard this walk/.test(prompt.msg), "DISCARD asks first");
+  prompt.answer(true);
+});
+step(function() {
+  var L = require("nsync");
+  ok(Object.keys(L.acts()).length == 1 && !L.readDual("nsync.run") && S.list(/^nsync\.rt/).length == 1, "discarded walk: no record, its route deleted");
+  ok(Bangle.gpsPower.nsync == 0, "GPS off after discard");
+  phone({ t: "pull", max: 20 }); // this phone did not list "act" in hello
+});
+step(function() {
+  var m = last();
+  ok(m.recs.every(function(r) { return r.k != "act"; }), "a phone that does not store runs never gets them (they stay on the watch)");
+  disconnect();
+  phone({ t: "hello", v: 1, phone: PID, mtu: 128, kinds: ["set", "ses", "mark", "chk", "act"] });
+});
+step(function() { nonce = last().nonce; phone({ t: "auth", proof: sha(key + ":" + nonce + ":" + PID) }); });
+step(function() { received(); phone({ t: "pull", max: 20 }); });
+step(function() {
+  var m = last(), a = m.recs.filter(function(r) { return r.k == "act"; })[0];
+  ok(a && a.id == runAct.id && a.n == runAct.n && a.dist == runAct.dist, "the run syncs as a record with its point count" + (a ? "" : ": " + JSON.stringify(m).substr(0, 200)));
+  phone({ t: "route", id: runAct.id, from: 0, max: 5 });
+});
+var routePts = [];
+step(function() {
+  var m = last();
+  routePts = routePts.concat(m.pts);
+  ok(m.t == "rte" && m.pts.length == Math.min(5, runAct.n) && m.more == runAct.n > 5, "route page 1");
+  phone({ t: "route", id: runAct.id, from: routePts.length, max: 60 });
+});
+step(function() {
+  var m = last();
+  routePts = routePts.concat(m.pts);
+  ok(!m.more && routePts.length == runAct.n && routePts[0].length == 3 && Math.abs(routePts[0][1] - 40) < 0.001, "rest of the route; points are [seconds, lat, lon]");
+  phone({ t: "route", id: runAct.id, from: 0, max: 60 });
+});
+step(function() {
+  ok(last().pts.length == runAct.n, "the route can be read again (a retry after a lost answer)");
+  phone({ t: "ack", ids: [[runAct.id, runAct.rev]] });
+});
+step(function() {
+  var L = require("nsync");
+  ok(last().left == 0 && L.acts()[runAct.id].synced && S.list(/^nsync\.rt/).length == 0, "after the ack the run is synced and its route erased");
+  phone({ t: "route", id: "nope", from: 0 });
+});
+step(function() { var m = last(); ok(m && m.t == "err" && m.code == "no_route", "unknown route refused" + (m ? "" : " (no answer)")); });
 
 next();

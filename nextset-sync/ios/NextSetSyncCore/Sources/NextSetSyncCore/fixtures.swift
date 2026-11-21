@@ -118,4 +118,26 @@ public enum DemoData {
         }
         return out
     }
+
+    /// A made-up loop route: `seconds` of movement at `speed` m/s on a 250 m
+    /// radius circle around a made-up point, one point every 5 s.
+    public static func route(seconds: Int, speed: Double, every: Int = 5) -> [RoutePoint] {
+        let lat0 = 40.0, lon0 = -100.0, r = 250.0
+        let mLat = 1 / 111_320.0, mLon = 1 / (111_320.0 * cos(lat0 * .pi / 180))
+        return stride(from: 0, through: seconds, by: every).map { t in
+            let a = Double(t) * speed / r
+            return RoutePoint(t: t, lat: lat0 + (r - r * cos(a)) * mLat, lon: lon0 + r * sin(a) * mLon)
+        }
+    }
+
+    /// Daily steps for the last `days` days (today partial), by local date.
+    public static func steps(now: Date = Date(), days: Int = 9) -> [WireDaySteps] {
+        let cal = Calendar.current, f = DateFormatter()
+        f.calendar = cal; f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "yyyy-MM-dd"
+        return (0..<days).reversed().compactMap { back in
+            guard let d = cal.date(byAdding: .day, value: -back, to: now) else { return nil }
+            let total = back == 0 ? 3_100 + cal.component(.hour, from: now) * 140 : 5_200 + (back * 1_877) % 6_400
+            return WireDaySteps(date: f.string(from: d), steps: total)
+        }
+    }
 }

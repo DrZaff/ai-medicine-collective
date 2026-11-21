@@ -68,13 +68,15 @@ Every request carries `q` (a number); the answer echoes it. An error is
 | `pair` `{phone, name, code}` | `paired` `{key, watch}` | Only while the watch app shows **Pair phone**; waits until the person taps **Pair** on the watch (or `pair_refused`). |
 | `auth` `{proof}` | `authok` | `proof = hex(SHA-256(key + ":" + nonce + ":" + phone))`. The nonce is single use. |
 | `time` `{ms, tz}` | `ok` | Sets the watch clock and time zone (minutes east of UTC); saves `timezone` in `setting.json` only if it changed. |
-| `status` | `st` `{pend, pendSets, ses, wkt, sAck, bat, free, now, sl}` | |
+| `status` | `st` `{pend, pendSets, pendMarks, pendActs, ses, wkt, sAck, bat, free, now, sl}` | `pendActs` (watch 0.03): runs and walks not yet acknowledged. |
 | `wput` `{w}` | `wack` `{id, rev}` | Stores the workout, reads it back from flash, **then** acknowledges. |
 | `pull` `{max}` | `recs` `{recs, more, total}` | Oldest first, up to 20 per answer (phone asks for 8). Only kinds the phone listed. |
 | `ack` `{ids: [[id, rev], …]}` | `acked` `{n, left}` | Watch deletes a set/session (or marks a marker synced) only if its stored `rev` ≤ the acknowledged rev. `left` counts only kinds this phone takes. |
 | `sleep` `{since, max}` | `slp` `{since, now, entries, more, sl}` | Calls Sleep Log's own `require("sleeplog").readLog(since×600000, now)`. |
 | `sack` `{upto}` | `ok` | Saves the sleep cursor (shown in `status`). |
 | `health` `{since, max}` | `hlt` `{rows, more, hl, now}` | BangleApps Health log through its own reader: `[t10, steps, bpmMin, bpmMax, movement, activity]` rows after `since` (UTC 10-minute steps; UTC filing mode converted). `hl` = `{ver, hrm, utc}`, also in `hi`. |
+| `route` `{id, from, max}` | `rte` `{id, from, pts, more}` | Watch 0.03. Points of a run's or walk's route from index `from`, at most `max` (5–60, phone asks for 40): `[seconds since start, lat, lon]`, 5 decimals. Read-only and repeatable; `no_route` if the watch has no such record. |
+| `steps` `{n}` | `stp` `{days, today}` | Watch 0.03. Daily step totals for the last `n` (1–14) **watch-local** days, oldest first: `[["2026-11-14", 6120], …]`. Past days add up the Health log's 10-minute records by the watch's own date; today also takes the firmware's live count. The date is the identity: the phone replaces that day's total. An older watch answers `unknown`, which the phone skips. |
 | `unpair` | `ok` | Forgets this phone. |
 
 Before `authok`, everything except `hello`, `pair` and `auth` is refused
@@ -92,7 +94,20 @@ with `unauthorized`.
 ```json
 {"k":"chk","id":"7a3c91e0-clz8k2q9b","rev":1,"score":4,"at":1794600000000}
 {"k":"mark","id":"7a3c91e0-mlz8k2q9a","rev":1,"label":"Coffee","at":1794600000000}
+{"k":"act","id":"7a3c91e0-alz8k2q9c","rev":1,"mode":"run","units":"mi","at":1794600000000,"end":1794601980000,
+ "dist":5012,"mov":1902,"el":1980,"splits":[592,601,598],"n":214}
 ```
+
+* **Runs and walks** (`act`, watch 0.03): `dist` metres, `mov` moving seconds
+  (paused time left out), `el` elapsed seconds, `splits` moving seconds per
+  completed mile or km (`units` "mi" or "km"), `n` route points, `cut: 1` if
+  the watch ran short of storage and stopped adding points. The phone reads the
+  whole route with `route` **before** storing the record, stores both, then
+  acknowledges; on that ack the watch marks the record synced and erases the
+  route file. A route the watch ends early (`more: false` with fewer than `n`
+  points) is stored as cut short rather than blocking the record. A cut-off
+  answer fails the sync and nothing is stored; the next sync reads it again.
+  A phone that does not list `act` in `hello` never receives them.
 
 * Every record has `k`, `id`, `rev`, `at`; all other fields are optional, so
   the phone can decode a kind it doesn't know. **It acknowledges only kinds it

@@ -2,12 +2,12 @@
   "id": "nsync",
   "name": "NextSet Sync",
   "shortName": "NextSet",
-  "version": "0.02",
+  "version": "0.03",
   "author": "DrZaff",
-  "description": "Everyday training companion for Bangle.js 2: log sets (load, reps, RIR) with Workout Ghost and a rest timer, silent timers, stopwatch and moment markers. Syncs sets, markers and Sleep Log data directly to the NextSet Sync iPhone app over Bluetooth. No companion app, account or cloud.",
+  "description": "Everyday training companion for Bangle.js 2: log sets (load, reps, RIR) with Workout Ghost and a rest timer, outdoor Run / Walk with GPS pace, split buzzes and the route, daily steps, a blinking Sleep face, silent timers, stopwatch and moment markers. Syncs everything directly to the NextSet Sync iPhone app over Bluetooth. No companion app, account or cloud.",
   "icon": "app.png",
   "type": "app",
-  "tags": "tool,health,bluetooth",
+  "tags": "tool,health,bluetooth,gps,outdoors",
   "supports": [
     "BANGLEJS2"
   ],
@@ -31,8 +31,40 @@
       "url": "tools.js"
     },
     {
+      "name": "nsync-sleep",
+      "url": "sleep.js"
+    },
+    {
+      "name": "nsync-gps",
+      "url": "gps.js"
+    },
+    {
+      "name": "nsync-run",
+      "url": "run.js"
+    },
+    {
       "name": "nsync.img",
       "url": "app-icon.js",
+      "evaluate": true
+    },
+    {
+      "name": "nsync.eye0.img",
+      "url": "eye-open.js",
+      "evaluate": true
+    },
+    {
+      "name": "nsync.eye1.img",
+      "url": "eye-closing.js",
+      "evaluate": true
+    },
+    {
+      "name": "nsync.eye2.img",
+      "url": "eye-nearly.js",
+      "evaluate": true
+    },
+    {
+      "name": "nsync.eye3.img",
+      "url": "eye-closed.js",
       "evaluate": true
     }
   ],
@@ -42,6 +74,9 @@
     },
     {
       "name": "nsync.last.json"
+    },
+    {
+      "name": "nsync.runcfg.json"
     }
   ],
   "dependencies": {
