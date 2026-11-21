@@ -1055,7 +1055,7 @@
       "id": "will-ai-replace-radiologists",
       "category": "general",
       "question": "Will AI replace radiologists?",
-      "answer": "No. Current evidence suggests AI will take over some radiology tasks and change how radiologists work, but it is not close to replacing them. The clearest gains come from AI taking on part of the work. In the MASAI randomised trial of mammography screening in Sweden, AI-supported reading reduced the screen-reading workload by 44·3% compared with standard double reading, with a similar cancer detection rate. Its main outcome, interval cancers, was still being followed up [1]. A retrospective study estimated that a commercial tool could have reported some normal chest radiographs on its own [2]. In a prospective study, AI-drafted reports made radiologists' reporting more efficient, and radiologists still reviewed the reports [3]. A task-based workforce model, posted as a preprint, concluded that radiologist job loss from AI is unlikely in the near term [4]. The main limitation is that most of this evidence covers narrow tasks, such as screening and normal chest X-rays. Trainees should expect to supervise AI and check its outputs as part of the job.",
+      "answer": "No. Current evidence suggests AI will take over some radiology tasks and change how radiologists work, but it is not close to replacing them. The clearest gains come from AI taking on part of the work. In the MASAI randomised trial of mammography screening in Sweden, AI-supported reading had a similar cancer detection rate to standard double reading and reduced the screen-reading workload by 44.3% [1]. Its primary endpoint, interval cancers, was still in follow-up when these results were reported [1]. A retrospective Danish study estimated that a commercial tool could have reported 28% of normal chest radiographs on its own, or 7.8% of all of them [2]. In a prospective study, AI-drafted reports made radiologists' documentation 15.5% more efficient, with no difference in clinical accuracy on peer review [3]. A task-based workforce model, posted as a preprint, projected a 33% fall in radiologists' hours within 5 years but concluded that job loss is unlikely for the foreseeable future [4]. Most of this evidence covers narrow tasks. Trainees should expect to supervise AI and check its outputs.",
       "sources": [
         {
           "title": "Artificial intelligence-supported screen reading versus standard double reading in the Mammography Screening with Artificial Intelligence trial (MASAI): a clinical safety analysis of a randomised, controlled, non-inferiority, single-blinded, screening accuracy study",
@@ -1065,19 +1065,19 @@
         },
         {
           "title": "Autonomous Chest Radiograph Reporting Using AI: Estimation of Clinical Impact",
-          "url": "https://doi.org/10.1148/radiol.222268",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36880947/",
           "source": "Radiology",
           "published": "2023-03-07"
         },
         {
           "title": "Efficiency and Quality of Generative AI–Assisted Radiograph Reporting",
-          "url": "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2834943",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40471579/",
           "source": "JAMA Network Open",
           "published": "2025-06-05"
         },
         {
           "title": "The Effect of AI on the Radiologist Workforce: A Task-Based Analysis",
-          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12755265",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41480022/",
           "source": "medRxiv (preprint, not peer reviewed)",
           "published": "2025-12-22"
         }
