@@ -708,16 +708,6 @@ function initHome() {
 
 document.addEventListener("DOMContentLoaded", initHome);
 
-// Featured creations: a "Read the story" link stays hidden until someone
-// gives it an href (the article about that creation), then it shows
-function initStoryLinks() {
-  document.querySelectorAll("a[data-story]").forEach((link) => {
-    link.hidden = !(link.getAttribute("href") || "").trim();
-  });
-}
-
-document.addEventListener("DOMContentLoaded", initStoryLinks);
-
 // Elements marked data-reveal rise into view as the page is scrolled
 // (light design only: the styling lives in modern.css). Without this
 // script, or for people who ask for reduced motion, they are simply visible.

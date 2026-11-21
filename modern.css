@@ -3877,78 +3877,18 @@ html.terminal::view-transition-new(root) {
    bottom row. The disclaimer now closes the footer band. */
 
 .modern .home-featured {
+  gap: 0;
   margin-top: 56px;
-}
-
-.modern .featured-head {
-  margin-bottom: 24px;
-  text-align: center;
-}
-
-.modern .featured-heading {
-  color: var(--ink);
-  font-family: var(--font-serif);
-  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
-  font-weight: 500;
-  letter-spacing: -0.025em;
-  text-transform: none;
-}
-
-.modern .featured-grid {
-  gap: 24px;
-}
-
-/* each creation: a white card, its picture across the top */
-.modern .feature {
+  padding: 0;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 24px;
   background: var(--card);
   box-shadow: var(--shadow);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.modern .feature:hover {
-  border-color: var(--line);
-  box-shadow: var(--shadow-lift);
-  transform: translateY(-3px);
-}
-
-.modern .feature-copy {
-  padding: 28px 32px 32px;
-}
-
-.modern .feature-tag {
-  margin-bottom: 8px;
-  color: var(--brand);
-  font-family: var(--font-label);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-}
-
-.modern .feature-story,
-.modern .feature-story:visited {
-  color: var(--brand);
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-/* (two classes: this must beat the jungle panel's .featured-visual below) */
-.modern .featured-visual.featured-visual--shot {
-  height: 320px;
-  padding: 0;
-  background: var(--night);
-}
-
-.modern .feature-shot {
-  transition: transform 0.6s ease;
-}
-
-.modern .feature:hover .feature-shot {
-  transform: scale(1.03);
+.modern .featured-copy {
+  padding: 44px 44px 40px;
 }
 
 .modern .featured-kicker {
@@ -4157,18 +4097,12 @@ html.terminal::view-transition-new(root) {
 }
 
 @media (max-width: 900px) {
-  .modern .featured-grid {
+  .modern .home-featured {
     grid-template-columns: 1fr;
   }
 
   .modern .featured-visual {
     min-height: 300px;
-  }
-
-  .modern .featured-visual.featured-visual--shot {
-    height: auto;
-    min-height: 0;
-    aspect-ratio: 16 / 10;
   }
 
   .modern .home-panel--tools,
@@ -4183,8 +4117,8 @@ html.terminal::view-transition-new(root) {
     margin-top: 40px;
   }
 
-  .modern .feature-copy {
-    padding: 24px 22px 26px;
+  .modern .featured-copy {
+    padding: 28px 22px;
   }
 
   .modern .home-panel--tools,
