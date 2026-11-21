@@ -111,8 +111,11 @@ struct WatchView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .disabled(!model.canSync)
+            .accessibilityIdentifier("watch.syncNow")
             LabeledContent("Last sync", value: model.link.lastSync.map { $0.formatted(date: .abbreviated, time: .shortened) } ?? "Never")
-            if let s = model.link.lastSyncSummary { Text(s).font(.footnote).foregroundStyle(.secondary) }
+            if let s = model.link.lastSyncSummary {
+                Text(s).font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("watch.syncSummary")
+            }
             LabeledContent("Waiting on the watch") {
                 if let st = model.link.watchStatus {
                     Text("\(st.pendingSets) sets (as of \(st.at.formatted(date: .omitted, time: .shortened)))")

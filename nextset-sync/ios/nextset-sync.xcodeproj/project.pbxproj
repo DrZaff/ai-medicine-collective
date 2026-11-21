@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		4E530000000000000000001E = {isa = PBXContainerItemProxy; containerPortal = 4E5300000000000000000001; proxyType = 1; remoteGlobalIDString = 4E530000000000000000000C; remoteInfo = NextSetSync; };
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXBuildFile section */
 		4E5300000000000000000002 /* NextSetSyncCore in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5300000000000000000003 /* NextSetSyncCore */; };
 /* End PBXBuildFile section */
@@ -13,9 +17,11 @@
 /* Begin PBXFileReference section */
 		4E5300000000000000000004 /* NextSetSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NextSetSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E5300000000000000000005 /* info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = info.plist; sourceTree = "<group>"; };
+		4E5300000000000000000017 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextSetSyncUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		4E5300000000000000000016 = {isa = PBXFileSystemSynchronizedRootGroup; path = NextSetSyncUITests; sourceTree = "<group>"; };
 		4E5300000000000000000007 /* NextSetSync */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = NextSetSync;
@@ -39,6 +45,7 @@
 			isa = PBXGroup;
 			children = (
 				4E5300000000000000000007 /* NextSetSync */,
+				4E5300000000000000000016 /* NextSetSyncUITests */,
 				4E530000000000000000000B /* config */,
 				4E530000000000000000000A /* Products */,
 			);
@@ -48,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				4E5300000000000000000004 /* NextSetSync.app */,
+				4E5300000000000000000017 /* NextSetSyncUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -63,6 +71,18 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		4E5300000000000000000018 /* NextSetSyncUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E530000000000000000001A;
+			buildPhases = (4E5300000000000000000019,);
+			buildRules = ();
+			dependencies = (4E530000000000000000001D,);
+			fileSystemSynchronizedGroups = (4E5300000000000000000016,);
+			name = NextSetSyncUITests;
+			productName = NextSetSyncUITests;
+			productReference = 4E5300000000000000000017;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		4E530000000000000000000C /* NextSetSync */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4E5300000000000000000012 /* Build configuration list for PBXNativeTarget "NextSetSync" */;
@@ -96,6 +116,7 @@
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					4E5300000000000000000018 = { CreatedOnToolsVersion = 16.0; TestTargetID = 4E530000000000000000000C; };
 					4E530000000000000000000C = {
 						CreatedOnToolsVersion = 16.0;
 					};
@@ -119,6 +140,7 @@
 			projectRoot = "";
 			targets = (
 				4E530000000000000000000C /* NextSetSync */,
+				4E5300000000000000000018 /* NextSetSyncUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -134,6 +156,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4E5300000000000000000019 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 		4E530000000000000000000D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -142,6 +165,10 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4E530000000000000000001D = {isa = PBXTargetDependency; target = 4E530000000000000000000C; targetProxy = 4E530000000000000000001E; };
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		4E5300000000000000000010 /* Debug */ = {
@@ -240,9 +267,34 @@
 			};
 			name = Release;
 		};
+		4E530000000000000000001B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zaffuto.nextsetsync.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = iphonesimulator;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = NextSetSync;
+			};
+			name = Debug;
+		};
+		4E530000000000000000001C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zaffuto.nextsetsync.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = iphonesimulator;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = NextSetSync;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4E530000000000000000001A = {isa = XCConfigurationList; buildConfigurations = (4E530000000000000000001B, 4E530000000000000000001C,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 		4E530000000000000000000F /* Build configuration list for PBXProject "nextset-sync" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
