@@ -1055,7 +1055,7 @@
       "id": "will-ai-replace-radiologists",
       "category": "general",
       "question": "Will AI replace radiologists?",
-      "answer": "Not in the foreseeable future: the cited evidence shows AI supporting specific, narrow reading tasks and reducing radiologists' workload, not replacing the radiologist. In the Swedish MASAI randomised breast-screening trial, AI-supported screening had a similar cancer detection rate to standard double reading without AI and reduced the screen-reading workload by 44·3% [1]. There, AI triaged examinations to single or double reading, so radiologists still read every screen [1]. Results on the trial's primary endpoint, interval cancers, have since been published [2]. In a randomised trial of chest radiographs, radiologists using AI-based software detected actionable lung nodules in 0.59% of participants (31 of 5238) versus 0.25% (13 of 5238) without AI. The AI was an aid, not a substitute [3]. Researchers have also estimated the clinical impact of letting AI report chest radiographs autonomously [4]. The FDA keeps a public list of AI-enabled medical devices [5], and a JACR study projects US imaging utilisation from 2025 to 2055 [6]. The realistic outlook is that radiologists who use and supervise AI remain central, with AI handling narrow, high-volume tasks.",
+      "answer": "Not in the foreseeable future: the cited evidence shows AI supporting specific, narrow reading tasks and reducing radiologists' workload, not replacing the radiologist. In the Swedish MASAI randomised breast-screening trial, AI-supported screening had a similar cancer detection rate to standard double reading and reduced the screen-reading workload by 44.3% [1]. AI triaged examinations to single or double reading, so radiologists still read every screen [1]. The trial's primary analysis later found a non-inferior interval cancer rate with AI: 1.55 versus 1.76 per 1000 participants [2]. In a randomised trial of chest radiographs, radiologists using AI-based software detected actionable lung nodules in 0.59% of participants (31 of 5238) versus 0.25% (13 of 5238) without AI [3]. A retrospective study estimated that AI could have reported 7.8% of all chest radiographs on its own [4]. The FDA keeps a public list of AI-enabled medical devices [5]. Meanwhile, US imaging use is projected to be 16.9% to 26.9% higher in 2055 than in 2023 if current per-person use persists [6]. Radiologists who use and supervise AI remain central.",
       "sources": [
         {
           "title": "Artificial intelligence-supported screen reading versus standard double reading in the Mammography Screening with Artificial Intelligence trial (MASAI): a clinical safety analysis of a randomised, controlled, non-inferiority, single-blinded, screening accuracy study",
@@ -1065,7 +1065,7 @@
         },
         {
           "title": "Interval cancer, sensitivity, and specificity comparing AI-supported mammography screening with standard double reading without AI in the MASAI study: a randomised, controlled, non-inferiority, single-blinded, population-based, screening-accuracy trial",
-          "url": "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(25)02464-X/abstract",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41620232/",
           "source": "The Lancet",
           "published": "2026-01-31"
         },
@@ -1077,7 +1077,7 @@
         },
         {
           "title": "Autonomous Chest Radiograph Reporting Using AI: Estimation of Clinical Impact",
-          "url": "https://www.semanticscholar.org/paper/Autonomous-Chest-Radiograph-Reporting-Using-AI:-of-Plesner-M%C3%BCller/9743c3b757e40b756e3686c73cea7276a4e58b21",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36880947/",
           "source": "Radiology",
           "published": "2023-03"
         },
@@ -1089,7 +1089,7 @@
         },
         {
           "title": "Projected US Imaging Utilization, 2025 to 2055",
-          "url": "https://www.jacr.org/article/S1546-1440(24)00898-6/fulltext",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/39952774/",
           "source": "Journal of the American College of Radiology",
           "published": "2025"
         }
