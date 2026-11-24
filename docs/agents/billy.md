@@ -105,11 +105,14 @@ sudo -u mission-control $P -m mission_control export-events --config /etc/missio
 
 Keep enrollment codes to yourself: anyone on the tailnet with the owner's login could use one in its 10 minutes.
 
-**Updating to a new merged commit:**
-1. `sudo git -C /opt/mission-control/app fetch origin main`, then `checkout --detach <merge SHA>`.
-2. Check `rev-parse HEAD`, and that `status --porcelain` prints nothing.
-3. Run the tests in a throwaway clone as yourself.
-4. `sudo systemctl restart billy-stop.service mission-control.service`, then both `selfcheck`s.
+**Updating to a new merged commit.** Test first; the live app changes only after the tests pass:
+1. **Test the new commit in a throwaway clone, as yourself.** Clone `DrZaff/billy-mission-control`, `checkout --detach <merge SHA>`, and run its tests with the live venv's Python.
+2. **Compare the requirements.** If `requirements.txt` differs from the installed one, the live venv won't match the commit, and step 1 doesn't catch that. Build a fresh venv for the new commit instead:
+   - Install the new requirements with `--require-hashes`, and run `tools/audit_deps.py`.
+   - Rerun the tests with that venv's Python.
+   - Swap it in for `/opt/mission-control/venv` only once they pass.
+3. **Move the live app.** `sudo git -C /opt/mission-control/app fetch origin main`, then `checkout --detach <merge SHA>`. Check `rev-parse HEAD`, and that `status --porcelain` prints nothing.
+4. **Restart and check.** `sudo systemctl restart billy-stop.service mission-control.service`, then both `selfcheck`s. If either fails, check out the previous SHA (and its venv) and restart again.
 
 A restart replaces the Settings page's form token, so reload Settings before pressing a button. Sessions survive a restart.
 
@@ -180,6 +183,8 @@ Installed at `64e2cf6` (PR #12 in `billy-mission-control`), then `ecf8d92` (PR #
 | Check | Result |
 | --- | --- |
 | Start-up checks, as each account | 14 of 14 (app), 8 of 8 (stop helper) |
+| Key isolation: `mission-control` and `billy-stop` cannot read Billy's key or the Codex sign-in | Passed. Each account's `selfcheck` reports `cannot read /var/lib/billy-pub/.config/billy/app.pem: unreachable` and the same for `/home/agent/.codex`; the services refuse to start otherwise. |
+| The events export (`export-events`) | Worked throughout the tests. Each event carries a time, kind, login, path, status and result, and never a code, challenge, key or cookie. |
 | Tailscale Serve | `https://billy.tail26e3d1.ts.net` → `unix:/run/mission-control/app.sock`, tailnet only; Funnel off; the tailnet has only the owner's two devices |
 | A request with no Tailscale login | 403 |
 | iPhone passkey: enroll, then sign in with Face ID | Passed |
