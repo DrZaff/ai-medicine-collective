@@ -830,6 +830,12 @@ class InstallScript(unittest.TestCase):
         self.assertLess(self.text.index('an ACL is set in $RUNS'),
                         self.text.index('echo "shared_runs_protected=yes"'))
         self.assertIn('sudo -u "$u" ls -a "$d" 2>/dev/null | grep -qx', self.text)
+        # Existing records are checked too: the writer's own regular files, no wider than 640,
+        # not hard-linked (Codex, b0bad16).
+        self.assertIn('-mindepth 1 \\( ! -type f -o ! -user "$w" -o -perm /0137 -o -links +1 \\)',
+                      self.text)
+        self.assertLess(self.text.index("aren't $w's private records"),
+                        self.text.index('echo "shared_runs_protected=yes"'))
         # Effective access is tested for everyone who mustn't read the records, so an ACL can't
         # slip past the group check (Codex, 0508c9a).
         self.assertIn('"mission-control:$RUNS/agent" "mission-control:$RUNS/$PUB"', self.text)

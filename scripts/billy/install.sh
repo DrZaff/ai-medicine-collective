@@ -121,6 +121,17 @@ acl=$(ls -lad "$RUNS" "$RUNS/agent" "$RUNS/$PUB" "$RUNS/agent/"* "$RUNS/$PUB/"* 
 if [ -n "$acl" ]; then
   echo "STOP: an ACL is set in $RUNS; remove it (setfacl -b) before installing:"; echo "$acl"; exit 1
 fi
+# Every existing entry in a writer's folder is a regular file of that writer, mode no wider than
+# 640 (no group write, no execute, nothing for others) and not hard-linked: a fresh probe can't
+# show that an older record is writable by the readers (Codex's review of b0bad16).
+for w in agent "$PUB"; do
+  bad=$(find "$RUNS/$w" -mindepth 1 \( ! -type f -o ! -user "$w" -o -perm /0137 -o -links +1 \) \
+          -print 2>/dev/null)
+  if [ -n "$bad" ]; then
+    echo "STOP: these entries in $RUNS/$w aren't $w's private records (fix or remove them):"
+    echo "$bad"; exit 1
+  fi
+done
 # billy-runs holds exactly the READERS: the group's listed members plus every account whose
 # primary group it is (getent lists only the former). Anyone else stops the install.
 gid=$(getent group "$RUNS_GROUP" | cut -d: -f3)
