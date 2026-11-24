@@ -105,32 +105,15 @@ sudo -u mission-control $P -m mission_control export-events --config /etc/missio
 
 Keep enrollment codes to yourself: anyone on the tailnet with the owner's login could use one in its 10 minutes.
 
-**Updating to a new merged commit** (as done for PRs #12 and #13). This covers only a commit whose `requirements.txt` is unchanged, so the live venv is never touched. A commit that changes the requirements is a separate task: it needs a reviewed upgrade script first, which doesn't exist yet. The procedure never sets or clears the stop marker. Run it in one terminal session, and stop at the first line that doesn't show what its comment says:
+**Updating to a new merged commit.** There is no written runbook yet, on purpose. Each review of one found another way a pasted block could carry on past a failed check. Until a reviewed upgrade script exists (Remaining setup), each update is a guided session, as for PRs #12 and #13: Claude gives one short step at a time and checks its output before the next. The rules each update keeps:
 
-```sh
-PREV=$(sudo git -C /opt/mission-control/app rev-parse HEAD); NEW=<the merge commit's full SHA>
-rm -rf ~/mc-test && git clone -q https://github.com/DrZaff/billy-mission-control ~/mc-test && git -C ~/mc-test checkout -q --detach "$NEW" && echo clone-ok   # clone-ok
-git -C ~/mc-test diff --quiet "$PREV" "$NEW" -- requirements.txt; echo "requirements diff exit=$?"   # 0 = unchanged; 1 = changed or anything else = error: stop
-(cd ~/mc-test && /opt/mission-control/venv/bin/python dev.py test)    # ends with OK; nothing live has changed so far
-sudo systemctl stop mission-control.socket mission-control.service billy-stop.socket billy-stop.service
-sudo git -C /opt/mission-control/app fetch -q origin main && sudo git -C /opt/mission-control/app checkout -q --detach "$NEW" && echo checkout-ok   # checkout-ok
-sudo git -C /opt/mission-control/app rev-parse HEAD; sudo git -C /opt/mission-control/app status --porcelain   # $NEW, then nothing
-sudo systemctl start billy-stop.socket mission-control.socket
-cd /opt/mission-control/app
-sudo -u mission-control /opt/mission-control/venv/bin/python -m mission_control selfcheck app --config /etc/mission-control/app.json        # all PASS
-sudo -u billy-stop /opt/mission-control/venv/bin/python -m mission_control selfcheck stopper --config /etc/mission-control/stopper.json   # all PASS
-cd ~ && rm -rf ~/mc-test
-```
-
-Between the `stop` and the `start`, the stop button is unavailable; the marker commands above still work. If anything after the `stop` fails, go back to the previous commit, which runs on the same, untouched venv:
-
-```sh
-sudo systemctl stop mission-control.socket mission-control.service billy-stop.socket billy-stop.service
-sudo git -C /opt/mission-control/app checkout -q --detach "$PREV"
-sudo systemctl start billy-stop.socket mission-control.socket
-```
-
-Then run both selfchecks again.
+- **Install only a merge commit on `main`.**
+- **Test it first, with the live venv,** in a throwaway clone.
+- **Don't install a commit that changes `requirements.txt`.** That waits for the script.
+- **Stop both sockets and services before the checkout,** and start them after.
+- **Run both selfchecks.**
+- **Never set or clear the stop marker as part of an update.**
+- **If anything fails, go back to the previous commit,** which runs on the same, untouched venv, before starting the services again.
 
 A restart replaces the Settings page's form token, so reload Settings before pressing a button. Sessions survive a restart.
 
@@ -230,7 +213,7 @@ Installed at `64e2cf6` (PR #12 in `billy-mission-control`), then `ecf8d92` (PR #
 | Both `main` rulesets: owner on each bypass list (pull requests only), Billy on neither, CodeQL rule removed | Owner | Done. "Main - Owner Merge Only" (26914500) is **Active** (2026-11-14); "Protect Main - Human Approval Required" (26913560) stays disabled |
 | Mission Control: enroll the backup security key (`passkey enroll --label YubiKey`) | Owner | Open: waiting for the key |
 | Mission Control: see a session end after 30 minutes idle | Owner | Open: check the next time it's opened |
-| Mission Control: a reviewed upgrade script for a commit that changes `requirements.txt` (a new venv, swapped and rolled back safely); until then, such a commit isn't installed | Claude builds; Codex reviews; owner merges | Open |
+| Mission Control: a reviewed upgrade script that stops at the first failure. It installs only a merge commit on `main`, tests it first, swaps a new venv when `requirements.txt` changes, rolls back, and never touches the stop marker. Until then, updates are guided sessions, and a commit that changes the requirements isn't installed. | Claude builds; Codex reviews; owner merges | Open |
 | Mission Control: two enrollment-message edge cases (Codex should-fix on `785bcf2`, listed in `billy-mission-control` PR #13) | Claude builds; Codex reviews; owner merges | Open |
 | Digest publisher app, then turning on protection for `main` | Owner | Ruleset on and Billy's negative test passed (above). Still open: the owner's own checks and the first Friday digest push under the ruleset; see phase 4 in [digest-publisher.md](digest-publisher.md) |
 
