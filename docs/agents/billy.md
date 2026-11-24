@@ -16,7 +16,8 @@ Two Unix users, so the reviewer can never read the publisher's key (the first ha
 | --- | --- | --- | --- |
 | `agent` | the Codex sign-in (`/home/agent/.codex`, mode `700`) | the **review** step (Codex) | read Billy's key |
 | `billy-pub` (system user, no login) | Billy's key and IDs in `/var/lib/billy-pub/.config/billy/` (`app.pem`, `app.json`, mode `600`) | `preflight.py`, `pr_test.py` and the **publish** step | run Codex or repository code |
-| `billy-stop` (system user, no login) | the control folder `/var/lib/billy-control/` | nothing yet: it only ever **sets** the stop marker (from A4a, through Mission Control's stop helper) | clear the marker in normal use, or read anything of Billy's |
+| `billy-stop` (system user, no login) | the control folder `/var/lib/billy-control/` | Mission Control's stop helper (`billy-stop.service`, since A4c): it only ever **sets** the stop marker | clear the marker in normal use, or read anything of Billy's |
+| `mission-control` (system user, no login) | Mission Control's sign-in and events databases in `/var/lib/mission-control/` (mode `700`) | the Mission Control web app (`mission-control.service`, since A4c) | read Billy's key or the Codex sign-in, or set the marker except by asking the stop helper |
 
 | Path | What |
 | --- | --- |
@@ -26,7 +27,7 @@ Two Unix users, so the reviewer can never read the publisher's key (the first ha
 | `~/.local/state/billy/runs/` of each user | a JSON record per step (verdict, findings, PR link; no secrets) |
 | `/var/lib/billy-control/` (`billy-stop` writes, everyone reads) | the stop marker `STOP`, when it is set |
 
-Each publishing step turns the key into a token that lasts at most an hour, is limited to this repository and the three permissions, is never printed, and is revoked when the step ends. Tailscale on the server is the snap package: receive Taildrop files into `/var/snap/tailscale/common/inbox`, not a folder under a home directory. Codex for `agent` is installed through nvm, so its node folder goes on PATH in the launch command.
+Each publishing step turns the key into a token that lasts at most an hour, is limited to this repository and the three permissions, is never printed, and is revoked when the step ends. Tailscale on the server is the official apt package from pkgs.tailscale.com (since 2026-11-21; it replaced the snap, which was too old and too confined to serve a Unix socket), with the same machine identity. Receive Taildrop files with `sudo tailscale file get <folder>`. Codex for `agent` is installed through nvm, so its node folder goes on PATH in the launch command.
 
 ## The handoff: Claude builds, Codex reviews, Billy publishes
 
@@ -73,6 +74,52 @@ sudo rm /var/lib/billy-control/STOP                             # clear: only af
 ```
 
 Setting it by hand is also the way to stop Billy if Mission Control's button is unavailable. `agent` and `billy-pub` can read the folder but not change it: `install.sh` proves this and prints `stop_marker_protected=yes`. It also prints the marker's state and the SHA-256 of every installed file, to compare with the merged commit.
+
+## Mission Control on the server (A4c)
+
+Mission Control ([mission-control.md](mission-control.md), code in `DrZaff/billy-mission-control`) runs on the server for the owner alone, set up by hand on 2026-11-21 to 2026-11-24. Nothing in it runs on a timer.
+
+| What | Where |
+| --- | --- |
+| The app, at a merged commit (root-owned) | `/opt/mission-control/app` (a detached checkout), with its hash-pinned requirements in `/opt/mission-control/venv` |
+| Its settings: names and paths only, no secrets | `/etc/mission-control/app.json` (`mission-control`, mode `600`) and `stopper.json` (`billy-stop`, mode `600`) |
+| Passkeys, sessions and the events log | `/var/lib/mission-control/auth.db` and `events.db` |
+| systemd units | `mission-control.socket` / `.service` and `billy-stop.socket` / `.service` in `/etc/systemd/system/`, plus a drop-in setting `PYTHONUNBUFFERED=1` for each service. Both services are locked down (no network, read-only system, no privileges; `systemd-analyze security` rates each 0.9, "SAFE"). |
+| Sockets (no TCP port) | `/run/mission-control/app.sock` (only `mission-control` and root) and `/run/billy-stop/stop.sock` (only `billy-stop` and the `mission-control` group) |
+| How the phone reaches it | Tailscale Serve: `https://billy.tail26e3d1.ts.net` proxies to `app.sock`, **tailnet only; Funnel off**. Tailscale adds the visitor's login; the app accepts only the owner's, and then asks for a passkey. |
+
+Each service refuses to start unless its start-up checks pass. The same checks run on demand with `selfcheck` (below).
+
+**Owner commands on the server** (run from `/opt/mission-control/app`; `P` is the venv's Python):
+
+```sh
+P=/opt/mission-control/venv/bin/python
+sudo -u mission-control $P -m mission_control selfcheck app --config /etc/mission-control/app.json
+sudo -u billy-stop $P -m mission_control selfcheck stopper --config /etc/mission-control/stopper.json
+sudo -u mission-control $P -m mission_control passkey list --config /etc/mission-control/app.json
+sudo -u mission-control $P -m mission_control passkey enroll --label YubiKey --config /etc/mission-control/app.json   # a one-time code for /enroll, 10 minutes
+sudo -u mission-control $P -m mission_control passkey revoke <id> --config /etc/mission-control/app.json
+sudo -u mission-control $P -m mission_control passkey reset --config /etc/mission-control/app.json   # removes every passkey and session; enroll again
+sudo -u mission-control $P -m mission_control export-events --config /etc/mission-control/app.json --since YYYY-MM-DD --out /tmp/events.jsonl
+```
+
+Keep enrollment codes to yourself: anyone on the tailnet with the owner's login could use one in its 10 minutes.
+
+**Updating to a new merged commit.** There is no written runbook yet, on purpose. Each review of one found another way a pasted block could carry on past a failed check. Until a reviewed upgrade script exists (Remaining setup), each update is a guided session, as for PRs #12 and #13: Claude gives one short step at a time and checks its output before the next. The rules each update keeps:
+
+- **Install only a merge commit on `main`.**
+- **Test it first, with the live venv,** in a throwaway clone.
+- **Don't install a commit that changes `requirements.txt`.** That waits for the script.
+- **Stop both sockets and services before the checkout,** and start them after.
+- **Run both selfchecks.**
+- **Never set or clear the stop marker as part of an update.**
+- **If anything fails, go back to the previous commit,** which runs on the same, untouched venv, before starting the services again.
+
+A restart replaces the Settings page's form token, so reload Settings before pressing a button. Sessions survive a restart.
+
+**Switching it off:** `sudo systemctl disable --now mission-control.socket mission-control.service` and `sudo tailscale serve --https=443 off`. The stop marker commands above still work without it.
+
+**What requests from the server itself carry:** Billy is the owner's own device on the tailnet, so Tailscale labels a request from any account on it with the owner's login. That includes `agent` and `billy-pub`. Without the owner's passkey, they get only the sign-in page (verified below). Tagging the server in Tailscale would remove the label; the owner deferred it on 2026-11-24.
 
 ## Working together
 
@@ -130,6 +177,32 @@ Installed from the merged commit `02470be` (PR #206, issue #205), after `sha256s
 | Marker set (`sudo -u billy-stop touch …/STOP`), then `preflight.py` as `billy-pub` | **Refused** before reading the key: "STOP: Billy is stopped: the stop marker is set. …", exit code 3 |
 | Marker cleared (`sudo rm …/STOP`), then `preflight.py` again | Passed: identity and scope verified, token revoked, exit code 0 |
 
+## Verified: Mission Control on the server (2026-11-23 and 24)
+
+Installed at `64e2cf6` (PR #12 in `billy-mission-control`), then `ecf8d92` (PR #13). Each time, Billy's Python 3.14 ran the full test suite first (307, then 312 tests, OK).
+
+| Check | Result |
+| --- | --- |
+| Start-up checks, as each account | 14 of 14 (app), 8 of 8 (stop helper) |
+| Key isolation: `mission-control` and `billy-stop` cannot read Billy's key or the Codex sign-in | Passed. Each account's `selfcheck` reports `cannot read /var/lib/billy-pub/.config/billy/app.pem: unreachable` and the same for `/home/agent/.codex`; the services refuse to start otherwise. |
+| The events export (`export-events`) | Worked throughout the tests. Each event carries a time, kind, login, path, status and result, and never a code, challenge, key or cookie. |
+| Tailscale Serve | `https://billy.tail26e3d1.ts.net` → `unix:/run/mission-control/app.sock`, tailnet only; Funnel off; the tailnet has only the owner's two devices |
+| A request with no Tailscale login | 403 |
+| iPhone passkey: enroll, then sign in with Face ID | Passed |
+| `agent` and `billy-pub`: the app socket directly, with a forged login header | Refused by the operating system (`curl` exit 7) |
+| `agent` and `billy-pub`: the stop socket directly | Permission denied |
+| `agent` and `billy-pub`: through Tailscale, with a forged login header | 303 to sign-in (Tailscale replaced the header with the real login; no session) |
+| `agent` and `billy-pub`: `POST /stop` through Tailscale | 403 |
+| The stop button | **First refused** (`refused:origin`): under `Referrer-Policy: no-referrer`, browsers send `Origin: null` on a form post. Fixed in PR #12 (`same-origin`). Then: "Billy is stopped", the marker set by `billy-stop`, and `handoff.py review` refused with **exit code 3**. |
+| A restart | The service came back on its socket. The old page's token was refused; the session survived. |
+| The events log made unreadable, then the stop button | Stopped, and the page said "Logging degraded" |
+| The sign-in database made unreadable | Fails closed: the sign-in page, no Settings, no stop button |
+| The stop helper down, then the stop button | "The stop could NOT be confirmed", and no marker |
+| Sign out, then Settings | Back to sign-in; signing in again worked |
+| `passkey reset`, then enroll again | Every passkey and session removed; a new iPhone passkey enrolled and signed in |
+| The helper's journal line for a stop | **First missing** (Python buffered it under systemd). Fixed in PR #13: the helper's log never waits on the journal, and closes the connection first. Now `stop helper: stopped` appears at once. |
+| Home after PR #13 | "Phase A4c", and a link to the stop switch instead of the demo's stop state |
+
 ## Remaining setup
 
 | Step | Who | State |
@@ -138,6 +211,10 @@ Installed from the merged commit `02470be` (PR #206, issue #205), after `sha256s
 | Every Codex finding from the setup reviews (#156, #157, #158) | Claude builds; Codex reviews; owner merges | Done (#166: no findings) |
 | Test ruleset, `billy-test/*` branches and test PRs | Owner | Removed 2026-11-11 |
 | Both `main` rulesets: owner on each bypass list (pull requests only), Billy on neither, CodeQL rule removed | Owner | Done. "Main - Owner Merge Only" (26914500) is **Active** (2026-11-14); "Protect Main - Human Approval Required" (26913560) stays disabled |
+| Mission Control: enroll the backup security key (`passkey enroll --label YubiKey`) | Owner | Open: waiting for the key |
+| Mission Control: see a session end after 30 minutes idle | Owner | Open: check the next time it's opened |
+| Mission Control: a reviewed upgrade script that stops at the first failure. It installs only a merge commit on `main`, tests it first, swaps a new venv when `requirements.txt` changes, rolls back, and never touches the stop marker. Until then, updates are guided sessions, and a commit that changes the requirements isn't installed. | Claude builds; Codex reviews; owner merges | Open |
+| Mission Control: two enrollment-message edge cases (Codex should-fix on `785bcf2`, listed in `billy-mission-control` PR #13) | Claude builds; Codex reviews; owner merges | Open |
 | Digest publisher app, then turning on protection for `main` | Owner | Ruleset on and Billy's negative test passed (above). Still open: the owner's own checks and the first Friday digest push under the ruleset; see phase 4 in [digest-publisher.md](digest-publisher.md) |
 
 Not part of the pilot: unattended runs, timers, issue labels (Billy has no Issues permission), Netlify settings (production auto-publishing was unlocked by the owner on 2026-11-14), and anything in architecture.md's sandbox and credential sections, which apply before any unattended run.
