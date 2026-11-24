@@ -809,14 +809,21 @@ class InstallScript(unittest.TestCase):
                         self.text.index('install -d -o root -g root -m 755 "$RUNS"'))
         proofs = self.text.index('echo "shared_runs_protected=yes"')
         for check in ('could write in $RUNS/$other', 'could write in $RUNS"',
-                      'must not be in the group $RUNS_GROUP', "can't read $d",
+                      'must not be in the group $RUNS_GROUP', 'not an allowed reader',
+                      "can't open a record in $d", 'could change a record in $d',
                       'could write in $d"', 'can read the key"',
                       'can enter or list /home/agent/.codex'):
             self.assertIn(check, self.text)
             self.assertLess(self.text.index(check), proofs, check)
         self.assertIn('for u in agent "$PUB" mission-control "$STOPPER"; do', self.text)
-        # Readers must enter as well as list (Codex, 4ab847b).
-        self.assertIn('{ sudo -u "$u" test -r "$d" && sudo -u "$u" test -x "$d"; } ||', self.text)
+        # Readers are an allow-list, empty until A5a names the fetcher; anyone else in the group
+        # stops the install (Codex, dadd4ce).
+        self.assertIn('READERS=""', self.text)
+        self.assertIn('for u in $members; do\n  case " $READERS " in', self.text)
+        # Each reader opens a real probe record written as Billy writes one (Codex, dadd4ce).
+        self.assertIn('probe="$d/.install-probe-$$.json"', self.text)
+        self.assertIn('sudo -u "$u" cat "$probe"', self.text)
+        self.assertIn('for u in $NEVER_READ $READERS; do', self.text)
         # Effective access is tested for everyone who mustn't read the records, so an ACL can't
         # slip past the group check (Codex, 0508c9a).
         self.assertIn('"mission-control:$RUNS/agent" "mission-control:$RUNS/$PUB"', self.text)

@@ -23,6 +23,10 @@ STOPPER=billy-stop
 CONTROL=/var/lib/billy-control
 RUNS=/var/lib/billy-runs
 RUNS_GROUP=billy-runs
+# The only accounts allowed to read the shared run records: an allow-list, not "everyone in the
+# group but a few" (Codex's review of dadd4ce). Empty until Mission Control's fetcher exists; its
+# phase A5a adds that one account here.
+READERS=""
 # Accounts that must never read the publisher's key or the Codex sign-in, besides agent.
 NEVER_READ="mission-control billy-stop"
 id "$PUB" >/dev/null 2>&1 || useradd --system --home-dir "$PH" --create-home --shell /usr/sbin/nologin "$PUB"
@@ -109,28 +113,42 @@ for pair in "agent:$RUNS/$PUB" "$PUB:$RUNS/agent" \
     echo "STOP: $u can enter or list $d"; exit 1
   fi
 done
-# Every billy-runs member can read the shared records but write none of them. Members are the
-# group's listed members plus every account whose primary group it is (getent lists only the
-# former).
+# billy-runs holds exactly the READERS: the group's listed members plus every account whose
+# primary group it is (getent lists only the former). Anyone else stops the install.
 gid=$(getent group "$RUNS_GROUP" | cut -d: -f3)
 members=$( { getent group "$RUNS_GROUP" | cut -d: -f4 | tr ',' '\n'
              getent passwd | awk -F: -v g="$gid" '$4 == g { print $1 }'; } |
            grep -v '^$' | sort -u | tr '\n' ' ')
 members=${members% }
 for u in $members; do
-  for d in "$RUNS/agent" "$RUNS/$PUB"; do
-    # List and enter both, so it can open a record by name (Codex, 4ab847b: an ACL granting
-    # list alone would pass a read test).
-    { sudo -u "$u" test -r "$d" && sudo -u "$u" test -x "$d"; } ||
-      { echo "STOP: $u can't read $d"; exit 1; }
+  case " $READERS " in
+    *" $u "*) ;;
+    *) echo "STOP: $u is in $RUNS_GROUP but not an allowed reader (READERS in install.sh)"; exit 1 ;;
+  esac
+done
+# Each allowed reader can open a real record, written as Billy writes one, and can write
+# nothing: folder permissions alone can't show a file-level ACL that would block real records
+# (Codex, dadd4ce).
+for u in $READERS; do
+  id "$u" >/dev/null 2>&1 || { echo "STOP: allowed reader $u doesn't exist"; exit 1; }
+  for w in agent "$PUB"; do
+    d="$RUNS/$w"; probe="$d/.install-probe-$$.json"
+    sudo -u "$w" sh -c "umask 022; printf '{}' > '$probe' && chmod 640 '$probe'" ||
+      { echo "STOP: $w couldn't write a probe record in $d"; exit 1; }
+    if ! sudo -u "$u" cat "$probe" >/dev/null 2>&1; then
+      rm -f "$probe"; echo "STOP: $u can't open a record in $d"; exit 1
+    fi
+    if sudo -u "$u" sh -c "printf x >> '$probe'" 2>/dev/null; then
+      rm -f "$probe"; echo "STOP: $u could change a record in $d"; exit 1
+    fi
+    rm -f "$probe"
     if sudo -u "$u" sh -c "touch '$d/.probe-$$'" 2>/dev/null; then
       rm -f "$d/.probe-$$"; echo "STOP: $u could write in $d"; exit 1
     fi
   done
 done
-# Mission Control's accounts, and every billy-runs member, can't read the key or the Codex
-# sign-in.
-for u in $NEVER_READ $members; do
+# Mission Control's accounts, and every allowed reader, can't read the key or the Codex sign-in.
+for u in $NEVER_READ $READERS; do
   id "$u" >/dev/null 2>&1 || continue
   if sudo -u "$u" test -r "$PH/.config/billy/app.pem"; then echo "STOP: $u can read the key"; exit 1; fi
   # Entering is enough to open a known file inside, so test entering as well as listing
@@ -142,7 +160,7 @@ done
 stat -c '%U:%G %a %n' "$PH" "$PH/.config/billy/app.pem" "$PH/.config/billy/app.json" \
   /opt/billy /opt/billy/* /var/lib/billy-reviews /var/lib/billy-sources /home/agent/.codex "$CONTROL" \
   "$RUNS" "$RUNS/agent" "$RUNS/$PUB"
-echo "billy-runs members: ${members:-(none yet; Mission Control's fetcher joins in A5a)}"
+echo "billy-runs readers: ${READERS:-(none yet; Mission Control's fetcher joins in A5a)}"
 if [ -e "$CONTROL/STOP" ] || [ -L "$CONTROL/STOP" ]; then
   echo "stop_marker=SET (Billy refuses every step until the owner clears it)"
 else

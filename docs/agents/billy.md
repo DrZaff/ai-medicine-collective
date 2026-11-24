@@ -88,8 +88,9 @@ Each step's run record is also copied to `/var/lib/billy-runs/<user>/`, so Missi
 
 - **The writers:** `agent` and `billy-pub` can each add files only to their own folder, not to the other's or the parent.
 - **The group:** neither writer, nor Mission Control's web app account, is in `billy-runs`.
-- **The readers:** every member of `billy-runs` can read both folders and write neither. That includes accounts whose primary group it is.
-- **The secrets:** Mission Control's accounts, and every member of `billy-runs`, can read neither the publisher's key nor the Codex sign-in.
+- **The readers:** `billy-runs` holds exactly the accounts named in `READERS` in `install.sh`, counting accounts whose primary group it is. `READERS` is empty until Mission Control's fetcher exists, and its phase A5a adds that one account. Each reader must open a probe record, written as Billy writes one, in both folders, and can change nothing there.
+- **The secrets:** Mission Control's accounts, and every allowed reader, can read neither the publisher's key nor the Codex sign-in, and can't enter the Codex folder.
+- **Real access:** the writers, `mission-control` and `billy-stop` are each tried against the folders they mustn't enter, so access granted any way, an ACL included, stops the install.
 
 ## Mission Control on the server (A4c)
 
