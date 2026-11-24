@@ -96,6 +96,18 @@ for u in agent "$PUB" mission-control; do
     echo "STOP: $u must not be in the group $RUNS_GROUP"; exit 1
   fi
 done
+# Effective access, not just membership: the kernel's own test applies ACLs too, so any extra
+# permission, however it was granted, stops the install (Codex's review of 0508c9a). A writer
+# can't enter the other's folder; Mission Control's other accounts can enter neither.
+for pair in "agent:$RUNS/$PUB" "$PUB:$RUNS/agent" \
+            "mission-control:$RUNS/agent" "mission-control:$RUNS/$PUB" \
+            "$STOPPER:$RUNS/agent" "$STOPPER:$RUNS/$PUB"; do
+  u=${pair%%:*}; d=${pair#*:}
+  id "$u" >/dev/null 2>&1 || continue
+  if sudo -u "$u" test -x "$d" || sudo -u "$u" test -r "$d"; then
+    echo "STOP: $u can enter or list $d"; exit 1
+  fi
+done
 # Every billy-runs member can read the shared records but write none of them. Members are the
 # group's listed members plus every account whose primary group it is (getent lists only the
 # former).

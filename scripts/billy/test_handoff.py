@@ -815,6 +815,14 @@ class InstallScript(unittest.TestCase):
             self.assertIn(check, self.text)
             self.assertLess(self.text.index(check), proofs, check)
         self.assertIn('for u in agent "$PUB" mission-control; do', self.text)
+        # Effective access is tested for everyone who mustn't read the records, so an ACL can't
+        # slip past the group check (Codex, 0508c9a).
+        self.assertIn('"mission-control:$RUNS/agent" "mission-control:$RUNS/$PUB"', self.text)
+        self.assertIn('"agent:$RUNS/$PUB" "$PUB:$RUNS/agent"', self.text)
+        self.assertIn('"$STOPPER:$RUNS/agent" "$STOPPER:$RUNS/$PUB"', self.text)
+        self.assertIn('if sudo -u "$u" test -x "$d" || sudo -u "$u" test -r "$d"; then', self.text)
+        self.assertLess(self.text.index('can enter or list $d"'),
+                        self.text.index('echo "shared_runs_protected=yes"'))
         # Entering the Codex folder is refused as well as listing it (Codex, ae88c51).
         self.assertIn('sudo -u "$u" test -x /home/agent/.codex || '
                       'sudo -u "$u" test -r /home/agent/.codex', self.text)
