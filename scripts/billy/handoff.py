@@ -78,7 +78,11 @@ SOURCE_RE = re.compile(r'^(claude|agent)/[A-Za-z0-9._/-]{1,100}$')
 SHA_RE = re.compile(r'^[0-9a-f]{40}$')
 SECRET_RE = re.compile(r'-----BEGIN [A-Z ]*PRIVATE KEY-----|\bgh[pousr]_[A-Za-z0-9]{20,}|'
                        r'github_pat_[A-Za-z0-9_]{20,}|\bsk-[A-Za-z0-9_-]{20,}|'
-                       r'\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}')
+                       r'\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|'
+                       # The same formats as scripts/checks/site_check.py (Supabase, Resend,
+                       # Postgres URL with a password).
+                       r'sb_secret_[A-Za-z0-9_-]{10,}|\bre_[A-Za-z0-9]{8,}_[A-Za-z0-9]{16,}|'
+                       r'postgres(?:ql)?://[^:\s/]+:[^@\s]+@')
 # Paths whose merge acts outside the code (AGENTS.md, "Never"); listed for the reviewer.
 SENSITIVE = ('.github/', 'netlify.toml', 'supabase/', 'auth.js', 'social/', 'newsletter/',
              'blog/posts/', 'evidence/', 'scripts/')
@@ -218,13 +222,47 @@ def journal(entry):
     share(entry, name)
 
 
+PR_URL_RE = re.compile(r'^https://github\.com/DrZaff/[A-Za-z0-9._-]{1,100}/pull/[0-9]{1,9}$')
+SHARED_FIELDS = {
+    'step': lambda v: v in ('review', 'fetch', 'publish'),
+    'repo': lambda v: v in REPOS,
+    'sha': lambda v: isinstance(v, str) and bool(SHA_RE.match(v)),
+    'merge_base': lambda v: isinstance(v, str) and bool(SHA_RE.match(v)),
+    'main': lambda v: isinstance(v, str) and bool(SHA_RE.match(v)),
+    'pr_head': lambda v: isinstance(v, str) and bool(SHA_RE.match(v)),
+    'source': lambda v: isinstance(v, str) and bool(SOURCE_RE.match(v)),
+    'branch': lambda v: isinstance(v, str) and bool(SOURCE_RE.match(v)),
+    'verdict': lambda v: v in ('no_blocking_findings', 'changes_needed'),
+    'pr': lambda v: isinstance(v, str) and bool(PR_URL_RE.match(v)),
+    'reviewed_at': lambda v: isinstance(v, (int, float)) and not isinstance(v, bool),
+    'fetched_at': lambda v: isinstance(v, (int, float)) and not isinstance(v, bool),
+    'files': lambda v: isinstance(v, int) and not isinstance(v, bool),
+    'via': lambda v: v in ('carried bundle', 'GitHub'),
+    'failed': lambda v: v == 'PR head is not the reviewed commit',
+}
+SEVERITIES = ('blocking', 'should_fix', 'note')
+
+
+def shareable(entry):
+    """What Mission Control may see of a run record: only checked, structured fields. No free
+    text ever leaves (Codex's summary and each finding's problem, reproduction and fix stay in
+    the private record), so a secret in a format SECRET_RE doesn't know has nowhere to ride
+    (Codex's review of 0934d4c). Findings keep their severity only."""
+    out = {k: v for k, v in entry.items() if k in SHARED_FIELDS and SHARED_FIELDS[k](v)}
+    if isinstance(entry.get('findings'), list):
+        out['findings'] = [{'severity': f['severity']} for f in entry['findings']
+                           if isinstance(f, dict) and f.get('severity') in SEVERITIES]
+    out['shared_at'] = time.time()
+    return out
+
+
 def share(entry, name):
-    """Copy a run record to this user's folder under SHARED, for Mission Control to read.
-    Best effort: a copy that can't be written never fails or blocks the step (the stop-marker
-    checks are untouched), and the step says so. Written whole, then renamed, so a reader never
-    sees half a record; never through a symlink; never anything key- or token-shaped."""
-    text = json.dumps(entry, indent=2)
-    if SECRET_RE.search(text):
+    """Copy a run record's checked fields (shareable) to this user's folder under SHARED, for
+    Mission Control to read. Best effort: a copy that can't be written never fails or blocks the
+    step (the stop-marker checks are untouched), and the step says so. Written whole, then
+    renamed, so a reader never sees half a record; never through a symlink."""
+    text = json.dumps(shareable(entry), indent=2)
+    if SECRET_RE.search(text):  # can't happen with checked fields; kept as a second guard
         print('WARNING: the run record looks key- or token-shaped, so no shared copy was made. '
               'The record above is unchanged.')
         return

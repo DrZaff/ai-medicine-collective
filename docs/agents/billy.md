@@ -80,7 +80,7 @@ Setting it by hand is also the way to stop Billy if Mission Control's button is 
 
 Each step's run record is also copied to `/var/lib/billy-runs/<user>/`, so Mission Control can show Billy's real runs (issue #228, phase A5):
 
-- **What's copied:** the same JSON as the record under `~/.local/state/billy/runs/`, with no secrets by design. A record that looks key- or token-shaped is not copied.
+- **What's copied: only checked, structured fields.** The step, repository, source and `agent/` branches, SHAs, verdict, each finding's severity, PR link, times and file count. Each one is checked against its expected form, and anything else is dropped. No free text leaves, not even Codex's summary or a finding's problem or fix, so a secret in a format the filter doesn't know has nowhere to ride. The private record under `~/.local/state/billy/runs/` keeps everything.
 - **How it's written:** whole and then renamed, so a reader never sees half a record, and never through a symlink.
 - **Best effort:** a copy that can't be written (the folder is missing, say) never fails or blocks a step, and the step prints a `WARNING` saying so. The stop marker is checked exactly as before.
 
@@ -88,7 +88,7 @@ Each step's run record is also copied to `/var/lib/billy-runs/<user>/`, so Missi
 
 - **The writers:** `agent` and `billy-pub` can each add files only to their own folder, not to the other's or the parent.
 - **The group:** neither writer, nor Mission Control's web app account, is in `billy-runs`.
-- **The readers:** every member of `billy-runs` can read both folders and write neither.
+- **The readers:** every member of `billy-runs` can read both folders and write neither. That includes accounts whose primary group it is.
 - **The secrets:** Mission Control's accounts, and every member of `billy-runs`, can read neither the publisher's key nor the Codex sign-in.
 
 ## Mission Control on the server (A4c)

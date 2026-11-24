@@ -96,8 +96,14 @@ for u in agent "$PUB" mission-control; do
     echo "STOP: $u must not be in the group $RUNS_GROUP"; exit 1
   fi
 done
-# Every billy-runs member can read the shared records but write none of them.
-members=$(getent group "$RUNS_GROUP" | cut -d: -f4 | tr ',' ' ')
+# Every billy-runs member can read the shared records but write none of them. Members are the
+# group's listed members plus every account whose primary group it is (getent lists only the
+# former).
+gid=$(getent group "$RUNS_GROUP" | cut -d: -f3)
+members=$( { getent group "$RUNS_GROUP" | cut -d: -f4 | tr ',' '\n'
+             getent passwd | awk -F: -v g="$gid" '$4 == g { print $1 }'; } |
+           grep -v '^$' | sort -u | tr '\n' ' ')
+members=${members% }
 for u in $members; do
   for d in "$RUNS/agent" "$RUNS/$PUB"; do
     sudo -u "$u" test -r "$d" || { echo "STOP: $u can't read $d"; exit 1; }

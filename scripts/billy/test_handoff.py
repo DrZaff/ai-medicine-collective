@@ -69,7 +69,10 @@ class SharedCopy(unittest.TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
         self.entry = {'step': 'review', 'repo': 'ai-medicine-collective', 'sha': 'a' * 40,
-                      'verdict': 'no_blocking_findings', 'findings': [], 'summary': 's'}
+                      'source': 'claude/x', 'merge_base': 'b' * 40, 'reviewed_at': 1.5,
+                      'verdict': 'changes_needed', 'summary': 'free text',
+                      'findings': [{'severity': 'blocking', 'file': 'a.py', 'line': 3,
+                                    'problem': 'p', 'reproduce': 'r', 'fix': 'f'}]}
 
     def journal(self, entry):
         out = io.StringIO()
@@ -77,21 +80,58 @@ class SharedCopy(unittest.TestCase):
             handoff.journal(entry)
         return out.getvalue()
 
-    def test_the_copy_is_the_record(self):
+    def shared_copy(self):
+        [record] = os.listdir(self.mine)  # one copy, no temp file left
+        with open(os.path.join(self.mine, record)) as f:
+            return record, json.load(f)
+
+    def test_the_copy_has_the_records_checked_fields(self):
         out = self.journal(self.entry)
         [record] = os.listdir(handoff.JOURNAL)
-        self.assertEqual(os.listdir(self.mine), [record])  # one copy, same name, no temp file
-        with open(os.path.join(handoff.JOURNAL, record)) as a, \
-                open(os.path.join(self.mine, record)) as b:
-            self.assertEqual(json.load(a), json.load(b))
-        self.assertEqual(os.stat(os.path.join(self.mine, record)).st_mode & 0o777, 0o640)
+        name, copy = self.shared_copy()
+        self.assertEqual(name, record)
+        self.assertEqual(os.stat(os.path.join(self.mine, name)).st_mode & 0o777, 0o640)
+        shared_at = copy.pop('shared_at')
+        self.assertIsInstance(shared_at, float)
+        self.assertEqual(copy, {'step': 'review', 'repo': 'ai-medicine-collective',
+                                'sha': 'a' * 40, 'source': 'claude/x', 'merge_base': 'b' * 40,
+                                'reviewed_at': 1.5, 'verdict': 'changes_needed',
+                                'findings': [{'severity': 'blocking'}]})
         self.assertIn('INFO: shared copy in', out)
 
-    def test_a_key_shaped_record_is_never_shared(self):
-        out = self.journal(dict(self.entry, summary='ghp_' + 'x' * 30))
-        self.assertEqual(os.listdir(self.mine), [])
-        self.assertEqual(len(os.listdir(handoff.JOURNAL)), 1)  # the record itself is unchanged
-        self.assertIn('no shared copy was made', out)
+    def test_no_free_text_is_ever_shared(self):
+        # Codex's review of 0934d4c (blocking): free text could carry a secret in a format the
+        # filter doesn't know. Only checked fields leave; the private record keeps the rest.
+        unknown = 'zz_unknownformat_' + 'Q' * 40
+        entry = dict(self.entry, summary=unknown, branch='agent/x; ' + unknown,
+                     pr='https://evil.example/' + unknown, files='3', via=unknown,
+                     failed=unknown, extra=unknown)
+        entry['findings'] = [{'severity': 'note', 'problem': unknown},
+                             {'severity': unknown}, 'not a dict']
+        self.journal(entry)
+        _, copy = self.shared_copy()
+        self.assertNotIn(unknown, json.dumps(copy))
+        self.assertEqual(copy['findings'], [{'severity': 'note'}])
+        for gone in ('summary', 'branch', 'pr', 'files', 'via', 'failed', 'extra'):
+            self.assertNotIn(gone, copy, gone)
+        [record] = os.listdir(handoff.JOURNAL)
+        with open(os.path.join(handoff.JOURNAL, record)) as f:
+            self.assertIn(unknown, f.read())  # the private record itself is unchanged
+
+    def test_publish_and_fetch_records_keep_their_fields(self):
+        url = 'https://github.com/DrZaff/ai-medicine-collective/pull/12'
+        self.journal({'step': 'publish', 'repo': 'ai-medicine-collective', 'sha': 'a' * 40,
+                      'source': 'claude/x', 'branch': 'agent/x-aaaaaaa', 'pr': url,
+                      'pr_head': 'a' * 40, 'failed': 'PR head is not the reviewed commit'})
+        _, copy = self.shared_copy()
+        self.assertEqual(copy['pr'], url)
+        self.assertEqual(copy['branch'], 'agent/x-aaaaaaa')
+        self.assertEqual(copy['failed'], 'PR head is not the reviewed commit')
+
+    def test_the_filter_knows_the_site_checkers_formats(self):
+        for secret in ('sb_secret_' + 'a' * 20, 're_' + 'a' * 8 + '_' + 'b' * 16,
+                       'postgresql://user:' + 'pw@host/db'):  # split so the site checker doesn't flag it
+            self.assertTrue(handoff.SECRET_RE.search('x ' + secret + ' y'), secret)
 
     def test_a_missing_folder_never_fails_the_step(self):
         shutil.rmtree(self.mine)
@@ -751,6 +791,8 @@ class InstallScript(unittest.TestCase):
             self.assertIn(check, self.text)
             self.assertLess(self.text.index(check), proofs, check)
         self.assertIn('for u in agent "$PUB" mission-control; do', self.text)
+        # Members include accounts whose primary group is billy-runs (Codex, 0934d4c).
+        self.assertIn("getent passwd | awk -F: -v g=\"$gid\" '$4 == g { print $1 }'", self.text)
         self.assertIn('NEVER_READ="mission-control billy-stop"', self.text)
 
     def test_shell_syntax(self):
