@@ -26,6 +26,7 @@ Two Unix users, so the reviewer can never read the publisher's key (the first ha
 | `/var/lib/billy-sources/` (`billy-pub` writes, `agent` reads) | a git bundle of a private repository's commit, for the reviewer |
 | `~/.local/state/billy/runs/` of each user | a JSON record per step (verdict, findings, PR link; no secrets) |
 | `/var/lib/billy-control/` (`billy-stop` writes, everyone reads) | the stop marker `STOP`, when it is set |
+| `/var/lib/billy-runs/agent/` and `/var/lib/billy-runs/billy-pub/` (each writer its own, mode `2750`; group `billy-runs` reads) | a read-only copy of each run record, for Mission Control's fetcher (issue #228). Only members of `billy-runs` can read them, and only the fetcher joins it (A5a). Neither writer can touch the other's. |
 
 Each publishing step turns the key into a token that lasts at most an hour, is limited to this repository and the three permissions, is never printed, and is revoked when the step ends. Tailscale on the server is the official apt package from pkgs.tailscale.com (since 2026-11-21; it replaced the snap, which was too old and too confined to serve a Unix socket), with the same machine identity. Receive Taildrop files with `sudo tailscale file get`, followed by the folder to put them in. Codex for `agent` is installed through nvm, so its node folder goes on PATH in the launch command.
 
@@ -74,6 +75,21 @@ sudo rm /var/lib/billy-control/STOP                             # clear: only af
 ```
 
 Setting it by hand is also the way to stop Billy if Mission Control's button is unavailable. `agent` and `billy-pub` can read the folder but not change it: `install.sh` proves this and prints `stop_marker_protected=yes`. It also prints the marker's state and the SHA-256 of every installed file, to compare with the merged commit.
+
+## Shared run records (for Mission Control)
+
+Each step's run record is also copied to `/var/lib/billy-runs/<user>/`, so Mission Control can show Billy's real runs (issue #228, phase A5):
+
+- **What's copied:** the same JSON as the record under `~/.local/state/billy/runs/`, with no secrets by design. A record that looks key- or token-shaped is not copied.
+- **How it's written:** whole and then renamed, so a reader never sees half a record, and never through a symlink.
+- **Best effort:** a copy that can't be written (the folder is missing, say) never fails or blocks a step, and the step prints a `WARNING` saying so. The stop marker is checked exactly as before.
+
+**What `install.sh` proves, and prints `shared_runs_protected=yes` and `mission_control_cannot_read_key=yes` for:**
+
+- **The writers:** `agent` and `billy-pub` can each add files only to their own folder, not to the other's or the parent.
+- **The group:** neither writer, nor Mission Control's web app account, is in `billy-runs`.
+- **The readers:** every member of `billy-runs` can read both folders and write neither.
+- **The secrets:** Mission Control's accounts, and every member of `billy-runs`, can read neither the publisher's key nor the Codex sign-in.
 
 ## Mission Control on the server (A4c)
 
@@ -215,7 +231,7 @@ Installed at `64e2cf6` (PR #12 in `billy-mission-control`), then `ecf8d92` (PR #
 | Mission Control: enroll the backup security key (`passkey enroll --label YubiKey`) | Owner | Open: waiting for the key |
 | Mission Control: see a session end after 30 minutes idle | Owner | Open: check the next time it's opened |
 | Mission Control: a reviewed upgrade script that stops at the first failure. It installs only a merge commit on `main`, tests it first, swaps a new venv when `requirements.txt` changes, rolls back, and never touches the stop marker. Until then, updates are guided sessions, and a commit that changes the requirements isn't installed. | Claude builds; Codex reviews; owner merges | Open |
-| Mission Control: two enrollment-message edge cases (Codex should-fix on `785bcf2`, listed in `billy-mission-control` PR #13) | Claude builds; Codex reviews; owner merges | In review (`claude/a4c-enroll-edges`) |
+| Mission Control: two enrollment-message edge cases (Codex should-fix on `785bcf2`, listed in `billy-mission-control` PR #13) | Claude builds; Codex reviews; owner merges | Done (`billy-mission-control` PR #14, installed 2026-11-24) |
 | Digest publisher app, then turning on protection for `main` | Owner | Ruleset on and Billy's negative test passed (above). Still open: the owner's own checks and the first Friday digest push under the ruleset; see phase 4 in [digest-publisher.md](digest-publisher.md) |
 
 Not part of the pilot: unattended runs, timers, issue labels (Billy has no Issues permission), Netlify settings (production auto-publishing was unlocked by the owner on 2026-11-14), and anything in architecture.md's sandbox and credential sections, which apply before any unattended run.

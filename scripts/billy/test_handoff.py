@@ -39,13 +39,92 @@ def setUpModule():
                         ('TRUSTED_UIDS', (0, os.getuid()))):
         _SAVED[name] = getattr(p, name)
         setattr(p, name, value)
+    # The shared run-record folder (issue #228): a folder of the test user's own, never the real
+    # one.
+    shared = Path(root) / 'shared'
+    (shared / ME).mkdir(parents=True, mode=0o750)
+    _SAVED['handoff.SHARED'] = handoff.SHARED
+    handoff.SHARED = str(shared)
     _SAVED['root'] = root
 
 
 def tearDownModule():
     shutil.rmtree(_SAVED.pop('root'), ignore_errors=True)
+    handoff.SHARED = _SAVED.pop('handoff.SHARED')
     for name, value in _SAVED.items():
         setattr(p, name, value)
+
+class SharedCopy(unittest.TestCase):
+    """Issue #228: each run record is also copied, read-only, for Mission Control. A copy that
+    can't be made never fails the step."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.shared = os.path.join(self.tmp, 'shared')
+        self.mine = os.path.join(self.shared, ME)
+        os.makedirs(self.mine, mode=0o750)
+        for name, value in (('SHARED', self.shared), ('JOURNAL', os.path.join(self.tmp, 'j'))):
+            patcher = mock.patch.object(handoff, name, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        self.entry = {'step': 'review', 'repo': 'ai-medicine-collective', 'sha': 'a' * 40,
+                      'verdict': 'no_blocking_findings', 'findings': [], 'summary': 's'}
+
+    def journal(self, entry):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            handoff.journal(entry)
+        return out.getvalue()
+
+    def test_the_copy_is_the_record(self):
+        out = self.journal(self.entry)
+        [record] = os.listdir(handoff.JOURNAL)
+        self.assertEqual(os.listdir(self.mine), [record])  # one copy, same name, no temp file
+        with open(os.path.join(handoff.JOURNAL, record)) as a, \
+                open(os.path.join(self.mine, record)) as b:
+            self.assertEqual(json.load(a), json.load(b))
+        self.assertEqual(os.stat(os.path.join(self.mine, record)).st_mode & 0o777, 0o640)
+        self.assertIn('INFO: shared copy in', out)
+
+    def test_a_key_shaped_record_is_never_shared(self):
+        out = self.journal(dict(self.entry, summary='ghp_' + 'x' * 30))
+        self.assertEqual(os.listdir(self.mine), [])
+        self.assertEqual(len(os.listdir(handoff.JOURNAL)), 1)  # the record itself is unchanged
+        self.assertIn('no shared copy was made', out)
+
+    def test_a_missing_folder_never_fails_the_step(self):
+        shutil.rmtree(self.mine)
+        out = self.journal(self.entry)
+        self.assertIn('WARNING: no shared copy', out)
+        self.assertEqual(len(os.listdir(handoff.JOURNAL)), 1)
+
+    def test_a_file_in_place_of_the_folder_never_fails_the_step(self):
+        shutil.rmtree(self.mine)
+        Path(self.mine).write_text('not a folder')
+        out = self.journal(self.entry)
+        self.assertIn('WARNING: no shared copy', out)
+
+    def test_a_symlinked_folder_is_never_followed(self):
+        elsewhere = os.path.join(self.tmp, 'elsewhere')
+        os.makedirs(elsewhere)
+        shutil.rmtree(self.mine)
+        os.symlink(elsewhere, self.mine)
+        out = self.journal(self.entry)
+        self.assertEqual(os.listdir(elsewhere), [])
+        self.assertIn('WARNING: no shared copy', out)
+
+    def test_a_planted_temp_file_is_never_overwritten(self):
+        # O_EXCL: something already at the temp name (a link to elsewhere, say) is refused.
+        target = os.path.join(self.tmp, 'target')
+        Path(target).write_text('untouched')
+        with mock.patch.object(handoff.time, 'strftime', return_value='20260101-000000'):
+            name = '20260101-000000-%d-%s.json' % (os.getpid(), 'a' * 12)
+            os.symlink(target, os.path.join(self.mine, '.' + name + '.tmp'))
+            out = self.journal(self.entry)
+        self.assertEqual(Path(target).read_text(), 'untouched')
+        self.assertIn('WARNING: no shared copy', out)
+
 
 URL = 'https://github.com/DrZaff/ai-medicine-collective/pull/999'
 PRIVATE = 'test-private'  # a stand-in private repository, listed only during tests
@@ -650,7 +729,29 @@ class InstallScript(unittest.TestCase):
     def test_prints_the_marker_state_and_fingerprints(self):
         self.assertIn('stop_marker=SET', self.text)
         self.assertIn('sha256sum /opt/billy/*', self.text)
-        self.assertTrue(self.text.rstrip().endswith('echo "stop_marker_protected=yes"'))
+        # The "yes" lines come last, after every check that could stop the script.
+        tail = self.text.rstrip().splitlines()[-4:]
+        self.assertEqual(tail, ['echo "agent_cannot_read_key=yes"',
+                                'echo "stop_marker_protected=yes"',
+                                'echo "shared_runs_protected=yes"',
+                                'echo "mission_control_cannot_read_key=yes"'])
+
+    def test_shares_run_records_safely(self):
+        # Issue #228: one folder per writer, setgid to billy-runs, never through a symlink.
+        self.assertIn('RUNS=/var/lib/billy-runs', self.text)
+        self.assertIn('install -d -o agent -g "$RUNS_GROUP" -m 2750 "$RUNS/agent"', self.text)
+        self.assertIn('install -d -o "$PUB" -g "$RUNS_GROUP" -m 2750 "$RUNS/$PUB"', self.text)
+        self.assertIn('install -d -o root -g root -m 755 "$RUNS"', self.text)
+        self.assertLess(self.text.index('is a symlink"; exit 1; }\ndone'),
+                        self.text.index('install -d -o root -g root -m 755 "$RUNS"'))
+        proofs = self.text.index('echo "shared_runs_protected=yes"')
+        for check in ('could write in $RUNS/$other', 'could write in $RUNS"',
+                      'must not be in the group $RUNS_GROUP', "can't read $d",
+                      'could write in $d"', 'can read the key"', 'can list /home/agent/.codex'):
+            self.assertIn(check, self.text)
+            self.assertLess(self.text.index(check), proofs, check)
+        self.assertIn('for u in agent "$PUB" mission-control; do', self.text)
+        self.assertIn('NEVER_READ="mission-control billy-stop"', self.text)
 
     def test_shell_syntax(self):
         here = os.path.dirname(os.path.abspath(__file__))

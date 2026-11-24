@@ -35,11 +35,13 @@ This host runs no repository code: Claude runs the AGENTS.md checks before handi
 Site checks run on the PR, which stays a draft until they pass.
 """
 import argparse
+import contextlib
 import json
 import os
 import pwd
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -66,6 +68,9 @@ RECORDS = '/var/lib/billy-reviews'
 HOME = pwd.getpwuid(os.getuid()).pw_dir
 WORK = os.path.join(HOME, '.cache', 'billy-handoff')
 JOURNAL = os.path.join(HOME, '.local', 'state', 'billy', 'runs')
+# A read-only copy of each run record for Mission Control's fetcher (issue #228): one folder per
+# writer, owned by it, setgid to the group billy-runs, which only the fetcher joins.
+SHARED = '/var/lib/billy-runs'
 REVIEWER, PUBLISHER = 'agent', 'billy-pub'
 KEY_PATHS = ('/var/lib/billy-pub/.config/billy/app.pem', '/home/agent/.config/billy/app.pem')
 PUSH_PREFIX = 'refs/heads/agent/'
@@ -205,11 +210,46 @@ def record_path(sha):
 
 def journal(entry):
     os.makedirs(JOURNAL, mode=0o700, exist_ok=True)
-    path = os.path.join(JOURNAL, '%s-%d-%s.json' % (time.strftime('%Y%m%d-%H%M%S'), os.getpid(),
-                                                   entry['sha'][:12]))
+    name = '%s-%d-%s.json' % (time.strftime('%Y%m%d-%H%M%S'), os.getpid(), entry['sha'][:12])
+    path = os.path.join(JOURNAL, name)
     with open(path, 'w') as f:
         json.dump(entry, f, indent=2)
     print('INFO: run recorded in ' + path)
+    share(entry, name)
+
+
+def share(entry, name):
+    """Copy a run record to this user's folder under SHARED, for Mission Control to read.
+    Best effort: a copy that can't be written never fails or blocks the step (the stop-marker
+    checks are untouched), and the step says so. Written whole, then renamed, so a reader never
+    sees half a record; never through a symlink; never anything key- or token-shaped."""
+    text = json.dumps(entry, indent=2)
+    if SECRET_RE.search(text):
+        print('WARNING: the run record looks key- or token-shaped, so no shared copy was made. '
+              'The record above is unchanged.')
+        return
+    user = pwd.getpwuid(os.getuid()).pw_name
+    folder = os.path.join(SHARED, user)
+    tmp = os.path.join(folder, '.' + name + '.tmp')
+    try:
+        info = os.lstat(folder)
+        if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid():
+            raise OSError('%s is not a folder of %s' % (folder, user))
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o640)
+        try:
+            with os.fdopen(fd, 'w') as f:
+                f.write(text)
+            os.chmod(tmp, 0o640)
+            os.replace(tmp, os.path.join(folder, name))
+        except BaseException:
+            with contextlib.suppress(OSError):
+                os.unlink(tmp)
+            raise
+    except OSError as error:
+        print('WARNING: no shared copy for Mission Control (%s). The step is unaffected and '
+              'the record above is unchanged.' % (error.strerror or error))
+        return
+    print('INFO: shared copy in ' + os.path.join(folder, name))
 
 
 # ---------------------------------------------------------------- review (as agent)

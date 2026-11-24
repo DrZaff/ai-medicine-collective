@@ -8,6 +8,9 @@
 #   billy-pub  holds the key in /var/lib/billy-pub/.config/billy; never runs Codex
 #   billy-stop owns /var/lib/billy-control and only ever sets the stop marker STOP there;
 #              agent and billy-pub can read it but never set, replace or clear it
+# Each step also leaves a read-only copy of its run record in /var/lib/billy-runs/<user>/ for
+# Mission Control (issue #228). Only members of the group billy-runs (Mission Control's fetcher,
+# added in its phase A5a) can read them; agent and billy-pub can't touch each other's.
 # The scripts live root-owned in /opt/billy, so neither user can change them.
 set -eu
 [ "$(id -u)" = 0 ] || { echo "STOP: run with sudo"; exit 1; }
@@ -18,6 +21,10 @@ OLD=/home/agent/.config/billy
 
 STOPPER=billy-stop
 CONTROL=/var/lib/billy-control
+RUNS=/var/lib/billy-runs
+RUNS_GROUP=billy-runs
+# Accounts that must never read the publisher's key or the Codex sign-in, besides agent.
+NEVER_READ="mission-control billy-stop"
 id "$PUB" >/dev/null 2>&1 || useradd --system --home-dir "$PH" --create-home --shell /usr/sbin/nologin "$PUB"
 chmod 700 "$PH"
 install -d -o "$PUB" -g "$PUB" -m 700 "$PH/.config" "$PH/.config/billy" "$PH/.cache"
@@ -45,6 +52,14 @@ id "$STOPPER" >/dev/null 2>&1 || useradd --system --no-create-home --home-dir /n
   --shell /usr/sbin/nologin "$STOPPER"
 [ ! -L "$CONTROL" ] || { echo "STOP: $CONTROL is a symlink"; exit 1; }
 install -d -o "$STOPPER" -g "$STOPPER" -m 755 "$CONTROL"
+# Shared run records: one folder per writer, setgid so each copy belongs to billy-runs.
+getent group "$RUNS_GROUP" >/dev/null || groupadd --system "$RUNS_GROUP"
+for d in "$RUNS" "$RUNS/agent" "$RUNS/$PUB"; do
+  [ ! -L "$d" ] || { echo "STOP: $d is a symlink"; exit 1; }
+done
+install -d -o root -g root -m 755 "$RUNS"
+install -d -o agent -g "$RUNS_GROUP" -m 2750 "$RUNS/agent"
+install -d -o "$PUB" -g "$RUNS_GROUP" -m 2750 "$RUNS/$PUB"
 # Old copies in agent's home are replaced by /opt/billy.
 rm -rf /home/agent/.local/lib/billy
 chmod 700 /home/agent/.codex 2>/dev/null || true
@@ -61,8 +76,49 @@ for u in agent "$PUB"; do
     rm -f "$probe"; echo "STOP: $u could create a file in $CONTROL"; exit 1
   fi
 done
+# Shared run records: each writer can add to its own folder only; the other can't write there.
+for pair in "agent:$PUB" "$PUB:agent"; do
+  u=${pair%%:*}; other=${pair#*:}
+  probe="$RUNS/$u/.probe-$$"
+  sudo -u "$u" sh -c "touch '$probe'" 2>/dev/null || { echo "STOP: $u can't write $RUNS/$u"; exit 1; }
+  rm -f "$probe"
+  if sudo -u "$u" sh -c "touch '$RUNS/$other/.probe-$$'" 2>/dev/null; then
+    rm -f "$RUNS/$other/.probe-$$"; echo "STOP: $u could write in $RUNS/$other"; exit 1
+  fi
+  if sudo -u "$u" sh -c "touch '$RUNS/.probe-$$'" 2>/dev/null; then
+    rm -f "$RUNS/.probe-$$"; echo "STOP: $u could write in $RUNS"; exit 1
+  fi
+done
+# Neither writer is in billy-runs (it would let each read the other's records), and neither is
+# Mission Control's web app account: only the fetcher joins it, in phase A5a.
+for u in agent "$PUB" mission-control; do
+  if id -nG "$u" 2>/dev/null | tr ' ' '\n' | grep -qx "$RUNS_GROUP"; then
+    echo "STOP: $u must not be in the group $RUNS_GROUP"; exit 1
+  fi
+done
+# Every billy-runs member can read the shared records but write none of them.
+members=$(getent group "$RUNS_GROUP" | cut -d: -f4 | tr ',' ' ')
+for u in $members; do
+  for d in "$RUNS/agent" "$RUNS/$PUB"; do
+    sudo -u "$u" test -r "$d" || { echo "STOP: $u can't read $d"; exit 1; }
+    if sudo -u "$u" sh -c "touch '$d/.probe-$$'" 2>/dev/null; then
+      rm -f "$d/.probe-$$"; echo "STOP: $u could write in $d"; exit 1
+    fi
+  done
+done
+# Mission Control's accounts, and every billy-runs member, can't read the key or the Codex
+# sign-in.
+for u in $NEVER_READ $members; do
+  id "$u" >/dev/null 2>&1 || continue
+  if sudo -u "$u" test -r "$PH/.config/billy/app.pem"; then echo "STOP: $u can read the key"; exit 1; fi
+  if sudo -u "$u" ls /home/agent/.codex >/dev/null 2>&1; then
+    echo "STOP: $u can list /home/agent/.codex"; exit 1
+  fi
+done
 stat -c '%U:%G %a %n' "$PH" "$PH/.config/billy/app.pem" "$PH/.config/billy/app.json" \
-  /opt/billy /opt/billy/* /var/lib/billy-reviews /var/lib/billy-sources /home/agent/.codex "$CONTROL"
+  /opt/billy /opt/billy/* /var/lib/billy-reviews /var/lib/billy-sources /home/agent/.codex "$CONTROL" \
+  "$RUNS" "$RUNS/agent" "$RUNS/$PUB"
+echo "billy-runs members: ${members:-(none yet; Mission Control's fetcher joins in A5a)}"
 if [ -e "$CONTROL/STOP" ] || [ -L "$CONTROL/STOP" ]; then
   echo "stop_marker=SET (Billy refuses every step until the owner clears it)"
 else
@@ -72,3 +128,5 @@ echo "Installed files (compare with the merged commit):"
 sha256sum /opt/billy/*
 echo "agent_cannot_read_key=yes"
 echo "stop_marker_protected=yes"
+echo "shared_runs_protected=yes"
+echo "mission_control_cannot_read_key=yes"
