@@ -105,70 +105,32 @@ sudo -u mission-control $P -m mission_control export-events --config /etc/missio
 
 Keep enrollment codes to yourself: anyone on the tailnet with the owner's login could use one in its 10 minutes.
 
-**Updating to a new merged commit.** Nothing live changes until the new commit has passed its tests in the environment it will run in, and every step after the stop can be undone. Run the steps in one terminal session, so `PREV` and `NEW` stay set.
+**Updating to a new merged commit** (as done for PRs #12 and #13). This covers only a commit whose `requirements.txt` is unchanged, so the live venv is never touched. A commit that changes the requirements is a separate task: it needs a reviewed upgrade script first, which doesn't exist yet. The procedure never sets or clears the stop marker. Run it in one terminal session, and stop at the first line that doesn't show what its comment says:
 
-1. **Note what's running, and the new commit:**
-   ```sh
-   PREV=$(sudo git -C /opt/mission-control/app rev-parse HEAD)
-   NEW=<the merge commit's full SHA>
-   ```
-2. **Compare the requirements, in a throwaway clone, as yourself:**
-   ```sh
-   rm -rf ~/mc-test && git clone -q https://github.com/DrZaff/billy-mission-control ~/mc-test
-   git -C ~/mc-test checkout -q --detach "$NEW"
-   git -C ~/mc-test diff --quiet "$PREV" "$NEW" -- requirements.txt && echo unchanged || echo CHANGED
-   ```
-3. **Test in the environment it will run in:**
-   - **Unchanged:** `cd ~/mc-test && /opt/mission-control/venv/bin/python dev.py test`
-   - **CHANGED:** build a new venv beside the live one, then test with it. First make sure no `venv.new`, `venv.prev` or `venv.failed` is left from an earlier update (delete any that are):
-     ```sh
-     ls -d /opt/mission-control/venv.* 2>/dev/null   # must print nothing
-     sudo python3 -m venv /opt/mission-control/venv.new
-     sudo /opt/mission-control/venv.new/bin/python -m pip install -q --require-hashes -r ~/mc-test/requirements.txt
-     /opt/mission-control/venv.new/bin/python ~/mc-test/tools/audit_deps.py ~/mc-test/requirements.txt
-     cd ~/mc-test && /opt/mission-control/venv.new/bin/python dev.py test
-     ```
-   - Stop here if anything fails; nothing live has changed. Remove `venv.new` if you made it.
-4. **Note whether Billy is already stopped,** so the test in step 7 never lifts a deliberate stop: `ls /var/lib/billy-control/`. If `STOP` is listed, leave it.
-5. **Stop both apps, sockets included,** so nothing can start mid-change:
-   ```sh
-   sudo systemctl stop mission-control.socket mission-control.service billy-stop.socket billy-stop.service
-   ```
-   From here until step 7 passes, the stop button is unavailable; the marker commands above still work.
-6. **Swap:**
-   ```sh
-   sudo git -C /opt/mission-control/app fetch -q origin main
-   sudo git -C /opt/mission-control/app checkout -q --detach "$NEW"
-   sudo git -C /opt/mission-control/app rev-parse HEAD           # must equal $NEW
-   sudo git -C /opt/mission-control/app status --porcelain       # must print nothing
-   # only if you built venv.new in step 3:
-   sudo mv -T /opt/mission-control/venv /opt/mission-control/venv.prev && sudo mv -T /opt/mission-control/venv.new /opt/mission-control/venv
-   ```
-7. **Start and check:**
-   ```sh
-   sudo systemctl start billy-stop.socket mission-control.socket
-   cd /opt/mission-control/app
-   sudo -u mission-control /opt/mission-control/venv/bin/python -m mission_control selfcheck app --config /etc/mission-control/app.json
-   sudo -u billy-stop /opt/mission-control/venv/bin/python -m mission_control selfcheck stopper --config /etc/mission-control/stopper.json
-   ```
-   **Only if step 4 showed no `STOP`:**
-   - Press the stop button once from the phone.
-   - Check that `ls /var/lib/billy-control/` shows `STOP`, then clear it with `sudo rm /var/lib/billy-control/STOP`.
+```sh
+PREV=$(sudo git -C /opt/mission-control/app rev-parse HEAD); NEW=<the merge commit's full SHA>
+rm -rf ~/mc-test && git clone -q https://github.com/DrZaff/billy-mission-control ~/mc-test && git -C ~/mc-test checkout -q --detach "$NEW" && echo clone-ok   # clone-ok
+git -C ~/mc-test diff --quiet "$PREV" "$NEW" -- requirements.txt; echo "requirements diff exit=$?"   # 0 = unchanged; 1 = changed or anything else = error: stop
+(cd ~/mc-test && /opt/mission-control/venv/bin/python dev.py test)    # ends with OK; nothing live has changed so far
+sudo systemctl stop mission-control.socket mission-control.service billy-stop.socket billy-stop.service
+sudo git -C /opt/mission-control/app fetch -q origin main && sudo git -C /opt/mission-control/app checkout -q --detach "$NEW" && echo checkout-ok   # checkout-ok
+sudo git -C /opt/mission-control/app rev-parse HEAD; sudo git -C /opt/mission-control/app status --porcelain   # $NEW, then nothing
+sudo systemctl start billy-stop.socket mission-control.socket
+cd /opt/mission-control/app
+sudo -u mission-control /opt/mission-control/venv/bin/python -m mission_control selfcheck app --config /etc/mission-control/app.json        # all PASS
+sudo -u billy-stop /opt/mission-control/venv/bin/python -m mission_control selfcheck stopper --config /etc/mission-control/stopper.json   # all PASS
+cd ~ && rm -rf ~/mc-test
+```
 
-   If `STOP` was there before, skip this test: the marker is yours, and stays.
-8. **Roll back** if anything from step 6 on fails. These commands work whichever parts of the swap had happened (`mv -T` only renames, and refuses to move a folder into another):
-   ```sh
-   sudo systemctl stop mission-control.socket mission-control.service billy-stop.socket billy-stop.service
-   sudo git -C /opt/mission-control/app checkout -q --detach "$PREV"
-   if sudo test -d /opt/mission-control/venv.prev; then
-     if sudo test -e /opt/mission-control/venv; then sudo mv -T /opt/mission-control/venv /opt/mission-control/venv.failed; fi
-     sudo mv -T /opt/mission-control/venv.prev /opt/mission-control/venv
-   fi
-   sudo systemctl start billy-stop.socket mission-control.socket
-   ```
-   Then run both selfchecks as in step 7.
+Between the `stop` and the `start`, the stop button is unavailable; the marker commands above still work. If anything after the `stop` fails, go back to the previous commit, which runs on the same, untouched venv:
 
-Finally, `rm -rf ~/mc-test`. Once the new release has run well, delete `venv.prev` and any `venv.failed`.
+```sh
+sudo systemctl stop mission-control.socket mission-control.service billy-stop.socket billy-stop.service
+sudo git -C /opt/mission-control/app checkout -q --detach "$PREV"
+sudo systemctl start billy-stop.socket mission-control.socket
+```
+
+Then run both selfchecks again.
 
 A restart replaces the Settings page's form token, so reload Settings before pressing a button. Sessions survive a restart.
 
@@ -268,6 +230,7 @@ Installed at `64e2cf6` (PR #12 in `billy-mission-control`), then `ecf8d92` (PR #
 | Both `main` rulesets: owner on each bypass list (pull requests only), Billy on neither, CodeQL rule removed | Owner | Done. "Main - Owner Merge Only" (26914500) is **Active** (2026-11-14); "Protect Main - Human Approval Required" (26913560) stays disabled |
 | Mission Control: enroll the backup security key (`passkey enroll --label YubiKey`) | Owner | Open: waiting for the key |
 | Mission Control: see a session end after 30 minutes idle | Owner | Open: check the next time it's opened |
+| Mission Control: a reviewed upgrade script for a commit that changes `requirements.txt` (a new venv, swapped and rolled back safely); until then, such a commit isn't installed | Claude builds; Codex reviews; owner merges | Open |
 | Mission Control: two enrollment-message edge cases (Codex should-fix on `785bcf2`, listed in `billy-mission-control` PR #13) | Claude builds; Codex reviews; owner merges | Open |
 | Digest publisher app, then turning on protection for `main` | Owner | Ruleset on and Billy's negative test passed (above). Still open: the owner's own checks and the first Friday digest push under the ruleset; see phase 4 in [digest-publisher.md](digest-publisher.md) |
 
