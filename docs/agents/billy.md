@@ -105,14 +105,24 @@ sudo -u mission-control $P -m mission_control export-events --config /etc/missio
 
 Keep enrollment codes to yourself: anyone on the tailnet with the owner's login could use one in its 10 minutes.
 
-**Updating to a new merged commit.** Test first; the live app changes only after the tests pass:
-1. **Test the new commit in a throwaway clone, as yourself.** Clone `DrZaff/billy-mission-control`, `checkout --detach <merge SHA>`, and run its tests with the live venv's Python.
-2. **Compare the requirements.** If `requirements.txt` differs from the installed one, the live venv won't match the commit, and step 1 doesn't catch that. Build a fresh venv for the new commit instead:
-   - Install the new requirements with `--require-hashes`, and run `tools/audit_deps.py`.
-   - Rerun the tests with that venv's Python.
-   - Swap it in for `/opt/mission-control/venv` only once they pass.
-3. **Move the live app.** `sudo git -C /opt/mission-control/app fetch origin main`, then `checkout --detach <merge SHA>`. Check `rev-parse HEAD`, and that `status --porcelain` prints nothing.
-4. **Restart and check.** `sudo systemctl restart billy-stop.service mission-control.service`, then both `selfcheck`s. If either fails, check out the previous SHA (and its venv) and restart again.
+**Updating to a new merged commit.** Nothing live changes until the new commit has passed its tests in the environment it will run in, and every step after the stop can be undone:
+1. **Note what's running.** `PREV=$(sudo git -C /opt/mission-control/app rev-parse HEAD)`.
+2. **Compare the requirements.** In a throwaway clone of `DrZaff/billy-mission-control`, run `git diff --quiet $PREV <merge SHA> -- requirements.txt`. Exit 0 means unchanged.
+3. **Test in the right environment, as yourself, in that clone at `<merge SHA>`:**
+   - **Requirements unchanged:** run the tests with `/opt/mission-control/venv/bin/python`.
+   - **Requirements changed:** build a new venv at `/opt/mission-control/venv.new` (root-owned), install with `--require-hashes`, run `tools/audit_deps.py`, then run the tests with that venv's Python.
+   - Stop here if anything fails; nothing live has changed.
+4. **Stop both apps, sockets included,** so nothing can start mid-change: `sudo systemctl stop mission-control.socket mission-control.service billy-stop.socket billy-stop.service`. From here until step 6 passes, the stop button is unavailable; the marker commands above still work.
+5. **Swap.**
+   - `sudo git -C /opt/mission-control/app fetch origin main`, then `checkout --detach <merge SHA>`. Check `rev-parse HEAD`, and that `status --porcelain` prints nothing.
+   - If you built `venv.new`: `sudo mv /opt/mission-control/venv /opt/mission-control/venv.prev`, then `sudo mv /opt/mission-control/venv.new /opt/mission-control/venv`.
+6. **Start and check.** `sudo systemctl start billy-stop.socket mission-control.socket`, then both `selfcheck`s. Then press the stop button once from the phone, and clear the marker.
+7. **Roll back** if any step from 5 on fails:
+   - Stop everything as in step 4.
+   - `checkout --detach $PREV`.
+   - If the venv was swapped: `sudo mv /opt/mission-control/venv /opt/mission-control/venv.failed`, then `sudo mv /opt/mission-control/venv.prev /opt/mission-control/venv`.
+   - Start as in step 6, and run both selfchecks.
+   - Once a release has run well, delete `venv.prev`.
 
 A restart replaces the Settings page's form token, so reload Settings before pressing a button. Sessions survive a restart.
 
