@@ -824,6 +824,12 @@ class InstallScript(unittest.TestCase):
         self.assertIn('probe="$d/.install-probe-$$.json"', self.text)
         self.assertIn('sudo -u "$u" cat "$probe"', self.text)
         self.assertIn('for u in $NEVER_READ $READERS; do', self.text)
+        # No ACL anywhere in the shared folders, so the mode bits are the whole story (Codex,
+        # 104d3d3); readers must list the folder as well as open a record.
+        self.assertIn('awk \'substr($1, 11, 1) == "+"\'', self.text)
+        self.assertLess(self.text.index('an ACL is set in $RUNS'),
+                        self.text.index('echo "shared_runs_protected=yes"'))
+        self.assertIn('sudo -u "$u" ls -a "$d" 2>/dev/null | grep -qx', self.text)
         # Effective access is tested for everyone who mustn't read the records, so an ACL can't
         # slip past the group check (Codex, 0508c9a).
         self.assertIn('"mission-control:$RUNS/agent" "mission-control:$RUNS/$PUB"', self.text)

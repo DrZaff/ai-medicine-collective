@@ -113,6 +113,14 @@ for pair in "agent:$RUNS/$PUB" "$PUB:$RUNS/agent" \
     echo "STOP: $u can enter or list $d"; exit 1
   fi
 done
+# No ACL anywhere in the shared folders (ls marks one with "+"), so the mode bits alone say who
+# can get in: the writer, and billy-runs, which holds only the READERS. Checking named accounts
+# can't cover an ACL granted to any other account (Codex's review of 104d3d3).
+acl=$(ls -lad "$RUNS" "$RUNS/agent" "$RUNS/$PUB" "$RUNS/agent/"* "$RUNS/$PUB/"* \
+        "$RUNS/agent/".[!.]* "$RUNS/$PUB/".[!.]* 2>/dev/null | awk 'substr($1, 11, 1) == "+"')
+if [ -n "$acl" ]; then
+  echo "STOP: an ACL is set in $RUNS; remove it (setfacl -b) before installing:"; echo "$acl"; exit 1
+fi
 # billy-runs holds exactly the READERS: the group's listed members plus every account whose
 # primary group it is (getent lists only the former). Anyone else stops the install.
 gid=$(getent group "$RUNS_GROUP" | cut -d: -f3)
@@ -137,6 +145,10 @@ for u in $READERS; do
       { echo "STOP: $w couldn't write a probe record in $d"; exit 1; }
     if ! sudo -u "$u" cat "$probe" >/dev/null 2>&1; then
       rm -f "$probe"; echo "STOP: $u can't open a record in $d"; exit 1
+    fi
+    # ...and can list the folder, to find new records (Codex, 104d3d3).
+    if ! sudo -u "$u" ls -a "$d" 2>/dev/null | grep -qx ".install-probe-$$.json"; then
+      rm -f "$probe"; echo "STOP: $u can't list the records in $d"; exit 1
     fi
     if sudo -u "$u" sh -c "printf x >> '$probe'" 2>/dev/null; then
       rm -f "$probe"; echo "STOP: $u could change a record in $d"; exit 1
