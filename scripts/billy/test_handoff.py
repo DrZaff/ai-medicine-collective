@@ -814,7 +814,9 @@ class InstallScript(unittest.TestCase):
                       'can enter or list /home/agent/.codex'):
             self.assertIn(check, self.text)
             self.assertLess(self.text.index(check), proofs, check)
-        self.assertIn('for u in agent "$PUB" mission-control; do', self.text)
+        self.assertIn('for u in agent "$PUB" mission-control "$STOPPER"; do', self.text)
+        # Readers must enter as well as list (Codex, 4ab847b).
+        self.assertIn('{ sudo -u "$u" test -r "$d" && sudo -u "$u" test -x "$d"; } ||', self.text)
         # Effective access is tested for everyone who mustn't read the records, so an ACL can't
         # slip past the group check (Codex, 0508c9a).
         self.assertIn('"mission-control:$RUNS/agent" "mission-control:$RUNS/$PUB"', self.text)

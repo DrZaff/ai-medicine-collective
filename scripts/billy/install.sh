@@ -89,9 +89,10 @@ for pair in "agent:$PUB" "$PUB:agent"; do
     rm -f "$RUNS/.probe-$$"; echo "STOP: $u could write in $RUNS"; exit 1
   fi
 done
-# Neither writer is in billy-runs (it would let each read the other's records), and neither is
-# Mission Control's web app account: only the fetcher joins it, in phase A5a.
-for u in agent "$PUB" mission-control; do
+# Neither writer is in billy-runs (it would let each read the other's records), nor Mission
+# Control's web app account, nor the stop helper's (Codex, 4ab847b): only the fetcher joins it,
+# in phase A5a.
+for u in agent "$PUB" mission-control "$STOPPER"; do
   if id -nG "$u" 2>/dev/null | tr ' ' '\n' | grep -qx "$RUNS_GROUP"; then
     echo "STOP: $u must not be in the group $RUNS_GROUP"; exit 1
   fi
@@ -118,7 +119,10 @@ members=$( { getent group "$RUNS_GROUP" | cut -d: -f4 | tr ',' '\n'
 members=${members% }
 for u in $members; do
   for d in "$RUNS/agent" "$RUNS/$PUB"; do
-    sudo -u "$u" test -r "$d" || { echo "STOP: $u can't read $d"; exit 1; }
+    # List and enter both, so it can open a record by name (Codex, 4ab847b: an ACL granting
+    # list alone would pass a read test).
+    { sudo -u "$u" test -r "$d" && sudo -u "$u" test -x "$d"; } ||
+      { echo "STOP: $u can't read $d"; exit 1; }
     if sudo -u "$u" sh -c "touch '$d/.probe-$$'" 2>/dev/null; then
       rm -f "$d/.probe-$$"; echo "STOP: $u could write in $d"; exit 1
     fi
