@@ -117,8 +117,10 @@ done
 for u in $NEVER_READ $members; do
   id "$u" >/dev/null 2>&1 || continue
   if sudo -u "$u" test -r "$PH/.config/billy/app.pem"; then echo "STOP: $u can read the key"; exit 1; fi
-  if sudo -u "$u" ls /home/agent/.codex >/dev/null 2>&1; then
-    echo "STOP: $u can list /home/agent/.codex"; exit 1
+  # Entering is enough to open a known file inside, so test entering as well as listing
+  # (Codex's review of ae88c51).
+  if sudo -u "$u" test -x /home/agent/.codex || sudo -u "$u" test -r /home/agent/.codex; then
+    echo "STOP: $u can enter or list /home/agent/.codex"; exit 1
   fi
 done
 stat -c '%U:%G %a %n' "$PH" "$PH/.config/billy/app.pem" "$PH/.config/billy/app.json" \

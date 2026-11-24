@@ -273,7 +273,9 @@ def share(entry, name):
         info = os.lstat(folder)
         if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid():
             raise OSError('%s is not a folder of %s' % (folder, user))
-        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o640)
+        # Private while it's being written; readable by the group only once whole, just before
+        # the rename (Codex's review of ae88c51: a reader could open a half-written temp file).
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
         try:
             with os.fdopen(fd, 'w') as f:
                 f.write(text)

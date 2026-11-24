@@ -158,6 +158,25 @@ class SharedCopy(unittest.TestCase):
         self.assertEqual(os.listdir(elsewhere), [])
         self.assertIn('WARNING: no shared copy', out)
 
+    def test_the_temp_file_is_private_until_whole(self):
+        # Codex's review of ae88c51: the temp file was group-readable while being written.
+        modes = []
+        real_chmod = os.chmod
+
+        def watch(path, mode, *a, **k):
+            modes.append(os.stat(path).st_mode & 0o777)  # the mode before this chmod
+            return real_chmod(path, mode, *a, **k)
+
+        old_umask = os.umask(0o022)
+        try:
+            with mock.patch.object(handoff.os, 'chmod', side_effect=watch):
+                self.journal(self.entry)
+        finally:
+            os.umask(old_umask)
+        self.assertEqual(modes, [0o600])  # private until the one chmod, just before the rename
+        _, copy = self.shared_copy()
+        self.assertEqual(copy['sha'], 'a' * 40)
+
     def test_a_planted_temp_file_is_never_overwritten(self):
         # O_EXCL: something already at the temp name (a link to elsewhere, say) is refused.
         target = os.path.join(self.tmp, 'target')
@@ -791,10 +810,14 @@ class InstallScript(unittest.TestCase):
         proofs = self.text.index('echo "shared_runs_protected=yes"')
         for check in ('could write in $RUNS/$other', 'could write in $RUNS"',
                       'must not be in the group $RUNS_GROUP', "can't read $d",
-                      'could write in $d"', 'can read the key"', 'can list /home/agent/.codex'):
+                      'could write in $d"', 'can read the key"',
+                      'can enter or list /home/agent/.codex'):
             self.assertIn(check, self.text)
             self.assertLess(self.text.index(check), proofs, check)
         self.assertIn('for u in agent "$PUB" mission-control; do', self.text)
+        # Entering the Codex folder is refused as well as listing it (Codex, ae88c51).
+        self.assertIn('sudo -u "$u" test -x /home/agent/.codex || '
+                      'sudo -u "$u" test -r /home/agent/.codex', self.text)
         # Members include accounts whose primary group is billy-runs (Codex, 0934d4c).
         self.assertIn("getent passwd | awk -F: -v g=\"$gid\" '$4 == g { print $1 }'", self.text)
         self.assertIn('NEVER_READ="mission-control billy-stop"', self.text)
