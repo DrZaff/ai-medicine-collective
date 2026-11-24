@@ -230,8 +230,6 @@ SHARED_FIELDS = {
     'merge_base': lambda v: isinstance(v, str) and bool(SHA_RE.match(v)),
     'main': lambda v: isinstance(v, str) and bool(SHA_RE.match(v)),
     'pr_head': lambda v: isinstance(v, str) and bool(SHA_RE.match(v)),
-    'source': lambda v: isinstance(v, str) and bool(SOURCE_RE.match(v)),
-    'branch': lambda v: isinstance(v, str) and bool(SOURCE_RE.match(v)),
     'verdict': lambda v: v in ('no_blocking_findings', 'changes_needed'),
     'pr': lambda v: isinstance(v, str) and bool(PR_URL_RE.match(v)),
     'reviewed_at': lambda v: isinstance(v, (int, float)) and not isinstance(v, bool),
@@ -244,10 +242,12 @@ SEVERITIES = ('blocking', 'should_fix', 'note')
 
 
 def shareable(entry):
-    """What Mission Control may see of a run record: only checked, structured fields. No free
-    text ever leaves (Codex's summary and each finding's problem, reproduction and fix stay in
-    the private record), so a secret in a format SECRET_RE doesn't know has nowhere to ride
-    (Codex's review of 0934d4c). Findings keep their severity only."""
+    """What Mission Control may see of a run record: only checked, structured fields. Nothing a
+    person or model chose as text ever leaves: not Codex's summary or a finding's problem,
+    reproduction or fix (Codex's review of 0934d4c), and not branch names, which a character
+    rule can't keep a credential out of (Codex's review of 82b7296). Mission Control gets branch
+    names from GitHub itself and ties each run to its pull request by commit SHA and PR number.
+    Findings keep their severity only."""
     out = {k: v for k, v in entry.items() if k in SHARED_FIELDS and SHARED_FIELDS[k](v)}
     if isinstance(entry.get('findings'), list):
         out['findings'] = [{'severity': f['severity']} for f in entry['findings']

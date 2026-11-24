@@ -80,7 +80,7 @@ Setting it by hand is also the way to stop Billy if Mission Control's button is 
 
 Each step's run record is also copied to `/var/lib/billy-runs/<user>/`, so Mission Control can show Billy's real runs (issue #228, phase A5):
 
-- **What's copied: only checked, structured fields.** The step, repository, source and `agent/` branches, SHAs, verdict, each finding's severity, PR link, times and file count. Each one is checked against its expected form, and anything else is dropped. No free text leaves, not even Codex's summary or a finding's problem or fix, so a secret in a format the filter doesn't know has nowhere to ride. The private record under `~/.local/state/billy/runs/` keeps everything.
+- **What's copied: only checked, structured fields.** The step, repository, SHAs, verdict, each finding's severity, PR link, times and file count. Each one is checked against its expected form, and anything else is dropped. Nothing a person or model chose as text leaves: not Codex's summary or a finding's problem or fix, and not branch names, which a character rule can't keep a credential out of. A secret in a format the filter doesn't know therefore has nowhere to ride. Mission Control gets branch names from GitHub itself, and ties each run to its PR by commit SHA and PR number. The private record under `~/.local/state/billy/runs/` keeps everything.
 - **How it's written:** whole and then renamed, so a reader never sees half a record, and never through a symlink.
 - **Best effort:** a copy that can't be written (the folder is missing, say) never fails or blocks a step, and the step prints a `WARNING` saying so. The stop marker is checked exactly as before.
 

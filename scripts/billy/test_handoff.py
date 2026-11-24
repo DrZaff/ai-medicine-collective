@@ -94,7 +94,7 @@ class SharedCopy(unittest.TestCase):
         shared_at = copy.pop('shared_at')
         self.assertIsInstance(shared_at, float)
         self.assertEqual(copy, {'step': 'review', 'repo': 'ai-medicine-collective',
-                                'sha': 'a' * 40, 'source': 'claude/x', 'merge_base': 'b' * 40,
+                                'sha': 'a' * 40, 'merge_base': 'b' * 40,
                                 'reviewed_at': 1.5, 'verdict': 'changes_needed',
                                 'findings': [{'severity': 'blocking'}]})
         self.assertIn('INFO: shared copy in', out)
@@ -103,7 +103,9 @@ class SharedCopy(unittest.TestCase):
         # Codex's review of 0934d4c (blocking): free text could carry a secret in a format the
         # filter doesn't know. Only checked fields leave; the private record keeps the rest.
         unknown = 'zz_unknownformat_' + 'Q' * 40
-        entry = dict(self.entry, summary=unknown, branch='agent/x; ' + unknown,
+        # Branch names too, even ones that pass the branch rule (Codex's review of 82b7296).
+        entry = dict(self.entry, summary=unknown, source='claude/' + unknown,
+                     branch='agent/' + unknown,
                      pr='https://evil.example/' + unknown, files='3', via=unknown,
                      failed=unknown, extra=unknown)
         entry['findings'] = [{'severity': 'note', 'problem': unknown},
@@ -112,7 +114,7 @@ class SharedCopy(unittest.TestCase):
         _, copy = self.shared_copy()
         self.assertNotIn(unknown, json.dumps(copy))
         self.assertEqual(copy['findings'], [{'severity': 'note'}])
-        for gone in ('summary', 'branch', 'pr', 'files', 'via', 'failed', 'extra'):
+        for gone in ('summary', 'source', 'branch', 'pr', 'files', 'via', 'failed', 'extra'):
             self.assertNotIn(gone, copy, gone)
         [record] = os.listdir(handoff.JOURNAL)
         with open(os.path.join(handoff.JOURNAL, record)) as f:
@@ -125,8 +127,10 @@ class SharedCopy(unittest.TestCase):
                       'pr_head': 'a' * 40, 'failed': 'PR head is not the reviewed commit'})
         _, copy = self.shared_copy()
         self.assertEqual(copy['pr'], url)
-        self.assertEqual(copy['branch'], 'agent/x-aaaaaaa')
+        self.assertEqual(copy['pr_head'], 'a' * 40)
         self.assertEqual(copy['failed'], 'PR head is not the reviewed commit')
+        self.assertNotIn('branch', copy)
+        self.assertNotIn('source', copy)
 
     def test_the_filter_knows_the_site_checkers_formats(self):
         for secret in ('sb_secret_' + 'a' * 20, 're_' + 'a' * 8 + '_' + 'b' * 16,
