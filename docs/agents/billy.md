@@ -27,7 +27,7 @@ Two Unix users, so the reviewer can never read the publisher's key (the first ha
 | `~/.local/state/billy/runs/` of each user | a JSON record per step (verdict, findings, PR link; no secrets) |
 | `/var/lib/billy-control/` (`billy-stop` writes, everyone reads) | the stop marker `STOP`, when it is set |
 
-Each publishing step turns the key into a token that lasts at most an hour, is limited to this repository and the three permissions, is never printed, and is revoked when the step ends. Tailscale on the server is the official apt package from pkgs.tailscale.com (since 2026-11-21; it replaced the snap, which was too old and too confined to serve a Unix socket), with the same machine identity. Receive Taildrop files with `sudo tailscale file get <folder>`. Codex for `agent` is installed through nvm, so its node folder goes on PATH in the launch command.
+Each publishing step turns the key into a token that lasts at most an hour, is limited to this repository and the three permissions, is never printed, and is revoked when the step ends. Tailscale on the server is the official apt package from pkgs.tailscale.com (since 2026-11-21; it replaced the snap, which was too old and too confined to serve a Unix socket), with the same machine identity. Receive Taildrop files with `sudo tailscale file get`, followed by the folder to put them in. Codex for `agent` is installed through nvm, so its node folder goes on PATH in the launch command.
 
 ## The handoff: Claude builds, Codex reviews, Billy publishes
 
@@ -98,7 +98,7 @@ sudo -u mission-control $P -m mission_control selfcheck app --config /etc/missio
 sudo -u billy-stop $P -m mission_control selfcheck stopper --config /etc/mission-control/stopper.json
 sudo -u mission-control $P -m mission_control passkey list --config /etc/mission-control/app.json
 sudo -u mission-control $P -m mission_control passkey enroll --label YubiKey --config /etc/mission-control/app.json   # a one-time code for /enroll, 10 minutes
-sudo -u mission-control $P -m mission_control passkey revoke <id> --config /etc/mission-control/app.json
+sudo -u mission-control $P -m mission_control passkey revoke ID_FROM_LIST --config /etc/mission-control/app.json   # put the id from passkey list in place of ID_FROM_LIST
 sudo -u mission-control $P -m mission_control passkey reset --config /etc/mission-control/app.json   # removes every passkey and session; enroll again
 sudo -u mission-control $P -m mission_control export-events --config /etc/mission-control/app.json --since YYYY-MM-DD --out /tmp/events.jsonl
 ```
@@ -188,6 +188,7 @@ Installed at `64e2cf6` (PR #12 in `billy-mission-control`), then `ecf8d92` (PR #
 | The events export (`export-events`) | Worked throughout the tests. Each event carries a time, kind, login, path, status and result, and never a code, challenge, key or cookie. |
 | Tailscale Serve | `https://billy.tail26e3d1.ts.net` → `unix:/run/mission-control/app.sock`, tailnet only; Funnel off; the tailnet has only the owner's two devices |
 | A request with no Tailscale login | 403 |
+| From outside the tailnet: the iPhone with Tailscale disconnected (on 5G), a fresh request in a new Safari tab | Did not load (2026-11-24). A first try appeared to load, most likely Safari showing the page it already had, or Tailscale reconnecting by itself; the retry, with Tailscale confirmed disconnected and a new address, failed as expected. |
 | iPhone passkey: enroll, then sign in with Face ID | Passed |
 | `agent` and `billy-pub`: the app socket directly, with a forged login header | Refused by the operating system (`curl` exit 7) |
 | `agent` and `billy-pub`: the stop socket directly | Permission denied |
@@ -214,7 +215,7 @@ Installed at `64e2cf6` (PR #12 in `billy-mission-control`), then `ecf8d92` (PR #
 | Mission Control: enroll the backup security key (`passkey enroll --label YubiKey`) | Owner | Open: waiting for the key |
 | Mission Control: see a session end after 30 minutes idle | Owner | Open: check the next time it's opened |
 | Mission Control: a reviewed upgrade script that stops at the first failure. It installs only a merge commit on `main`, tests it first, swaps a new venv when `requirements.txt` changes, rolls back, and never touches the stop marker. Until then, updates are guided sessions, and a commit that changes the requirements isn't installed. | Claude builds; Codex reviews; owner merges | Open |
-| Mission Control: two enrollment-message edge cases (Codex should-fix on `785bcf2`, listed in `billy-mission-control` PR #13) | Claude builds; Codex reviews; owner merges | Open |
+| Mission Control: two enrollment-message edge cases (Codex should-fix on `785bcf2`, listed in `billy-mission-control` PR #13) | Claude builds; Codex reviews; owner merges | In review (`claude/a4c-enroll-edges`) |
 | Digest publisher app, then turning on protection for `main` | Owner | Ruleset on and Billy's negative test passed (above). Still open: the owner's own checks and the first Friday digest push under the ruleset; see phase 4 in [digest-publisher.md](digest-publisher.md) |
 
 Not part of the pilot: unattended runs, timers, issue labels (Billy has no Issues permission), Netlify settings (production auto-publishing was unlocked by the owner on 2026-11-14), and anything in architecture.md's sandbox and credential sections, which apply before any unattended run.
