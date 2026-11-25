@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-23",
+  "headline": "AI-assisted case discussion for students; AI helps endosonographers find pancreatic tumours on video",
+  "intro": "This briefing covers AI at two stages of a career. The first review looks at how AI-supported case discussion and virtual patients affect what medical students learn. The second tests whether an AI aid helps experienced endosonographers spot solid pancreatic tumours on ultrasound video clips.",
+  "items": [
+    {
+      "title": "Effects of AI-assisted case discussion and virtual patient consultation on medical students' learning outcomes",
+      "source": "BMC Medical Education",
+      "url": "https://link.springer.com/article/10.1186/s12909-026-10901-8",
+      "published": "2026-11-23",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "In two between-subjects experiments, medical students learned through AI-assisted case discussion, peer case discussion, AI virtual patient consultations or a control group. Students who used AI-assisted case discussion scored significantly higher on knowledge than the control group. Every virtual-consultation arm also beat the control, whichever order it came in. Students who did the case discussion before the virtual consultation showed more intrinsic motivation and took more complete histories, but they showed less empathy than students who did the virtual consultation alone.",
+      "why_it_matters": "Both AI activities beat the control group, so the open question is how to combine them. The order of activities seemed to shift motivation, thoroughness and empathy in different directions, so educators should test the order deliberately rather than assume it doesn't matter.",
+      "teaser": "AI case talks and virtual patients beat a control group, but the order changed empathy and thoroughness"
+    },
+    {
+      "title": "Influence of artificial intelligence on the performance of endosonographers in detection of solid pancreatic tumors: a tandem randomized video study",
+      "source": "Endoscopy",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42617651/",
+      "published": "2026-08-19",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_help_improved",
+      "summary": "The task was detecting solid pancreatic tumours in 38 curated endoscopic ultrasound (EUS) video clips, set up as three experiments of varying perceptual difficulty. The AI was a detection aid; its name is not given in the abstract. Fifty-seven endosonographers read every clip twice, once with and once without AI, in a counterbalanced 1:1 randomized design. Their diagnostic accuracy rose from 70.8% without AI to 77.1% with it (P < 0.001), a gain of 6.3 percentage points. The gain came mainly from the hard clips with small or transient lesions, with no significant improvement on easier clips and no significant difference by experience level. The AI on its own scored 92.3%. The main limitation is that readers judged selected, short video clips rather than doing live procedures on patients.",
+      "why_it_matters": "The AI helped readers most on the hardest clips, but readers using it still scored well below the AI on its own. That makes this a useful case for teaching how clinicians weigh, or under-use, AI prompts during image-based procedures.",
+      "teaser": "An AI aid raised endosonographers' accuracy from 70.8% to 77.1% on pancreatic tumour clips, mostly on hard cases"
+    }
+  ],
+  "tags": [
+    "case-based learning",
+    "computer-aided detection",
+    "endoscopic ultrasound",
+    "gastroenterology",
+    "generative ai",
+    "human-ai collaboration",
+    "medical education",
+    "medical students",
+    "pancreatic cancer",
+    "randomized",
+    "reader study",
+    "virtual patients"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
