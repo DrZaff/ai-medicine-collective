@@ -11,9 +11,9 @@
       "category": "research",
       "section": "med_ed",
       "verdict": "not_applicable",
-      "summary": "In two between-subjects experiments, medical students learned through AI-assisted case discussion, peer case discussion, AI virtual patient consultations or a lecture-only control. Students who used AI-assisted case discussion scored significantly higher on knowledge than the control group. Every virtual-consultation arm also beat the control, whichever order it came in. Students who did the case discussion before the virtual consultation showed more intrinsic motivation and took more complete histories, but they showed less empathy than students who did the virtual consultation alone.",
-      "why_it_matters": "Both AI activities beat a video-only comparison, so the open question is how to combine them. The order of activities seemed to shift motivation, thoroughness and empathy in different directions, so educators should test the order deliberately rather than assume it doesn't matter.",
-      "teaser": "AI case talks and virtual patients beat lecture-only teaching, but the order changed empathy and thoroughness"
+      "summary": "In two between-subjects experiments, medical students learned through AI-assisted case discussion, peer case discussion, AI virtual patient consultations or a control group. Students who used AI-assisted case discussion scored significantly higher on knowledge than the control group. Every virtual-consultation arm also beat the control, whichever order it came in. Students who did the case discussion before the virtual consultation showed more intrinsic motivation and took more complete histories, but they showed less empathy than students who did the virtual consultation alone.",
+      "why_it_matters": "Both AI activities beat the control group, so the open question is how to combine them. The order of activities seemed to shift motivation, thoroughness and empathy in different directions, so educators should test the order deliberately rather than assume it doesn't matter.",
+      "teaser": "AI case talks and virtual patients beat a control group, but the order changed empathy and thoroughness"
     },
     {
       "title": "Influence of artificial intelligence on the performance of endosonographers in detection of solid pancreatic tumors: a tandem randomized video study",
