@@ -1,6 +1,6 @@
 {
   "_about": "Frequently asked questions about AI in medicine, shown on faq.html (faq.js) and built into the page as static HTML and FAQPage data at deploy time (scripts/seo/build_seo.py). Answers are plain text; [1] marks cite the item's sources in order. The FAQ agent (scripts/blog_agent/faq_agent.py) proposes one new item every other day and the monthly audit (faq_audit.py) proposes refreshes, both by pull request: merging publishes. Every number in an answer must appear in a cited source.",
-  "updated": "2026-11-19",
+  "updated": "2026-11-25",
   "categories": [
     {
       "id": "general",
@@ -1103,6 +1103,47 @@
       ],
       "added": "2026-11-19",
       "updated": "2026-11-19"
+    },
+    {
+      "id": "does-medical-ai-work-equally-well-for-patients-of-every-skin-tone-sex",
+      "category": "general",
+      "question": "Does medical AI work equally well for patients of every skin tone, sex and background?",
+      "answer": "No. Several studies found that medical AI performed worse for, or disadvantaged, some patients by race, skin tone, sex or insurance status. A widely used US care-management algorithm predicted health care costs rather than illness. Because less money is spent caring for Black patients, they were sicker than White patients at a given risk score, and remedying this would raise the percentage of Black patients receiving additional help from 17.7 to 46.5% [1]. Chest X-ray models more often missed disease in female, Black, Hispanic, younger and Medicaid-insured patients [2]. Dermatology AI models performed worse on dark skin and on uncommon diseases when tested on a diverse, biopsy-confirmed image set [3]. In a simulated teledermatology experiment, AI decision support improved specialists' and generalists' diagnostic accuracy by more than 33%. However, it widened the accuracy gap between light and dark skin for generalists [4]. Most of this evidence comes from retrospective or simulated studies, and bias depends on the tool and setting. Ask for a tool's performance broken down by subgroup in a population like yours.",
+      "sources": [
+        {
+          "title": "Dissecting racial bias in an algorithm used to manage the health of populations",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31649194/",
+          "source": "Science",
+          "published": "2019-10-25"
+        },
+        {
+          "title": "Underdiagnosis bias of artificial intelligence algorithms applied to chest radiographs in under-served patient populations",
+          "url": "https://www.nature.com/articles/s41591-021-01595-0",
+          "source": "Nature Medicine",
+          "published": "2021-12"
+        },
+        {
+          "title": "Disparities in dermatology AI performance on a diverse, curated clinical image set",
+          "url": "https://www.science.org/doi/10.1126/sciadv.abq6147",
+          "source": "Science Advances",
+          "published": "2022-08"
+        },
+        {
+          "title": "Deep learning-aided decision support for diagnosis of skin disease across skin tones",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38317019/",
+          "source": "Nature Medicine",
+          "published": "2024-02-05"
+        }
+      ],
+      "keywords": [
+        "AI bias in medicine",
+        "algorithmic bias skin tone",
+        "health equity AI",
+        "racial bias in healthcare algorithms",
+        "sex bias medical AI"
+      ],
+      "added": "2026-11-25",
+      "updated": "2026-11-25"
     }
   ]
 }
