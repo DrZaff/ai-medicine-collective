@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-25",
+  "headline": "Building AI into residency, and testing chatbots against ED triage clinicians",
+  "intro": "Sutter Health is making AI part of residency training on purpose. A new real-world triage study shows why that training matters: chatbots matched most clinicians on some emergency department tasks but fell clearly behind on others.",
+  "items": [
+    {
+      "title": "Making AI a key physician tool in residency training",
+      "source": "American Medical Association (AMA)",
+      "url": "https://www.ama-assn.org/medical-residents/residency-life/making-ai-key-physician-tool-residency-training",
+      "published": "2026-11-20",
+      "category": "education",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "This AMA news feature covers Sutter Health, which runs 34 physician training programs with almost 500 trainees. Sutter has started a one-year, philanthropically funded AI and Medical Education Fellowship at California Pacific Medical Center to set the groundwork for responsible AI use in medical education. Sutter's GME leader argues that simply banning residents from AI tools is not appropriate, because programs have to prepare trainees for practice in a world where AI is part of the work. The article is a news feature, not a study, and much of it is open only to AMA members.",
+      "why_it_matters": "Program directors are deciding whether to ban AI or teach it, and this is a concrete example of a health system that chose to teach it on purpose while keeping clinical reasoning first.",
+      "teaser": "Sutter Health's GME leaders say banning AI in residency isn't the answer, and they've started a fellowship to teach it"
+    },
+    {
+      "title": "Evaluating Human and AI-Based Triage Performance in the Emergency Department: Real-World Cohort Study",
+      "source": "Journal of Medical Internet Research",
+      "url": "https://www.jmir.org/2026/1/e91442",
+      "published": "2026-11-24",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "mixed",
+      "summary": "The task was emergency department triage under the Manchester Triage System (urgency level), plus choosing the right specialty, for 305 real walk-in visits at a German tertiary-care hospital. The study tested 12 large language models from OpenAI, Google, Anthropic and Mistral against 4 physicians of varying seniority and the triage nurse who triaged each patient in real time. Against a consensus human reference, the human raters' triage accuracy ranged from 0.59 to 0.83 (quadratic-weighted κ 0.60–0.88) and the models' from 0.35 to 0.70 (weighted κ 0.46–0.72). After a correction for bias in that reference, only one specialist physician (weighted κ 0.81) stayed clearly above every model, while 3 models (Gemini-3.5-flash 0.72, GPT-5.5 0.69, GPT-5 0.66) beat the other 4 human raters. For specialty assignment, physicians were clearly ahead: 0.88–0.93 accuracy versus 0.62–0.80 for the models. The main limitations are that this was a retrospective, single-centre study, and that both reference standards were based on expert or routine judgement rather than patient outcomes.",
+      "why_it_matters": "How AI compares with clinicians here depends on the task and on which clinician you compare it with. The models came close on urgency but lagged on specialty assignment, and the authors say they belong in a supporting, human-in-the-loop role. That is a useful case for teaching learners when to lean on an AI tool and when to override it.",
+      "teaser": "On 305 real ED visits, chatbots matched most clinicians on triage urgency but fell behind on picking the specialty."
+    }
+  ],
+  "tags": [
+    "ai curriculum",
+    "ai vs physician",
+    "emergency medicine",
+    "faculty development",
+    "graduate medical education",
+    "jmir",
+    "large language models",
+    "manchester triage system",
+    "residency",
+    "retrospective cohort",
+    "sutter health",
+    "triage"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
