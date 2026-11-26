@@ -5280,6 +5280,8 @@ html.terminal::view-transition-new(root) {
     margin-top: 40px;
     padding: 44px 20px;
     border-radius: 22px;
+  }
+}
 
 /* === MEMBER CREATIONS (hub.html) ============================= */
 
