@@ -5493,3 +5493,246 @@ html.terminal::view-transition-new(root) {
     padding: 12px;
   }
 }
+
+/* === HOME PAGE FLOW (2026-11-26) ===============================
+   The light design of the new home order: hero, evidence, Member
+   Creations, membership. Same content edges, radii and button hierarchy. */
+
+.modern .hero-actions .btn--quiet,
+.modern .hero-actions .btn--quiet:visited {
+  border: 1.5px solid rgb(255 255 255 / 0.35);
+  background: rgb(255 255 255 / 0.06);
+  color: #ecfdf5;
+}
+
+.modern .hero-actions .btn--quiet:hover {
+  border-color: rgb(255 255 255 / 0.6);
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
+}
+
+.modern .home-section {
+  margin-top: 56px;
+}
+
+.modern .home-section-head {
+  margin-bottom: 20px;
+}
+
+.modern .home-section-kicker {
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.modern .home-section-title {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.modern .home-card,
+.modern .showcase-card {
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.modern .home-card {
+  gap: 12px;
+  padding: 26px 28px;
+}
+
+.modern .home-card-label {
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.modern .home-card-meta {
+  font-size: 0.875rem;
+  letter-spacing: 0;
+}
+
+.modern .home-card-title,
+.modern .home-card-title:visited {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.modern .home-card--review .home-card-title {
+  font-size: clamp(1.6rem, 3vw, 2rem);
+}
+
+.modern .home-card-title:hover {
+  color: var(--brand);
+}
+
+.modern .home-card-text {
+  color: #334155;
+}
+
+.modern .home-card-link,
+.modern .home-card-link:visited {
+  color: var(--brand);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.modern .home-card-link--quiet,
+.modern .home-card-link--quiet:visited {
+  color: var(--muted);
+}
+
+.modern .home-finding {
+  padding: 16px 20px;
+  border-left: 4px solid var(--spark);
+  border-radius: 0 12px 12px 0;
+  background: var(--brand-soft);
+}
+
+.modern .home-finding-label {
+  color: var(--brand);
+  font-family: var(--font-label);
+  font-weight: 700;
+}
+
+.modern .home-finding p {
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.modern .home-alerts {
+  padding: 20px 22px;
+  border-radius: var(--radius);
+}
+
+.modern .showcase-card {
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modern .showcase-card:hover {
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-3px);
+}
+
+.modern .showcase-art {
+  background: var(--night);
+}
+
+.modern .showcase-art--jungle {
+  background:
+    radial-gradient(circle at 50% 45%, rgb(16 185 129 / 0.25), transparent 60%),
+    linear-gradient(140deg, rgb(0 0 0 / 0.35), rgb(2 19 10 / 0.65)),
+    url("images/featured/junglecards-bg.jpg") center / cover;
+}
+
+.modern .showcase-art .jc-card {
+  width: min(250px, 90%);
+  padding: 16px 16px 14px;
+  border-radius: 14px;
+  animation: none;
+}
+
+.modern .showcase-art .jc-cloze {
+  font-size: 1rem;
+}
+
+.modern .showcase-body {
+  gap: 10px;
+  padding: 20px 22px 22px;
+}
+
+.modern .showcase-title {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.modern .showcase-text {
+  color: #334155;
+}
+
+.modern .showcase-story,
+.modern .showcase-story:visited {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.modern .showcase-story:hover {
+  color: var(--brand);
+}
+
+.modern .home-join {
+  padding: 56px 40px;
+  border: 0;
+  border-radius: 28px;
+  background:
+    radial-gradient(640px 320px at 50% 120%, rgb(16 185 129 / 0.32), transparent 70%),
+    linear-gradient(165deg, #03211b 0%, var(--night) 60%, #06323a 100%);
+  box-shadow: 0 24px 48px -20px rgb(4 32 26 / 0.55);
+  color: #d1fae5;
+}
+
+.modern .home-join .home-section-kicker {
+  color: var(--spark-soft);
+}
+
+.modern .home-join .home-section-title {
+  color: #fff;
+}
+
+.modern .home-join-text {
+  color: #d1fae5;
+  font-size: 1.08rem;
+}
+
+.modern .home-join-note,
+.modern .home-join-team {
+  color: rgb(209 250 229 / 0.75);
+}
+
+.modern .home-join-team a,
+.modern .home-join-team a:visited {
+  color: var(--spark-soft);
+}
+
+/* phones: a tighter hero so the headline, line and both actions fit the first screen */
+@media (max-width: 600px) {
+  .modern .hero {
+    padding: 56px 22px 40px;
+  }
+
+  .modern .hero-title {
+    font-size: clamp(2.8rem, 14vw, 3.6rem);
+  }
+
+  .modern .hero-text {
+    font-size: 1.05rem;
+  }
+
+  .modern .home-section {
+    margin-top: 40px;
+  }
+
+  .modern .home-card {
+    padding: 22px 20px;
+  }
+
+  .modern .home-join {
+    padding: 36px 20px;
+  }
+}
