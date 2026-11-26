@@ -647,59 +647,20 @@ function initHome() {
       const entry = Array.isArray(index) ? index[0] : null;
       if (!entry || !/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) return;
 
-      const link = node("a", "home-headline", entry.headline);
+      const link = node("a", "home-card-title", entry.headline);
       link.href = `blog.html?date=${entry.date}`;
-      const nodes = [node("p", "home-list-meta", `// ${niceDate(entry.date)}`), link];
+      const nodes = [node("p", "home-card-meta", niceDate(entry.date)), link];
 
       try {
         const post = await (await fetch(`blog/posts/${entry.date}.json`)).json();
         const intro = String(post.intro || "");
-        if (intro) nodes.push(node("p", "home-panel-text", intro.length > 170 ? `${intro.slice(0, 170).trimEnd()}…` : intro));
+        // about two lines, cut at a word
+        const short = intro.length > 200 ? `${intro.slice(0, 200).replace(/\s+\S*$/, "")}…` : intro;
+        if (short) nodes.push(node("p", "home-card-text", short));
       } catch {
         // headline alone is fine
       }
-      // ...and the three before it
-      const earlier = index.slice(1, 4).filter((older) => /^\d{4}-\d{2}-\d{2}$/.test(older.date));
-      if (earlier.length) {
-        const list = node("ul", "home-list home-earlier");
-        for (const older of earlier) {
-          const item = node("li");
-          const title = node("a", "home-list-title", older.headline);
-          title.href = `blog.html?date=${older.date}`;
-          item.append(title, node("span", "home-list-meta", niceDate(older.date)));
-          list.append(item);
-        }
-        nodes.push(node("p", "home-earlier-label", "// Earlier"), list);
-      }
       briefing.replaceChildren(...nodes);
-    } catch {
-      // keep the plain text
-    }
-  })();
-
-  (async () => {
-    try {
-      const response = await fetch(
-        `${PUBLIC_API_URL}/projects?select=id&kind=eq.project&status=eq.published&limit=1`,
-        { headers: { apikey: PUBLIC_API_KEY, Prefer: "count=exact" } }
-      );
-      if (!response.ok) return;
-
-      // "0-0/16": the part after the slash is the number of tools
-      const total = parseInt((response.headers.get("content-range") || "").split("/")[1], 10);
-      // The count and "+N" are hidden in the page's HTML (a written number
-      // goes out of date) and shown only once the live count is known
-      const counter = document.getElementById("home-project-count");
-      if (counter && total > 0) {
-        counter.textContent = String(total);
-        if (counter.parentElement) counter.parentElement.hidden = false;
-      }
-      // The Member Creations panel shows five icons and "+N" for the rest
-      const more = document.getElementById("home-more-tools");
-      if (more && total > 5) {
-        more.textContent = `+${total - 5}`;
-        if (more.parentElement) more.parentElement.hidden = false;
-      }
     } catch {
       // keep the plain text
     }
@@ -737,7 +698,8 @@ function initHeroNet() {
   if (!canvas || !canvas.getContext) return;
   const hero = canvas.parentElement;
   const context = canvas.getContext("2d");
-  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Still for people who ask for less motion, and on phones (a static texture)
+  const still = window.matchMedia("(prefers-reduced-motion: reduce), (max-width: 600px)").matches;
   let width = 0;
   let height = 0;
   let points = [];
@@ -858,192 +820,6 @@ function initHeroNet() {
 }
 
 document.addEventListener("DOMContentLoaded", initHeroNet);
-
-/* ========= HOME PAGE: featured interviews that scroll themselves =========
-   Each .interview-reel names an interview page (data-interview). Its Q&A
-   and pull quotes are copied in, and once at least half the reel is on
-   screen it scrolls from the top at an easy reading pace (READ_WPM). It
-   pauses while the pointer is over it, while it has keyboard focus, while
-   someone scrolls it by hand, and with the Pause button; it starts over
-   from the top each time it comes back on screen, and after the end. With
-   reduced motion it never moves on its own: it is an ordinary scroll box. */
-const READ_WPM = 190;
-
-function initInterviewReels() {
-  const reels = document.querySelectorAll(".interview-reel[data-interview]");
-  if (!reels.length) return;
-  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  reels.forEach((reel) => loadInterviewReel(reel, still));
-}
-
-function loadInterviewReel(reel, still) {
-  const track = reel.querySelector(".reel-track");
-  const pageUrl = new URL(reel.dataset.interview, location.href);
-  fetch(pageUrl)
-    .then((r) => (r.ok ? r.text() : Promise.reject(r.status)))
-    .then((html) => {
-      const doc = new DOMParser().parseFromString(html, "text/html");
-      const parts = doc.querySelectorAll(".interview .qa, .interview .pull-quote");
-      if (!parts.length) return;
-      const frag = document.createDocumentFragment();
-      parts.forEach((part) => {
-        const node = document.importNode(part, true);
-        node.querySelectorAll("[href]").forEach((a) => {
-          a.href = new URL(a.getAttribute("href"), pageUrl).href;
-        });
-        frag.appendChild(node);
-      });
-      const end = document.createElement("p");
-      end.className = "reel-end";
-      const link = document.createElement("a");
-      link.href = pageUrl.href;
-      link.textContent = "Read the full interview, with pictures";
-      end.append("End of the interview. ", link);
-      frag.appendChild(end);
-      track.replaceChildren(frag);
-      reel.classList.add("is-loaded");
-      if (!still) runInterviewReel(reel);
-    })
-    .catch(() => {
-      /* keep the short text and the link to the full interview */
-    });
-}
-
-function runInterviewReel(reel) {
-  const box = reel.parentElement;
-  const controls = box.querySelector(".reel-controls");
-  const toggle = box.querySelector(".reel-toggle");
-  const restart = box.querySelector(".reel-restart");
-  const bar = box.querySelector(".reel-progress span");
-  const words = reel.textContent.trim().split(/\s+/).length;
-
-  let pos = 0;
-  let onScreen = false;
-  let wasAway = true;   // off screen since the last run: start over
-  let hovered = false;
-  let focused = false;
-  let paused = false;   // the Pause button
-  let holdUntil = 0;    // after a hand scroll, or before the first line
-  let atEnd = false;
-  let frame = 0;
-  let last = 0;
-
-  if (controls) controls.hidden = false;
-
-  const maxScroll = () => Math.max(0, reel.scrollHeight - reel.clientHeight);
-  // pixels per second so that words pass at READ_WPM
-  const speed = () => {
-    const pxPerWord = reel.scrollHeight / words;
-    return Math.min(60, Math.max(8, (READ_WPM / 60) * pxPerWord));
-  };
-
-  function show() {
-    const max = maxScroll();
-    if (bar) bar.style.width = max ? `${(pos / max) * 100}%` : "0%";
-  }
-
-  function jumpTo(y) {
-    pos = y;
-    reel.scrollTop = y;
-    show();
-  }
-
-  function startOver(lead) {
-    atEnd = false;
-    jumpTo(0);
-    holdUntil = performance.now() + lead;
-  }
-
-  function moving() {
-    return onScreen && !hovered && !focused && !paused;
-  }
-
-  function tick(now) {
-    frame = 0;
-    if (!moving()) return;
-    const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
-    last = now;
-    if (!handScrolled() && now >= holdUntil) {
-      const max = maxScroll();
-      if (atEnd) {
-        atEnd = false;
-        startOver(2000);
-      } else if (pos >= max - 1) {
-        // the end: rest a moment on the last lines, then back to the top
-        atEnd = true;
-        holdUntil = now + 6000;
-      } else {
-        pos = Math.min(max, pos + speed() * dt);
-        reel.scrollTop = pos;
-        show();
-      }
-    }
-    frame = requestAnimationFrame(tick);
-  }
-
-  function wake() {
-    if (!frame && moving()) {
-      last = 0;
-      frame = requestAnimationFrame(tick);
-    }
-  }
-
-  // a scroll we didn't make is the reader taking over: follow them and wait
-  function handScrolled() {
-    if (Math.abs(reel.scrollTop - pos) <= 3) return false;
-    pos = reel.scrollTop;
-    atEnd = false;
-    holdUntil = performance.now() + 4000;
-    show();
-    return true;
-  }
-  reel.addEventListener("scroll", handScrolled, { passive: true });
-
-  reel.addEventListener("pointerenter", (e) => {
-    if (e.pointerType === "mouse") hovered = true;
-  });
-  reel.addEventListener("pointerleave", (e) => {
-    if (e.pointerType === "mouse") { hovered = false; wake(); }
-  });
-  reel.addEventListener("touchstart", () => {
-    holdUntil = performance.now() + 5000;
-  }, { passive: true });
-  reel.addEventListener("focusin", () => { focused = true; });
-  reel.addEventListener("focusout", () => { focused = false; wake(); });
-
-  if (toggle) {
-    toggle.addEventListener("click", () => {
-      paused = !paused;
-      toggle.textContent = paused ? "Play" : "Pause";
-      toggle.setAttribute("aria-pressed", String(paused));
-      wake();
-    });
-  }
-  if (restart) {
-    restart.addEventListener("click", () => {
-      startOver(800);
-      wake();
-    });
-  }
-
-  new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) {
-        onScreen = false;
-        wasAway = true;
-        return;
-      }
-      onScreen = entry.intersectionRatio >= 0.5;
-      if (onScreen && wasAway) {
-        wasAway = false;
-        startOver(1500);
-      }
-      wake();
-    });
-  }, { threshold: [0, 0.5] }).observe(reel);
-}
-
-document.addEventListener("DOMContentLoaded", initInterviewReels);
 
 /* ========= TOOLS PAGE: launcher ========= */
 
@@ -1406,14 +1182,19 @@ function initLivingReview() {
       const ready = review && Array.isArray(review.studies) && Array.isArray(review.sections) && review.sections.length;
       if (feature && ready) {
         const plain = (text) => String(text).replace(/\s*\[S\d+\]/g, "");
-        const meta = el("p", "home-list-meta",
-          `// Edition ${review.edition} · ${review.studies.length} studies · updated ${longDate(review.updated)}`);
-        const title = el("a", "home-headline", "How AI is changing what physicians can do");
+        const meta = el("p", "home-card-meta",
+          `Edition ${review.edition} · ${review.studies.length} studies · updated ${longDate(review.updated)}`);
+        const title = el("a", "home-card-title", "How AI is changing what physicians can do");
         title.href = "ai-vs-physician.html";
-        const summary = el("p", "home-panel-text", plain(review.summary).split(/(?<=\.)\s+/).slice(0, 2).join(" "));
-        const findings = el("ul", "home-findings");
-        (review.key_findings || []).slice(0, 1).forEach((finding) => findings.append(el("li", null, plain(finding))));
-        feature.replaceChildren(meta, title, summary, verdictChart(review.studies), findings);
+        const nodes = [meta, title];
+        // One finding from the current edition, word for word (its own qualifications intact)
+        const finding = (review.key_findings || [])[0];
+        if (finding) {
+          const box = el("blockquote", "home-finding");
+          box.append(el("span", "home-finding-label", "Key finding"), el("p", null, plain(finding)));
+          nodes.push(box);
+        }
+        feature.replaceChildren(...nodes);
       }
       if (!app) return;
       if (!ready) {

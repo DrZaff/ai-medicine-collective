@@ -7466,3 +7466,285 @@ button.meeting-undo {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* === HOME PAGE FLOW (2026-11-26) ===============================
+   Hero, then the evidence (review beside the latest briefing and the email
+   box), then three Member Creations cards, then one membership section. */
+
+.hero-actions .btn--quiet {
+  border-color: var(--line-strong);
+  color: var(--body);
+}
+
+.home-section {
+  margin-top: 36px;
+  scroll-margin-top: 80px;
+}
+
+.home-section-head {
+  margin-bottom: 14px;
+}
+
+.home-section-kicker {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.home-section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3.6vw, 1.7rem);
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+/* the evidence: the review gets more room than the briefing */
+.evidence-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.evidence-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+}
+
+.home-card-label,
+.home-card-meta {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.home-card-label {
+  text-transform: uppercase;
+}
+
+.home-card-title,
+.home-card-title:visited {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.home-card-text {
+  margin: 0;
+  font-family: var(--font-read);
+  line-height: 1.55;
+}
+
+.home-card-link,
+.home-card-link:visited {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.home-card-link--quiet,
+.home-card-link--quiet:visited {
+  color: var(--muted);
+}
+
+.home-finding {
+  margin: 4px 0 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--accent);
+  background: rgb(var(--green-rgb) / 0.05);
+}
+
+.home-finding-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.home-finding p {
+  margin: 0;
+  font-family: var(--font-read);
+  line-height: 1.55;
+}
+
+.home-alerts {
+  margin: 0;
+}
+
+/* Member Creations: three cards, one picture, one sentence, one action */
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.showcase-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+}
+
+.showcase-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--bg-inner);
+}
+
+/* the screenshot fills the 4:3 box instead of setting its height */
+.showcase-art img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcase-art--jungle {
+  padding: 16px;
+  background:
+    linear-gradient(rgb(var(--surface-rgb) / 0.45), rgb(var(--surface-rgb) / 0.65)),
+    url("images/featured/junglecards-bg.jpg") center / cover;
+}
+
+.showcase-art .jc-card {
+  width: min(250px, 92%);
+  padding: 12px 14px;
+}
+
+.showcase-art .jc-cloze {
+  margin: 6px 0;
+  font-size: 0.92rem;
+}
+
+.showcase-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 16px 18px 18px;
+}
+
+.showcase-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--text);
+}
+
+.showcase-text {
+  margin: 0 0 4px;
+  font-family: var(--font-read);
+  line-height: 1.5;
+}
+
+.showcase-story,
+.showcase-story:visited {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.home-section-more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 14px 0 0;
+}
+
+.showcase-credit {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.showcase-credit a {
+  color: inherit;
+}
+
+/* membership: one focused section */
+.home-join {
+  padding: 28px 24px;
+  border: 1px solid var(--accent);
+  background: var(--panel);
+  text-align: center;
+}
+
+.home-join-text {
+  max-width: 62ch;
+  margin: 12px auto 18px;
+  font-family: var(--font-read);
+  line-height: 1.6;
+}
+
+.home-join-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-join-note {
+  max-width: 52ch;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.home-join-team {
+  margin: 18px 0 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .evidence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .showcase-grid {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-section {
+    margin-top: 28px;
+  }
+
+  .home-card,
+  .home-join {
+    padding: 18px 16px;
+  }
+}

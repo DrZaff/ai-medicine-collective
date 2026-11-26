@@ -178,6 +178,33 @@ def check_pages(problems: Problems, files: list[Path]) -> None:
                 problems.add("pages", f"{rel_page} does not load script.js (every page must)")
 
 
+def check_css(problems: Problems, files: list[Path]) -> None:
+    """Every { has its }. A rule left open makes the browser read the rest of
+    the file as part of it, so every later rule silently stops working (on
+    2026-11-21 an unclosed phone rule in modern.css switched off the Member
+    Creations page's light styles)."""
+    for path in files:
+        if path.suffix != ".css":
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, FileNotFoundError):
+            continue
+        text = re.sub(r"/\*.*?\*/", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S)
+        opened = []
+        for number, line in enumerate(text.splitlines(), 1):
+            for char in line:
+                if char == "{":
+                    opened.append(number)
+                elif char == "}":
+                    if not opened:
+                        problems.add("css", f"{path.relative_to(ROOT)} line {number}: a }} with no {{ before it")
+                        break
+                    opened.pop()
+        for number in opened:
+            problems.add("css", f"{path.relative_to(ROOT)} line {number}: this {{ is never closed")
+
+
 def check_secrets(problems: Problems, files: list[Path]) -> None:
     for path in files:
         if path.suffix not in SECRET_SCAN_SUFFIXES or path.name == "site_check.py":
@@ -198,11 +225,12 @@ def main() -> int:
     check_build(problems)
     js_checked = check_js(problems, files)
     check_pages(problems, files)
+    check_css(problems, files)
     check_secrets(problems, files)
 
     pages = sum(1 for f in files if f.suffix == ".html")
     print(f"Checked {pages} pages, JSON data, the blog build"
-          f"{', JavaScript syntax' if js_checked else ''} and a secret scan.")
+          f"{', JavaScript syntax' if js_checked else ''}, stylesheet braces and a secret scan.")
     if problems.items:
         print(f"\n{len(problems.items)} problem(s):")
         for item in problems.items:
