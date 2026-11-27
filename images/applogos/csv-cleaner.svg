@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="25%" cy="15%" r="120%">
+      <stop offset="0" stop-color="#0f5a48"/>
+      <stop offset="0.62" stop-color="#05261f"/>
+    </radialGradient>
+    <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ee7b7"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- faint rings, as on the Join emblem -->
+  <circle cx="256" cy="256" r="214" fill="none" stroke="#6ee7b7" stroke-opacity=".08" stroke-width="3"/>
+  <circle cx="256" cy="256" r="182" fill="none" stroke="#6ee7b7" stroke-opacity=".05" stroke-width="3"/>
+  <!-- the sheet -->
+  <rect x="96" y="118" width="262" height="276" rx="22" fill="#6ee7b7" fill-opacity=".12" stroke="#6ee7b7" stroke-width="16"/>
+  <path d="M96 196h262M96 270h262M96 344h262M186 118v276" stroke="#6ee7b7" stroke-width="12" stroke-linecap="round"/>
+  <!-- header row filled, a flagged cell, a tidied cell -->
+  <rect x="104" y="126" width="246" height="62" rx="14" fill="#6ee7b7" fill-opacity=".28"/>
+  <path d="M212 233h108" stroke="#06b6d4" stroke-width="14" stroke-linecap="round"/>
+  <path d="M212 307h64" stroke="#6ee7b7" stroke-opacity=".55" stroke-width="14" stroke-linecap="round"/>
+  <!-- the sparkle: cleaned -->
+  <path d="M378 232l17 46 46 17-46 17-17 46-17-46-46-17 46-17z" fill="url(#sweep)" stroke="#05261f" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M410 140v34M393 157h34" stroke="#06b6d4" stroke-width="11" stroke-linecap="round"/>
+</svg>
