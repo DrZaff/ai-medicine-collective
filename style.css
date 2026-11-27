@@ -6,7 +6,6 @@
    precedence for visited links.
    ============================================================= */
 
-
 /* === TOKENS ================================================== */
 
 :root {
@@ -74,7 +73,6 @@
   --ev-moderate: var(--cyan);
   --ev-limited: var(--muted);
 }
-
 
 /* === BASE ==================================================== */
 
@@ -267,7 +265,6 @@ legend,
 .roster-name,
 .chat-author,
 .ms-title,
-.home-list-title,
 .loading-label,
 .empty-state-title {
   color: var(--text);
@@ -314,7 +311,6 @@ textarea:focus-visible {
   }
 }
 
-
 /* The hidden attribute always wins. Without this, any rule that sets
    "display" (a menu link, a card) would show an element the page has hidden,
    such as JOIN once someone is signed in. */
@@ -345,7 +341,6 @@ textarea:focus-visible {
     display: none;
   }
 }
-
 
 /* === THEME SWITCH (both looks) =============================== */
 
@@ -405,7 +400,6 @@ html.theme-fading body {
   transition: opacity 0.18s ease-out;
 }
 
-
 /* The tabs inside a menu group (Evidence, Community): script.js adds them */
 .section-tabs {
   display: flex;
@@ -413,7 +407,6 @@ html.theme-fading body {
   gap: 8px;
   margin: 2px 0 14px;
 }
-
 
 /* === NAV ===================================================== */
 
@@ -599,7 +592,6 @@ html.theme-fading body {
   }
 }
 
-
 /* Members area links, added by script.js for signed-in, approved members */
 .members-bar {
   display: flex;
@@ -644,7 +636,6 @@ html.theme-fading body {
   border-color: var(--accent);
   background-color: rgb(var(--green-rgb) / 0.12);
 }
-
 
 /* === SECTIONS & TEXT ========================================= */
 
@@ -692,8 +683,6 @@ html.theme-fading body {
 .section li:not([class]),
 .section dd:not([class]),
 .hero-text,
-.home-panel-body p:not([class]),
-.home-panel-text,
 .tile-text,
 .project-desc,
 .hub-description,
@@ -738,7 +727,6 @@ html.theme-fading body {
   color: var(--error);
   font-size: 0.85rem;
 }
-
 
 /* === BUTTONS ================================================= */
 
@@ -790,7 +778,6 @@ button:hover {
   background-color: rgb(var(--yellow-rgb) / 0.12);
   box-shadow: 0 0 14px rgb(var(--yellow-rgb) / 0.55);
 }
-
 
 /* === FOOTER ================================================== */
 
@@ -898,7 +885,6 @@ button:hover {
 
 @keyframes blink { 50% { opacity: 0; } }
 
-
 /* === ANIMATION HELPERS ======================================= */
 
 .fade-in {
@@ -910,7 +896,6 @@ button:hover {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 
 /* === LOADING & EMPTY STATES ================================== */
 
@@ -967,7 +952,6 @@ button:hover {
 .empty-state .btn {
   margin-top: 14px;
 }
-
 
 /* === ACCOUNT & MODERATION (auth.js) ========================== */
 
@@ -1475,7 +1459,6 @@ button:hover {
   }
 }
 
-
 /* === PROJECTS HUB (hub.js) =================================== */
 
 .hub-toolbar {
@@ -1766,7 +1749,6 @@ button:hover {
   }
 }
 
-
 /* === MEMBER DIRECTORY & PROFILES (profiles.js) =============== */
 
 .directory-search {
@@ -1860,7 +1842,6 @@ div.roster-card:hover {
   font-size: 0.78rem;
   letter-spacing: 0.08em;
 }
-
 
 /* === TOOLS LAUNCHER (script.js initTools) ==================== */
 
@@ -1979,7 +1960,6 @@ div.roster-card:hover {
   color: var(--cyan);
 }
 
-
 /* === TOOL REQUESTS (requests.js) ============================= */
 
 .request-form {
@@ -2070,7 +2050,6 @@ div.roster-card:hover {
   border-color: rgb(var(--error-rgb) / 0.5);
   color: var(--error);
 }
-
 
 /* === CORE PATH, CITATIONS, GETTING STARTED =================== */
 
@@ -2228,7 +2207,6 @@ button.onboard-hide {
     padding: 10px;
   }
 }
-
 
 /* === CHAT (chat.js) ========================================== */
 
@@ -2417,7 +2395,6 @@ button.onboard-hide {
   display: none;
 }
 
-
 /* === LANDING PAGE ============================================ */
 
 .hero {
@@ -2558,46 +2535,9 @@ button.onboard-hide {
   color: var(--muted);
 }
 
-.home-panels {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 24px;
-}
-
-.home-panel {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-top: 2px solid var(--accent);
-  background: var(--panel);
-  transition: 0.15s ease-out;
-}
-
-.home-panel:hover {
-  border-color: var(--accent);
-  box-shadow: var(--glow);
-}
-
 /* A grid of unequal cards: the AI vs Physician paper is the large one with
    the latest briefing beside it, the tools and the games share the next
    row, and the team closes the page across the full width. */
-.home-panel--review {
-  grid-column: span 2;
-}
-
-.home-panel--members {
-  grid-column: 1 / -1;
-}
-
-.home-panel--members {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  align-items: center;
-  gap: 18px 28px;
-}
 
 .team-headline {
   margin: 4px 0 8px;
@@ -2668,12 +2608,6 @@ button.onboard-hide {
   color: var(--muted);
 }
 
-@media (max-width: 900px) {
-  .home-panel--members {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 600px) {
   .team-grid,
   .section .team-grid {
@@ -2682,34 +2616,9 @@ button.onboard-hide {
 }
 
 /* the tools card's headline figure */
-.home-stat {
-  margin: 0 0 6px;
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: var(--text);
-}
-
-.home-stat span {
-  font-size: 1.8rem;
-}
-
-.home-panel--hub {
-  grid-column: span 2;
-}
 
 /* Featured creation: one thing a member built, between the hero and the
    cards. Copy on the left, a drawing of the thing on the right. */
-.home-featured {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 24px;
-  margin-top: 24px;
-  padding: 20px;
-  border: 1px solid var(--line);
-  border-top: 2px solid var(--accent);
-  background: var(--panel);
-}
 
 .featured-kicker {
   margin: 0 0 6px;
@@ -2864,21 +2773,8 @@ button.onboard-hide {
   text-transform: uppercase;
 }
 
-@media (max-width: 720px) {
-  .home-featured {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* The closing band: "Let's create together", what members get, and Join
    (signed-out visitors only: data-signed-out-only) */
-.home-closing {
-  margin-top: 24px;
-  padding: 24px;
-  border: 1px solid var(--accent);
-  background: var(--panel);
-  text-align: center;
-}
 
 .closing-kicker {
   margin: 0 0 6px;
@@ -2920,12 +2816,6 @@ button.onboard-hide {
   margin: 0;
 }
 
-@media (max-width: 480px) {
-  .home-closing {
-    padding: 18px 14px;
-  }
-}
-
 /* A second featured creation shown with a gameplay screenshot */
 .featured-visual--shot {
   padding: 20px;
@@ -2946,146 +2836,6 @@ button.onboard-hide {
 /* Featured creations with their interview scrolling beside the picture
    (initInterviewReels in script.js). The flipped one puts the picture
    on the left. */
-.home-featured--reel {
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  align-items: stretch;
-}
-
-.home-featured--flip {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-}
-
-.home-featured--reel .featured-copy {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.home-featured--reel .featured-kicker {
-  align-self: flex-start;
-}
-
-.home-featured--reel .featured-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.home-featured--reel .featured-actions .btn + .btn {
-  margin-left: 0;
-}
-
-.interview-reel {
-  position: relative;
-  height: clamp(380px, 58vh, 540px);
-  margin: 4px 0 10px;
-  padding: 6px 14px 0 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scroll-behavior: auto;
-  scrollbar-width: thin;
-  border-top: 1px var(--rule-style) var(--line-strong);
-  border-bottom: 1px var(--rule-style) var(--line-strong);
-  /* fade the text in at the top edge and out at the bottom */
-  -webkit-mask-image: linear-gradient(transparent, currentColor 36px, currentColor calc(100% - 56px), transparent);
-  mask-image: linear-gradient(transparent, currentColor 36px, currentColor calc(100% - 56px), transparent);
-}
-
-.interview-reel:focus-visible {
-  outline-offset: 4px;
-}
-
-.reel-track {
-  padding: 30px 0 64px;
-  font-family: var(--font-read);
-  line-height: 1.65;
-}
-
-.reel-track .qa-q,
-.reel-track .qa-a p {
-  max-width: none;
-}
-
-.reel-track .pull-quote {
-  margin: 22px 0;
-}
-
-.reel-end {
-  margin: 8px 0 0;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.reel-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 14px;
-}
-
-.reel-controls[hidden] {
-  display: none;
-}
-
-.reel-toggle,
-.reel-restart {
-  min-height: 32px;
-  padding: 4px 12px;
-  border: 1px solid var(--line-strong);
-  background: transparent;
-  font: inherit;
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.reel-toggle:hover,
-.reel-restart:hover {
-  border-color: var(--accent);
-  box-shadow: var(--glow);
-}
-
-.reel-progress {
-  flex: 1;
-  min-width: 80px;
-  height: 3px;
-  background: var(--line);
-}
-
-.reel-progress span {
-  display: block;
-  width: 0;
-  height: 100%;
-  background: var(--accent);
-}
-
-.home-featured--reel .featured-visual {
-  min-height: 100%;
-}
-
-@media (max-width: 720px) {
-  .home-featured--reel,
-  .home-featured--flip {
-    grid-template-columns: 1fr;
-  }
-
-  /* on phones the picture comes first, then the interview */
-  .home-featured--reel .featured-visual {
-    order: -1;
-    min-height: 240px;
-  }
-
-  .interview-reel {
-    height: min(62vh, 440px);
-  }
-
-  .reel-controls button {
-    font-size: 1rem;
-  }
-}
 
 /* === INTERVIEWS ===
    features/*.html: a Q&A with the person who built a creation.
@@ -3134,16 +2884,11 @@ button.onboard-hide {
   color: inherit;
 }
 
-.interview-intro,
 .qa-q,
 .qa-a p {
   max-width: 72ch;
   font-family: var(--font-read);
   line-height: 1.65;
-}
-
-.interview-intro {
-  margin: 0 0 24px;
 }
 
 .qa {
@@ -3219,18 +2964,6 @@ button.onboard-hide {
 
 .game-interviews {
   margin-top: 28px;
-}
-
-.home-findings {
-  margin: 10px 0 0;
-  padding-left: 20px;
-  font-family: var(--font-read);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.home-findings li {
-  margin-bottom: 6px;
 }
 
 .bento-apps,
@@ -3380,123 +3113,9 @@ a.verdict-dot:focus-visible {
   filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(2.4) brightness(0.9);
 }
 
-.home-panel-title {
-  margin: 0 0 10px;
-  font-size: 0.85rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.home-panel-body {
-  flex: 1;
-  font-size: 1rem;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-.home-panel-body p {
-  margin: 0 0 8px;
-}
-
-.home-headline {
-  display: block;
-  margin-bottom: 8px;
-  line-height: 1.35;
-}
-
-.home-panel-text {
-  margin-top: 8px;
-  font-size: 0.95rem;
-  color: var(--body);
-}
-
 /* The home page's Games card: icon, name and kind for each game */
-.home-games,
-.section .home-games {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.home-games li {
-  margin: 0;
-}
 
 /* in the card on the home page: two by two */
-.home-panel--hub .home-games {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.home-game,
-.home-game:visited {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: var(--text);
-  text-decoration: none;
-}
-
-.home-game .game-icon {
-  width: 52px;
-  height: 52px;
-}
-
-.home-game:hover .game-icon {
-  transform: rotate(-4deg) scale(1.05);
-}
-
-.home-game-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.home-game-title {
-  font-family: var(--font-display);
-  font-weight: bold;
-  letter-spacing: 0.04em;
-}
-
-.home-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.home-list li {
-  padding: 6px 0;
-}
-
-.home-list li + li {
-  border-top: 1px var(--rule-style) var(--line);
-}
-
-.home-list-title {
-  display: block;
-}
-
-.home-list-meta {
-  display: block;
-  margin: 0;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.home-panel-link {
-  margin-top: 12px;
-  font-size: 0.85rem;
-  letter-spacing: 0.1em;
-}
-
-.home-explore {
-  margin-top: 26px;
-}
 
 .tile-grid {
   display: grid;
@@ -3551,15 +3170,6 @@ a.verdict-dot:focus-visible {
 }
 
 @media (max-width: 720px) {
-  .home-panels {
-    grid-template-columns: 1fr;
-  }
-
-  .home-panel--review,
-  .home-panel--hub {
-    grid-column: auto;
-    grid-row: auto;
-  }
 
   .tile-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3584,7 +3194,6 @@ a.verdict-dot:focus-visible {
     letter-spacing: 0.02em;
   }
 }
-
 
 /* === PROJECTS PAGE =========================================== */
 
@@ -3690,7 +3299,6 @@ a.verdict-dot:focus-visible {
   color: var(--yellow);
   border-color: var(--yellow);
 }
-
 
 /* === MEMBERS PAGE: ROSTER ==================================== */
 
@@ -3863,7 +3471,6 @@ a.verdict-dot:focus-visible {
   .roster-meta { font-size: 0.75rem; }
 }
 
-
 /* === MEMBER PROFILE ========================================== */
 
 .profile-layout {
@@ -3995,7 +3602,6 @@ a.verdict-dot:focus-visible {
     max-width: 100%;
   }
 }
-
 
 /* === RESOURCES PAGE ========================================== */
 
@@ -4229,12 +3835,10 @@ a.verdict-dot:focus-visible {
   background: rgb(var(--green-rgb) / 0.15);
 }
 
-
 .join-input::placeholder {
   color: var(--muted);
   opacity: 0.8;
 }
-
 
 /* === LINKS (keep after NAV and LANDING PAGE) ================= */
 
@@ -4277,7 +3881,6 @@ a:active {
   text-decoration: underline;
   text-shadow: 0 0 6px rgba(255, 106, 213, 0.9);
 }
-
 
 /* === JOIN SECTION + SHARED FORM FIELDS ======================= */
 /* The .join-row/.join-label/.join-input/.interest-chip/.join-submit styles
@@ -4608,7 +4211,6 @@ textarea.join-input {
   }
 }
 
-
 /* === BLOG ==================================================== */
 
 .blog-status {
@@ -4915,7 +4517,6 @@ textarea.join-input {
   }
 }
 
-
 /* === MEETING POLL (meetings.js) ============================== */
 
 .meeting-confirmed {
@@ -5024,7 +4625,6 @@ button.meeting-undo {
   }
 }
 
-
 /* === MEETING SCHEDULE ======================================== */
 
 .ms-section {
@@ -5128,7 +4728,6 @@ button.meeting-undo {
     gap: 6px 18px;
   }
 }
-
 
 /* === APP STORE =============================================== */
 
@@ -5260,7 +4859,6 @@ button.meeting-undo {
   }
 }
 
-
 /* === iOS FOCUS ZOOM FIX (keep after BUTTONS) ================= */
 
 @media (max-width: 600px) {
@@ -5272,7 +4870,6 @@ button.meeting-undo {
     -webkit-text-size-adjust: 100%;
   }
 }
-
 
 /* === ABOUT PAGE – GUIDE AVATAR =============================== */
 
@@ -5385,7 +4982,6 @@ button.meeting-undo {
     flex: 1 1 auto;
   }
 }
-
 
 /* === AI VS PHYSICIAN: THE LIVING REVIEW ========================== */
 
@@ -5924,7 +5520,6 @@ button.meeting-undo {
   }
 }
 
-
 /* === FAQ PAGE (faq.html, faq.js) ============================== */
 
 .faq-tools {
@@ -6068,7 +5663,6 @@ button.meeting-undo {
   margin-top: 24px;
 }
 
-
 /* === TOOLS PAGE: ONE CARD PER TOOL ============================ */
 
 .toolbox-card {
@@ -6142,7 +5736,6 @@ button.meeting-undo {
 .toolbox-recent .note {
   margin: 0;
 }
-
 
 /* === MEMBER CREATIONS: BY INTEREST, WITH PREVIEWS ============ */
 /* hub.html, drawn by hub.js (creationsHero, creationsNodes, creationCard) */
@@ -6475,68 +6068,7 @@ button.meeting-undo {
   }
 }
 
-
 /* === HOME PAGE: THREE WAYS IN ================================ */
-
-.home-doors {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 30px;
-  text-align: left;
-}
-
-.home-door {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-  padding: 16px;
-  border: 1px solid var(--line-strong);
-  background: var(--panel);
-}
-
-.home-door[hidden] {
-  display: none;
-}
-
-.home-door-step {
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  color: var(--accent);
-}
-
-.home-door-title,
-.home-door-title:visited {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: bold;
-  line-height: 1.2;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text);
-}
-
-.home-door-text {
-  flex: 1;
-  margin: 0 0 4px;
-  font-family: var(--font-read);
-  font-size: 0.98rem;
-  line-height: 1.5;
-  color: var(--body);
-}
-
-.home-door-link {
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-@media (max-width: 720px) {
-  .home-doors {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* What a head-to-head study compared, beside its verdict */
 .blog-compare {
@@ -6552,7 +6084,6 @@ button.meeting-undo {
     animation: none;
   }
 }
-
 
 /* === GAMES PAGE ============================================== */
 
@@ -6683,7 +6214,6 @@ button.meeting-undo {
   }
 }
 
-
 /* === OUR VISION (a pop-up; script.js: initVision) ============ */
 
 .vision-dialog {
@@ -6782,14 +6312,6 @@ button.meeting-undo {
 }
 
 /* the home page's briefing card: the three briefings before the latest */
-.home-earlier-label {
-  margin: 18px 0 4px;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
 
 /* === COURSES (course-*.html, course.js) ======================
    A members' course: a header with progress, one fold per lesson, a
@@ -7154,7 +6676,6 @@ button.meeting-undo {
     padding: 12px;
   }
 }
-
 
 /* === REPORTING CONTENT (auth.js: reportButton; migration 022) =========
    A quiet "Report" link under content written by someone else, opening a
