@@ -38,8 +38,10 @@
         "patients using AI chatbots",
         "Dr Google ChatGPT"
       ],
-      "status": "open",
-      "added": "2026-11-11"
+      "status": "answered",
+      "added": "2026-11-11",
+      "answered_id": "is-it-safe-for-patients-to-use-chatgpt-for-medical-advice",
+      "answered": "2026-11-23"
     },
     {
       "question": "Does AI work equally well for patients of every skin tone, sex and background?",

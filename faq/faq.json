@@ -1,6 +1,6 @@
 {
   "_about": "Frequently asked questions about AI in medicine, shown on faq.html (faq.js) and built into the page as static HTML and FAQPage data at deploy time (scripts/seo/build_seo.py). Answers are plain text; [1] marks cite the item's sources in order. The FAQ agent (scripts/blog_agent/faq_agent.py) proposes one new item every other day and the monthly audit (faq_audit.py) proposes refreshes, both by pull request: merging publishes. Every number in an answer must appear in a cited source.",
-  "updated": "2026-11-19",
+  "updated": "2026-11-23",
   "categories": [
     {
       "id": "general",
@@ -1103,6 +1103,35 @@
       ],
       "added": "2026-11-19",
       "updated": "2026-11-19"
+    },
+    {
+      "id": "is-it-safe-for-patients-to-use-chatgpt-for-medical-advice",
+      "category": "general",
+      "question": "Is it safe for patients to use ChatGPT for medical advice?",
+      "answer": "Not on its own. Chatbots can give useful background information, but studies show they do not reliably help people judge what is wrong or how urgently to get care, so they should not replace a clinician, especially for possible emergencies. In a randomized, preregistered study of 1,298 UK adults working through ten medical scenarios, the chatbots tested on their own identified relevant conditions in 94.9% of cases. Participants who used the same chatbots identified relevant conditions in fewer than 34.5% of cases and chose the right course of action in fewer than 44.2%, both no better than a control group using sources of their choice [1]. In a structured test of OpenAI's consumer ChatGPT Health using 60 clinician-authored vignettes (960 responses), the tool undertriaged 52% of gold-standard emergencies. When family or friends minimized symptoms, its recommendations shifted significantly in edge cases, with the majority of shifts toward less urgent care [2]. Both studies used simulated scenarios, not real patients. Chatbots can help patients prepare questions, but severe or worsening symptoms need in-person care. This is general information, not personal medical advice.",
+      "sources": [
+        {
+          "title": "Reliability of LLMs as medical assistants for the general public: a randomized preregistered study",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41663592/",
+          "source": "Nature Medicine",
+          "published": "2026-02-09"
+        },
+        {
+          "title": "ChatGPT Health performance in a structured test of triage recommendations",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41731097/",
+          "source": "Nature Medicine",
+          "published": "2026-05"
+        }
+      ],
+      "keywords": [
+        "ChatGPT medical advice safe",
+        "patients using AI chatbots",
+        "Dr Google ChatGPT",
+        "ChatGPT Health triage",
+        "AI symptom checker accuracy"
+      ],
+      "added": "2026-11-23",
+      "updated": "2026-11-23"
     }
   ]
 }
