@@ -50,8 +50,10 @@
         "algorithmic bias skin tone",
         "health equity AI"
       ],
-      "status": "open",
-      "added": "2026-11-11"
+      "status": "answered",
+      "added": "2026-11-11",
+      "answered_id": "does-medical-ai-work-equally-well-for-patients-of-every-skin-tone-sex",
+      "answered": "2026-11-25"
     },
     {
       "question": "Do AI-drafted replies to patient portal messages save physicians time?",
