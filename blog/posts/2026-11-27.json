@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-27",
+  "headline": "Students lean on AI to study, and an ECG app beats cardiologists on tricky heart attack tracings",
+  "intro": "Most first-year medical students now study with AI, but one in five rarely checks what it tells them. A small Swiss study shows why checking matters: on hard ECGs, an AI app caught every blocked artery but also raised false alarms.",
+  "items": [
+    {
+      "title": "How Medical Students Use AI for Learning: Cross-Sectional, Survey-Based Quality Improvement Evaluation",
+      "source": "JMIR Medical Education",
+      "url": "https://mededu.jmir.org/2026/1/e109763",
+      "published": "2026-11-26",
+      "category": "research",
+      "section": "med_ed",
+      "verdict": "not_applicable",
+      "summary": "After a neuroscience module, the Uniformed Services University School of Medicine surveyed its first-year medical students as a quality improvement project. Of 186 students, 171 (91.9%) said they used AI, mostly for exam preparation, content review, clarifying concepts and making practice questions. Most said AI made studying more efficient (88.9%) and helped them understand difficult concepts (86.5%). However, 21.6% rarely or never checked what the AI told them. The authors also compared exam results at the level of whole classes and describe this as exploratory: this class scored about the same as, or slightly better than, earlier classes.",
+      "why_it_matters": "AI use is now almost universal among early learners, so the practical gap is verification, not access. Educators can make checking AI output an explicit, assessed skill in the curriculum and in faculty development.",
+      "teaser": "91.9% of first-year med students used AI to study, but 1 in 5 rarely or never checked its answers."
+    },
+    {
+      "title": "Human vs Artificial Intelligence in Detecting Coronary Occlusions in ST-Elevation Myocardial Infarction: Retrospective Study",
+      "source": "JMIR Cardio",
+      "url": "https://cardio.jmir.org/2026/1/e88399",
+      "published": "2026-10-14",
+      "category": "research",
+      "section": "ai_vs_human",
+      "verdict": "ai_ahead",
+      "summary": "The task was to decide from a hard-to-read emergency department ECG whether a patient had an occlusion myocardial infarction (a blocked or nearly blocked coronary artery) that needed urgent angiography. The AI was PMCardio, a CE-marked smartphone and web app that reads ECG images, tested against 3 experienced interventional cardiologists who did not know the final diagnosis, on 33 ECGs; 13 of these turned out to be occlusions on angiography. Sensitivity was 100% for the AI versus 62%, 85% and 62% for the cardiologists, and the misclassification rate was 24% versus 33%, 36% and 42%; the AI's specificity of 60% fell within the cardiologists' range of 50% to 70%, and the authors report the AI did significantly better than the cardiologists' consensus diagnosis (P=.02). The main limitation is size and design: this was a retrospective study at a single centre with only 33 ECGs and 3 readers, all selected because they were hard to interpret.",
+      "why_it_matters": "Subtle occlusion MIs that don't meet STEMI criteria are a known blind spot, and this suggests AI ECG tools could serve as a safety net. But the AI's 60% specificity means false alarms, and a study of 33 ECGs cannot settle the question, so learners should treat it as a reason to sharpen their own OMI pattern recognition, not to hand over the decision.",
+      "teaser": "On 33 tricky ECGs, an AI app caught every blocked artery, while three interventional cardiologists caught 62–85%"
+    }
+  ],
+  "tags": [
+    "ai literacy",
+    "ai vs physician",
+    "cardiology",
+    "curriculum design",
+    "diagnostic accuracy",
+    "ecg",
+    "emergency medicine",
+    "generative ai",
+    "medical students",
+    "occlusion myocardial infarction",
+    "retrospective study",
+    "survey",
+    "undergraduate medical education",
+    "verification"
+  ],
+  "generated_by": "claude-opus-5-5"
+}
