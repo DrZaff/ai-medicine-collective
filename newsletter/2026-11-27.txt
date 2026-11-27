@@ -3,17 +3,21 @@ Weekly digest, Nov 21 - Nov 27, 2026
 
 [[AMC:NOTE]]
 // THE ONE THING
-Making AI a key physician tool in residency training
-Program directors are deciding whether to ban AI or teach it, and this is a concrete example of a health system that chose to teach it on purpose while keeping clinical reasoning first.
-https://www.ama-assn.org/medical-residents/residency-life/making-ai-key-physician-tool-residency-training
+How Medical Students Use AI for Learning: Cross-Sectional, Survey-Based Quality Improvement Evaluation
+AI use is now almost universal among early learners, so the practical gap is verification, not access. Educators can make checking AI output an explicit, assessed skill in the curriculum and in faculty development.
+https://mededu.jmir.org/2026/1/e109763
 
 // AI VS PHYSICIAN
-This week: Mixed results
-Evaluating Human and AI-Based Triage Performance in the Emergency Department: Real-World Cohort Study
-How AI compares with clinicians here depends on the task and on which clinician you compare it with. The models came close on urgency but lagged on specialty assignment, and the authors say they belong in a supporting, human-in-the-loop role. That is a useful case for teaching learners when to lean on an AI tool and when to override it.
-https://www.jmir.org/2026/1/e91442
+This week: AI outperformed physicians
+Human vs Artificial Intelligence in Detecting Coronary Occlusions in ST-Elevation Myocardial Infarction: Retrospective Study
+Subtle occlusion MIs that don't meet STEMI criteria are a known blind spot, and this suggests AI ECG tools could serve as a safety net. But the AI's 60% specificity means false alarms, and a study of 33 ECGs cannot settle the question, so learners should treat it as a reason to sharpen their own OMI pattern recognition, not to hand over the decision.
+https://cardio.jmir.org/2026/1/e88399
 
 // ALSO THIS WEEK
+> Making AI a key physician tool in residency training (American Medical Association (AMA))
+  https://www.ama-assn.org/medical-residents/residency-life/making-ai-key-physician-tool-residency-training
+> Evaluating Human and AI-Based Triage Performance in the Emergency Department: Real-World Cohort Study (Journal of Medical Internet Research)
+  https://www.jmir.org/2026/1/e91442
 > Effects of AI-assisted case discussion and virtual patient consultation on medical students' learning outcomes (BMC Medical Education)
   https://link.springer.com/article/10.1186/s12909-026-10901-8
 > Influence of artificial intelligence on the performance of endosonographers in detection of solid pancreatic tumors: a tandem randomized video study (Endoscopy)
