@@ -1,0 +1,37 @@
+:: AI MEDICINE COLLECTIVE ::
+Weekly digest, Nov 21 - Nov 27, 2026
+
+[[AMC:NOTE]]
+// THE ONE THING
+Making AI a key physician tool in residency training
+Program directors are deciding whether to ban AI or teach it, and this is a concrete example of a health system that chose to teach it on purpose while keeping clinical reasoning first.
+https://www.ama-assn.org/medical-residents/residency-life/making-ai-key-physician-tool-residency-training
+
+// AI VS PHYSICIAN
+This week: Mixed results
+Evaluating Human and AI-Based Triage Performance in the Emergency Department: Real-World Cohort Study
+How AI compares with clinicians here depends on the task and on which clinician you compare it with. The models came close on urgency but lagged on specialty assignment, and the authors say they belong in a supporting, human-in-the-loop role. That is a useful case for teaching learners when to lean on an AI tool and when to override it.
+https://www.jmir.org/2026/1/e91442
+
+// ALSO THIS WEEK
+> Effects of AI-assisted case discussion and virtual patient consultation on medical students' learning outcomes (BMC Medical Education)
+  https://link.springer.com/article/10.1186/s12909-026-10901-8
+> Influence of artificial intelligence on the performance of endosonographers in detection of solid pancreatic tumors: a tandem randomized video study (Endoscopy)
+  https://pubmed.ncbi.nlm.nih.gov/42617651/
+
+// TOOL OF THE WEEK
+Acid-Base Calculator
+Clinical micro-app for acid-base interpretation, built with ClinicalToolsDEV. Opens in the browser on phone or computer.
+https://www.aimedicinecollective.com/hub.html?project=d6b518f8-89ab-44fa-a6c1-00690319d01a
+
+// FROM THE COLLECTIVE
+[[AMC:COLLECTIVE]]
+
+// ONE ASK
+[[AMC:ASK]]Open one tool this week and tell its author what you think. https://www.aimedicinecollective.com/hub.html[[/AMC:ASK]]
+
+Every briefing: https://www.aimedicinecollective.com/blog.html
+Summaries are AI-drafted and reviewed by the Collective before publishing; always check the original source.
+
+On Instagram: @aimedicinecollective (https://www.instagram.com/aimedicinecollective/)
+You get this as a member. Reply to this email to reach us. To stop it, untick "Email me the weekly digest" under Your profile on your account page: https://www.aimedicinecollective.com/account.html#profile
