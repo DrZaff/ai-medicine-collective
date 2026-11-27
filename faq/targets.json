@@ -62,8 +62,10 @@
         "LLM drafted patient portal responses",
         "in-basket AI"
       ],
-      "status": "open",
-      "added": "2026-11-11"
+      "status": "answered",
+      "added": "2026-11-11",
+      "answered_id": "do-ai-drafted-replies-to-patient-portal-messages-save-physicians-time",
+      "answered": "2026-11-27"
     },
     {
       "question": "Can AI read ECGs better than cardiologists?",
