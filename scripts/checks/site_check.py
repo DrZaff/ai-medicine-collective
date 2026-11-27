@@ -14,7 +14,7 @@ Checks:
   3. Every JavaScript file passes a syntax check (needs Node; skipped without it).
   4. Every local link and asset in the HTML pages points to a file that exists,
      with the exact same upper/lower case (CLAUDE.md Rule 4).
-  5. Every page except the forwarding pages loads script.js (CLAUDE.md).
+  5. Every page except the forwarding pages and self-contained games/ and apps/ builds loads script.js (CLAUDE.md).
   6. No obvious secrets in tracked files (CLAUDE.md Rule 2).
 """
 
@@ -171,9 +171,9 @@ def check_pages(problems: Problems, files: list[Path]) -> None:
                 continue
             if not exists_exact_case(target):
                 problems.add("links", f"{rel_page}: '{ref}' does not exist (check the spelling and case)")
-        # games/ pages are self-contained builds, newsletter/ pages are email copies,
-        # and forwarding pages carry a meta refresh: none of them need script.js.
-        if rel_page.parts[0] not in {"games", "newsletter"} and not collector.refresh:
+        # games/ and apps/ pages are self-contained builds, newsletter/ pages are email
+        # copies, and forwarding pages carry a meta refresh: none of them need script.js.
+        if rel_page.parts[0] not in {"games", "apps", "newsletter"} and not collector.refresh:
             if not any(Path(urlsplit(s).path).name == "script.js" for s in collector.scripts):
                 problems.add("pages", f"{rel_page} does not load script.js (every page must)")
 

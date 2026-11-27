@@ -176,6 +176,8 @@ const SITE_CREATIONS = [
   },
   {
     title: "CSV Cleaner", href: "apps/csv-cleaner.html", group: "Research tools", art: "table",
+    image: "images/creations/csv-cleaner.webp", badge: "images/creations/logo-csv-cleaner.webp",
+    alt: "CSV Cleaner: a cleaned table with changed cells marked and missing values flagged",
     description: "Clean a CSV or Excel export in one click: duplicates, extra spaces, capitalization, dates and your own rules, with every change listed and missing values flagged, never filled in. Files stay in your browser.",
   },
 ];
@@ -593,7 +595,9 @@ function initHubPage() {
       play: entry.href,
       playLabel: "> OPEN",
       sort: "On this site · phone or computer",
-      image: null,
+      image: entry.image || null,
+      alt: entry.alt || "",
+      badge: entry.badge || null,
       art: entry.art,
     };
   }
