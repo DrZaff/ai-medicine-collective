@@ -174,6 +174,10 @@ const SITE_CREATIONS = [
     title: "Signature Card Studio", href: "signature-card-studio.html", group: "Other", art: "document",
     description: "Design and download a business card in your browser.",
   },
+  {
+    title: "CSV Cleaner", href: "apps/csv-cleaner.html", group: "Research tools", art: "table",
+    description: "Clean a CSV or Excel export in one click: duplicates, extra spaces, capitalization, dates and your own rules, with every change listed and missing values flagged, never filled in. Files stay in your browser.",
+  },
 ];
 
 let creationsUpgradeCheck = null;
@@ -465,6 +469,9 @@ function initHubPage() {
       '<path class="b" d="M52 6v8M48 10h8M12 48v8M8 52h8" stroke-width="2.5"/>',
     game: '<path class="a soft" d="M18 20h28c7 0 12 6 13 14l2 12c1 6-6 9-10 4l-6-7H19l-6 7c-4 5-11 2-10-4l2-12c1-8 6-14 13-14z" stroke-width="3"/>' +
       '<path class="b" d="M20 27v10M15 32h10" stroke-width="3"/><circle class="fa" cx="42" cy="29" r="2.5"/><circle class="fa" cx="48" cy="35" r="2.5"/>',
+    table: '<rect class="a soft" x="6" y="14" width="40" height="42" rx="4" stroke-width="3"/>' +
+      '<path class="a" d="M6 26h40M6 37h40M6 48h40M19 14v42" stroke-width="2.5"/>' +
+      '<path class="b" d="M51 28l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" stroke-width="2.5"/><path class="b" d="M55 8v8M51 12h8" stroke-width="2.5"/>',
     globe: '<circle class="a soft" cx="32" cy="32" r="24" stroke-width="3"/>' +
       '<path class="b" d="M8 32h48M32 8c-8 8-8 40 0 48M32 8c8 8 8 40 0 48" stroke-width="2.5"/>',
   };
@@ -477,6 +484,7 @@ function initHubPage() {
     [/heart|cardi|\becg\b|\bekg\b|\bqtc?\b/, "heart"],
     [/writ|statement|summar|\bnote|letter|discharge|document/, "document"],
     [/meeting|\bchat\b|assistant|tutor|coach/, "chat"],
+    [/\bcsv\b|spreadsheet|excel|data clean/, "table"],
     [/research|evidence|literature|paper|search/, "research"],
     [/educat|learn|teach|study|board|exam|curricul/, "education"],
     [/reflect|introspect|wellness|well-being|wellbeing|mindful|alignment/, "spark"],
