@@ -1,6 +1,6 @@
 {
   "_about": "Frequently asked questions about AI in medicine, shown on faq.html (faq.js) and built into the page as static HTML and FAQPage data at deploy time (scripts/seo/build_seo.py). Answers are plain text; [1] marks cite the item's sources in order. The FAQ agent (scripts/blog_agent/faq_agent.py) proposes one new item every other day and the monthly audit (faq_audit.py) proposes refreshes, both by pull request: merging publishes. Every number in an answer must appear in a cited source.",
-  "updated": "2026-11-19",
+  "updated": "2026-11-27",
   "categories": [
     {
       "id": "general",
@@ -1103,6 +1103,35 @@
       ],
       "added": "2026-11-19",
       "updated": "2026-11-19"
+    },
+    {
+      "id": "do-ai-drafted-replies-to-patient-portal-messages-save-physicians-time",
+      "category": "general",
+      "question": "Do AI-drafted replies to patient portal messages save physicians time?",
+      "answer": "On current evidence, not reliably: AI-drafted replies to patient portal messages may ease clinicians' sense of burden, but measured time savings have been absent or limited to some messages. In a 5-week Stanford quality-improvement study of 162 clinicians, the mean draft utilization rate was 20%. Burden and burnout scores fell significantly, but there was no significant change in reply, read or write time [1]. In a 1-year observational study of 10 786 patient messages at a Dutch tertiary academic hospital, drafts were used for 42% of messages. Replies that kept a substantial part of the draft had a shorter median total handling time (140 s) than replies started blank (155 s), but replies that kept little of the draft took longer (175 s). These differences were described, not tested for significance [2]. In its clinician survey, 51% of respondents reported no perceived time savings [2]. Both studies are observational or quality-improvement designs, not randomized trials. Drafts may ease burden but are not a proven time saver, and each still needs clinician review.",
+      "sources": [
+        {
+          "title": "Artificial Intelligence-Generated Draft Replies to Patient Inbox Messages",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38506805/",
+          "source": "JAMA Network Open",
+          "published": "2024-03-20"
+        },
+        {
+          "title": "Implementation and use of EHR-integrated large language model-generated draft responses in patient portal messaging: a 1-year prospective observational study in a tertiary hospital",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42963099/",
+          "source": "BMJ Open",
+          "published": "2026"
+        }
+      ],
+      "keywords": [
+        "AI inbox replies patient messages",
+        "LLM drafted patient portal responses",
+        "in-basket AI",
+        "Epic AI draft replies time savings",
+        "AI patient message burnout"
+      ],
+      "added": "2026-11-27",
+      "updated": "2026-11-27"
     }
   ]
 }
