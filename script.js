@@ -894,7 +894,7 @@ document.addEventListener("DOMContentLoaded", initRosterFilter);
 // AI draft, so everything is inserted as text, never as HTML.
 // "Report an error" under each briefing and the AI vs Physician paper: an
 // email to the editors naming what is wrong, and the corrections policy
-const CORRECTIONS_EMAIL = "zaffutbn@ucmail.uc.edu";
+const CORRECTIONS_EMAIL = "contact@aimedicinecollective.com";
 
 function errorReportNote(what) {
   const note = document.createElement("p");

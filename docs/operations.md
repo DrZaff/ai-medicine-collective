@@ -20,7 +20,7 @@ owner is unavailable.
 |---|---|---|---|---|
 | **GitHub** (`DrZaff/ai-medicine-collective`) | The site's code, every automation (blog drafts, digest, Instagram, backups), and all GitHub secrets | Nothing new can be published, and the automations stop | DrZaff | |
 | **Netlify** (site `ai-medicine-collective`) | Hosting, deploy previews, security headers | The site goes offline | | |
-| **Porkbun** | Owns `aimedicinecollective.com` and its DNS, including the records Resend needs | The address stops working, and email stops if DNS lapses | | |
+| **Porkbun** | Owns `aimedicinecollective.com` and its DNS, including the records Resend needs, and the email forward `contact@aimedicinecollective.com` (the site's public address) to the owner's inbox | The address stops working, and email stops if DNS lapses | | |
 | **Supabase** (project `ahwnarhmuzxgjindreuz`) | Accounts, sign-in, every members' table, uploaded files, the timetable (`pg_cron`), Vault secrets | All member features stop. Nothing can be recovered without a backup | | |
 | **Google Cloud** (OAuth client) | "Sign in with Google" | Google sign-in stops (email and password sign-in still works) | | |
 | **Resend** | All email: sign-in codes, inbox alerts, meeting confirmations, the digest, action emails | No sign-in codes, so password sign-ups and resets stop | | |
